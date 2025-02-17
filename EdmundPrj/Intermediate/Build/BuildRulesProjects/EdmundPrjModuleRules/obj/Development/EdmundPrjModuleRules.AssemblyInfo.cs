@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EdmundPrjModuleRules")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Development")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+177d5f74353c800aa0e7917a9d502ea05492092f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e875c7066fbe14872de98ac4d693ed850e99d3ab")]
 [assembly: System.Reflection.AssemblyProductAttribute("EdmundPrjModuleRules")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EdmundPrjModuleRules")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

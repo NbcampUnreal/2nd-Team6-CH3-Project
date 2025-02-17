@@ -195,6 +195,9 @@
     <ClCompile Include="..\..\Source\EdmundPrj\Private\UI\BaseWidget.cpp">
       <Filter>Source\EdmundPrj\Private\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\EdmundPrj\Private\UI\TitleWidget.cpp">
+      <Filter>Source\EdmundPrj\Private\UI</Filter>
+    </ClCompile>
     <Filter Include="Source\EdmundPrj\Public">
       <UniqueIdentifier>{61F474B9-4C11-349A-B8C4-2DFD7F381D00}</UniqueIdentifier>
     </Filter>
@@ -229,6 +232,9 @@
       <UniqueIdentifier>{33B10C9E-3251-3C76-A212-386FB8F2D67F}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="..\..\Source\EdmundPrj\Public\UI\BaseWidget.h">
+      <Filter>Source\EdmundPrj\Public\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\EdmundPrj\Public\UI\TitleWidget.h">
       <Filter>Source\EdmundPrj\Public\UI</Filter>
     </ClInclude>
   </ItemGroup>
