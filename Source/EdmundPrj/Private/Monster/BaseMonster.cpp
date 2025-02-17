@@ -4,6 +4,8 @@
 #include "Monster/BaseMonster.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/ProgressBar.h"
 
 // Sets default values
 ABaseMonster::ABaseMonster()
@@ -13,6 +15,12 @@ ABaseMonster::ABaseMonster()
 
 	MonsterAttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("AttackRange"));
 	MonsterAttackRange->SetupAttachment(RootComponent); // 공격 범위 콜리전
+
+	USkeletalMeshComponent* MeshComp = GetMesh();
+
+	MonsterOverHeadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("MonsterOverHeadWidget"));
+	MonsterOverHeadWidget->SetupAttachment(MeshComp);
+	MonsterOverHeadWidget->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -20,6 +28,9 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
+
+	// OverHeadWidget 업데이트
+	UpdateMonsterOverHeadWidget();
 
 	if (MonsterHP <= 0)
 	{
@@ -67,3 +78,19 @@ void ABaseMonster::DropReward()
 		//바닥에 Healkit이 떨어짐
 	}
 }
+
+void ABaseMonster::UpdateMonsterOverHeadWidget()
+{
+	if (!MonsterOverHeadWidget) return;
+
+	UUserWidget* MonsterOverHeadWidgetInstance = MonsterOverHeadWidget->GetUserWidgetObject();
+
+	if (!MonsterOverHeadWidgetInstance) return;
+
+	if (UProgressBar* HPBar = Cast<UProgressBar>(MonsterOverHeadWidgetInstance->GetWidgetFromName(TEXT("HealthBar"))))
+	{
+		float HealthPercent = MonsterHP / MonsterMaxHP;
+		HPBar->SetPercent(HealthPercent);
+	}
+}
+

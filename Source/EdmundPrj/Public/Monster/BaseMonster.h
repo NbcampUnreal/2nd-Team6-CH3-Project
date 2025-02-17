@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "EnumMonsterState.h"
+#include "System/EnumSet.h"
 #include "BaseMonster.generated.h"
 
 class USphereComponent;
+class UWidgetComponent;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseMonster : public ACharacter
@@ -43,6 +44,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float MonsterAttackSpeed = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
+	FName MonsterType;	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
+	EMonsterState MonsterState;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
 	UParticleSystem* AttackParticle;
 
@@ -54,12 +61,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
 	USoundBase* TakeDamageSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	FName MonsterType;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
-	AEnumMonsterState* MonsterState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Animation")
 	UAnimMontage* AttackAnimation;
@@ -79,6 +80,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Item")
 	float MonsterGoldProbability = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|UI")
+	UWidgetComponent* MonsterOverHeadWidget;
+
 	virtual float TakeDamage(
 		float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
@@ -88,6 +92,8 @@ protected:
 	void MonsterDead();
 	void MonsterDestroy();
 	void DropReward();
+	// 아직 UI가 없음. MonsterOverHeadWidget 만들 때, 체력바 이름을 HealthBar로 할 것
+	void UpdateMonsterOverHeadWidget();
 
 	FTimerHandle DeadAnimTimerHandle;
 };
