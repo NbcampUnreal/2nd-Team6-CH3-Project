@@ -159,5 +159,77 @@
     <ClInclude Include="..\..\Source\EdmundPrj\EdmundPrj.h">
       <Filter>Source\EdmundPrj</Filter>
     </ClInclude>
+    <Filter Include="Source\EdmundPrj\Private">
+      <UniqueIdentifier>{EADCFF2C-E673-386A-8EFD-DE923786B769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\EdmundPrj\Private\Monster">
+      <UniqueIdentifier>{3EA75FCE-E926-39B0-9D12-703007AA6B65}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\EdmundPrj\Private\Monster\BaseMonster.cpp">
+      <Filter>Source\EdmundPrj\Private\Monster</Filter>
+    </ClCompile>
+    <Filter Include="Source\EdmundPrj\Private\NPC">
+      <UniqueIdentifier>{A56E8FE2-171C-3A0E-A46C-B6EEE9D1776A}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\EdmundPrj\Private\NPC\BaseNPC.cpp">
+      <Filter>Source\EdmundPrj\Private\NPC</Filter>
+    </ClCompile>
+    <Filter Include="Source\EdmundPrj\Private\Player">
+      <UniqueIdentifier>{F881B700-4BAC-343C-8802-24C5D240F41F}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\EdmundPrj\Private\Player\BaseCharacterInterface.cpp">
+      <Filter>Source\EdmundPrj\Private\Player</Filter>
+    </ClCompile>
+    <Filter Include="Source\EdmundPrj\Private\System">
+      <UniqueIdentifier>{A5E2E120-D04A-318A-9838-D8E91C36F139}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\EdmundPrj\Private\System\EdmundGameMode.cpp">
+      <Filter>Source\EdmundPrj\Private\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\EdmundPrj\Private\System\EnumSet.cpp">
+      <Filter>Source\EdmundPrj\Private\System</Filter>
+    </ClCompile>
+    <Filter Include="Source\EdmundPrj\Private\UI">
+      <UniqueIdentifier>{BCE49FE8-F4B9-31C5-899E-B8988189FD65}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\EdmundPrj\Private\UI\BaseWidget.cpp">
+      <Filter>Source\EdmundPrj\Private\UI</Filter>
+    </ClCompile>
+    <Filter Include="Source\EdmundPrj\Public">
+      <UniqueIdentifier>{61F474B9-4C11-349A-B8C4-2DFD7F381D00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\EdmundPrj\Public\Monster">
+      <UniqueIdentifier>{D2F44510-25BC-396C-84CA-DF85A289A303}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\EdmundPrj\Public\Monster\BaseMonster.h">
+      <Filter>Source\EdmundPrj\Public\Monster</Filter>
+    </ClInclude>
+    <Filter Include="Source\EdmundPrj\Public\NPC">
+      <UniqueIdentifier>{96BC4121-B437-3A7C-8BAB-9F6BF3E08CA9}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\EdmundPrj\Public\NPC\BaseNPC.h">
+      <Filter>Source\EdmundPrj\Public\NPC</Filter>
+    </ClInclude>
+    <Filter Include="Source\EdmundPrj\Public\Player">
+      <UniqueIdentifier>{85D5DD3C-7C78-3BAD-8C93-5B88686F76B7}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\EdmundPrj\Public\Player\BaseCharacterInterface.h">
+      <Filter>Source\EdmundPrj\Public\Player</Filter>
+    </ClInclude>
+    <Filter Include="Source\EdmundPrj\Public\System">
+      <UniqueIdentifier>{332D1C6B-DC0C-3C19-A2E2-D78BB087EC22}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\EdmundPrj\Public\System\EdmundGameMode.h">
+      <Filter>Source\EdmundPrj\Public\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\EdmundPrj\Public\System\EnumSet.h">
+      <Filter>Source\EdmundPrj\Public\System</Filter>
+    </ClInclude>
+    <Filter Include="Source\EdmundPrj\Public\UI">
+      <UniqueIdentifier>{33B10C9E-3251-3C76-A212-386FB8F2D67F}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\EdmundPrj\Public\UI\BaseWidget.h">
+      <Filter>Source\EdmundPrj\Public\UI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

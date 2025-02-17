@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\jucho\\desktop\\unrealprj\\2nd-team6-ch3-project\\edmundprj\\source\\edmundprj\\edmundprj.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\jucho\\desktop\\unrealprj\\2nd-team6-ch3-project\\edmundprj\\intermediate\\build\\win64\\x64\\edmundprjeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "c:\\users\\jucho\\desktop\\unrealprj\\2nd-team6-ch3-project\\edmundprj\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\edmundprj\\definitions.edmundprj.h",
+            "c:\\users\\jucho\\desktop\\unrealprj\\2nd-team6-ch3-project\\edmundprj\\source\\edmundprj\\edmundprj.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
