@@ -1,0 +1,12 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-EdmundPrj.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Users\jucho\Desktop\UnrealPrj\EdmundPrj\Intermediate\Build\Win64\x64\EdmundPrjEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.obj"
+"C:\Users\jucho\Desktop\UnrealPrj\EdmundPrj\Intermediate\Build\Win64\x64\UnrealEditor\Development\EdmundPrj\EdmundPrj.cpp.obj"
+"C:\Users\jucho\Desktop\UnrealPrj\EdmundPrj\Intermediate\Build\Win64\x64\UnrealEditor\Development\EdmundPrj\Default.rc2.res"
+/OUT:"C:\Users\jucho\Desktop\UnrealPrj\EdmundPrj\Intermediate\Build\Win64\x64\UnrealEditor\Development\EdmundPrj\UnrealEditor-EdmundPrj.lib"
