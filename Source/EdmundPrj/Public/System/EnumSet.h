@@ -6,9 +6,81 @@
 #include "UObject/NoExportTypes.h"
 #include "EnumSet.generated.h"
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class ESceneName : uint8
+{
+	Title = 0,
+	Main,
+	Mission1,
+	Mission2,
+	Mission3,
+	Infinity,
+	Ending
+};
+
+UENUM(BlueprintType)
+enum class EWidgetName : uint8
+{
+	TitleWidget = 0,
+	MainWidget,
+	InGameWidget,
+	EndingWidget,
+	FadeWidget,
+	TextWidget,
+	OptionWidget,
+	ShopWidget,
+	ResultWidget,
+	CharacterListWidget,
+	SkillListWidget
+};
+
+UENUM(BlueprintType)
+enum class ESoundCategory : uint8
+{
+	BGM = 0,
+	UI,
+	Player,
+	Monster,
+	Item,
+	Etc
+};
+
+UENUM(BlueprintType)
+enum class ETableName : uint8
+{
+	PlayerSkill = 0,
+	ShopCatalog,
+	MissionItem
+};
+
+UENUM(BlueprintType)
+enum class ECharacterType : uint8
+{
+	Gunner = 0
+};
+
+UENUM(BlueprintType)
+enum class EPlayerState : uint8
+{
+	Idle = 0,
+	Move,
+	Reload,
+	Attack,
+	Hit,
+	Die
+};
+
+UENUM(BlueprintType)
+enum class EMonsterState : uint8
+{
+	Idle = 0,
+	Patrol,
+	Trace,
+	Attack,
+	Hit,
+	Die
+};
+
 UCLASS()
 class EDMUNDPRJ_API UEnumSet : public UObject
 {
