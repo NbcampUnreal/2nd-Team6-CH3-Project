@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jucho\\Desktop\\UnrealPrj\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\EdmundPrjModuleRules.csproj": {}
+    "C:\\Users\\jucho\\Desktop\\UnrealPrj\\2nd-Team6-CH3-Project\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\EdmundPrjModuleRules.csproj": {}
   },
   "projects": {
     "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Intermediate\\Build\\BuildRulesProjects\\UE5ProgramRules\\UE5ProgramRules.csproj": {
@@ -1118,14 +1118,14 @@
         }
       }
     },
-    "C:\\Users\\jucho\\Desktop\\UnrealPrj\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\EdmundPrjModuleRules.csproj": {
+    "C:\\Users\\jucho\\Desktop\\UnrealPrj\\2nd-Team6-CH3-Project\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\EdmundPrjModuleRules.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jucho\\Desktop\\UnrealPrj\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\EdmundPrjModuleRules.csproj",
+        "projectUniqueName": "C:\\Users\\jucho\\Desktop\\UnrealPrj\\2nd-Team6-CH3-Project\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\EdmundPrjModuleRules.csproj",
         "projectName": "EdmundPrjModuleRules",
-        "projectPath": "C:\\Users\\jucho\\Desktop\\UnrealPrj\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\EdmundPrjModuleRules.csproj",
+        "projectPath": "C:\\Users\\jucho\\Desktop\\UnrealPrj\\2nd-Team6-CH3-Project\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\EdmundPrjModuleRules.csproj",
         "packagesPath": "C:\\Users\\jucho\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jucho\\Desktop\\UnrealPrj\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\obj\\",
+        "outputPath": "C:\\Users\\jucho\\Desktop\\UnrealPrj\\2nd-Team6-CH3-Project\\EdmundPrj\\Intermediate\\Build\\BuildRulesProjects\\EdmundPrjModuleRules\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\..\..\..\..\..\..\..\..\Program Files\Epic Games\UE_5.4\Engine\Source\Programs\UnrealBuildTool\UnrealBuildTool.csproj"><Private>false</Private></ProjectReference>
   </ItemGroup>
   <ItemGroup>
+  <Compile Include="..\..\..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\GitSourceControl.Build.cs"><Link>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\GitSourceControl.Build.cs</Link></Compile>
   <Compile Include="..\..\..\..\Source\EdmundPrj.Target.cs"><Link>Source\EdmundPrj.Target.cs</Link></Compile>
   <Compile Include="..\..\..\..\Source\EdmundPrjEditor.Target.cs"><Link>Source\EdmundPrjEditor.Target.cs</Link></Compile>
   <Compile Include="..\..\..\..\Source\EdmundPrj\EdmundPrj.Build.cs"><Link>Source\EdmundPrj\EdmundPrj.Build.cs</Link></Compile>

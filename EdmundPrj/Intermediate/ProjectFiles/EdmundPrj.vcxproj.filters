@@ -18,6 +18,9 @@
     <None Include="..\..\Config\DefaultEditor.ini">
       <Filter>Config</Filter>
     </None>
+    <None Include="..\..\Config\DefaultEditorPerProjectUserSettings.ini">
+      <Filter>Config</Filter>
+    </None>
     <None Include="..\..\Config\DefaultEngine.ini">
       <Filter>Config</Filter>
     </None>
@@ -26,6 +29,123 @@
     </None>
     <None Include="..\..\Config\DefaultInput.ini">
       <Filter>Config</Filter>
+    </None>
+    <Filter Include="Plugins">
+      <UniqueIdentifier>{BB38096A-B391-30DC-A0D4-4F3EA6B44507}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\UEGitPlugin-3.16">
+      <UniqueIdentifier>{05A89678-C840-3542-B48D-173B2E0D5192}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\UEGitPlugin-3.16\Source">
+      <UniqueIdentifier>{3CB06C43-9822-3937-9D67-49F56B95E10A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\UEGitPlugin-3.16\Source\GitSourceControl">
+      <UniqueIdentifier>{E84DEB8A-AA50-3576-B27B-B7D0EBE0AB1E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\GitSourceControl.Build.cs">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl</Filter>
+    </None>
+    <Filter Include="Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private">
+      <UniqueIdentifier>{5B478451-F06F-387B-9C20-6D021B248F73}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitMessageLog.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlChangelist.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlChangelist.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlChangelistState.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlChangelistState.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlCommand.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlCommand.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlConsole.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlConsole.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlMenu.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlMenu.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlModule.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlModule.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlOperations.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlOperations.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlProvider.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlProvider.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlRevision.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlRevision.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlRunner.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlRunner.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlSettings.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlSettings.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlState.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlState.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlUtils.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\GitSourceControlUtils.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\IGitSourceControlWorker.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\SGitSourceControlSettings.cpp">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private\SGitSourceControlSettings.h">
+      <Filter>Plugins\UEGitPlugin-3.16\Source\GitSourceControl\Private</Filter>
+    </ClInclude>
+    <None Include="..\..\Plugins\UEGitPlugin-3.16\GitSourceControl.uplugin">
+      <Filter>Plugins\UEGitPlugin-3.16</Filter>
+    </None>
+    <Filter Include="Plugins\UEGitPlugin-3.16\Resources">
+      <UniqueIdentifier>{F7BD824C-30C2-3134-B537-0DE11A9BC350}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Plugins\UEGitPlugin-3.16\Resources\Icon128.png">
+      <Filter>Plugins\UEGitPlugin-3.16\Resources</Filter>
     </None>
     <Filter Include="Source\EdmundPrj">
       <UniqueIdentifier>{AD8375C1-23FB-3912-BAA9-0009F52F91A5}</UniqueIdentifier>
