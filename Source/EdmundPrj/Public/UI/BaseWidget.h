@@ -23,7 +23,27 @@ public:
 	virtual void InitWidget(UUIHandle* uiHandle);
 	virtual void Action();
 	virtual void Update();
+	virtual void PlayAddAnim();
+	virtual void PlayRemoveAnim();
+	
+protected:
+	UFUNCTION()
+	virtual void StartAddAnim();
+
+	UFUNCTION()
+	virtual void EndAddAnim();
+
+	UFUNCTION()
+	virtual void StartRemoveAnim();
+
+	UFUNCTION()
+	virtual void EndRemoveAnim();
 
 protected:
+	FWidgetAnimationDynamicEvent StartAddDelegate;
+	FWidgetAnimationDynamicEvent EndAddDelegate;
+	FWidgetAnimationDynamicEvent StartRemoveDelegate;
+	FWidgetAnimationDynamicEvent EndRemoveDelegate;
+
 	TObjectPtr<UUIHandle> UIHandle;
 };

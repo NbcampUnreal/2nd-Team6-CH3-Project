@@ -22,6 +22,8 @@ public:
 	void InitUIHandle(UEdmundGameInstance* NewGameInstance);
 	//BaseWidget Controll. Add or Remove to Viewport
 	void AddToViewportBySceneType(const ESceneType SceneType);
+	void AddToViewportByCoverType(const EWidgetType WidgetType);
+	void RemoveCoverFromViewport();
 
 	//Fade In / Out : Play Animation from FadeWidget
 	void FadeIn();
@@ -50,8 +52,13 @@ public:
 	// SkillListWidget Close or Open
 	void OpenSkillList();
 	void CloseSkillList();
+
+	// MissionListWidget Close or Open
+	void OpenMissionList();
+	void CloseMissionList();
 	
 	// UI Button Click Event
+	void ClickedCloseCoverWidget() const;
 	void ClickedMoveToTitle() const;
 	void ClickedMoveToMain() const;
 	void ClickedMoveToNext() const;
@@ -77,55 +84,87 @@ protected:
 protected:
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> TitleWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> MainWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> InGameWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> EndingWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> FadeWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> OptionWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> ShopWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> TextWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> ResultWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> CharacterListWidgetClass = nullptr;
+
 	UPROPERTY()
 	TSubclassOf<UBaseWidget> SkillListWidgetClass = nullptr;
 
 	UPROPERTY()
+	TSubclassOf<UBaseWidget> MissionListWidgetClass = nullptr;
+
+
+	UPROPERTY()
 	TObjectPtr<UBaseWidget> TitleWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> MainWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> InGameWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> EndingWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> FadeWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> OptionWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> ShopWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> TextWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> ResultWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> CharacterListWidget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> SkillListWidget = nullptr;
+
 	UPROPERTY()
-	TObjectPtr<UBaseWidget> BaseWidget = nullptr;
+	TObjectPtr<UBaseWidget> MissionListWidget = nullptr;
+
+
+	UPROPERTY()
+	TObjectPtr<UBaseWidget> CurrentBaseWidget = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UBaseWidget> CurrentCoverWidget = nullptr;
 
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 	TArray<TScriptInterface<IGameStateObserver>> UIObservers;
 	FTimerHandle TimerHandle;
 	int32 ViewCount = 0;
-	bool bPreCursorMode = false;
+	bool bBaseCursorMode = false;
 };

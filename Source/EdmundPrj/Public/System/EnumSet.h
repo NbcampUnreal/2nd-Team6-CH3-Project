@@ -31,7 +31,8 @@ enum class EWidgetType : uint8
 	ShopWidget,
 	ResultWidget,
 	CharacterListWidget,
-	SkillListWidget
+	SkillListWidget,
+	MissionListWidget
 };
 
 UENUM(BlueprintType)

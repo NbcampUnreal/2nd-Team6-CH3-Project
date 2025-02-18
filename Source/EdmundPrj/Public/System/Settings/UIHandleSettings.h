@@ -46,4 +46,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Config, Category = "WidgetClass")
 	TSubclassOf<UBaseWidget> SkillListWidgetClass = nullptr;
+
+	UPROPERTY(EditAnywhere, Config, Category = "WidgetClass")
+	TSubclassOf<UBaseWidget> MissionListWidgetClass = nullptr;
 };

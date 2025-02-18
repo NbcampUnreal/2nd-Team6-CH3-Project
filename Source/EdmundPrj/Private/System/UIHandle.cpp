@@ -27,42 +27,49 @@ void UUIHandle::InitUIHandle(UEdmundGameInstance* NewGameInstance)
 
 void UUIHandle::AddToViewportBySceneType(ESceneType SceneType)
 {
-	if (IsValid(BaseWidget))
+	if (IsValid(CurrentBaseWidget))
 	{
-		BaseWidget = nullptr;
-		--ViewCount;
+		RemoveWidgetFromViewport(CurrentBaseWidget);
+		CurrentBaseWidget = nullptr;
+		ViewCount = 0;
 	}
 
 	switch (SceneType)
 	{
 	case ESceneType::Title:
-		BaseWidget = TitleWidget;
+		CurrentBaseWidget = TitleWidget;
 		RequestChangeCursorMode(true, FInputModeUIOnly());
+		bBaseCursorMode = true;
 		break;
 
 	case ESceneType::Main:
-		BaseWidget = MainWidget;
+		CurrentBaseWidget = MainWidget;
 		RequestChangeCursorMode(true, FInputModeUIOnly());
+		bBaseCursorMode = true;
 		break;
 
 	case ESceneType::Mission1:
-		BaseWidget = InGameWidget;
+		CurrentBaseWidget = InGameWidget;
+		bBaseCursorMode = false;
 		RequestChangeCursorMode(false, FInputModeGameOnly());
 		break;
 
 	case ESceneType::Mission2:
-		BaseWidget = InGameWidget;
+		CurrentBaseWidget = InGameWidget;
+		bBaseCursorMode = false;
 		RequestChangeCursorMode(false, FInputModeGameOnly());
 		break;
 
 	case ESceneType::Mission3:
-		BaseWidget = InGameWidget;
+		CurrentBaseWidget = InGameWidget;
+		bBaseCursorMode = false;
 		RequestChangeCursorMode(false, FInputModeGameOnly());
 		break;
 
 	case ESceneType::Ending:
-		BaseWidget = EndingWidget;
+		CurrentBaseWidget = EndingWidget;
 		RequestChangeCursorMode(true, FInputModeUIOnly());
+		bBaseCursorMode = true;
 		break;
 
 	default:
@@ -70,7 +77,64 @@ void UUIHandle::AddToViewportBySceneType(ESceneType SceneType)
 		break;
 	}
 
-	AddWidgetToViewport(BaseWidget);
+	AddWidgetToViewport(CurrentBaseWidget);
+}
+
+void UUIHandle::AddToViewportByCoverType(const EWidgetType WidgetType)
+{
+	if (IsValid(CurrentCoverWidget))
+	{
+		CurrentCoverWidget->PlayRemoveAnim();
+		return;
+	}
+
+	switch (WidgetType)
+	{
+	case EWidgetType::OptionWidget:
+		CurrentCoverWidget = OptionWidget;
+		break;
+
+	case EWidgetType::ShopWidget:
+		CurrentCoverWidget = ShopWidget;
+		break;
+
+	case EWidgetType::ResultWidget:
+		CurrentCoverWidget = ResultWidget;
+		break;
+
+	case EWidgetType::TextWidget:
+		CurrentCoverWidget = TextWidget;
+		break;
+
+	case EWidgetType::CharacterListWidget:
+		CurrentCoverWidget = CharacterListWidget;
+		break;
+
+	case EWidgetType::SkillListWidget:
+		CurrentCoverWidget = SkillListWidget;
+		break;
+
+	case EWidgetType::MissionListWidget:
+		CurrentCoverWidget = MissionListWidget;
+		break;
+
+	default:
+		checkNoEntry();
+		break;
+	}
+
+	AddWidgetToViewport(CurrentCoverWidget);
+	CurrentCoverWidget->Action();
+	CurrentCoverWidget->PlayAddAnim();
+}
+
+void UUIHandle::RemoveCoverFromViewport()
+{
+	if (IsValid(CurrentCoverWidget))
+	{
+		RemoveWidgetFromViewport(CurrentCoverWidget);
+		CurrentCoverWidget = nullptr;
+	}
 }
 
 void UUIHandle::FadeIn()
@@ -92,12 +156,6 @@ void UUIHandle::FadeOut()
 
 	FadeWidget->AddToViewport(20);
 	FadeWidget->Action();
-
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()
-		{
-			RemoveWidgetFromViewport(FadeWidget);
-		}), 0.5f, false);
-
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
@@ -185,6 +243,26 @@ void UUIHandle::CloseSkillList()
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
+void UUIHandle::OpenMissionList()
+{
+	checkf(IsValid(MissionListWidget), TEXT("MissionListWidget is not valid"));
+	RemoveWidgetFromViewport(MissionListWidget);
+	RequestChangeCursorMode(true, FInputModeGameOnly());
+}
+
+void UUIHandle::CloseMissionList()
+{
+	checkf(IsValid(MissionListWidget), TEXT("SkillListWidget is not valid"));
+	RemoveWidgetFromViewport(MissionListWidget);
+	RequestChangeCursorMode(false, FInputModeGameOnly());
+}
+
+void UUIHandle::ClickedCloseCoverWidget() const
+{
+	checkf(IsValid(CurrentCoverWidget), TEXT("Current Cover Widget is not valid"));
+	CurrentCoverWidget->PlayRemoveAnim();
+}
+
 void UUIHandle::ClickedMoveToTitle() const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is not valid"));
@@ -249,9 +327,9 @@ void UUIHandle::RequestChangeCursorMode(const bool bIsVisible, const FInputModeD
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is Not valid"));
 
-	if (!bPreCursorMode)
+	if (!bBaseCursorMode)
 	{
-		bPreCursorMode = bIsVisible;
+		UE_LOG(LogTemp, Warning, TEXT("Change CursorMode"));
 		EdmundGameInstance->ChangeCursorMode(bIsVisible);
 		EdmundGameInstance->ChangeInputMode(InputMode);
 	}
@@ -294,6 +372,7 @@ void UUIHandle::LoadCoverWidgets(const UUIHandleSettings* UISettings)
 	TextWidgetClass = UISettings->TextWidgetClass;
 	CharacterListWidgetClass = UISettings->CharacterListWidgetClass;
 	SkillListWidgetClass = UISettings->SkillListWidgetClass;
+	MissionListWidgetClass = UISettings->MissionListWidgetClass;
 }
 
 void UUIHandle::CreateBaseWidgets()
@@ -349,4 +428,7 @@ void UUIHandle::CreateCoverWidgets()
 	SkillListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, SkillListWidgetClass);
 	SkillListWidget->InitWidget(this);
 
+	checkf(IsValid(MissionListWidgetClass), TEXT("MissionListWidgetClass is Not valid"));
+	MissionListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, MissionListWidgetClass);
+	MissionListWidget->InitWidget(this);
 }
