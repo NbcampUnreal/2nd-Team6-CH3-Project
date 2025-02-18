@@ -7,7 +7,7 @@
 #include "EnumSet.generated.h"
 
 UENUM(BlueprintType)
-enum class ESceneName : uint8
+enum class ESceneType : uint8
 {
 	Title = 0,
 	Main,
@@ -19,7 +19,7 @@ enum class ESceneName : uint8
 };
 
 UENUM(BlueprintType)
-enum class EWidgetName : uint8
+enum class EWidgetType : uint8
 {
 	TitleWidget = 0,
 	MainWidget,
@@ -35,7 +35,7 @@ enum class EWidgetName : uint8
 };
 
 UENUM(BlueprintType)
-enum class ESoundCategory : uint8
+enum class ESoundType : uint8
 {
 	BGM = 0,
 	UI,
@@ -46,7 +46,7 @@ enum class ESoundCategory : uint8
 };
 
 UENUM(BlueprintType)
-enum class ETableName : uint8
+enum class ETableType : uint8
 {
 	PlayerSkill = 0,
 	ShopCatalog,

@@ -14,10 +14,16 @@ class EDMUNDPRJ_API USceneHandle : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 public:
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	//Initialize
+	//virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	void InitSceneHandle();
+
+	//OpenLevel
 	void MoveNextScene();
-	void OpenScene(ESceneName SceneName);
-	ESceneName GetCurrentScene() const;
+	void OpenScene(ESceneType SceneName);
+
+	//Controll CurrentScene
+	ESceneType GetCurrentScene() const;
 	void CheckCurrentScene();
 
 protected:
@@ -32,5 +38,7 @@ protected:
 	const FName InfinitySceneName = "InfinityLevel";
 	const FName EndingSceneName = "EndingLevel";
 
-	ESceneName CurrentScene;
+	const float FadeTime = 0.5f;
+	ESceneType CurrentScene = ESceneType::Title;
+	FTimerHandle TimerHandle;
 };

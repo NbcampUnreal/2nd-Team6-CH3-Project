@@ -2,10 +2,16 @@
 
 
 #include "System/SoundHandle.h"
+#include "System/EdmundGameInstance.h"
 
-void USoundHandle::Initialize(FSubsystemCollectionBase& Collection)
+//void USoundHandle::Initialize(FSubsystemCollectionBase& Collection)
+//{
+//	Super::Initialize(Collection);
+//
+//	
+//}
+
+void USoundHandle::InitSoundHandle(UEdmundGameInstance* NewGameInstance)
 {
-	Super::Initialize(Collection);
-
-	UE_LOG(LogTemp, Warning, TEXT("Init SoundHandle"));
+	EdmundGameInstance = NewGameInstance;
 }

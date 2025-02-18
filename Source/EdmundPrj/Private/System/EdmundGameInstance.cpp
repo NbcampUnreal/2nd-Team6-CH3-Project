@@ -18,25 +18,15 @@ void UEdmundGameInstance::Init()
 	SoundHandle = GetSubsystem<USoundHandle>();
 	DataHandle = GetSubsystem<UDataHandle>();
 
-	if (IsValid(SceneHandle))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Success Get SceneHandle"));
-	}
+	checkf(IsValid(SceneHandle), TEXT("Fail Get SceneHandle"));
+	checkf(IsValid(UIHandle), TEXT("Fail Get UIHandle"));
+	checkf(IsValid(SoundHandle), TEXT("Fail Get SoundHandle"));
+	checkf(IsValid(DataHandle), TEXT("Fail Get DataHandle"));
 
-	if (IsValid(UIHandle))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Success Get UIHandle"));
-	}
-
-	if (IsValid(SoundHandle))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Success Get SoundHandle"));
-	}
-
-	if (IsValid(DataHandle))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Success Get DataHandle"));
-	}
+	SceneHandle->InitSceneHandle();
+	UIHandle->InitUIHandle(this);
+	SoundHandle->InitSoundHandle(this);
+	DataHandle->InitDataHandle(this);
 }
 
 void UEdmundGameInstance::StartedGameState()
@@ -48,99 +38,79 @@ void UEdmundGameInstance::StartedGameState()
 	PlayBGMByScene();
 }
 
-void UEdmundGameInstance::BindGameStateObserver()
+void UEdmundGameInstance::BindGameStateObserver() const
 {
-	if (!IsValid(EdmundGameState))
-	{
-		return;
-	}
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is not valid"));
+	checkf(UIHandle, TEXT("Not exist UIHandle"));
 
-	if (!IsValid(UIHandle))
-	{
-		return;
-	}
 }
 
-void UEdmundGameInstance::QuitGame()
+void UEdmundGameInstance::QuitGame() const
 {
 	//게임이 종료될 때 필요한 기능 처리.
 	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 }
 
-void UEdmundGameInstance::ActiveFade(bool bIsFadeIn)
+void UEdmundGameInstance::OnUIByScene() const
 {
-	if (!IsValid(UIHandle))
-	{
-		return;
-	}
-}
+	checkf(SceneHandle, TEXT("Not exist SceneHandle"));
+	checkf(UIHandle, TEXT("Not exist UIHandle"));
 
-void UEdmundGameInstance::OnUIByScene()
-{
-	if (!IsValid(SceneHandle))
-	{
-		return;
-	}
-	ActiveFade(true);
+	UIHandle->FadeIn();
 	SceneHandle->CheckCurrentScene();
+	UIHandle->AddToViewportBySceneType(SceneHandle->GetCurrentScene());
 }
 
-void UEdmundGameInstance::OnPause()
+void UEdmundGameInstance::OnPause() const
 {
 
 }
 
-void UEdmundGameInstance::ChangeCursorMode(bool bIsVisible)
+void UEdmundGameInstance::ChangeCursorMode(const bool bIsVisible) const
 {
-	if (!IsValid(EdmundGameState))
-	{
-		return;
-	}
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is not valid"));
+	EdmundGameState->ChangeCursorMode(bIsVisible);
 }
 
-void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode)
+void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode) const
 {
-	if (!IsValid(EdmundGameState))
-	{
-		return;
-	}
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is not valid"));
+	EdmundGameState->ChangeInputMode(InputMode);
 }
 
-void UEdmundGameInstance::EndMission()
+void UEdmundGameInstance::EndMission() const
 {
 	
 }
 
-void UEdmundGameInstance::DestroyedGameState()
+void UEdmundGameInstance::DestroyedGameState() 
 {
 	EdmundGameState = nullptr;
 }
 
-void UEdmundGameInstance::MoveScene(ESceneName SceneName)
+void UEdmundGameInstance::MoveScene(const ESceneType SceneType) const
 {
-	if (!IsValid(SceneHandle))
-	{
-		return;
-	}
-	ActiveFade(false);
-	SceneHandle->OpenScene(SceneName);
+	checkf(IsValid(SceneHandle), TEXT("SceneHandle is not valid"));
+	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
+
+	UIHandle->FadeOut();
+	SceneHandle->OpenScene(SceneType);
 }
 
-void UEdmundGameInstance::MoveNextScene()
+void UEdmundGameInstance::MoveNextScene() const
 {
-	if (!IsValid(SceneHandle))
-	{
-		return;
-	}
+	checkf(IsValid(SceneHandle), TEXT("SceneHandle is not valid"));
+
+	UIHandle->FadeOut();
 	SceneHandle->MoveNextScene();
 }
 
-ESceneName UEdmundGameInstance::GetCurrentSceneName() const
+ESceneType UEdmundGameInstance::GetCurrentSceneName() const
 {
-	return ESceneName();
+	return ESceneType();
 }
 
-UDataTable* UEdmundGameInstance::GetDataTable(ETableName TableName) const
+UDataTable* UEdmundGameInstance::GetDataTable(const ETableType TableType) const
 {
 	return nullptr;
 }
@@ -150,7 +120,7 @@ TMap<FName, int32>* UEdmundGameInstance::GetPlayerInfo() const
 	return nullptr;
 }
 
-void UEdmundGameInstance::UpdatePlayerInfo(FName Type, int32 Price)
+void UEdmundGameInstance::UpdatePlayerInfo(const FName Type, const int32 Price) const
 {
 }
 
@@ -159,11 +129,11 @@ ECharacterType UEdmundGameInstance::GetPlayerType() const
 	return ECharacterType();
 }
 
-void UEdmundGameInstance::SetPlayerType(ECharacterType Type)
+void UEdmundGameInstance::SetPlayerType(const ECharacterType Type) const
 {
 }
 
-void UEdmundGameInstance::AddPossessMoney(int32 Value)
+void UEdmundGameInstance::AddPossessMoney(const int32 Value) const
 {
 }
 
@@ -172,22 +142,22 @@ int32 UEdmundGameInstance::GetPossessMoney() const
 	return int32();
 }
 
-void UEdmundGameInstance::SetBGMVolume(float Volume)
+void UEdmundGameInstance::SetBGMVolume(const float Volume) const
 {
 }
 
-void UEdmundGameInstance::SetEffectVolume(float Volume)
+void UEdmundGameInstance::SetEffectVolume(const float Volume) const
 {
 }
 
-void UEdmundGameInstance::PlayBGMByScene()
+void UEdmundGameInstance::PlayBGMByScene() const
 {
 }
 
-void UEdmundGameInstance::PlayUISound(int32 Index)
+void UEdmundGameInstance::PlayUISound(const int32 Index) const
 {
 }
 
-void UEdmundGameInstance::PlayEffectSound(UAudioComponent* AudioComp, ESoundCategory SoundCategory, int32 Index)
+void UEdmundGameInstance::PlayEffectSound(const UAudioComponent* AudioComp, const ESoundType SoundType, const int32 Index) const
 {
 }
