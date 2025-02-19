@@ -21,38 +21,41 @@ class EDMUNDPRJ_API UEdmundGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	void StartedGameState();
-	void BindGameStateObserver();
-	void QuitGame();
+	void BindGameStateObserver() const;
+	void QuitGame() const;
 
-	void ActiveFade(bool bIsFadeIn);
-	void OnUIByScene();
-	void OnPause();
-	void ChangeCursorMode(bool bIsVisible);
-	void ChangeInputMode(const FInputModeDataBase& InputMode);
+	void OnUIByScene() const;
+	void OnPause() const;
+	void ChangeCursorMode(const bool bIsVisible) const;
+	void ChangeInputMode(const FInputModeDataBase& InputMode) const;
 	//void OnSkillList(const TArray<FPlayerSkillRow*>& SkillList);
 	//void UpdatePlayerSkill(const FPlayerSkillRow* Skill);
 
-	void EndMission();
+	void EndMission() const;
 	void DestroyedGameState();
 
-	void MoveScene(ESceneName SceneName);
-	void MoveNextScene();
-	ESceneName GetCurrentSceneName() const;
+	//void ReceiveSceneMove();
+	void RequestSceneMove(const bool bIsNext, ESceneType SceneType = ESceneType::Title) const;
+	void MoveScene(const ESceneType SceneType) const;
+	void MoveNextScene() const;
+	ESceneType GetCurrentSceneName() const;
 
-	UDataTable* GetDataTable(ETableName TableName) const;
+	UDataTable* GetDataTable(const ETableType TableName) const;
 	TMap<FName, int32>* GetPlayerInfo() const;
-	void UpdatePlayerInfo(FName Type, int32 Price);
+	void UpdatePlayerInfo(const FName Type, const int32 Price) const;
 	ECharacterType GetPlayerType() const;
-	void SetPlayerType(ECharacterType Type);
+	void SetPlayerType(const ECharacterType Type) const;
 	//FMissionItemRow* GetCurrentMissionInfo() const;
-	void AddPossessMoney(int32 Value);
+	void AddPossessMoney(const int32 Value) const;
 	int32 GetPossessMoney() const;
 
-	void SetBGMVolume(float Volume);
-	void SetEffectVolume(float Volume);
-	void PlayBGMByScene();
-	void PlayUISound(int32 Index);
-	void PlayEffectSound(UAudioComponent* AudioComp, ESoundCategory SoundCategory, int32 Index);
+	void SetBGMVolume(const float Volume) const;
+	float GetBGMVolume() const;
+	void SetEffectVolume(const float Volume) const;
+	float GetEffectVolume() const;
+	void PlayBGMByScene() const;
+	void PlayUISound(const int32 Index) const;
+	void PlayEffectSound(const UAudioComponent* AudioComp, const ESoundType SoundCategory, const int32 Index) const;
 protected:
 	
 

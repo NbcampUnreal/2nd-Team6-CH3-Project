@@ -6,9 +6,9 @@
 #include "GameFramework/GameState.h"
 #include "EdmundGameState.generated.h"
 
-/**
- * 
- */
+class UEdmundGameInstance;
+class AEdmundGameMode;
+
 UCLASS()
 class EDMUNDPRJ_API AEdmundGameState : public AGameState
 {
@@ -18,6 +18,11 @@ public:
 	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
 
+	void ChangeCursorMode(bool bIsValid);
+	void ChangeInputMode(const FInputModeDataBase& InputMode);
 
-	
+private:
+	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
+	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
+	TObjectPtr<APlayerController> PlayerController = nullptr;
 };
