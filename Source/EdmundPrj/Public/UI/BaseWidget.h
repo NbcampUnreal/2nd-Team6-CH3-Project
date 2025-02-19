@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "System/EnumSet.h"
 #include "System/Observer/GameStateObserver.h"
 #include "BaseWidget.generated.h"
 
@@ -24,7 +25,7 @@ public:
 	virtual void Action();
 	virtual void Update();
 	virtual void PlayAddAnim();
-	virtual void PlayRemoveAnim();
+	virtual void PlayRemoveAnim(bool bIsNext = false, ESceneType SceneType = ESceneType::Title);
 	
 protected:
 	UFUNCTION()
@@ -46,4 +47,5 @@ protected:
 	FWidgetAnimationDynamicEvent EndRemoveDelegate;
 
 	TObjectPtr<UUIHandle> UIHandle;
+	bool bIsPlaying = false;
 };

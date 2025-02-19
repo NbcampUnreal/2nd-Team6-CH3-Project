@@ -20,14 +20,45 @@ class EDMUNDPRJ_API UUIHandle : public UGameInstanceSubsystem
 public:
 	//virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	void InitUIHandle(UEdmundGameInstance* NewGameInstance);
+
 	//BaseWidget Controll. Add or Remove to Viewport
 	void AddToViewportBySceneType(const ESceneType SceneType);
 	void AddToViewportByCoverType(const EWidgetType WidgetType);
-	void RemoveCoverFromViewport();
+	void RequestRemoveCoverFromViewport(const EWidgetType WidgetType);
+	void RemoveCoverFromViewport(const EWidgetType WidgetType);
 
 	//Fade In / Out : Play Animation from FadeWidget
 	void FadeIn();
-	void FadeOut();
+	void FadeOut(const bool bIsNext, const ESceneType SceneType);
+	void RequestMoveSceneByFade(const bool bIsNext, const ESceneType SceneType);
+
+	// Apply Sound Volume To Option Widget
+	float GetBGMVolumeByGameInstance() const;
+	float GetEffectVolumeByGameInstance() const;
+
+	// UI Button Click Event
+	void ClickedCloseCoverWidget() const;
+	void ClickedMoveToTitle() const;
+	void ClickedMoveToMain() const;
+	void ClickedMoveToNext() const;
+	void ClickedMoveToMission(const ESceneType SceneType) const;
+	void ClickedQuitGame() const;
+	void ClickedBGMVolume(const float Volume) const;
+	void ClickedEffectVolume(const float Volume) const;
+
+private:
+	//Initialize Widgets : Load WidgetClass from UIHandleSettings(DeveloperSettings), and Create UserWidget from WidgetClass
+	void LoadBaseWidgets(const UUIHandleSettings* UISettings);
+	void LoadCoverWidgets(const UUIHandleSettings* UISettings);
+	void CreateBaseWidgets();
+	void CreateCoverWidgets();
+
+	// Cursor Visible and Input Mode Change. Request to GameInstance
+	void RequestChangeCursorMode(const bool bIsVisible, const FInputModeDataBase& InputMode);
+
+	// Add or Remove
+	void AddWidgetToViewport(UBaseWidget* Widget);
+	void RemoveWidgetFromViewport(UBaseWidget* Widget);
 
 	// OptionWidget Close or Open
 	void OpenOption();
@@ -56,68 +87,20 @@ public:
 	// MissionListWidget Close or Open
 	void OpenMissionList();
 	void CloseMissionList();
-	
-	// UI Button Click Event
-	void ClickedCloseCoverWidget() const;
-	void ClickedMoveToTitle() const;
-	void ClickedMoveToMain() const;
-	void ClickedMoveToNext() const;
-	void ClickedMoveToMission(const int32 Index) const;
-	void ClickedQuitGame() const;
-	void ClickedBGMVolume(const float Volume) const;
-	void ClickedEffectVolume(const float Volume) const;
 
-protected:
-	//Initialize Widgets : Load WidgetClass from UIHandleSettings(DeveloperSettings), and Create UserWidget from WidgetClass
-	void LoadBaseWidgets(const UUIHandleSettings* UISettings);
-	void LoadCoverWidgets(const UUIHandleSettings* UISettings);
-	void CreateBaseWidgets();
-	void CreateCoverWidgets();
-
-	// Cursor Visible and Input Mode Change. Request to GameInstance
-	void RequestChangeCursorMode(const bool bIsVisible, const FInputModeDataBase& InputMode);
-
-	// Add or Remove
-	void AddWidgetToViewport(UBaseWidget* Widget);
-	void RemoveWidgetFromViewport(UBaseWidget* Widget);
-
-protected:
-	UPROPERTY()
+private:
 	TSubclassOf<UBaseWidget> TitleWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> MainWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> InGameWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> EndingWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> FadeWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> OptionWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> ShopWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> TextWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> ResultWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> CharacterListWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> SkillListWidgetClass = nullptr;
-
-	UPROPERTY()
 	TSubclassOf<UBaseWidget> MissionListWidgetClass = nullptr;
-
 
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> TitleWidget = nullptr;

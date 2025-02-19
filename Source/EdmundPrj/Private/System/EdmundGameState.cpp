@@ -13,7 +13,7 @@ void AEdmundGameState::BeginPlay()
 	EdmundGameMode = GetWorld()->GetAuthGameMode<AEdmundGameMode>();
 	PlayerController = GetWorld()->GetPlayerControllerIterator()->Get();
 
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is not valid"));
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 
 	EdmundGameInstance->StartedGameState();
 }
@@ -25,12 +25,12 @@ void AEdmundGameState::BeginDestroy()
 
 void AEdmundGameState::ChangeCursorMode(bool bIsValid)
 {
-	checkf(IsValid(PlayerController), TEXT("PlayerController is not Valid"));
+	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
 	PlayerController->bShowMouseCursor = bIsValid;
 }
 
 void AEdmundGameState::ChangeInputMode(const FInputModeDataBase& InputMode)
 {
-	checkf(IsValid(PlayerController), TEXT("PlayerController is not Valid"));
+	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
 	PlayerController->SetInputMode(InputMode);
 }

@@ -50,47 +50,42 @@ void USceneHandle::MoveNextScene()
 
 void USceneHandle::OpenScene(ESceneType SceneType)
 {
-	checkf(IsValid(GetWorld()), TEXT("World is not valid"));
-
 	CurrentScene = SceneType;
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()
-		{
-			switch (CurrentScene)
-			{
-			case ESceneType::Title:
-				UGameplayStatics::OpenLevel(GetWorld(), TitleSceneName);
-				break;
+	switch (CurrentScene)
+	{
+	case ESceneType::Title:
+		UGameplayStatics::OpenLevel(GetWorld(), TitleSceneName);
+		break;
 
-			case ESceneType::Main:
-				UGameplayStatics::OpenLevel(GetWorld(), MainSceneName);
-				break;
+	case ESceneType::Main:
+		UGameplayStatics::OpenLevel(GetWorld(), MainSceneName);
+		break;
 
-			case ESceneType::Mission1:
-				UGameplayStatics::OpenLevel(GetWorld(), Mission1SceneName);
-				break;
+	case ESceneType::Mission1:
+		UGameplayStatics::OpenLevel(GetWorld(), Mission1SceneName);
+		break;
 
-			case ESceneType::Mission2:
-				UGameplayStatics::OpenLevel(GetWorld(), Mission2SceneName);
-				break;
+	case ESceneType::Mission2:
+		UGameplayStatics::OpenLevel(GetWorld(), Mission2SceneName);
+		break;
 
-			case ESceneType::Mission3:
-				UGameplayStatics::OpenLevel(GetWorld(), Mission3SceneName);
-				break;
+	case ESceneType::Mission3:
+		UGameplayStatics::OpenLevel(GetWorld(), Mission3SceneName);
+		break;
 
-			case ESceneType::Infinity:
-				UGameplayStatics::OpenLevel(GetWorld(), InfinitySceneName);
-				break;
+	case ESceneType::Infinity:
+		UGameplayStatics::OpenLevel(GetWorld(), InfinitySceneName);
+		break;
 
-			case ESceneType::Ending:
-				UGameplayStatics::OpenLevel(GetWorld(), EndingSceneName);
-				break;
+	case ESceneType::Ending:
+		UGameplayStatics::OpenLevel(GetWorld(), EndingSceneName);
+		break;
 
-			default:
-				checkNoEntry();
-				break;
-			}
-		}), FadeTime, false);
+	default:
+		checkNoEntry();
+		break;
+	}
 }
 
 ESceneType USceneHandle::GetCurrentScene() const

@@ -47,12 +47,13 @@ void UBaseWidget::Action()
 
 void UBaseWidget::StartAddAnim()
 {
-
+	bIsPlaying = true;
 }
 
 void UBaseWidget::EndAddAnim()
 {
-
+	bIsPlaying = false;
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 }
 
 void UBaseWidget::Update()
@@ -62,21 +63,21 @@ void UBaseWidget::Update()
 
 void UBaseWidget::PlayAddAnim()
 {
-
+	
 }
 
-void UBaseWidget::PlayRemoveAnim()
-{
-
-}
-
-void UBaseWidget::StartRemoveAnim()
+void UBaseWidget::PlayRemoveAnim(bool bIsNext, ESceneType SceneType)
 {
 	
 }
 
+void UBaseWidget::StartRemoveAnim()
+{
+	bIsPlaying = true;
+}
+
 void UBaseWidget::EndRemoveAnim()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
-	UIHandle->RemoveCoverFromViewport();
+	bIsPlaying = false;
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 }

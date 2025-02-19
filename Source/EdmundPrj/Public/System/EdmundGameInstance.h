@@ -34,6 +34,8 @@ public:
 	void EndMission() const;
 	void DestroyedGameState();
 
+	//void ReceiveSceneMove();
+	void RequestSceneMove(const bool bIsNext, ESceneType SceneType = ESceneType::Title) const;
 	void MoveScene(const ESceneType SceneType) const;
 	void MoveNextScene() const;
 	ESceneType GetCurrentSceneName() const;
@@ -48,7 +50,9 @@ public:
 	int32 GetPossessMoney() const;
 
 	void SetBGMVolume(const float Volume) const;
+	float GetBGMVolume() const;
 	void SetEffectVolume(const float Volume) const;
+	float GetEffectVolume() const;
 	void PlayBGMByScene() const;
 	void PlayUISound(const int32 Index) const;
 	void PlayEffectSound(const UAudioComponent* AudioComp, const ESoundType SoundCategory, const int32 Index) const;

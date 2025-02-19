@@ -7,7 +7,6 @@
 #include "MissionListWidget.generated.h"
 
 class UButton;
-class UImage;
 class UUIHandle;
 
 UCLASS()
@@ -40,8 +39,6 @@ private:
 	UFUNCTION()
 	void OnClickedEnter();
 
-	void OnSelectedImage(int Index);
-
 private:
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UButton> MissionButton1;
@@ -60,18 +57,6 @@ private:
 
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UButton> EnterButton;
-
-	UPROPERTY(Meta = (BindWidget))
-	TObjectPtr<UImage> SelectedImage1;
-
-	UPROPERTY(Meta = (BindWidget))
-	TObjectPtr<UImage> SelectedImage2;
-
-	UPROPERTY(Meta = (BindWidget))
-	TObjectPtr<UImage> SelectedImage3;
-
-	UPROPERTY(Meta = (BindWidget))
-	TObjectPtr<UImage> SelectedImage4;
 
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> OpenAnim;

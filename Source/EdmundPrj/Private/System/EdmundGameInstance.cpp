@@ -40,8 +40,8 @@ void UEdmundGameInstance::StartedGameState()
 
 void UEdmundGameInstance::BindGameStateObserver() const
 {
-	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is not valid"));
-	checkf(UIHandle, TEXT("Not exist UIHandle"));
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	checkf(UIHandle, TEXT("UIHandle is invalid"));
 
 }
 
@@ -53,8 +53,8 @@ void UEdmundGameInstance::QuitGame() const
 
 void UEdmundGameInstance::OnUIByScene() const
 {
-	checkf(SceneHandle, TEXT("Not exist SceneHandle"));
-	checkf(UIHandle, TEXT("Not exist UIHandle"));
+	checkf(SceneHandle, TEXT("SceneHandle is invalid"));
+	checkf(UIHandle, TEXT("UIHandle is invalid"));
 
 	UIHandle->FadeIn();
 	SceneHandle->CheckCurrentScene();
@@ -68,13 +68,13 @@ void UEdmundGameInstance::OnPause() const
 
 void UEdmundGameInstance::ChangeCursorMode(const bool bIsVisible) const
 {
-	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is not valid"));
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
 	EdmundGameState->ChangeCursorMode(bIsVisible);
 }
 
 void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode) const
 {
-	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is not valid"));
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
 	EdmundGameState->ChangeInputMode(InputMode);
 }
 
@@ -88,20 +88,21 @@ void UEdmundGameInstance::DestroyedGameState()
 	EdmundGameState = nullptr;
 }
 
+void UEdmundGameInstance::RequestSceneMove(const bool bIsNext, ESceneType SceneType) const
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->FadeOut(bIsNext, SceneType);
+}
+
 void UEdmundGameInstance::MoveScene(const ESceneType SceneType) const
 {
-	checkf(IsValid(SceneHandle), TEXT("SceneHandle is not valid"));
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
-
-	UIHandle->FadeOut();
+	checkf(IsValid(SceneHandle), TEXT("SceneHandle is invalid"));
 	SceneHandle->OpenScene(SceneType);
 }
 
 void UEdmundGameInstance::MoveNextScene() const
 {
-	checkf(IsValid(SceneHandle), TEXT("SceneHandle is not valid"));
-
-	UIHandle->FadeOut();
+	checkf(IsValid(SceneHandle), TEXT("SceneHandle is invalid"));
 	SceneHandle->MoveNextScene();
 }
 
@@ -144,10 +145,26 @@ int32 UEdmundGameInstance::GetPossessMoney() const
 
 void UEdmundGameInstance::SetBGMVolume(const float Volume) const
 {
+	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+	SoundHandle->UpdateBGMVolume(Volume);
+}
+
+float UEdmundGameInstance::GetBGMVolume() const
+{
+	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+	return SoundHandle->GetBGMVolume();
 }
 
 void UEdmundGameInstance::SetEffectVolume(const float Volume) const
 {
+	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+	SoundHandle->UpdateEffectVolume(Volume);
+}
+
+float UEdmundGameInstance::GetEffectVolume() const
+{
+	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+	return SoundHandle->GetEffectVolume();
 }
 
 void UEdmundGameInstance::PlayBGMByScene() const

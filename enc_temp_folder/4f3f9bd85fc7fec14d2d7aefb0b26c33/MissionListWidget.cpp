@@ -3,7 +3,6 @@
 
 #include "UI/MissionListWidget.h"
 #include "Components/Button.h"
-#include "Components/Image.h"
 #include "System/UIHandle.h"
 
 void UMissionListWidget::InitWidget(UUIHandle* NewUIHandle)
@@ -27,8 +26,6 @@ void UMissionListWidget::PlayAddAnim()
 {
 	Super::PlayAddAnim();
 
-	OnSelectedImage(0);
-
 	if (bIsPlaying)
 	{
 		return;
@@ -40,8 +37,6 @@ void UMissionListWidget::PlayAddAnim()
 void UMissionListWidget::PlayRemoveAnim(bool bIsNext, ESceneType SceneType)
 {
 	Super::PlayRemoveAnim(bIsNext, SceneType);
-
-	OnSelectedImage(0);
 
 	if (bIsPlaying)
 	{
@@ -61,25 +56,21 @@ void UMissionListWidget::EndRemoveAnim()
 void UMissionListWidget::OnClickedMission1()
 {
 	TargetScene = ESceneType::Mission1;
-	OnSelectedImage(1);
 }
 
 void UMissionListWidget::OnClickedMission2()
 {
 	TargetScene = ESceneType::Mission2;
-	OnSelectedImage(2);
 }
 
 void UMissionListWidget::OnClickedMission3()
 {
 	TargetScene = ESceneType::Mission3;
-	OnSelectedImage(3);
 }
 
 void UMissionListWidget::OnClickedInfinity()
 {
 	TargetScene = ESceneType::Infinity;
-	OnSelectedImage(4);
 }
 
 void UMissionListWidget::OnClickedClose()
@@ -93,39 +84,4 @@ void UMissionListWidget::OnClickedEnter()
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 	UIHandle->ClickedMoveToMission(TargetScene);
 	TargetScene = ESceneType::Title;
-}
-
-void UMissionListWidget::OnSelectedImage(int Index)
-{
-	SelectedImage1->SetVisibility(ESlateVisibility::Collapsed);
-	SelectedImage2->SetVisibility(ESlateVisibility::Collapsed);
-	SelectedImage3->SetVisibility(ESlateVisibility::Collapsed);
-	SelectedImage4->SetVisibility(ESlateVisibility::Collapsed);
-
-	switch (Index)
-	{
-	case 0:
-		
-		break;
-
-	case 1:
-		SelectedImage1->SetVisibility(ESlateVisibility::Visible);
-		break;
-
-	case 2:
-		SelectedImage2->SetVisibility(ESlateVisibility::Visible);
-		break;
-
-	case 3:
-		SelectedImage3->SetVisibility(ESlateVisibility::Visible);
-		break;
-
-	case 4:
-		SelectedImage4->SetVisibility(ESlateVisibility::Visible);
-		break;
-
-	default:
-		checkNoEntry();
-		break;
-	}
 }

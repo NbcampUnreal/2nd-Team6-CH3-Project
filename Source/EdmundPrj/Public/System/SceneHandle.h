@@ -14,8 +14,6 @@ class EDMUNDPRJ_API USceneHandle : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 public:
-	//Initialize
-	//virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	void InitSceneHandle();
 
 	//OpenLevel

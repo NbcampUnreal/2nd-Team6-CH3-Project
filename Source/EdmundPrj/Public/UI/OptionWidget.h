@@ -8,6 +8,7 @@
 
 class UUIHandle;
 class UButton;
+class USlider;
 
 UCLASS()
 class EDMUNDPRJ_API UOptionWidget : public UBaseWidget
@@ -16,6 +17,9 @@ class EDMUNDPRJ_API UOptionWidget : public UBaseWidget
 	
 public:
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
+	virtual void PlayAddAnim() override;
+	virtual void PlayRemoveAnim(bool bIsNext = false, ESceneType SceneType = ESceneType::Title) override;
+	virtual void EndRemoveAnim() override;
 
 private:
 	UFUNCTION()
@@ -30,6 +34,12 @@ private:
 	UFUNCTION()
 	void OnClickedCloseOption();
 
+	UFUNCTION()
+	void OnClickedBGMVolume(float Value);
+
+	UFUNCTION()
+	void OnClickedEffectVolume(float Value);
+
 private:
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UButton> MoveTitleButton;
@@ -42,4 +52,16 @@ private:
 
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UButton> QuitButton;
+
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<USlider> BGMVolumSlider;
+
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<USlider> EffectVolumSlider;
+
+	UPROPERTY(Meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> OpenOptionAnim;
+
+	UPROPERTY(Meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> CloseOptionAnim;
 };

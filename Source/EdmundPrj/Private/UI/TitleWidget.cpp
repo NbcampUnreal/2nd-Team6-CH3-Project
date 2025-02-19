@@ -16,21 +16,22 @@ void UTitleWidget::InitWidget(UUIHandle* NewUIHandle)
 
 void UTitleWidget::OnClickedStartButton()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 
 	UIHandle->ClickedMoveToNext();
 }
 
 void UTitleWidget::OnClickedOptionButton()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 
-	UIHandle->OpenOption();
+	//UIHandle->OpenOption();
+	UIHandle->AddToViewportByCoverType(EWidgetType::OptionWidget);
 }
 
 void UTitleWidget::OnClickedQuitButton()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 
 	UIHandle->ClickedQuitGame();
 }

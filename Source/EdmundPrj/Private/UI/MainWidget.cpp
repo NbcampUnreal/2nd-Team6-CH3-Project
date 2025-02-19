@@ -17,24 +17,25 @@ void UMainWidget::InitWidget(UUIHandle* NewUIHandle)
 
 void UMainWidget::OnClickedShop()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
-	UIHandle->OpenShop();
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::ShopWidget);
 }
 
 void UMainWidget::OnClickedCharacterList()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
-	UIHandle->OpenCharacterList();
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::CharacterListWidget);
 }
 
 void UMainWidget::OnClickedMissionList()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
-
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::MissionListWidget);
 }
 
 void UMainWidget::OnClickedOption()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is not valid"));
-	UIHandle->OpenOption();
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::OptionWidget);
+	//UIHandle->OpenOption();
 }
