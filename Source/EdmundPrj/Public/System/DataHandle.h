@@ -6,14 +6,17 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "DataHandle.generated.h"
 
-/**
- * 
- */
+class UEdmundGameInstance;
+
 UCLASS()
 class EDMUNDPRJ_API UDataHandle : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	//virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	void InitDataHandle(UEdmundGameInstance* NewGameInstance);
+
+private:
+	TObjectPtr<UEdmundGameInstance> EdmundGameInstance;
 };
