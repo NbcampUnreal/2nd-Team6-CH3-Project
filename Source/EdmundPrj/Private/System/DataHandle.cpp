@@ -2,10 +2,16 @@
 
 
 #include "System/DataHandle.h"
+#include "System/EdmundGameInstance.h"
 
-void UDataHandle::Initialize(FSubsystemCollectionBase& Collection)
+//void UDataHandle::Initialize(FSubsystemCollectionBase& Collection)
+//{
+//	Super::Initialize(Collection);
+//
+//	
+//}
+
+void UDataHandle::InitDataHandle(UEdmundGameInstance* NewGameInstance)
 {
-	Super::Initialize(Collection);
-
-	UE_LOG(LogTemp, Warning, TEXT("Init DataHandle"));
+	EdmundGameInstance = NewGameInstance;
 }

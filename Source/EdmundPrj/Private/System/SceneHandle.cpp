@@ -4,80 +4,91 @@
 #include "System/SceneHandle.h"
 #include "Kismet/GameplayStatics.h"
 
-void USceneHandle::Initialize(FSubsystemCollectionBase& Collection)
+//void USceneHandle::Initialize(FSubsystemCollectionBase& Collection)
+//{
+//	Super::Initialize(Collection);
+//}
+
+void USceneHandle::InitSceneHandle()
 {
-	Super::Initialize(Collection);
-
-	UE_LOG(LogTemp, Warning, TEXT("Init SceneHandle"));
-
-	CurrentScene = ESceneName::Title;
+	CurrentScene = ESceneType::Title;
 }
 
 void USceneHandle::MoveNextScene()
 {
 	switch (CurrentScene)
 	{
-	case ESceneName::Title:
-		OpenScene(ESceneName::Main);
+	case ESceneType::Title:
+		OpenScene(ESceneType::Main);
 		break;
 
-	case ESceneName::Mission1:
-		OpenScene(ESceneName::Mission2);
+	case ESceneType::Mission1:
+		OpenScene(ESceneType::Mission2);
 		break;
 
-	case ESceneName::Mission2:
-		OpenScene(ESceneName::Mission3);
+	case ESceneType::Mission2:
+		OpenScene(ESceneType::Mission3);
 		break;
 
-	case ESceneName::Mission3:
-		OpenScene(ESceneName::Ending);
+	case ESceneType::Mission3:
+		OpenScene(ESceneType::Ending);
 		break;
 
-	case ESceneName::Infinity:
-		OpenScene(ESceneName::Main);
+	case ESceneType::Infinity:
+		OpenScene(ESceneType::Main);
 		break;
 
-	case ESceneName::Ending:
-		OpenScene(ESceneName::Title);
+	case ESceneType::Ending:
+		OpenScene(ESceneType::Title);
+		break;
+
+	default:
+		checkNoEntry();
 		break;
 	}
 }
 
-void USceneHandle::OpenScene(ESceneName SceneName)
+void USceneHandle::OpenScene(ESceneType SceneType)
 {
+	CurrentScene = SceneType;
+
 	switch (CurrentScene)
 	{
-	case ESceneName::Title:
+	case ESceneType::Title:
 		UGameplayStatics::OpenLevel(GetWorld(), TitleSceneName);
 		break;
 
-	case ESceneName::Main:
+	case ESceneType::Main:
 		UGameplayStatics::OpenLevel(GetWorld(), MainSceneName);
 		break;
 
-	case ESceneName::Mission1:
+	case ESceneType::Mission1:
 		UGameplayStatics::OpenLevel(GetWorld(), Mission1SceneName);
 		break;
 
-	case ESceneName::Mission2:
+	case ESceneType::Mission2:
 		UGameplayStatics::OpenLevel(GetWorld(), Mission2SceneName);
 		break;
 
-	case ESceneName::Mission3:
+	case ESceneType::Mission3:
 		UGameplayStatics::OpenLevel(GetWorld(), Mission3SceneName);
 		break;
 
-	case ESceneName::Infinity:
+	case ESceneType::Infinity:
 		UGameplayStatics::OpenLevel(GetWorld(), InfinitySceneName);
 		break;
 
-	case ESceneName::Ending:
+	case ESceneType::Ending:
 		UGameplayStatics::OpenLevel(GetWorld(), EndingSceneName);
+		break;
+
+	default:
+		checkNoEntry();
 		break;
 	}
 }
 
-ESceneName USceneHandle::GetCurrentScene() const
+ESceneType USceneHandle::GetCurrentScene() const
 {
 	return CurrentScene;
 }
@@ -88,30 +99,30 @@ void USceneHandle::CheckCurrentScene()
 
 	if (LevelName == TitleSceneName)
 	{
-		CurrentScene = ESceneName::Title;
+		CurrentScene = ESceneType::Title;
 	}
 	else if (LevelName == MainSceneName)
 	{
-		CurrentScene = ESceneName::Main;
+		CurrentScene = ESceneType::Main;
 	}
 	else if (LevelName == Mission1SceneName)
 	{
-		CurrentScene = ESceneName::Mission1;
+		CurrentScene = ESceneType::Mission1;
 	}
 	else if (LevelName == Mission2SceneName)
 	{
-		CurrentScene = ESceneName::Mission2;
+		CurrentScene = ESceneType::Mission2;
 	}
 	else if (LevelName == Mission3SceneName)
 	{
-		CurrentScene = ESceneName::Mission3;
+		CurrentScene = ESceneType::Mission3;
 	}
 	else if (LevelName == InfinitySceneName)
 	{
-		CurrentScene = ESceneName::Infinity;
+		CurrentScene = ESceneType::Infinity;
 	}
 	else if (LevelName == EndingSceneName)
 	{
-		CurrentScene = ESceneName::Ending;
+		CurrentScene = ESceneType::Ending;
 	}
 }
