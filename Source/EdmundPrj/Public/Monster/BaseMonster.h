@@ -19,6 +19,8 @@ public:
 	// Sets default values for this character's properties
 	ABaseMonster();
 
+float GetMonsterAttackDamage();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
 	USphereComponent* MonsterAttackRange;
@@ -135,7 +137,6 @@ protected:
 	void MonsterAttack();
 
 	void MonsterAttackEnd();
-
 
 	FTimerHandle DeadAnimTimerHandle;
 	FTimerHandle AttackAnimTimerHandle;

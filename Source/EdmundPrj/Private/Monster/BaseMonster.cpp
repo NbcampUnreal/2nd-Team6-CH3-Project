@@ -148,9 +148,14 @@ void ABaseMonster::MonsterAttack()
 
 void ABaseMonster::MonsterAttackEnd()
 {
-	GetMesh()->GetAnimInstance()->Montage_Stop(0.1f, AttackAnimation);
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.3f, AttackAnimation);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	UE_LOG(LogTemp, Warning, TEXT("AttackEnd"));
+}
+
+float ABaseMonster::GetMonsterAttackDamage()
+{
+	return MonsterAttackDamage;
 }
 
 void ABaseMonster::UpdateMonsterOverHeadWidget()
