@@ -6,18 +6,16 @@
 #include "Components\SphereComponent.h"
 #include "Monster\BaseMonster.h"
 #include "Kismet\KismetMathLibrary.h"
-
+#include "Components\SplineComponent.h"
 
 AElectricEffect::AElectricEffect()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	RootComponent = Scene;
 
 	EnemySearchCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
-
 	EnemySearchCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	EnemySearchCollision->SetupAttachment(RootComponent);
 	EnemySearchCollision->OnComponentBeginOverlap.AddDynamic(this, &AElectricEffect::FindMonster);
@@ -25,27 +23,15 @@ AElectricEffect::AElectricEffect()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(EnemySearchCollision);
 
+	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
+	SplineComponent->SetupAttachment(RootComponent);
+	SplineComponent->SetClosedLoop(false);
 }
 
-// Called when the game starts or when spawned
 void AElectricEffect::BeginPlay()
 {
 	Super::BeginPlay();
 	EnemySearchCollision->SetSphereRadius(AttackRadius);
-	for (int i = 0; i < ElectricCount; i++)
-	{
-		TObjectPtr<AActor> electric = GetWorld()->SpawnActor<AActor>(ElectricClass, FVector::ZeroVector, FRotator::ZeroRotator);
-		electric->SetActorTickEnabled(false);
-		electric->SetActorHiddenInGame(true);
-		electric->SetActorEnableCollision(false);
-		Electrics.Add(electric);
-	}
-	GetWorldTimerManager().SetTimer(MoveTimer,
-		[this] {
-			SetActorLocation(GetActorLocation() + FVector(1, 0, 0));
-		},
-		0.1f,
-		true);
 }
 
 void AElectricEffect::FindMonster(
@@ -56,48 +42,58 @@ void AElectricEffect::FindMonster(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	GetWorldTimerManager().ClearTimer(MoveTimer);
-	if (TargetMonster != nullptr)
-	{
-		//SetActorLocation(TargetMonster->GetActorLocation());
-	}
 	if (CurrentElectricCount >= ElectricCount) return;
 	if (otherActor && otherActor->ActorHasTag("Monster"))
 	{
-		TObjectPtr<ABaseMonster> monster = Cast<ABaseMonster>(otherActor);
-		if (TargetMonster != nullptr)
+		if (TObjectPtr<ABaseMonster> monster = Cast<ABaseMonster>(otherActor))
 		{
-			if (monster == TargetMonster) return;
-		}
-		TargetMonster = monster;
-		if (TargetMonster != nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("IsMonster!!!!: %s"), *TargetMonster->GetName());
+			if (TargetMonster != nullptr && TargetMonster == monster) return;
+
+			TargetMonster = monster;
+			if (!isFirst)
+			{
+				isFirst = true;
+				FirstEnemyPos = TargetMonster->GetActorLocation();
+				SplineComponent->SetWorldLocation(FirstEnemyPos);
+				SplineComponent->ClearSplinePoints(true);
+				SplineComponent->UpdateSpline();
+			}
+			EnemyPosArray.Add(TargetMonster->GetActorLocation());
 			MoveToMonster(TargetMonster);
 		}
 	}
 }
 
+
 void AElectricEffect::MoveToMonster(ABaseMonster* monster)
 {
 	FRotator direction = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), monster->GetActorLocation());
-	ActivateElectric(monster->GetActorLocation(), direction);
+	AddSplinePoint(monster->GetActorLocation());
 	CurrentElectricCount++;
-	SetActorRotation(direction);
+	EnemySearchCollision->SetWorldRotation(direction);
 	
-	GetWorldTimerManager().SetTimer(MoveTimer,
+	GetWorldTimerManager().SetTimer(
+		MoveTimer,
 		this,
 		&AElectricEffect::Move,
-		0.003f,
+		0.1f,
 		true);
 	Attack(monster);
 }
 
 void AElectricEffect::Move()
 {
-	SetActorLocation(GetActorLocation() + GetActorForwardVector() * 2.3f);
-	float distance = FVector::Distance(GetActorLocation(), TargetMonster->GetActorLocation());
-	if (distance < 5)
+	if (!TargetMonster || !EnemySearchCollision)
+	{
+		GetWorldTimerManager().ClearTimer(MoveTimer);
+		return;
+	}
+
+	FVector NewLocation = EnemySearchCollision->GetComponentLocation() + EnemySearchCollision->GetForwardVector() * Speed;
+	EnemySearchCollision->SetWorldLocation(NewLocation);
+
+	float Distance = FVector::Distance(EnemySearchCollision->GetComponentLocation(), TargetMonster->GetActorLocation());
+	if (Distance < 10.0f)
 	{
 		GetWorldTimerManager().ClearTimer(MoveTimer);
 	}
@@ -105,44 +101,69 @@ void AElectricEffect::Move()
 
 void AElectricEffect::Attack(ABaseMonster* monster)
 {
-	//몬스터에게 데미지 입히기
+	/*
+	몬스터에게 데미지 입히기 구현
+	*/
+
 	if (CurrentElectricCount >= ElectricCount)
 	{
 		GetWorldTimerManager().ClearTimer(MoveTimer);
-		UE_LOG(LogTemp, Warning, TEXT("IsEnd!!!!"));
 	}
 }
 
-TObjectPtr<AActor> AElectricEffect::ActivateElectric(FVector monsterPos, FRotator direction)
+void AElectricEffect::Deactivate()
 {
-	if (CurrentElectricCount >= Electrics.Num()) return nullptr; // 배열 크기 확인
-
-	TObjectPtr<AActor> electric = Electrics[CurrentElectricCount];
-	if (!electric->IsHidden()) return nullptr;
-	if (!electric) return nullptr; // nullptr 체크
-	FString NewName = FString::Printf(TEXT("Electric %d"), CurrentElectricCount);
-	electric->Rename(*NewName);
-	electric->SetActorLabel(*NewName); 
-	electric->SetActorLocation(monsterPos);
-	electric->SetActorRotation(direction);
-	electric->SetActorHiddenInGame(false);
-	electric->SetActorEnableCollision(true);
-	electric->SetActorTickEnabled(true);
-	FTimerHandle DeactivateTimer;
-	GetWorldTimerManager().SetTimer(DeactivateTimer,
-		[electric, this] {
-			DeactivateElectric(electric);
-		},
-		1.f,
-		false);
-	return electric;
-}
-void AElectricEffect::DeactivateElectric(TObjectPtr<AActor> electric)
-{
-	if (!electric) return; // nullptr 체크
-
-	electric->SetActorHiddenInGame(true);
-	electric->SetActorEnableCollision(false);
-	electric->SetActorTickEnabled(false);
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+	CurrentElectricCount = 0;
+	TargetMonster = nullptr;
 }
 
+void AElectricEffect::AddSplinePoint(FVector NewPoint)
+{
+	if (!SplineComponent) return;
+
+	SplineComponent->AddSplinePoint(FirstEnemyPos, ESplineCoordinateSpace::World, true);
+
+	int32 NumPoints = SplineComponent->GetNumberOfSplinePoints();
+	for (int i = 0; i < NumPoints; i++)
+	{
+		SplineComponent->SetLocationAtSplinePoint(i, EnemyPosArray[i], ESplineCoordinateSpace::World, true);
+	}
+	FTimerHandle SplinePointDeleteTimer;
+	GetWorldTimerManager().SetTimer(
+		SplinePointDeleteTimer,
+		this,
+		&AElectricEffect::DeleteSplinePoint,
+		PointDestroyTime,
+		false
+	);
+	ResetSplineRotation(); 
+}
+
+void AElectricEffect::DeleteSplinePoint()
+{
+	int32 NumPoints = SplineComponent->GetNumberOfSplinePoints();
+	if (NumPoints <= 1)
+	{
+		Deactivate();
+	}
+	SplineComponent->RemoveSplinePoint(0, true);
+	SplineComponent->UpdateSpline();
+}
+
+void AElectricEffect::ResetSplineRotation()
+{
+	if (!SplineComponent) return;
+
+	int32 NumPoints = SplineComponent->GetNumberOfSplinePoints();
+
+	for (int32 i = 0; i < NumPoints; i++)
+	{
+		SplineComponent->SetSplinePointType(i, ESplinePointType::Linear, true); 
+		SplineComponent->SetTangentAtSplinePoint(i, FVector::ZeroVector, ESplineCoordinateSpace::Local); 
+	}
+
+	SplineComponent->UpdateSpline();
+}
