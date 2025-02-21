@@ -13,6 +13,9 @@ void AMeleeMonster::MonsterAttackCheck()
 
     if (Monster)
     {
+        PlayParticle();
+        PlaySound();
+
         UCapsuleComponent* CollisionComp = NewObject<UCapsuleComponent>(this);
         CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
@@ -59,4 +62,30 @@ void AMeleeMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
             );
         }
     }
+}
+
+void AMeleeMonster::PlayParticle()
+{
+    //파티클 활성화, 헤더는 BaseMonster에 있음
+    UParticleSystemComponent* Particle = nullptr;
+
+    if (AttackParticle)
+    {
+        FVector ParticleScale = FVector(8.0f, 8.0f, 8.0f);
+
+        Particle = UGameplayStatics::SpawnEmitterAtLocation(
+            GetWorld(),
+            AttackParticle,
+            GetActorLocation(),
+            GetActorRotation(),
+            ParticleScale,
+            false
+        );
+    }
+}
+
+void AMeleeMonster::PlaySound()
+{
+    CurrentAudioComp->SetSound(AttackSound);
+    CurrentAudioComp->Play();
 }

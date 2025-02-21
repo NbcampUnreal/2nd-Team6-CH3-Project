@@ -7,12 +7,19 @@
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "GameFramework//CharacterMovementComponent.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ABaseMonster::ABaseMonster()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	CurrentAudioComp->SetupAttachment(RootComponent);
 
 	MonsterAttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("AttackRange"));
 	MonsterAttackRange->SetupAttachment(RootComponent); // 공격 범위 콜리전
@@ -29,6 +36,10 @@ ABaseMonster::ABaseMonster()
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+
+	CurrentAudioComp->SetSound(TakeDamageSound);
+	CurrentAudioComp->Play();
+
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);

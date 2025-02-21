@@ -25,4 +25,7 @@ public:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+
+	void PlayParticle();
+	void PlaySound();
 };
