@@ -21,11 +21,13 @@ public:
 
 float GetMonsterAttackDamage();
 
+virtual void MonsterAttackCheck();
+
+void MonsterDead();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
 	USphereComponent* MonsterAttackRange;
-
-	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	int32 MonsterLevel = 1;
@@ -111,7 +113,6 @@ protected:
 		AController* EventInstigator,
 		AActor* DamageCauser) override;
 
-	void MonsterDead();
 	void MonsterDestroy();
 	void DropReward();
 

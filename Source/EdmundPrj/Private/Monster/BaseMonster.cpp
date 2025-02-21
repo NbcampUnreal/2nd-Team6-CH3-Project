@@ -59,11 +59,13 @@ void ABaseMonster::MonsterDead()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
+			GetCharacterMovement()->DisableMovement();
+
 			AnimInstance->Montage_Play(DeathAnimation);
 
 			float AnimDuration = DeathAnimation->GetPlayLength();
 
-			GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration, false);
+			GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
 		}
 	}
 }
@@ -71,6 +73,7 @@ void ABaseMonster::MonsterDead()
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
 	DropReward();
 	Destroy();
 }
@@ -96,7 +99,6 @@ void ABaseMonster::MonsterHit()
 
 	if (HitAnimation)
 	{
-
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
@@ -148,6 +150,11 @@ void ABaseMonster::MonsterAttackEnd()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.3f, AttackAnimation);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void ABaseMonster::MonsterAttackCheck()
+{
+	UE_LOG(LogTemp, Warning, TEXT("몬스터에 MonsterAttackCheck 함수가 없습니다."));
 }
 
 float ABaseMonster::GetMonsterAttackDamage()
