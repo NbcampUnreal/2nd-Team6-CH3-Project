@@ -64,7 +64,6 @@ void ABaseMonster::MonsterDead()
 			AnimInstance->Montage_Play(DeathAnimation);
 
 			float AnimDuration = DeathAnimation->GetPlayLength();
-
 			GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
 		}
 	}
