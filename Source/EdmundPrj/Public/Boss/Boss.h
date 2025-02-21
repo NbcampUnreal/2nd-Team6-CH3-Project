@@ -20,4 +20,7 @@ private:
     UPROPERTY()
     UBossState* BossState;
 
+    UPROPERTY()
+    UBoss_AnimInstance* AnimInstance;
+
 };

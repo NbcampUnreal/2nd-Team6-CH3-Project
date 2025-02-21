@@ -17,6 +17,11 @@ ABoss::ABoss()
 void ABoss::BeginPlay()
 {
     Super::BeginPlay();
+
+    if (GetMesh() && GetMesh()->GetAnimInstance())
+    {
+        AnimInstance = Cast<UBoss_AnimInstance>(GetMesh()->GetAnimInstance());
+    }
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -41,10 +46,12 @@ void ABoss::SetState(EBossState NewState)
     {
     case EBossState::Idle:
         BossState = NewObject<UBoss_Idle>(this);
+        if (AnimInstance) AnimInstance->bIsMoving = false;
         break;
     case EBossState::Chase:
         BossState = NewObject<UBoss_Chase>();
         GetCharacterMovement()->MaxWalkSpeed = MonsterMoveSpeed;
+        if (AnimInstance) AnimInstance->bIsMoving = true;
         break;
     default:
         BossState = nullptr;
