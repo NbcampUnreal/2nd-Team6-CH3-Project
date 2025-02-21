@@ -7,6 +7,9 @@
 
 void UMainWidget::InitWidget(UUIHandle* NewUIHandle)
 {
+	OpenAnimation = OpenAnim;
+	CloseAnimation = CloseAnim;
+
 	Super::InitWidget(NewUIHandle);
 
 	EnterShopButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedShop);
@@ -17,25 +20,20 @@ void UMainWidget::InitWidget(UUIHandle* NewUIHandle)
 
 void UMainWidget::OnClickedShop()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	UIHandle->AddToViewportByCoverType(EWidgetType::ShopWidget);
+	OnClickedOpenWidget(EWidgetType::ShopWidget);
 }
 
 void UMainWidget::OnClickedCharacterList()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	UIHandle->AddToViewportByCoverType(EWidgetType::CharacterListWidget);
+	OnClickedOpenWidget(EWidgetType::CharacterListWidget);
 }
 
 void UMainWidget::OnClickedMissionList()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	UIHandle->AddToViewportByCoverType(EWidgetType::MissionListWidget);
+	OnClickedOpenWidget(EWidgetType::MissionListWidget);
 }
 
 void UMainWidget::OnClickedOption()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	UIHandle->AddToViewportByCoverType(EWidgetType::OptionWidget);
-	//UIHandle->OpenOption();
+	OnClickedOpenWidget(EWidgetType::OptionWidget);
 }

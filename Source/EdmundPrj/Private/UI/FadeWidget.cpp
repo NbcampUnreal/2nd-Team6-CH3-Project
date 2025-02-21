@@ -8,14 +8,14 @@ void UFadeWidget::InitWidget(UUIHandle* NewUIHandle)
 {
 	Super::InitWidget(NewUIHandle);
 
+	BindToAnimationStarted(FadeOutAnim, StartRemoveDelegate);
 	BindToAnimationFinished(FadeOutAnim, EndRemoveDelegate);
+	BindToAnimationStarted(FadeInAnim, StartAddDelegate);
 	BindToAnimationFinished(FadeInAnim, EndAddDelegate);
 }
 
-void UFadeWidget::PlayRemoveAnim(bool bIsNext, ESceneType SceneType)
+void UFadeWidget::PlayFadeOutAnim(bool bIsNext, ESceneType SceneType)
 {
-	Super::PlayRemoveAnim();
-
 	bIsFadeNext = bIsNext;
 	FadeSceneType = SceneType;
 	PlayAnimation(FadeOutAnim);
@@ -23,8 +23,6 @@ void UFadeWidget::PlayRemoveAnim(bool bIsNext, ESceneType SceneType)
 
 void UFadeWidget::PlayAddAnim()
 {
-	Super::PlayAddAnim();
-
 	PlayAnimation(FadeInAnim);
 }
 

@@ -28,6 +28,7 @@ public:
 	void OnPause() const;
 	void ChangeCursorMode(const bool bIsVisible) const;
 	void ChangeInputMode(const FInputModeDataBase& InputMode) const;
+	void ChangeSelectMode(const bool bIsSelect) const;
 	//void OnSkillList(const TArray<FPlayerSkillRow*>& SkillList);
 	//void UpdatePlayerSkill(const FPlayerSkillRow* Skill);
 

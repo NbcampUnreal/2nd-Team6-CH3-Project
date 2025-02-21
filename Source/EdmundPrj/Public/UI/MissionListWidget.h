@@ -18,7 +18,7 @@ class EDMUNDPRJ_API UMissionListWidget : public UBaseWidget
 public:
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
 	virtual void PlayAddAnim() override;
-	virtual void PlayRemoveAnim(bool bIsNext = false, ESceneType SceneType = ESceneType::Title) override;
+	virtual void PlayRemoveAnim() override;
 	virtual void EndRemoveAnim() override;
 
 private:
@@ -40,7 +40,7 @@ private:
 	UFUNCTION()
 	void OnClickedEnter();
 
-	void OnSelectedImage(int Index);
+	void OnSelectedImage(int32 Index);
 
 private:
 	UPROPERTY(Meta = (BindWidget))
@@ -79,5 +79,5 @@ private:
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> CloseAnim;
 
-	ESceneType TargetScene = ESceneType::Title;
+	ESceneType TargetScene = ESceneType::Main;
 };

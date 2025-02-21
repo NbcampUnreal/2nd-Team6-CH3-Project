@@ -8,12 +8,10 @@
 
 void UMissionListWidget::InitWidget(UUIHandle* NewUIHandle)
 {
-	Super::InitWidget(NewUIHandle);
+	OpenAnimation = OpenAnim;
+	CloseAnimation = CloseAnim;
 
-	BindToAnimationStarted(CloseAnim, StartRemoveDelegate);
-	BindToAnimationFinished(CloseAnim, EndRemoveDelegate);
-	BindToAnimationStarted(OpenAnim, StartAddDelegate);
-	BindToAnimationFinished(OpenAnim, EndAddDelegate);
+	Super::InitWidget(NewUIHandle);
 
 	MissionButton1->OnClicked.AddDynamic(this, &ThisClass::OnClickedMission1);
 	MissionButton2->OnClicked.AddDynamic(this, &ThisClass::OnClickedMission2);
@@ -26,29 +24,13 @@ void UMissionListWidget::InitWidget(UUIHandle* NewUIHandle)
 void UMissionListWidget::PlayAddAnim()
 {
 	Super::PlayAddAnim();
-
 	OnSelectedImage(0);
-
-	if (bIsPlaying)
-	{
-		return;
-	}
-
-	PlayAnimation(OpenAnim);
 }
 
-void UMissionListWidget::PlayRemoveAnim(bool bIsNext, ESceneType SceneType)
+void UMissionListWidget::PlayRemoveAnim()
 {
-	Super::PlayRemoveAnim(bIsNext, SceneType);
-
+	Super::PlayRemoveAnim();
 	OnSelectedImage(0);
-
-	if (bIsPlaying)
-	{
-		return;
-	}
-
-	PlayAnimation(CloseAnim);
 }
 
 void UMissionListWidget::EndRemoveAnim()
@@ -84,18 +66,16 @@ void UMissionListWidget::OnClickedInfinity()
 
 void UMissionListWidget::OnClickedClose()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	UIHandle->RequestRemoveCoverFromViewport(EWidgetType::MissionListWidget);
+	OnClickedCloseWidget(EWidgetType::MissionListWidget);
 }
 
 void UMissionListWidget::OnClickedEnter()
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 	UIHandle->ClickedMoveToMission(TargetScene);
-	TargetScene = ESceneType::Title;
 }
 
-void UMissionListWidget::OnSelectedImage(int Index)
+void UMissionListWidget::OnSelectedImage(int32 Index)
 {
 	SelectedImage1->SetVisibility(ESlateVisibility::Collapsed);
 	SelectedImage2->SetVisibility(ESlateVisibility::Collapsed);
