@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Player/BaseCharacter.h"
-#include "System/EnumSet.h"
 #include "PlayerCharacter.generated.h"
 
 class AWeapon;
@@ -15,20 +14,15 @@ class EDMUNDPRJ_API APlayerCharacter : public ABaseCharacter
 	
 public:
 	APlayerCharacter();
+
 	virtual void BeginPlay() override;
 
 	// ÃÑ ½î±â
-	void Fire(const FInputActionValue& value);
-
-protected:
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual bool ActiveWeapon() override;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
 	TSubclassOf<AWeapon> Weapon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	ECharacterType CharacterType;
 
 	UPROPERTY()
 	TObjectPtr<AWeapon> WeaponActor;
