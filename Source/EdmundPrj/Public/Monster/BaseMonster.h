@@ -19,9 +19,13 @@ public:
 	// Sets default values for this character's properties
 	ABaseMonster();
 
+float GetMonsterAttackDamage();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
 	USphereComponent* MonsterAttackRange;
+
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	int32 MonsterLevel = 1;
@@ -42,7 +46,22 @@ protected:
 	float MonsterMoveSpeed = 43.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
+	float MonsterChaseSpeed = 43.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float MonsterAttackSpeed = 1.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
+	bool bIsAttack = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
+	bool bIsHit = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
+	bool bIsDead = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
+	bool bIsInitialSpawn = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	FName MonsterType;	
@@ -62,11 +81,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
 	USoundBase* TakeDamageSound;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Animation")
 	UAnimMontage* AttackAnimation;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Animation")
 	UAnimMontage* DeathAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Animation")
+	UAnimMontage* HitAnimation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Item")
 	float MonsterExpReward = 25.0f + (MonsterLevel * 20.0f);
@@ -92,8 +114,32 @@ protected:
 	void MonsterDead();
 	void MonsterDestroy();
 	void DropReward();
-	// 아직 UI가 없음. MonsterOverHeadWidget 만들 때, 체력바 이름을 HealthBar로 할 것
+
+	void MonsterHit();
+	void MonsterHitEnd();
+
 	void UpdateMonsterOverHeadWidget();
+	void UpdateMonsterOverHeadWidgetEnd();
+
+	UFUNCTION(BlueprintCallable)
+	void SetInitialSpawn();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateChaseSpeed();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdatePatrolSpeed();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateState(EMonsterState NewMonsterState);
+
+	UFUNCTION(BlueprintCallable)
+	void MonsterAttack();
+
+	void MonsterAttackEnd();
 
 	FTimerHandle DeadAnimTimerHandle;
+	FTimerHandle AttackAnimTimerHandle;
+	FTimerHandle HitAnimTimerHandle;
+	FTimerHandle OverHeadUITimerHandle;
 };
