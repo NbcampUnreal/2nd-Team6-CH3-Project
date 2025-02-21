@@ -3,26 +3,18 @@
 
 #include "System/UIHandle.h"
 #include "UI/BaseWidget.h"
+#include "UI/FadeWidget.h"
 #include "System/EdmundGameInstance.h"
 #include "System/Settings/UIHandleSettings.h"
-
-//void UUIHandle::Initialize(FSubsystemCollectionBase& Collection)
-//{
-//	Super::Initialize(Collection);
-//
-//	
-//}
 
 void UUIHandle::InitUIHandle(UEdmundGameInstance* NewGameInstance)
 {
 	EdmundGameInstance = NewGameInstance;
 
 	const UUIHandleSettings* UISettings = GetDefault<UUIHandleSettings>();
-
-	LoadBaseWidgets(UISettings);
-	LoadCoverWidgets(UISettings);
-	CreateBaseWidgets();
-	CreateCoverWidgets();
+	checkf(IsValid(UISettings), TEXT("UI Settings is invalid"));
+	CreateBaseWidgets(UISettings);
+	CreateCoverWidgets(UISettings);
 }
 
 void UUIHandle::AddToViewportBySceneType(ESceneType SceneType)
@@ -211,7 +203,7 @@ void UUIHandle::FadeOut(const bool bIsNext, const ESceneType SceneType)
 	checkf(IsValid(FadeWidget), TEXT("FadeWidget is invalid"));
 
 	FadeWidget->AddToViewport(20);
-	FadeWidget->PlayRemoveAnim(bIsNext, SceneType);
+	FadeWidget->PlayFadeOutAnim(bIsNext, SceneType);
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
@@ -241,99 +233,85 @@ float UUIHandle::GetEffectVolumeByGameInstance() const
 
 void UUIHandle::OpenOption()
 {
-	//checkf(IsValid(OptionWidget), TEXT("OptionWidget is not valid"));
-	//AddWidgetToViewport(OptionWidget);
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseOption()
 {
-	//checkf(IsValid(OptionWidget), TEXT("OptionWidget is not valid"));
-	//RemoveWidgetFromViewport(OptionWidget);
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
 void UUIHandle::OpenText()
 {
-	//checkf(IsValid(TextWidget), TEXT("TextWidget is not valid"));
-	//AddWidgetToViewport(TextWidget);
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseText()
 {
-	//checkf(IsValid(TextWidget), TEXT("TextWidget is not valid"));
-	//RemoveWidgetFromViewport(TextWidget);
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
 void UUIHandle::OpenShop()
 {
-	//checkf(IsValid(ShopWidget), TEXT("ShopWidget is not valid"));
-	//AddWidgetToViewport(ShopWidget);
+	CurrentBaseWidget->PlayRemoveAnim();
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseShop()
 {
-	//checkf(IsValid(ShopWidget), TEXT("ShopWidget is not valid"));
-	//RemoveWidgetFromViewport(ShopWidget);
+	CurrentBaseWidget->PlayAddAnim();
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
 void UUIHandle::OpenResult()
 {
-	//checkf(IsValid(ResultWidget), TEXT("ResultWidget is not valid"));
-	//AddWidgetToViewport(ResultWidget);
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseResult()
 {
-	//checkf(IsValid(ResultWidget), TEXT("ResultWidget is not valid"));
-	//RemoveWidgetFromViewport(ResultWidget);
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
 void UUIHandle::OpenCharacterList()
 {
-	//checkf(IsValid(CharacterListWidget), TEXT("CharacterListWidget is not valid"));
-	//AddWidgetToViewport(CharacterListWidget);
+	CurrentBaseWidget->PlayRemoveAnim();
 	RequestChangeCursorMode(true, FInputModeUIOnly());
+
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->ChangeSelectMode(true);
+	EdmundGameInstance->ChangeCursorMode(true);
+	EdmundGameInstance->ChangeInputMode(FInputModeGameAndUI());
 }
 
 void UUIHandle::CloseCharacterList()
 {
-	//checkf(IsValid(CharacterListWidget), TEXT("CharacterListWidget is not valid"));
-	//RemoveWidgetFromViewport(CharacterListWidget);
+	CurrentBaseWidget->PlayAddAnim();
 	RequestChangeCursorMode(false, FInputModeGameOnly());
+
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->ChangeSelectMode(false);
+	EdmundGameInstance->ChangeCursorMode(true);
+	EdmundGameInstance->ChangeInputMode(FInputModeUIOnly());
 }
 
 void UUIHandle::OpenSkillList()
 {
-	//checkf(IsValid(SkillListWidget), TEXT("SkillListWidget is not valid"));
-	//AddWidgetToViewport(SkillListWidget);
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseSkillList()
 {
-	//checkf(IsValid(SkillListWidget), TEXT("SkillListWidget is not valid"));
-	//RemoveWidgetFromViewport(SkillListWidget);
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
 void UUIHandle::OpenMissionList()
 {
-	//checkf(IsValid(MissionListWidget), TEXT("MissionListWidget is not valid"));
-	//RemoveWidgetFromViewport(MissionListWidget);
 	RequestChangeCursorMode(true, FInputModeGameOnly());
 }
 
 void UUIHandle::CloseMissionList()
 {
-	//checkf(IsValid(MissionListWidget), TEXT("SkillListWidget is not valid"));
-	//RemoveWidgetFromViewport(MissionListWidget);
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
@@ -385,6 +363,23 @@ void UUIHandle::ClickedEffectVolume(const float Volume) const
 	EdmundGameInstance->SetEffectVolume(Volume);
 }
 
+void UUIHandle::ClickedSelectCharacter(const ECharacterType CharacterType) const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->SetPlayerType(CharacterType);
+}
+
+void UUIHandle::ClickedSelectSkill() const
+{
+}
+
+void UUIHandle::ClickedRetry() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	ESceneType CurrentScene = EdmundGameInstance->GetCurrentSceneName();
+	EdmundGameInstance->RequestSceneMove(false, CurrentScene);
+}
+
 void UUIHandle::RequestChangeCursorMode(const bool bIsVisible, const FInputModeDataBase& InputMode)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
@@ -414,84 +409,60 @@ void UUIHandle::RemoveWidgetFromViewport(UBaseWidget* Widget)
 	}
 }
 
-void UUIHandle::LoadBaseWidgets(const UUIHandleSettings* UISettings)
-{
-	checkf(IsValid(UISettings), TEXT("UI Settings is invalid"));
-
-	TitleWidgetClass = UISettings->TitleWidgetClass;
-	MainWidgetClass = UISettings->MainWidgetClass;
-	InGameWidgetClass = UISettings->InGameWidgetClass;
-	EndingWidgetClass = UISettings->EndingWidgetClass;
-}
-
-void UUIHandle::LoadCoverWidgets(const UUIHandleSettings* UISettings)
-{
-	checkf(IsValid(UISettings), TEXT("UI Settings is invalid"));
-
-	FadeWidgetClass = UISettings->FadeWidgetClass;
-	OptionWidgetClass = UISettings->OptionWidgetClass;
-	ShopWidgetClass = UISettings->ShopWidgetClass;
-	ResultWidgetClass = UISettings->ResultWidgetClass;
-	TextWidgetClass = UISettings->TextWidgetClass;
-	CharacterListWidgetClass = UISettings->CharacterListWidgetClass;
-	SkillListWidgetClass = UISettings->SkillListWidgetClass;
-	MissionListWidgetClass = UISettings->MissionListWidgetClass;
-}
-
-void UUIHandle::CreateBaseWidgets()
+void UUIHandle::CreateBaseWidgets(const UUIHandleSettings* UISettings)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 
-	checkf(IsValid(TitleWidgetClass), TEXT("TitleWidgetClass is invalid"));
-	TitleWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, TitleWidgetClass);
+	checkf(IsValid(UISettings->TitleWidgetClass), TEXT("TitleWidgetClass is invalid"));
+	TitleWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->TitleWidgetClass);
 	TitleWidget->InitWidget(this);
 
-	checkf(IsValid(MainWidgetClass), TEXT("MainWidgetClass is invalid"));
-	MainWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, MainWidgetClass);
+	checkf(IsValid(UISettings->MainWidgetClass), TEXT("MainWidgetClass is invalid"));
+	MainWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->MainWidgetClass);
 	MainWidget->InitWidget(this);
 
-	checkf(IsValid(InGameWidgetClass), TEXT("InGmaeWidgetClass is invalid"));
-	InGameWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, InGameWidgetClass);
+	checkf(IsValid(UISettings->InGameWidgetClass), TEXT("InGmaeWidgetClass is invalid"));
+	InGameWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->InGameWidgetClass);
 	InGameWidget->InitWidget(this);
 
-	checkf(IsValid(EndingWidgetClass), TEXT("EndingWidgetClass is invalid"));
-	EndingWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, EndingWidgetClass);
+	checkf(IsValid(UISettings->EndingWidgetClass), TEXT("EndingWidgetClass is invalid"));
+	EndingWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->EndingWidgetClass);
 	EndingWidget->InitWidget(this);
 }
 
-void UUIHandle::CreateCoverWidgets()
+void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 
-	checkf(IsValid(FadeWidgetClass), TEXT("FadeWidgetClass is invalid"));
-	FadeWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, FadeWidgetClass);
+	checkf(IsValid(UISettings->FadeWidgetClass), TEXT("FadeWidgetClass is invalid"));
+	FadeWidget = Cast<UFadeWidget>(CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->FadeWidgetClass));
 	FadeWidget->InitWidget(this);
 
-	checkf(IsValid(OptionWidgetClass), TEXT("OptionWidgetClass is invalid"));
-	OptionWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, OptionWidgetClass);
+	checkf(IsValid(UISettings->OptionWidgetClass), TEXT("OptionWidgetClass is invalid"));
+	OptionWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->OptionWidgetClass);
 	OptionWidget->InitWidget(this);
 
-	checkf(IsValid(ResultWidgetClass), TEXT("ResultWidgetClass is invalid"));
-	ResultWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, ResultWidgetClass);
+	checkf(IsValid(UISettings->ResultWidgetClass), TEXT("ResultWidgetClass is invalid"));
+	ResultWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->ResultWidgetClass);
 	ResultWidget->InitWidget(this);
 
-	checkf(IsValid(ShopWidgetClass), TEXT("ShopWidgetClass is invalid"));
-	ShopWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, ShopWidgetClass);
+	checkf(IsValid(UISettings->ShopWidgetClass), TEXT("ShopWidgetClass is invalid"));
+	ShopWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->ShopWidgetClass);
 	ShopWidget->InitWidget(this);
 
-	checkf(IsValid(TextWidgetClass), TEXT("TextWidgetClass is invalid"));
-	TextWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, TextWidgetClass);
+	checkf(IsValid(UISettings->TextWidgetClass), TEXT("TextWidgetClass is invalid"));
+	TextWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->TextWidgetClass);
 	TextWidget->InitWidget(this);
 
-	checkf(IsValid(CharacterListWidgetClass), TEXT("CharacterListWidgetClass is invalid"));
-	CharacterListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, CharacterListWidgetClass);
+	checkf(IsValid(UISettings->CharacterListWidgetClass), TEXT("CharacterListWidgetClass is invalid"));
+	CharacterListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->CharacterListWidgetClass);
 	CharacterListWidget->InitWidget(this);
 
-	checkf(IsValid(SkillListWidgetClass), TEXT("SkillListWidgetClass is invalid"));
-	SkillListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, SkillListWidgetClass);
+	checkf(IsValid(UISettings->SkillListWidgetClass), TEXT("SkillListWidgetClass is invalid"));
+	SkillListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->SkillListWidgetClass);
 	SkillListWidget->InitWidget(this);
 
-	checkf(IsValid(MissionListWidgetClass), TEXT("MissionListWidgetClass is invalid"));
-	MissionListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, MissionListWidgetClass);
+	checkf(IsValid(UISettings->MissionListWidgetClass), TEXT("MissionListWidgetClass is invalid"));
+	MissionListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->MissionListWidgetClass);
 	MissionListWidget->InitWidget(this);
 }

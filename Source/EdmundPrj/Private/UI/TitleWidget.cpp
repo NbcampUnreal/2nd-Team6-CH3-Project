@@ -9,29 +9,12 @@ void UTitleWidget::InitWidget(UUIHandle* NewUIHandle)
 {
 	Super::InitWidget(NewUIHandle);
 
-	StartButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedStartButton);
+	StartButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedMoveNext);
 	OptionButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedOptionButton);
-	QuitButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedQuitButton);
-}
-
-void UTitleWidget::OnClickedStartButton()
-{
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-
-	UIHandle->ClickedMoveToNext();
+	QuitButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedQuitGame);
 }
 
 void UTitleWidget::OnClickedOptionButton()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-
-	//UIHandle->OpenOption();
-	UIHandle->AddToViewportByCoverType(EWidgetType::OptionWidget);
-}
-
-void UTitleWidget::OnClickedQuitButton()
-{
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-
-	UIHandle->ClickedQuitGame();
+	OnClickedOpenWidget(EWidgetType::OptionWidget);
 }

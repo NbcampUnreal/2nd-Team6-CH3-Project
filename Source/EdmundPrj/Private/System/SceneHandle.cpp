@@ -51,7 +51,9 @@ void USceneHandle::MoveNextScene()
 void USceneHandle::OpenScene(ESceneType SceneType)
 {
 	CurrentScene = SceneType;
-
+	/*UEnum* SceneEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ESceneType"));
+	FString name = SceneEnum->GetNameStringByValue((int64)CurrentScene);
+	UE_LOG(LogTemp, Warning, TEXT("Current Scene : %s"), *name);*/
 	switch (CurrentScene)
 	{
 	case ESceneType::Title:

@@ -25,7 +25,7 @@ public:
 	virtual void Action();
 	virtual void Update();
 	virtual void PlayAddAnim();
-	virtual void PlayRemoveAnim(bool bIsNext = false, ESceneType SceneType = ESceneType::Title);
+	virtual void PlayRemoveAnim();
 	
 protected:
 	UFUNCTION()
@@ -40,12 +40,31 @@ protected:
 	UFUNCTION()
 	virtual void EndRemoveAnim();
 
+	UFUNCTION()
+	virtual void OnClickedMoveNext();
+
+	UFUNCTION()
+	virtual void OnClickedMoveMain();
+
+	UFUNCTION()
+	virtual void OnClickedMoveTitle();
+
+	UFUNCTION()
+	virtual void OnClickedQuitGame();
+
+	virtual void OnClickedOpenWidget(const EWidgetType WidgetType);
+	virtual void OnClickedCloseWidget(const EWidgetType WidgetType);
+
 protected:
 	FWidgetAnimationDynamicEvent StartAddDelegate;
 	FWidgetAnimationDynamicEvent EndAddDelegate;
 	FWidgetAnimationDynamicEvent StartRemoveDelegate;
 	FWidgetAnimationDynamicEvent EndRemoveDelegate;
 
+	TObjectPtr<UWidgetAnimation> OpenAnimation;
+	TObjectPtr<UWidgetAnimation> CloseAnimation;
+
 	TObjectPtr<UUIHandle> UIHandle;
+	//ESceneType MoveTargetScene = ESceneType::Title;
 	bool bIsPlaying = false;
 };

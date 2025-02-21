@@ -10,6 +10,7 @@
 class UEdmundGameInstance;
 class UUIHandleSettings;
 class UBaseWidget;
+class UFadeWidget;
 class IGameStateObserver;
 
 UCLASS()
@@ -42,16 +43,17 @@ public:
 	void ClickedMoveToMain() const;
 	void ClickedMoveToNext() const;
 	void ClickedMoveToMission(const ESceneType SceneType) const;
+	void ClickedRetry() const;
 	void ClickedQuitGame() const;
 	void ClickedBGMVolume(const float Volume) const;
 	void ClickedEffectVolume(const float Volume) const;
+	void ClickedSelectCharacter(const ECharacterType CharacterType) const;
+	void ClickedSelectSkill() const;
 
 private:
 	//Initialize Widgets : Load WidgetClass from UIHandleSettings(DeveloperSettings), and Create UserWidget from WidgetClass
-	void LoadBaseWidgets(const UUIHandleSettings* UISettings);
-	void LoadCoverWidgets(const UUIHandleSettings* UISettings);
-	void CreateBaseWidgets();
-	void CreateCoverWidgets();
+	void CreateBaseWidgets(const UUIHandleSettings* UISettings);
+	void CreateCoverWidgets(const UUIHandleSettings* UISettings);
 
 	// Cursor Visible and Input Mode Change. Request to GameInstance
 	void RequestChangeCursorMode(const bool bIsVisible, const FInputModeDataBase& InputMode);
@@ -89,19 +91,6 @@ private:
 	void CloseMissionList();
 
 private:
-	TSubclassOf<UBaseWidget> TitleWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> MainWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> InGameWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> EndingWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> FadeWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> OptionWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> ShopWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> TextWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> ResultWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> CharacterListWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> SkillListWidgetClass = nullptr;
-	TSubclassOf<UBaseWidget> MissionListWidgetClass = nullptr;
-
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> TitleWidget = nullptr;
 
@@ -115,7 +104,7 @@ private:
 	TObjectPtr<UBaseWidget> EndingWidget = nullptr;
 
 	UPROPERTY()
-	TObjectPtr<UBaseWidget> FadeWidget = nullptr;
+	TObjectPtr<UFadeWidget> FadeWidget = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> OptionWidget = nullptr;

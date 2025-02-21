@@ -18,13 +18,7 @@ public:
 
 private:
 	UFUNCTION()
-	void OnClickedStartButton();
-
-	UFUNCTION()
 	void OnClickedOptionButton();
-
-	UFUNCTION()
-	void OnClickedQuitButton();
 
 private:
 	UPROPERTY(Meta = (BindWidget))

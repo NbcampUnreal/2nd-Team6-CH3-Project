@@ -78,9 +78,18 @@ void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode) c
 	EdmundGameState->ChangeInputMode(InputMode);
 }
 
+void UEdmundGameInstance::ChangeSelectMode(const bool bIsSelect) const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->ChangeSelectMode(bIsSelect);
+}
+
 void UEdmundGameInstance::EndMission() const
 {
-	
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	// 소지금 등 데이터 저장 필요
+	//UIHandle->AddToViewportByCoverType(EWidgetType::ResultWidget);
+	UIHandle->AddToViewportByCoverType(EWidgetType::SkillListWidget);
 }
 
 void UEdmundGameInstance::DestroyedGameState() 
@@ -108,7 +117,8 @@ void UEdmundGameInstance::MoveNextScene() const
 
 ESceneType UEdmundGameInstance::GetCurrentSceneName() const
 {
-	return ESceneType();
+	checkf(IsValid(SceneHandle), TEXT("SceneHandle is invalid"));
+	return SceneHandle->GetCurrentScene();
 }
 
 UDataTable* UEdmundGameInstance::GetDataTable(const ETableType TableType) const
@@ -169,12 +179,15 @@ float UEdmundGameInstance::GetEffectVolume() const
 
 void UEdmundGameInstance::PlayBGMByScene() const
 {
+
 }
 
 void UEdmundGameInstance::PlayUISound(const int32 Index) const
 {
+
 }
 
 void UEdmundGameInstance::PlayEffectSound(const UAudioComponent* AudioComp, const ESoundType SoundType, const int32 Index) const
 {
+
 }

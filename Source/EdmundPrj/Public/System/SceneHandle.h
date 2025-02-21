@@ -28,6 +28,9 @@ protected:
 	
 
 protected:
+	UPROPERTY()
+	ESceneType CurrentScene = ESceneType::Title;
+
 	const FName TitleSceneName = "TitleLevel";
 	const FName MainSceneName = "MainLevel";
 	const FName Mission1SceneName = "Mission1Level";
@@ -37,6 +40,5 @@ protected:
 	const FName EndingSceneName = "EndingLevel";
 
 	const float FadeTime = 0.5f;
-	ESceneType CurrentScene = ESceneType::Title;
 	FTimerHandle TimerHandle;
 };
