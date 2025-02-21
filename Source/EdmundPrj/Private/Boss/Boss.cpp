@@ -12,6 +12,10 @@ ABoss::ABoss()
     BossState = nullptr;
 
     MonsterMoveSpeed = 500.0f;
+
+    MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
+    MuzzleLocation->SetupAttachment(GetMesh());
+    
 }
 
 void ABoss::BeginPlay()

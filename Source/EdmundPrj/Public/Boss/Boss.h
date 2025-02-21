@@ -23,4 +23,8 @@ private:
     UPROPERTY()
     UBoss_AnimInstance* AnimInstance;
 
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    USceneComponent* MuzzleLocation;
+
 };
