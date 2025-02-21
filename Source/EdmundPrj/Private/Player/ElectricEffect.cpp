@@ -2,7 +2,6 @@
 
 
 #include "Player/ElectricEffect.h"
-#include "Components\StaticMeshComponent.h"
 #include "Components\SphereComponent.h"
 #include "Monster\BaseMonster.h"
 #include "Kismet\KismetMathLibrary.h"
@@ -11,7 +10,7 @@
 AElectricEffect::AElectricEffect()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
+	
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	RootComponent = Scene;
 
@@ -19,9 +18,6 @@ AElectricEffect::AElectricEffect()
 	EnemySearchCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	EnemySearchCollision->SetupAttachment(RootComponent);
 	EnemySearchCollision->OnComponentBeginOverlap.AddDynamic(this, &AElectricEffect::FindMonster);
-
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetupAttachment(EnemySearchCollision);
 
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 	SplineComponent->SetupAttachment(RootComponent);

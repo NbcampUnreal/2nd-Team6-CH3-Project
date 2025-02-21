@@ -32,7 +32,6 @@ public:
 	void Attack(ABaseMonster* monster);
 	void Deactivate();
 	void ResetSplineRotation();
-	//void SpawnNiagaraEffect(UWorld* World, UNiagaraSystem* NiagaraEffect, FVector Location, FRotator Rotation);
 
 	void AddSplinePoint(FVector NewPoint);
 	void DeleteSplinePoint();
