@@ -7,6 +7,7 @@
 #include "DataHandle.generated.h"
 
 class UEdmundGameInstance;
+class UDataHandleSettings;
 
 UCLASS()
 class EDMUNDPRJ_API UDataHandle : public UGameInstanceSubsystem
@@ -18,5 +19,9 @@ public:
 	void InitDataHandle(UEdmundGameInstance* NewGameInstance);
 
 private:
+	void LoadDataTables(const UDataHandleSettings* DataSettings);
+
+private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance;
+	TObjectPtr<UDataTable> ShopCatalogDataTable;
 };
