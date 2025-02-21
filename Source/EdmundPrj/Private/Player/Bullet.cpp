@@ -17,8 +17,8 @@ ABullet::ABullet()
 	Collision->SetupAttachment(StaticMeshComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	ProjectileMovementComponent->InitialSpeed = 3000.0f;
-	ProjectileMovementComponent->MaxSpeed = 3000.0f;
+	ProjectileMovementComponent->InitialSpeed = 10000.0f;
+	ProjectileMovementComponent->MaxSpeed = 10000.0f;
 
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnBulletOverlap);
 }
@@ -56,12 +56,10 @@ void ABullet::EndBulletLife()
 
 void ABullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Overlap Start!!1")));
 	if (OtherActor && OtherActor->ActorHasTag("Player"))
 	{
 		return;
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Overlap Start!!2")));
 
 	GetWorld()->GetTimerManager().ClearTimer(BulletLifeTimerHandle);
 
