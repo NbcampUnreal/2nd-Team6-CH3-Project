@@ -139,8 +139,6 @@ void ABaseMonster::MonsterAttack()
 
 			float AnimDuration = AttackAnimation->GetPlayLength();
 
-			UE_LOG(LogTemp, Warning, TEXT("%f"), AnimDuration);
-
 			GetWorld()->GetTimerManager().SetTimer(AttackAnimTimerHandle, this, &ABaseMonster::MonsterAttackEnd, AnimDuration, false);
 		}
 	}
@@ -150,7 +148,6 @@ void ABaseMonster::MonsterAttackEnd()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.3f, AttackAnimation);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	UE_LOG(LogTemp, Warning, TEXT("AttackEnd"));
 }
 
 float ABaseMonster::GetMonsterAttackDamage()
