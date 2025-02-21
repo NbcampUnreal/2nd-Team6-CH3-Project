@@ -17,20 +17,9 @@ class EDMUNDPRJ_API UOptionWidget : public UBaseWidget
 	
 public:
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
-	virtual void PlayAddAnim() override;
-	virtual void PlayRemoveAnim(bool bIsNext = false, ESceneType SceneType = ESceneType::Title) override;
 	virtual void EndRemoveAnim() override;
 
 private:
-	UFUNCTION()
-	void OnClickedMoveToMain();
-
-	UFUNCTION()
-	void OnClickedMoveToTitle();
-
-	UFUNCTION()
-	void OnClickedQuitGame();
-
 	UFUNCTION()
 	void OnClickedCloseOption();
 

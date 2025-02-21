@@ -37,7 +37,10 @@ void UBaseWidget::InitWidget(UUIHandle* uiHandle)
 	StartRemoveDelegate.BindDynamic(this, &ThisClass::StartRemoveAnim);
 	EndRemoveDelegate.BindDynamic(this, &ThisClass::EndRemoveAnim);
 
-	//BindToAnimationStarted(Animation, Delegate);
+	BindToAnimationStarted(OpenAnimation, StartAddDelegate);
+	BindToAnimationFinished(OpenAnimation, EndAddDelegate);
+	BindToAnimationStarted(CloseAnimation, StartRemoveDelegate);
+	BindToAnimationFinished(CloseAnimation, EndRemoveDelegate);
 }
 
 void UBaseWidget::Action()
@@ -63,12 +66,20 @@ void UBaseWidget::Update()
 
 void UBaseWidget::PlayAddAnim()
 {
-	
+	if (bIsPlaying)
+	{
+		return;
+	}
+	PlayAnimation(OpenAnimation);
 }
 
-void UBaseWidget::PlayRemoveAnim(bool bIsNext, ESceneType SceneType)
+void UBaseWidget::PlayRemoveAnim()
 {
-	
+	if (bIsPlaying)
+	{
+		return;
+	}
+	PlayAnimation(CloseAnimation);
 }
 
 void UBaseWidget::StartRemoveAnim()
@@ -80,4 +91,40 @@ void UBaseWidget::EndRemoveAnim()
 {
 	bIsPlaying = false;
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+}
+
+void UBaseWidget::OnClickedMoveNext()
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->ClickedMoveToNext();
+}
+
+void UBaseWidget::OnClickedMoveMain()
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->ClickedMoveToMain();
+}
+
+void UBaseWidget::OnClickedMoveTitle()
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->ClickedMoveToTitle();
+}
+
+void UBaseWidget::OnClickedQuitGame()
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->ClickedQuitGame();
+}
+
+void UBaseWidget::OnClickedOpenWidget(const EWidgetType WidgetType)
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(WidgetType);
+}
+
+void UBaseWidget::OnClickedCloseWidget(const EWidgetType WidgetType)
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->RequestRemoveCoverFromViewport(WidgetType);
 }

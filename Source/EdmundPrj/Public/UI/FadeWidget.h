@@ -15,7 +15,7 @@ class EDMUNDPRJ_API UFadeWidget : public UBaseWidget
 	
 public:
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
-	virtual void PlayRemoveAnim(bool bIsNext = false, ESceneType SceneType = ESceneType::Title) override; //FadeOut
+	void PlayFadeOutAnim(bool bIsNext = false, ESceneType SceneType = ESceneType::Title); //FadeOut
 	virtual void PlayAddAnim() override; //FadeIn
 	virtual void EndRemoveAnim() override;
 	virtual void EndAddAnim() override;

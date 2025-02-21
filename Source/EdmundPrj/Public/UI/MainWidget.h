@@ -42,4 +42,10 @@ private:
 
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UButton> OptionButton;
+
+	UPROPERTY(Meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> OpenAnim;
+
+	UPROPERTY(Meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> CloseAnim;
 };
