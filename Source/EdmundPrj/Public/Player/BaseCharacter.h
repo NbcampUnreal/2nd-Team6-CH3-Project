@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "System/EnumSet.h"
 #include "BaseCharacter.generated.h"
 
 class USpringArmComponent;
@@ -40,17 +41,27 @@ protected:
 	void StartSprint(const FInputActionValue& value);
 	void StopSprint(const FInputActionValue& value);
 
+	// 공격
+	void Attack(const FInputActionValue& value);
+	virtual bool ActiveWeapon();
+
+	// 근접공격
+	void MeleeAttack(const FInputActionValue& value);
+
 	// 재장전
+	void ReloadAction(const FInputActionValue& value);
 	void Reload();
 
 	// 상호작용
-	void Interaction();
+	void Interaction(const FInputActionValue& value);
 
-	// 공격
-	void Attack();
+	// 줌 인/아웃
+	void ZoomIn(const FInputActionValue& value);
+	void ZoomOut(const FInputActionValue& value);
 
-	// 근접공격
-	void MeleeAttack();
+	// 앉기
+	void StartCrouch(const FInputActionValue& value);
+	void StopCrouch(const FInputActionValue& value);
 
 	// 피격
 	void TakeDamage(float Damage);
@@ -86,6 +97,13 @@ protected:
 	void GetUpgradeStatus();
 
 public:
+	// 캐릭터 타입 반환
+	ECharacterType getCharacterType();
+
+	// 캐릭터 타입
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	ECharacterType CharacterType;
+
 	// 현재 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float HP;
@@ -102,6 +120,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float SprintSpeed;
 
+	// 앉아서 이동 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	float CrouchMoveSpeed;
+
 	// 공격력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float AttackDamage;
@@ -114,13 +136,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float AttackSpeed;
 
-	// 현재 탄환
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	int32 CurrentAmmo;
-
 	// 최대 탄환
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 MaxAmmo;
+
+	// 현재 탄환
+	int32 CurrentAmmo;
 
 	// 보유 스킬
 	/*FVector<ActiveSkill> MyActiveSkill;
@@ -158,6 +179,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 RevivalCount;
 
+private:
 	// 달리는 중
 	bool IsSprint;
+
+	// 앉기 중
+	bool IsCrouch;
+
+	// 캡슐 높이 <- 앉기에서 사용
+	float CapsuleHeight;
 };

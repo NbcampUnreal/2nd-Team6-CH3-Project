@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "System/EnumSet.h"
+#include "Components/AudioComponent.h"
 #include "BaseMonster.generated.h"
 
 class USphereComponent;
@@ -21,11 +22,16 @@ public:
 
 float GetMonsterAttackDamage();
 
+virtual void MonsterAttackCheck();
+
+void MonsterDead();
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
+UAudioComponent* CurrentAudioComp;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
 	USphereComponent* MonsterAttackRange;
-
-	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	int32 MonsterLevel = 1;
@@ -75,10 +81,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
 	UParticleSystem* TakeDamageParticle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 	USoundBase* AttackSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 	USoundBase* TakeDamageSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Animation")
@@ -111,7 +117,6 @@ protected:
 		AController* EventInstigator,
 		AActor* DamageCauser) override;
 
-	void MonsterDead();
 	void MonsterDestroy();
 	void DropReward();
 
