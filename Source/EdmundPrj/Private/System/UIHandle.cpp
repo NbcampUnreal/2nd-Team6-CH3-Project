@@ -12,7 +12,7 @@ void UUIHandle::InitUIHandle(UEdmundGameInstance* NewGameInstance)
 	EdmundGameInstance = NewGameInstance;
 
 	const UUIHandleSettings* UISettings = GetDefault<UUIHandleSettings>();
-
+	checkf(IsValid(UISettings), TEXT("UI Settings is invalid"));
 	CreateBaseWidgets(UISettings);
 	CreateCoverWidgets(UISettings);
 }
@@ -412,7 +412,6 @@ void UUIHandle::RemoveWidgetFromViewport(UBaseWidget* Widget)
 void UUIHandle::CreateBaseWidgets(const UUIHandleSettings* UISettings)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	checkf(IsValid(UISettings), TEXT("UI Settings is invalid"));
 
 	checkf(IsValid(UISettings->TitleWidgetClass), TEXT("TitleWidgetClass is invalid"));
 	TitleWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->TitleWidgetClass);
@@ -434,7 +433,6 @@ void UUIHandle::CreateBaseWidgets(const UUIHandleSettings* UISettings)
 void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	checkf(IsValid(UISettings), TEXT("UI Settings is invalid"));
 
 	checkf(IsValid(UISettings->FadeWidgetClass), TEXT("FadeWidgetClass is invalid"));
 	FadeWidget = Cast<UFadeWidget>(CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->FadeWidgetClass));

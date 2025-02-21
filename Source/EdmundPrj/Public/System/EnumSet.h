@@ -7,6 +7,14 @@
 #include "EnumSet.generated.h"
 
 UENUM(BlueprintType)
+enum class ETimerSkillType : uint8
+{
+	Thunder = 0,
+	Meteor,
+	Plants
+};
+
+UENUM(BlueprintType)
 enum class ESceneType : uint8
 {
 	Title = 0,
