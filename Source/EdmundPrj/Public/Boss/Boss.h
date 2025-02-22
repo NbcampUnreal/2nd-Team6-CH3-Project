@@ -3,6 +3,8 @@
 #include "Monster/BaseMonster.h"
 #include "Boss/BossState.h"
 #include "Boss/Boss_AnimInstance.h"
+#include "Components/ArrowComponent.h"
+#include "Boss/Attack/Boss_Attack1_Bullet.h"
 #include "Boss.generated.h"
 
 UCLASS()
@@ -14,7 +16,10 @@ public:
 
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     void SetState(EBossState NewState);
+
+    void InitiallizeBullerPool();
 
 private:
     UPROPERTY()
@@ -25,6 +30,9 @@ private:
 
 public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    USceneComponent* MuzzleLocation;
+    UArrowComponent* MuzzleLocation;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
+    TSubclassOf<ABoss_Attack1_Bullet> Attack1BulletClass;
 
 };

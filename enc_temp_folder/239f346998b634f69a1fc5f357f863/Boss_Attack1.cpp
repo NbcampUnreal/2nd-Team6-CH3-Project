@@ -36,6 +36,7 @@ void UBoss_Attack1::ExitState()
 
 void UBoss_Attack1::FireBullet()
 {
+    UE_LOG(LogTemp, Log, TEXT("FireBullet 호출됨"));
 
     if (!BossRef || !BossRef->GetWorld())
     {
