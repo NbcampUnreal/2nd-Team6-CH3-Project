@@ -43,8 +43,6 @@ void ABoss_Attack1_Bullet::Tick(float DeltaTime)
         SetActorLocation(NewLocation);
         TraveledDistance += BulletSpeed * DeltaTime;
 
-        UE_LOG(LogTemp, Log, TEXT("Bullet moving: %s"), *NewLocation.ToString());
-
         if (TraveledDistance >= MaxDistance)
         {
             UE_LOG(LogTemp, Log, TEXT("Bullet reached max distance"));

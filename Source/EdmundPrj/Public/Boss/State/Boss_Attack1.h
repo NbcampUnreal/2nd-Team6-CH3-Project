@@ -21,7 +21,7 @@ private:
     UPROPERTY()
     ABoss* BossRef;
 
-    
+    FTimerHandle RotationTimerHandle;
 
     USceneComponent* MuzzleLocation;
 

@@ -21,11 +21,23 @@ void UBoss_Attack1::EnterState(ABoss* Boss)
         return;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("EnterState: Player found at %s"), *Player->GetActorLocation().ToString());
+    FVector PlayerLocation = Player->GetActorLocation();
+    FVector BossLocation = BossRef->GetActorLocation();
+    FVector Direction = (PlayerLocation - BossLocation).GetSafeNormal();
+    FRotator TargetRotation = Direction.Rotation();
 
-    FireBullet();
+    // 일정 시간 동안 보스 회전
+    BossRef->GetWorld()->GetTimerManager().SetTimer(
+        RotationTimerHandle,
+        [this, TargetRotation]() {
+            BossRef->SetActorRotation(TargetRotation);
+            UE_LOG(LogTemp, Log, TEXT("Boss fully rotated towards %s"), *TargetRotation.ToString());
+            FireBullet();
+        },
+        0.3f,  // 0.3초 후 실행 (회전 시간 확보)
+        false
+    );
 }
-
 
 void UBoss_Attack1::ExitState()
 {
@@ -36,16 +48,9 @@ void UBoss_Attack1::ExitState()
 
 void UBoss_Attack1::FireBullet()
 {
-
-    if (!BossRef || !BossRef->GetWorld())
+    if (!BossRef || !BossRef->GetWorld() || !BossRef->MuzzleLocation)
     {
-        UE_LOG(LogTemp, Error, TEXT("FireBullet: BossRef or World is NULL"));
-        return;
-    }
-
-    if (!BossRef->MuzzleLocation)
-    {
-        UE_LOG(LogTemp, Error, TEXT("FireBullet: MuzzleLocation is NULL"));
+        UE_LOG(LogTemp, Error, TEXT("FireBullet: BossRef, World, or MuzzleLocation is NULL"));
         return;
     }
 
@@ -56,25 +61,41 @@ void UBoss_Attack1::FireBullet()
     }
 
     FVector SpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
-    FRotator SpawnRotation = BossRef->MuzzleLocation->GetComponentRotation();
 
-    UE_LOG(LogTemp, Log, TEXT("FireBullet: Bullet SpawnLocation: %s"), *SpawnLocation.ToString());
+    AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
+    if (!Player)
+    {
+        UE_LOG(LogTemp, Error, TEXT("FireBullet: Player is NULL"));
+        return;
+    }
+
+    FVector PlayerLocation = Player->GetActorLocation();
+    FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
+    FRotator TargetRotation = Direction.Rotation();
+
+    // 보스가 부드럽게 회전하도록 보간 적용
+    FRotator NewRotation = FMath::RInterpTo(BossRef->GetActorRotation(), TargetRotation, BossRef->GetWorld()->GetDeltaSeconds(), 5.0f);
+    BossRef->SetActorRotation(NewRotation);
+
+    UE_LOG(LogTemp, Log, TEXT("FireBullet: Boss rotating smoothly towards %s"), *NewRotation.ToString());
 
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
 
     if (Bullet)
     {
         Bullet->SetActorLocation(SpawnLocation);
-        Bullet->SetActorRotation(SpawnRotation);
+        Bullet->SetActorRotation(TargetRotation);
         Bullet->SetActorHiddenInGame(false);
         Bullet->SetActorEnableCollision(true);
         Bullet->ActivateBullet();
-        UE_LOG(LogTemp, Log, TEXT("FireBullet: Bullet fire success at %s"), *Bullet->GetActorLocation().ToString());
+
+        UE_LOG(LogTemp, Log, TEXT("Bullet fired successfully at %s"), *Bullet->GetActorLocation().ToString());
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("FireBullet: Bullet fire fail"));
+        UE_LOG(LogTemp, Error, TEXT("Bullet fire failed"));
     }
 }
+
 
 
