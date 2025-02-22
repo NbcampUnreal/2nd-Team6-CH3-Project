@@ -9,14 +9,6 @@ class EDMUNDPRJ_API UBoss_Attack1 : public UBossState {
     GENERATED_BODY()
 
 public:
-	//UBoss_Attack1();
-	//void EnterState(ABoss* Boss) override;
-	//void UpdateState(float DeltaTime) override;
-	//void ExitState() override;
- //   void FireAttack();
-
- //   UPROPERTY(VisibleAnywhere)
- //   USceneComponent* MuzzleLocation;
- //   UPROPERTY(EditDefaultsOnly)
- //   TSubclassOf<ABoss_Attack1_Bullet> BullectClass;
+    virtual void EnterState(ABoss* Boss) override;
+    virtual void ExitState() override;
 };

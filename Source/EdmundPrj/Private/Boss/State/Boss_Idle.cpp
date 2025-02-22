@@ -15,7 +15,6 @@ void UBoss_Idle::EnterState(ABoss* Boss)
 
     UE_LOG(LogTemp, Log, TEXT("Idle Start"));
 
-    // 5초 후 Chase 상태로 변경하는 타이머 설정
     Boss->GetWorld()->GetTimerManager().SetTimer(IdleTimerHandle, FTimerDelegate::CreateLambda([Boss]()
         {
             if (Boss)
