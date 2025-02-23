@@ -18,6 +18,12 @@ public:
     virtual void ExitState() override;
     virtual void TickState(float DeltaTime) override;
 
+    UFUNCTION()
+    void DelayedFire_Attack2();
+
+    UFUNCTION()
+    void DelayedTransition();
+
 protected:
     // 0: InitialWait  
     // 1: Ascending  

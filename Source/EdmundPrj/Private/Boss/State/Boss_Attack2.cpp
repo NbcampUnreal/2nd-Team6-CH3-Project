@@ -2,8 +2,9 @@
 #include "Boss/Boss.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
-#include "GameFramework/CharacterMovementComponent.h" // 추가
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
+#include "Boss/Boss_AnimInstance.h"
 
 UBoss_Attack2::UBoss_Attack2()
 {
@@ -20,7 +21,6 @@ void UBoss_Attack2::EnterState(ABoss* Boss)
     BossRef = Boss;
     CurrentPhase = 0; // InitialWait
 
-    // 초기 2초 대기 후 상승 시작
     BossRef->GetWorld()->GetTimerManager().SetTimer(TimerHandle_Phase, [this]()
         {
             StartAscend();
@@ -31,14 +31,14 @@ void UBoss_Attack2::StartAscend()
 {
     UE_LOG(LogTemp, Log, TEXT("Boss starting to ascend"));
 
-    // 이동 모드를 Flying으로 전환하여 Z축 이동 가능하게 함
     if (BossRef && BossRef->GetCharacterMovement())
     {
         BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
     }
 
     CurrentPhase = 1; // Ascending
-    // 상승은 TickState()에서 매 프레임 처리합니다.
+
+    DelayedFire_Attack2();
 }
 
 void UBoss_Attack2::OnAscendComplete()
@@ -48,7 +48,6 @@ void UBoss_Attack2::OnAscendComplete()
 
     BossRef->GetWorld()->GetTimerManager().SetTimer(TimerHandle_Phase, [this]()
         {
-            // 수평 재배치 단계 시작 (플레이어의 X,Y, 현재 Z 유지)
             AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
             if (Player)
             {
@@ -63,14 +62,14 @@ void UBoss_Attack2::OnAscendComplete()
             UE_LOG(LogTemp, Log, TEXT("Boss starting horizontal reposition to (%f, %f)"),
                 TargetHorizontalLocation.X, TargetHorizontalLocation.Y);
             CurrentPhase = 3; // HorizontalReposition
+
         }, 1.0f, false);
 }
 
 void UBoss_Attack2::StartDescend()
 {
     UE_LOG(LogTemp, Log, TEXT("Boss starting to descend"));
-    CurrentPhase = 5; // Descending
-    // 하강은 TickState()에서 처리합니다.
+    CurrentPhase = 5;
 }
 
 void UBoss_Attack2::TickState(float DeltaTime)
@@ -89,9 +88,8 @@ void UBoss_Attack2::TickState(float DeltaTime)
         if (NewLocation.Z >= BossRef->Attack2_TargetHeight)
         {
             NewLocation.Z = BossRef->Attack2_TargetHeight;
-            // Sweep 옵션을 false로 하여 충돌 검사 없이 위치를 강제 업데이트
             BossRef->SetActorLocation(NewLocation, false);
-            CurrentPhase = 6; // 임시 Completed 상태로 전환
+            CurrentPhase = 6;
             OnAscendComplete();
         }
         else
@@ -100,17 +98,17 @@ void UBoss_Attack2::TickState(float DeltaTime)
         }
         break;
     }
-    case 3: // HorizontalReposition
+    case 3:
     {
         FVector CurrentLocation = BossRef->GetActorLocation();
         FVector Direction = (TargetHorizontalLocation - CurrentLocation);
-        Direction.Z = 0; // Z는 유지
+        Direction.Z = 0;
         float Distance = Direction.Size();
 
         if (Distance < 10.0f)
         {
             BossRef->SetActorLocation(FVector(TargetHorizontalLocation.X, TargetHorizontalLocation.Y, CurrentLocation.Z));
-            CurrentPhase = 4; // PreDescendWait
+            CurrentPhase = 4;
             BossRef->GetWorld()->GetTimerManager().SetTimer(TimerHandle_Phase, [this]()
                 {
                     StartDescend();
@@ -125,7 +123,7 @@ void UBoss_Attack2::TickState(float DeltaTime)
         }
         break;
     }
-    case 5: // Descending
+    case 5:
     {
         FVector CurrentLocation = BossRef->GetActorLocation();
         FVector NewLocation = CurrentLocation - FVector(0, 0, BossRef->Attack2_DescendSpeed * DeltaTime);
@@ -135,12 +133,10 @@ void UBoss_Attack2::TickState(float DeltaTime)
             NewLocation.Z = BossRef->Attack2_GroundZ;
             BossRef->SetActorLocation(NewLocation, false);
 
-            // 하강 완료 시 다시 Walking 모드로 전환
             if (BossRef->GetCharacterMovement())
             {
                 BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
             }
-
             UE_LOG(LogTemp, Log, TEXT("Boss finished descending"));
             BossRef->SetState(EBossState::Chase);
         }
@@ -151,9 +147,31 @@ void UBoss_Attack2::TickState(float DeltaTime)
         break;
     }
     default:
-        // 0 (InitialWait), 2 (AtMaxWait), 4 (PreDescendWait), 6 (Completed) 등은 타이머로 전환
         break;
     }
+}
+
+void UBoss_Attack2::DelayedFire_Attack2()
+{
+    if (!BossRef) return;
+
+    UBoss_AnimInstance* AnimInst = Cast<UBoss_AnimInstance>(BossRef->GetMesh()->GetAnimInstance());
+    if (AnimInst && AnimInst->Attack2Montage)
+    {
+        float Duration = BossRef->GetMesh()->GetAnimInstance()->Montage_Play(AnimInst->Attack2Montage);
+        UE_LOG(LogTemp, Log, TEXT("Attack2 montage playing for duration: %f"), Duration);
+        BossRef->GetWorld()->GetTimerManager().SetTimer(TimerHandle_Phase, this, &UBoss_Attack2::DelayedTransition, Duration, false);
+    }
+    else
+    {
+        BossRef->GetWorld()->GetTimerManager().SetTimer(TimerHandle_Phase, this, &UBoss_Attack2::DelayedTransition, 2.0f, false);
+    }
+}
+
+void UBoss_Attack2::DelayedTransition()
+{
+    if (!BossRef) return;
+    BossRef->SetState(EBossState::Chase);
 }
 
 void UBoss_Attack2::ExitState()
