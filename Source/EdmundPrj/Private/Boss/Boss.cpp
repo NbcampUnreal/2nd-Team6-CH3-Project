@@ -49,6 +49,18 @@ void ABoss::Tick(float DeltaTime)
     }
 }
 
+int32 ABoss::SetAttack1Count(int32 NewCount)
+{
+    Attack1Count = NewCount;
+    return Attack1Count;
+}
+
+float ABoss::SetMonsterMoveSpeed(float NewSpeed)
+{
+    MonsterMoveSpeed = NewSpeed;
+    return MonsterMoveSpeed;
+}
+
 void ABoss::SetState(EBossState NewState)
 {
     // 기존 상태 종료
@@ -63,13 +75,13 @@ void ABoss::SetState(EBossState NewState)
     {
     case EBossState::Idle:
         BossState = NewObject<UBoss_Idle>(this);
-        if (AnimInstance) AnimInstance->bIsMoving = false;
+        //if (AnimInstance) AnimInstance->bIsMoving = false;
         break;
 
     case EBossState::Chase:
         BossState = NewObject<UBoss_Chase>();
         GetCharacterMovement()->MaxWalkSpeed = MonsterMoveSpeed;
-        if (AnimInstance) AnimInstance->bIsMoving = true;
+        //if (AnimInstance) AnimInstance->bIsMoving = true;
         break;
 
     case EBossState::Attack1:

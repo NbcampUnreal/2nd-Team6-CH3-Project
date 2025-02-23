@@ -61,10 +61,10 @@ void ABoss_Attack1_Bullet::Tick(float DeltaTime)
 
 		if (HitResult.bBlockingHit)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Bullet sweep hit: %s at %s"),
+			/*UE_LOG(LogTemp, Log, TEXT("Bullet sweep hit: %s at %s"),
 				HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("Unknown"),
 				*GetActorLocation().ToString());
-			Explode();
+			Explode();*/
 			return;
 		}
 
@@ -96,7 +96,7 @@ void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* Othe
 	// 만약 OtherActor가 유효하고 자기 자신이 아니면 폭발 처리
 	if (OtherActor && OtherActor != this)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Bullet OnHit: %s at %s"), *OtherActor->GetName(), *GetActorLocation().ToString());
+		//UE_LOG(LogTemp, Log, TEXT("Bullet OnHit: %s at %s"), *OtherActor->GetName(), *GetActorLocation().ToString());
 		Explode();
 	}
 }
@@ -107,7 +107,7 @@ void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 	// Pawn(캐릭터 등)과의 Overlap 시 바로 폭발 처리
 	if (OtherActor && OtherActor != this)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Bullet OnOverlapBegin: %s at %s"), *OtherActor->GetName(), *GetActorLocation().ToString());
+		//UE_LOG(LogTemp, Log, TEXT("Bullet OnOverlapBegin: %s at %s"), *OtherActor->GetName(), *GetActorLocation().ToString());
 		Explode();
 	}
 }
@@ -129,10 +129,10 @@ void ABoss_Attack1_Bullet::Explode()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ExplosionEffect Template is not assigned!"));
+		//UE_LOG(LogTemp, Warning, TEXT("ExplosionEffect Template is not assigned!"));
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Bullet exploded at: %s"), *GetActorLocation().ToString());
+	//UE_LOG(LogTemp, Log, TEXT("Bullet exploded at: %s"), *GetActorLocation().ToString());
 
 	// ExplosionDelay 후에 ResetBullet() 호출하여 탄환을 풀에 반환
 	FTimerHandle TimerHandle;

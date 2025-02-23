@@ -19,11 +19,23 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-    // 보스 상태 전환 함수
-    UFUNCTION(BlueprintCallable, Category = "Boss")
+    UFUNCTION(BlueprintCallable)
     void SetState(EBossState NewState);
 
     void InitiallizeBullerPool();
+    
+    UFUNCTION(BlueprintCallable)
+    float GetMonsterMoveSpeed() const { return MonsterMoveSpeed; }
+
+    UFUNCTION(BlueprintCallable)
+    float SetMonsterMoveSpeed(float NewSpeed);
+
+    UFUNCTION(BlueprintCallable)
+    int32 GetAttack1Count() const { return Attack1Count; }
+
+    UFUNCTION(BlueprintCallable)
+    int32 SetAttack1Count(int32 NewCount);
+
 
 private:
     UPROPERTY()
@@ -33,16 +45,21 @@ private:
     UBoss_AnimInstance* AnimInstance;
 
 public:
+
+    // ***********************Attack 1*************************
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Attack1Count = 0;
+
     // 탄환 발사 위치 (Muzzle)
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack States")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack1")
     UArrowComponent* MuzzleLocation;
 
-    // Attack1 탄환 클래스 (Attack1 상태에서 사용)
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack States")
+    // Attack1 탄환 클래스
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
     TSubclassOf<ABoss_Attack1_Bullet> Attack1BulletClass;
 
 
-    // *** Attack2 관련 파라미터 (보스 블루프린트에서 일괄 관리) ***
+    // ***********************Attack 2*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_AscendSpeed = 300.0f;   // 상승 속도
 
@@ -57,4 +74,6 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_GroundZ = 0.0f;  // 하강 완료 기준 지면 높이
+
+
 };
