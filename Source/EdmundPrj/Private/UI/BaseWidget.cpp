@@ -73,6 +73,15 @@ void UBaseWidget::PlayAddAnim()
 	PlayAnimation(OpenAnimation);
 }
 
+void UBaseWidget::PlayRemoveAnim(bool bIsNext, ESceneType SceneType)
+{
+	if (bIsPlaying)
+	{
+		return;
+	}
+	PlayAnimation(CloseAnimation);
+}
+
 void UBaseWidget::PlayRemoveAnim()
 {
 	if (bIsPlaying)

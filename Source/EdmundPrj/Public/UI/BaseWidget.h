@@ -26,6 +26,7 @@ public:
 	virtual void Update();
 	virtual void PlayAddAnim();
 	virtual void PlayRemoveAnim();
+	virtual void PlayRemoveAnim(bool bIsNext, ESceneType SceneType = ESceneType::Title);
 	
 protected:
 	UFUNCTION()

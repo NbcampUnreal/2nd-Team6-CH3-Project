@@ -12,6 +12,7 @@ class UUIHandleSettings;
 class UBaseWidget;
 class UFadeWidget;
 class IGameStateObserver;
+struct FShopCatalogRow;
 
 UCLASS()
 class EDMUNDPRJ_API UUIHandle : public UGameInstanceSubsystem
@@ -37,6 +38,11 @@ public:
 	float GetBGMVolumeByGameInstance() const;
 	float GetEffectVolumeByGameInstance() const;
 
+	// Apply Current Data
+	const TArray<FShopCatalogRow*>& GetCurrentAdvance() const;
+	const int32 GetCurrentMoney() const;
+	bool CheckClearedMission(int32 Index) const;
+
 	// UI Button Click Event
 	void ClickedCloseCoverWidget() const;
 	void ClickedMoveToTitle() const;
@@ -48,7 +54,8 @@ public:
 	void ClickedBGMVolume(const float Volume) const;
 	void ClickedEffectVolume(const float Volume) const;
 	void ClickedSelectCharacter(const ECharacterType CharacterType) const;
-	void ClickedSelectSkill() const;
+	void ClickedSelectSkill(const int32 Index) const;
+	const FShopCatalogRow* ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const;
 
 private:
 	//Initialize Widgets : Load WidgetClass from UIHandleSettings(DeveloperSettings), and Create UserWidget from WidgetClass
@@ -104,7 +111,7 @@ private:
 	TObjectPtr<UBaseWidget> EndingWidget = nullptr;
 
 	UPROPERTY()
-	TObjectPtr<UFadeWidget> FadeWidget = nullptr;
+	TObjectPtr<UBaseWidget> FadeWidget = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> OptionWidget = nullptr;

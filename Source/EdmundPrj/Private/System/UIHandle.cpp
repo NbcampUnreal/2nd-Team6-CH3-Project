@@ -3,7 +3,6 @@
 
 #include "System/UIHandle.h"
 #include "UI/BaseWidget.h"
-#include "UI/FadeWidget.h"
 #include "System/EdmundGameInstance.h"
 #include "System/Settings/UIHandleSettings.h"
 
@@ -203,7 +202,7 @@ void UUIHandle::FadeOut(const bool bIsNext, const ESceneType SceneType)
 	checkf(IsValid(FadeWidget), TEXT("FadeWidget is invalid"));
 
 	FadeWidget->AddToViewport(20);
-	FadeWidget->PlayFadeOutAnim(bIsNext, SceneType);
+	FadeWidget->PlayRemoveAnim(bIsNext, SceneType);
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
@@ -229,6 +228,24 @@ float UUIHandle::GetEffectVolumeByGameInstance() const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	return EdmundGameInstance->GetEffectVolume();
+}
+
+const TArray<FShopCatalogRow*>& UUIHandle::GetCurrentAdvance() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->GetAdvanceState();
+}
+
+const int32 UUIHandle::GetCurrentMoney() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->GetPossessMoney();
+}
+
+bool UUIHandle::CheckClearedMission(int32 Index) const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->CheckClearedMission(Index);
 }
 
 void UUIHandle::OpenOption()
@@ -369,8 +386,23 @@ void UUIHandle::ClickedSelectCharacter(const ECharacterType CharacterType) const
 	EdmundGameInstance->SetPlayerType(CharacterType);
 }
 
-void UUIHandle::ClickedSelectSkill() const
+void UUIHandle::ClickedSelectSkill(const int32 Index) const
 {
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->ApplySelectSkill(Index);
+}
+
+const FShopCatalogRow* UUIHandle::ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	bool bIsUpdated =  EdmundGameInstance->UpdateAdvanceState(TargetRow, UpdateValue);
+
+	if (bIsUpdated)
+	{
+		return EdmundGameInstance->GetAdvanceState(TargetRow);
+	}
+
+	return nullptr;
 }
 
 void UUIHandle::ClickedRetry() const
@@ -435,7 +467,7 @@ void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 
 	checkf(IsValid(UISettings->FadeWidgetClass), TEXT("FadeWidgetClass is invalid"));
-	FadeWidget = Cast<UFadeWidget>(CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->FadeWidgetClass));
+	FadeWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->FadeWidgetClass);
 	FadeWidget->InitWidget(this);
 
 	checkf(IsValid(UISettings->OptionWidgetClass), TEXT("OptionWidgetClass is invalid"));

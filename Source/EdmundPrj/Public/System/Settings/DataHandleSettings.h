@@ -16,4 +16,7 @@ class EDMUNDPRJ_API UDataHandleSettings : public UDeveloperSettings
 public:
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
 	TSoftObjectPtr<UDataTable> ShopCatalogDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
+	TSoftObjectPtr<UDataTable> PlayDataTable;
 };

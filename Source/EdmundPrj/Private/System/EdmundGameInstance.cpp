@@ -24,9 +24,9 @@ void UEdmundGameInstance::Init()
 	checkf(IsValid(DataHandle), TEXT("Fail Get DataHandle"));
 
 	SceneHandle->InitSceneHandle();
+	DataHandle->InitDataHandle(this);
 	UIHandle->InitUIHandle(this);
 	SoundHandle->InitSoundHandle(this);
-	DataHandle->InitDataHandle(this);
 }
 
 void UEdmundGameInstance::StartedGameState()
@@ -121,36 +121,70 @@ ESceneType UEdmundGameInstance::GetCurrentSceneName() const
 	return SceneHandle->GetCurrentScene();
 }
 
-UDataTable* UEdmundGameInstance::GetDataTable(const ETableType TableType) const
+const UDataTable* UEdmundGameInstance::GetDataTable(const ETableType TableType) const
 {
-	return nullptr;
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetDataTable(TableType);
 }
 
-TMap<FName, int32>* UEdmundGameInstance::GetPlayerInfo() const
+const TArray<FShopCatalogRow*>& UEdmundGameInstance::GetAdvanceState() const
 {
-	return nullptr;
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetCurrentAdvance();
 }
 
-void UEdmundGameInstance::UpdatePlayerInfo(const FName Type, const int32 Price) const
+const FShopCatalogRow* UEdmundGameInstance::GetAdvanceState(const FName& TargetRow) const
 {
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetCurrentAdvanceByRowName(TargetRow);
+}
+
+bool UEdmundGameInstance::UpdateAdvanceState(const FName RowName, const int32 UpdateValue) const
+{
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->UpdateCurrentAdvance(RowName, UpdateValue);
 }
 
 ECharacterType UEdmundGameInstance::GetPlayerType() const
 {
-	return ECharacterType();
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetPlayerType();
 }
 
 void UEdmundGameInstance::SetPlayerType(const ECharacterType Type) const
 {
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	DataHandle->SetPlayerType(Type);
 }
 
 void UEdmundGameInstance::AddPossessMoney(const int32 Value) const
 {
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	DataHandle->AddMoney(Value);
 }
 
 int32 UEdmundGameInstance::GetPossessMoney() const
 {
-	return int32();
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetMoney();
+}
+
+bool UEdmundGameInstance::CheckClearedMission(const int32 Index) const
+{
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->IsClearedMission(Index);
+}
+
+void UEdmundGameInstance::OnSkillListUI() const
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::SkillListWidget);
+}
+
+void UEdmundGameInstance::ApplySelectSkill(const int32 Index) const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->ApplySelectedSkill(Index);
 }
 
 void UEdmundGameInstance::SetBGMVolume(const float Volume) const
