@@ -4,6 +4,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -20,15 +21,28 @@ ABaseCharacter::ABaseCharacter()
 
 	WalkSpeed = 600.0f;
 	SprintSpeed = 1000.0f;
+	CrouchMoveSpeed = 300.0f;
+
+	CurrentAmmo = MaxAmmo = 40;
 
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	IsSprint = false;
+	IsCrouch = false;
 }
 
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	CurrentAmmo = MaxAmmo;
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+	// 캡슐 콜리전 크기 저장하기
+	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+
+	if (IsValid(CapsuleComp))
+	{
+		CapsuleHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
+	}
 }
 
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -92,6 +106,80 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 					&ABaseCharacter::StopSprint
 				);
 			}
+
+			if (PlayerController->AttackAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->AttackAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABaseCharacter::Attack
+				);
+			}
+
+			if (PlayerController->MeleeAttackAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->MeleeAttackAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABaseCharacter::MeleeAttack
+				);
+			}
+
+			if (PlayerController->ReloadAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->ReloadAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABaseCharacter::ReloadAction
+				);
+			}
+
+			if (PlayerController->InteractionAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->InteractionAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABaseCharacter::Interaction
+				);
+			}
+
+			if (PlayerController->ZoomAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->ZoomAction,
+					ETriggerEvent::Started,
+					this,
+					&ABaseCharacter::ZoomIn
+				);
+
+				EnhancedInput->BindAction(
+					PlayerController->ZoomAction,
+					ETriggerEvent::Completed,
+					this,
+					&ABaseCharacter::ZoomOut
+				);
+			}
+
+			if (PlayerController->CrouchAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->CrouchAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABaseCharacter::StartCrouch
+				);
+
+				EnhancedInput->BindAction(
+					PlayerController->CrouchAction,
+					ETriggerEvent::Completed,
+					this,
+					&ABaseCharacter::StopCrouch
+				);
+			}
 		}
 	}
 }
@@ -141,8 +229,13 @@ void ABaseCharacter::StartSprint(const FInputActionValue& value)
 {
 	if (GetCharacterMovement())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 		IsSprint = true;
+
+		// 앉은 상태에서는 달리기 불가
+		if (!IsCrouch)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		}
 	}
 }
 
@@ -150,30 +243,150 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 {
 	if (GetCharacterMovement())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 		IsSprint = false;
+
+		// 앉은 상태에서는 달리기 불가
+		if (!IsCrouch)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		}
 	}
+}
+
+void ABaseCharacter::Attack(const FInputActionValue& value)
+{
+	if (CurrentAmmo <= 0)
+	{
+		return;
+	}
+
+	if (ActiveWeapon())
+	{
+		CurrentAmmo--;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Ammo: %d/%d"), CurrentAmmo, MaxAmmo));
+	}
+
+	if (CurrentAmmo <= 0)
+	{
+		Reload();
+	}
+}
+
+bool ABaseCharacter::ActiveWeapon()
+{
+	// 자식 클래스의 함수 실행
+	return false;
+}
+
+void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("MeleeAttack Start!!")));
+}
+
+void ABaseCharacter::ReloadAction(const FInputActionValue& value)
+{
+	Reload();
 }
 
 void ABaseCharacter::Reload()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Reload Start!!")));
 	CurrentAmmo = MaxAmmo;
 }
 
-void ABaseCharacter::Interaction()
+void ABaseCharacter::Interaction(const FInputActionValue& value)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Interaction Start!!")));
 }
 
-void ABaseCharacter::Attack()
+void ABaseCharacter::ZoomIn(const FInputActionValue& value)
 {
-	if (CurrentAmmo > 0)
+	if (!IsValid(SpringArmComp))
 	{
-		CurrentAmmo--;
+		return;
+	}
+
+	SpringArmComp->TargetArmLength = -1000;
+	//SpringArmComp->SocketOffset = FVector(0, 40, 60);
+}
+
+void ABaseCharacter::ZoomOut(const FInputActionValue& value)
+{
+	if (!IsValid(SpringArmComp))
+	{
+		return;
+	}
+
+	SpringArmComp->TargetArmLength = 300;
+	//SpringArmComp->SocketOffset = FVector(0, 60, 60);
+}
+
+void ABaseCharacter::StartCrouch(const FInputActionValue& value)
+{
+	if (!IsCrouch && GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = CrouchMoveSpeed;
+
+		// 캡슐 콜리전 가져오기
+		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+
+		if (IsValid(CapsuleComp))
+		{
+			// 캡슐 크기 조정
+			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight / 2);
+
+			// 메쉬 위치 조정
+			FVector NewLocation = GetMesh()->GetRelativeLocation();
+			NewLocation.Z += CapsuleHeight / 2;
+			GetMesh()->SetRelativeLocation(NewLocation);
+
+			// 카메라 위치 조정
+			NewLocation = SpringArmComp->GetRelativeLocation();
+			NewLocation.Z += CapsuleHeight / 2;
+			SpringArmComp->SetRelativeLocation(NewLocation);
+
+			// 전체 액터 조정
+			NewLocation = GetActorLocation();
+			NewLocation.Z -= CapsuleHeight / 2;
+			SetActorLocation(NewLocation);
+		}
+
+		IsCrouch = true;
 	}
 }
 
-void ABaseCharacter::MeleeAttack()
+void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 {
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+		// 캡슐 콜리전 가져오기
+		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+
+		if (IsValid(CapsuleComp))
+		{
+			// 캡슐 크기 조정
+			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight);
+
+			// 메쉬 위치 조정
+			FVector NewLocation = GetMesh()->GetRelativeLocation();
+			NewLocation.Z -= CapsuleHeight / 2;
+			GetMesh()->SetRelativeLocation(NewLocation);
+
+			// 카메라 위치 조정
+			NewLocation = SpringArmComp->GetRelativeLocation();
+			NewLocation.Z -= CapsuleHeight / 2;
+			SpringArmComp->SetRelativeLocation(NewLocation);
+
+			// 전체 액터 조정
+			NewLocation = GetActorLocation();
+			NewLocation.Z += CapsuleHeight / 2;
+			SetActorLocation(NewLocation);
+		}
+
+		IsCrouch = false;
+	}
 }
 
 void ABaseCharacter::TakeDamage(float Damage)
@@ -228,4 +441,9 @@ void ABaseCharacter::AddGold(int32 Gold)
 
 void ABaseCharacter::GetUpgradeStatus()
 {
+}
+
+ECharacterType ABaseCharacter::getCharacterType()
+{
+	return CharacterType;
 }

@@ -18,16 +18,19 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void Fire();
+	bool Fire();
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class USkeletalMeshComponent> Mesh;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<USceneComponent> MuzzleOffset;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TObjectPtr<class UAnimMontage> FireMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	float AttackDelay;
 
 private:
 
@@ -35,9 +38,15 @@ private:
 	ABullet* GetBulletFromPool();
 	void ReturnBulletToPool(ABullet* Bullet);
 
+	FTimerHandle AttackDelayHandle;
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABullet> BulletClass;
 
 	UPROPERTY()
 	TArray<ABullet*> BulletPool;  // ÃÑ¾Ë Ç® ¹è¿­
+
+	void ActivateAttack();
+
+	bool IsAttack;
 };

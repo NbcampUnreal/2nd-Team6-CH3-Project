@@ -7,12 +7,19 @@
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "GameFramework//CharacterMovementComponent.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ABaseMonster::ABaseMonster()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	CurrentAudioComp->SetupAttachment(RootComponent);
 
 	MonsterAttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("AttackRange"));
 	MonsterAttackRange->SetupAttachment(RootComponent); // 공격 범위 콜리전
@@ -29,6 +36,10 @@ ABaseMonster::ABaseMonster()
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+
+	CurrentAudioComp->SetSound(TakeDamageSound);
+	CurrentAudioComp->Play();
+
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
@@ -59,11 +70,12 @@ void ABaseMonster::MonsterDead()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
+			GetCharacterMovement()->DisableMovement();
+
 			AnimInstance->Montage_Play(DeathAnimation);
 
 			float AnimDuration = DeathAnimation->GetPlayLength();
-
-			GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration, false);
+			GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
 		}
 	}
 }
@@ -71,6 +83,7 @@ void ABaseMonster::MonsterDead()
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
 	DropReward();
 	Destroy();
 }
@@ -96,7 +109,6 @@ void ABaseMonster::MonsterHit()
 
 	if (HitAnimation)
 	{
-
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
@@ -139,8 +151,6 @@ void ABaseMonster::MonsterAttack()
 
 			float AnimDuration = AttackAnimation->GetPlayLength();
 
-			UE_LOG(LogTemp, Warning, TEXT("%f"), AnimDuration);
-
 			GetWorld()->GetTimerManager().SetTimer(AttackAnimTimerHandle, this, &ABaseMonster::MonsterAttackEnd, AnimDuration, false);
 		}
 	}
@@ -150,7 +160,11 @@ void ABaseMonster::MonsterAttackEnd()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.3f, AttackAnimation);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	UE_LOG(LogTemp, Warning, TEXT("AttackEnd"));
+}
+
+void ABaseMonster::MonsterAttackCheck()
+{
+	UE_LOG(LogTemp, Warning, TEXT("몬스터에 MonsterAttackCheck 함수가 없습니다."));
 }
 
 float ABaseMonster::GetMonsterAttackDamage()

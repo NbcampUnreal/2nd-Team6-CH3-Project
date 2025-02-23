@@ -31,7 +31,22 @@ public:
 	UInputAction* SprintAction = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	UInputAction* FireAction = nullptr;
+	UInputAction* AttackAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* MeleeAttackAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* ReloadAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* InteractionAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* ZoomAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* CrouchAction = nullptr;
 
 protected:
 	virtual void BeginPlay() override;

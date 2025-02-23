@@ -13,6 +13,9 @@ AWeapon::AWeapon()
 
 	MuzzleOffset = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleOffset"));
 	MuzzleOffset->SetupAttachment(Mesh);
+
+	AttackDelay = 0.2f;
+	IsAttack = false;
 }
 
 void AWeapon::BeginPlay()
@@ -68,8 +71,13 @@ void AWeapon::ReturnBulletToPool(ABullet* Bullet)
 	}
 }
 
-void AWeapon::Fire()
+bool AWeapon::Fire()
 {
+	if (IsAttack)
+	{
+		return false;
+	}
+
 	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 
 	if (IsValid(AnimInstance) && IsValid(FireMontage))
@@ -77,7 +85,7 @@ void AWeapon::Fire()
 		AnimInstance->Montage_Play(FireMontage);
 	}
 
-	// BulletPool에서 총알을 가져옵니다.
+	// BulletPool에서 총알을 가져옴
 	ABullet* BulletToFire = GetBulletFromPool();
 	if (BulletToFire)
 	{
@@ -96,7 +104,7 @@ void AWeapon::Fire()
 		PC->DeprojectScreenPositionToWorld(x / 2.0f, y / 2.0f, WorldCenter, WorldDirection);
 
 		// WorldCenter에서 WorldDirection 방향으로 발사
-		FVector TargetLocation = WorldCenter + WorldDirection * 10000; // 충분히 먼 거리로 설정
+		FVector TargetLocation = WorldCenter + WorldDirection * 10000;
 		SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, TargetLocation);
 
 		BulletToFire->SetActorLocation(SpawnLocation + WorldDirection * 100);
@@ -108,87 +116,23 @@ void AWeapon::Fire()
 		{
 			BulletToFire->ProjectileMovementComponent->Velocity = ForwardDirection * BulletToFire->ProjectileMovementComponent->InitialSpeed;
 		}
+
+		// 총알에 딜레이 설정
+		IsAttack = true;
+
+		GetWorld()->GetTimerManager().SetTimer(
+			AttackDelayHandle,
+			this,
+			&AWeapon::ActivateAttack,
+			AttackDelay,
+			false
+		);
 	}
+
+	return true;
 }
 
-
-//void AWeapon::Fire()
-//{
-//	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
-//
-//	if (IsValid(AnimInstance) && IsValid(FireMontage))
-//	{
-//		AnimInstance->Montage_Play(FireMontage);
-//	}
-//	
-//	// BulletPool에서 총알을 가져옵니다.
-//	ABullet* BulletToFire = GetBulletFromPool();
-//	if (BulletToFire)
-//	{
-//		FRotator SpawnRotation = MuzzleOffset->GetComponentRotation();
-//		FVector SpawnLocation = MuzzleOffset->GetComponentLocation();
-//
-//		//// 총알 위치 및 회전 설정
-//		//BulletToFire->SetActorLocation(SpawnLocation);
-//		//BulletToFire->SetActorRotation(SpawnRotation);
-//
-//		// 총알 발사 처리를 추가하려면 여기에 로직을 추가하세요.
-//		int32 x, y;
-//
-//		APlayerController* PC = Cast<APlayerController>(Cast<ABaseCharacter>(GetOwner())->GetController());
-//
-//		PC->GetViewportSize(x, y);
-//
-//		FVector WorldCenter;
-//		FVector WorldFront;
-//
-//		PC->DeprojectScreenPositionToWorld(x / 2.0f, y / 2.0f, WorldCenter, WorldFront);
-//
-//		WorldCenter += WorldFront * 10000;
-//		SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, WorldCenter);
-//		BulletToFire->SetActorLocation(SpawnLocation);
-//		BulletToFire->SetActorRotation(SpawnRotation);
-//	}
-//
-//	
-//}
-	/*void AWeapon::Fire()
-	{
-
-		if (IsValid(Bullet))
-		{
-			FRotator SpawnRotation = MuzzleOffset->GetComponentRotation();
-			FVector SpawnLocation = MuzzleOffset->GetComponentLocation();
-
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-
-			ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(GetOwner());
-
-			if (!IsValid(BaseCharacter))
-			{
-				GetWorld()->SpawnActor<ABullet>(Bullet, SpawnLocation, SpawnRotation, SpawnParams);
-				return;
-			}
-
-			APlayerController* PC = Cast<APlayerController>(BaseCharacter->GetController());
-			int32 x, y;
-
-			if (!IsValid(PC))
-			{
-				GetWorld()->SpawnActor<ABullet>(Bullet, SpawnLocation, SpawnRotation, SpawnParams);
-				return;
-			}
-
-			PC->GetViewportSize(x, y);
-
-			FVector WorldCenter;
-			FVector WorldFront;
-
-			PC->DeprojectScreenPositionToWorld(x / 2.0f, y / 2.0f, WorldCenter, WorldFront);
-
-			WorldCenter += WorldFront * 10000;
-			SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, WorldCenter);
-			GetWorld()->SpawnActor<ABullet>(Bullet, SpawnLocation, SpawnRotation, SpawnParams);
-		}
-	}*/
+void AWeapon::ActivateAttack()
+{
+	IsAttack = false;
+}
