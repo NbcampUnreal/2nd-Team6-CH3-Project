@@ -18,22 +18,11 @@ public:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-    UFUNCTION(BlueprintCallable)
     void SetState(EBossState NewState);
-
     void InitiallizeBullerPool();
-    
-    UFUNCTION(BlueprintCallable)
     float GetMonsterMoveSpeed() const { return MonsterMoveSpeed; }
-
-    UFUNCTION(BlueprintCallable)
     float SetMonsterMoveSpeed(float NewSpeed);
-
-    UFUNCTION(BlueprintCallable)
     int32 GetAttack1Count() const { return Attack1Count; }
-
-    UFUNCTION(BlueprintCallable)
     int32 SetAttack1Count(int32 NewCount);
 
 
@@ -75,5 +64,5 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_GroundZ = 0.0f;  // 하강 완료 기준 지면 높이
 
-
+    // ***********************Attack 3*************************
 };
