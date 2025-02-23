@@ -16,6 +16,7 @@ void UBoss_Chase::EnterState(ABoss* Boss)
     }
     BossCharacter = Boss;
     Boss->GetWorld()->GetTimerManager().SetTimer(UpdateTimerHandle, this, &UBoss_Chase::UpdateChase, 0.5f, true);
+    Boss->SetState(EBossState::Attack1);
 }
 
 void UBoss_Chase::ExitState()

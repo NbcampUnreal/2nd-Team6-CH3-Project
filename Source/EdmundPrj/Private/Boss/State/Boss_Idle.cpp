@@ -20,7 +20,7 @@ void UBoss_Idle::EnterState(ABoss* Boss)
             if (Boss)
             {
                 UE_LOG(LogTemp, Log, TEXT("Idle Timer Triggered, Changing to Chase"));
-                Boss->SetState(EBossState::Attack1);
+                Boss->SetState(EBossState::Attack2);
             }
         }), 5.0f, false);
 
