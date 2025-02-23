@@ -66,3 +66,13 @@ void AEdmundGameState::ChangeSelectMode(const bool bIsSelect) const
 
 	//MainLevelPlayerController->
 }
+
+void AEdmundGameState::CalculateSkillList()
+{
+
+}
+
+void AEdmundGameState::ApplySelectedSkill(const int32 Index)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Selected Skill Index is %d"), Index);
+}
