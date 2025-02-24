@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
 #include "RangedMonsterBullet.generated.h"
+
+class USphereComponent;
+class UProjectileMovementComponent;
 
 UCLASS()
 class EDMUNDPRJ_API ARangedMonsterBullet : public AActor
@@ -12,15 +16,35 @@ class EDMUNDPRJ_API ARangedMonsterBullet : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+
 	ARangedMonsterBullet();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	float DamageValue = 1;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Componenets")
+	USphereComponent* CollisionComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Components")
+	UStaticMeshComponent* StaticMeshComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Components")
+	UProjectileMovementComponent* ProjectileMovementComp;
+
+	void SetMonsterBulletHidden(bool isHidden);
+
+	void EndMonsterBulletLife();
+
+	void SetDamage(float Damage);
+
+	UFUNCTION()
+	virtual void OnMonsterBulletOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	FTimerHandle MonsterBulletLifeTimerHandle;
 
 };

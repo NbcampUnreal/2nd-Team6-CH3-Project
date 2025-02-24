@@ -32,6 +32,8 @@ ABaseMonster::ABaseMonster()
 	MonsterOverHeadWidget->SetVisibility(false, true);
 
 	GetCharacterMovement()->MaxWalkSpeed = MonsterMoveSpeed;
+
+	Tags.Add(FName("Monster"));
 }
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
