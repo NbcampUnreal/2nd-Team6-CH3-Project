@@ -23,9 +23,9 @@ protected:
 	USphereComponent* Collision;
 
 public:
-	void SetBulletHidden(bool IsHidden);  // ï¿½Ñ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
+	void SetBulletHidden(bool IsHidden);  // ÃÑ¾Ë ¼û±è »óÅÂ¸¦ ¼³Á¤ÇÏ´Â ÇÔ¼ö
 
-	void EndBulletLife();  // ï¿½Ñ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
+	void EndBulletLife();  // ÃÑ¾Ë ¼û±è »óÅÂ¸¦ ¼³Á¤ÇÏ´Â ÇÔ¼ö
 
 	UFUNCTION()
 	virtual void OnBulletOverlap(
