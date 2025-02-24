@@ -74,4 +74,18 @@ public:
     // Attack4 탄환 클래스
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
     TSubclassOf<ABoss_Attack4_Bullet> Attack4BulletClass;
+
+    // ***********************Skill 1*************************
+    // ***********************Skill 2*************************
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    float Skill2SpawnRadius = 500.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    int32 Skill2SpawnCount = 10;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    TArray<TSubclassOf<AActor>> Skill2MonsterList;
+
+    // ***********************Skill 3*************************
+    // ***********************Skill 4*************************
 };

@@ -6,6 +6,7 @@
 #include "Boss/State/Boss_Attack2.h"
 #include "Boss/State/Boss_Attack3.h"
 #include "Boss/State/Boss_Attack4.h"
+#include "Boss/State/Boss_Skill2.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
@@ -95,6 +96,10 @@ void ABoss::SetState(EBossState NewState)
 
     case EBossState::Attack4:
         BossState = NewObject<UBoss_Attack4>();
+        break;
+
+    case EBossState::Skill2:
+        BossState = NewObject<UBoss_Skill2>();
         break;
 
     default:
