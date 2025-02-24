@@ -21,7 +21,7 @@ void UBoss_Idle::EnterState(ABoss* Boss)
             {
                 Boss->SetState(EBossState::Attack4);
             }
-        }), 3.0f, false);
+        }), 1000.0f, false);
 }
 
 void UBoss_Idle::ExitState()
