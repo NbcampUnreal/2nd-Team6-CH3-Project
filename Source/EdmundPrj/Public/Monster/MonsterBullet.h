@@ -2,17 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Bullet.generated.h"
+#include "MonsterBullet.generated.h"
 
 class USphereComponent;
 
 UCLASS()
-class EDMUNDPRJ_API ABullet : public AActor
+class EDMUNDPRJ_API AMonsterBullet : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	ABullet();
+	AMonsterBullet();
 
 protected:
 	virtual void BeginPlay() override;

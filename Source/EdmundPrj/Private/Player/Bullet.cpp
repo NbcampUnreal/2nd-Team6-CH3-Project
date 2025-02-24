@@ -35,7 +35,7 @@ void ABullet::Tick(float DeltaTime)
 
 void ABullet::SetBulletHidden(bool IsHidden)
 {
-	// 3ÃÊ µÚ±îÁö ¿À¹ö·¦ ¾ÈµÉ °æ¿ì Ç®¸µ
+	// 3ï¿½ï¿½ ï¿½Ú±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Èµï¿½ ï¿½ï¿½ï¿½ Ç®ï¿½ï¿½
 	if (!IsHidden)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
@@ -46,7 +46,7 @@ void ABullet::SetBulletHidden(bool IsHidden)
 			false
 		);
 	}
-	SetActorHiddenInGame(IsHidden);  // ÃÑ¾Ë ¼û±è Ã³¸®
+	SetActorHiddenInGame(IsHidden);  // ï¿½Ñ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
 }
 
 void ABullet::EndBulletLife()

@@ -1,23 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Monster/SuicideMonster.h"
+#include "Monster/RangedMonster.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
 
-ASuicideMonster::ASuicideMonster()
+ARangedMonster::ARangedMonster()
 {
 }
 
-void ASuicideMonster::MonsterAttackCheck()
+void ARangedMonster::MonsterAttackCheck()
 {
     USkeletalMeshComponent* MeshComp = GetMesh();
     ABaseMonster* Monster = Cast<ABaseMonster>(this);
 
     if (Monster)
     {
-        //파티클 재생
         PlayParticle();
         PlaySound();
 
@@ -25,39 +24,33 @@ void ASuicideMonster::MonsterAttackCheck()
         CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
         // 콜리전 컴포넌트 초기화
-        CollisionComp->SetCapsuleSize(3000.0f, 3000.0f); // 필요에 따라 사이즈 조정
+        CollisionComp->SetCapsuleSize(100.0f, 100.0f); // 필요에 따라 사이즈 조정
         CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-        CollisionComp->SetRelativeLocation(FVector(0.0f, 10.0f, 0.0f)); // 액터의 앞에 콜리전 위치
+        CollisionComp->SetRelativeLocation(FVector(0.0f, 150.0f, 0.0f)); // 액터의 앞에 콜리전 위치
 
         CollisionComp->RegisterComponent();
 
-        CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ASuicideMonster::OnOverlapBegin);
+        CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ARangedMonster::OnOverlapBegin);
 
 
         //  공격 Collision Visible 활성화
-         FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-         DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
+        FVector CapsuleLocation = CollisionComp->GetComponentLocation();
+        DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
 
 
-         // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
+        // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
         FTimerHandle TimerHandle;
         this->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]()
             {
                 CollisionComp->DestroyComponent();
             }), 0.01f, false);
-
-        FTimerHandle DeadTimerHandle;
-        this->GetWorldTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([=]()
-            {
-                Monster->MonsterDead();
-            }), 0.01f, false);
     }
 }
-void ASuicideMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ARangedMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
     {
-        UE_LOG(LogTemp, Warning, TEXT("Suicide Attack Succeed")); // 공격 성공 Log
+        UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
         AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
         ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
         if (Monster)
@@ -75,7 +68,7 @@ void ASuicideMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
     }
 }
 
-void ASuicideMonster::PlayParticle()
+void ARangedMonster::PlayParticle()
 {
     //파티클 활성화, 헤더는 BaseMonster에 있음
     UParticleSystemComponent* Particle = nullptr;
@@ -95,8 +88,9 @@ void ASuicideMonster::PlayParticle()
     }
 }
 
-void ASuicideMonster::PlaySound()
+void ARangedMonster::PlaySound()
 {
     CurrentAudioComp->SetSound(AttackSound);
     CurrentAudioComp->Play();
 }
+

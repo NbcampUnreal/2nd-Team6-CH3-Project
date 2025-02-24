@@ -198,6 +198,14 @@ void ABaseMonster::UpdateMonsterOverHeadWidgetEnd()
 	MonsterOverHeadWidget->SetVisibility(false, true);
 }
 
+void ABaseMonster::PlayParticle()
+{
+}
+
+void ABaseMonster::PlaySound()
+{
+}
+
 void ABaseMonster::SetInitialSpawn()
 {
 	bIsInitialSpawn = false;

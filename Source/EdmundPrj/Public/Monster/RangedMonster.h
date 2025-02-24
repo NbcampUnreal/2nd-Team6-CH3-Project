@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Monster/BaseMonster.h"
-#include "MeleeMonster.generated.h"
+#include "RangedMonster.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EDMUNDPRJ_API AMeleeMonster : public ABaseMonster
+class EDMUNDPRJ_API ARangedMonster : public ABaseMonster
 {
 	GENERATED_BODY()
-	
+
 public:
-	AMeleeMonster();
+	ARangedMonster();
 
 	void MonsterAttackCheck() override;
 
