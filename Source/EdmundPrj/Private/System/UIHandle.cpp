@@ -302,7 +302,6 @@ void UUIHandle::OpenCharacterList()
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->ChangeSelectMode(true);
 	EdmundGameInstance->ChangeCursorMode(true);
 	EdmundGameInstance->ChangeInputMode(FInputModeGameAndUI());
 }
@@ -313,7 +312,6 @@ void UUIHandle::CloseCharacterList()
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->ChangeSelectMode(false);
 	EdmundGameInstance->ChangeCursorMode(true);
 	EdmundGameInstance->ChangeInputMode(FInputModeUIOnly());
 }
@@ -390,6 +388,12 @@ void UUIHandle::ClickedSelectCharacter(const ECharacterType CharacterType) const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->SetPlayerType(CharacterType);
+}
+
+void UUIHandle::ClickedCancleSelectCharacter()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->CancleSelectedType();
 }
 
 void UUIHandle::ClickedSelectSkill(const int32 Index) const
@@ -503,6 +507,7 @@ void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(UISettings->CharacterListWidgetClass), TEXT("CharacterListWidgetClass is invalid"));
 	CharacterListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->CharacterListWidgetClass);
 	CharacterListWidget->InitWidget(this);
+	UIObservers.Add(CharacterListWidget);
 
 	checkf(IsValid(UISettings->SkillListWidgetClass), TEXT("SkillListWidgetClass is invalid"));
 	SkillListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->SkillListWidgetClass);

@@ -7,6 +7,7 @@
 #include "System/MainLevelPlayerController.h"
 #include "System/DataStructure/PlayerSkillRow.h"
 #include "System/Observer/GameStateObserver.h"
+#include "Player/BaseCharacter.h"
 
 void AEdmundGameState::BeginPlay()
 {
@@ -20,6 +21,7 @@ void AEdmundGameState::BeginPlay()
 
 	EdmundGameInstance->StartedGameState();
 	InitSkillData();
+	InitMainLevel();
 
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 	
@@ -58,17 +60,20 @@ void AEdmundGameState::ChangeInputMode(const FInputModeDataBase& InputMode)
 	PlayerController->FlushPressedKeys();
 }
 
-void AEdmundGameState::OnClickedCharacter(ECharacterType CharacterType)
+void AEdmundGameState::InitMainLevel()
 {
-	//observer notify 구현
-}
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	ESceneType CurrentScene = EdmundGameInstance->GetCurrentSceneName();
 
-void AEdmundGameState::ChangeSelectMode(const bool bIsSelect) const
-{
+	if (CurrentScene != ESceneType::Main)
+	{
+		return;
+	}
+
+	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
 	AMainLevelPlayerController* MainLevelPlayerController = Cast<AMainLevelPlayerController>(PlayerController);
 	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
-
-	//MainLevelPlayerController->
+	MainLevelPlayerController->InitMainLevelCharacters(EdmundGameInstance->GetCharacterData());
 }
 
 void AEdmundGameState::InitSkillData()
@@ -138,6 +143,21 @@ void AEdmundGameState::ApplySelectedSkill(const int32 Index)
 	// 플레이어에 전달 필요
 }
 
+void AEdmundGameState::SetSelectedCharacter(AActor* Character)
+{
+	checkf(IsValid(Character), TEXT("Selected Character is invalid"));
+
+	ABaseCharacter* TargetActor = Cast<ABaseCharacter>(Character);
+	NotifySelectCharacterType(TargetActor->getCharacterType());
+}
+
+void AEdmundGameState::CancleSelectedCharacter()
+{
+	AMainLevelPlayerController* MainLevelPlayerController = Cast<AMainLevelPlayerController>(PlayerController);
+	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
+	MainLevelPlayerController->SetTargetToNull();
+}
+
 void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
 {
 	Observers.Add(Observer);
@@ -157,5 +177,17 @@ void AEdmundGameState::NotifyCreateRandomSkill() const
 			continue;
 		}
 		Observer->ChangedSkillList();
+	}
+}
+
+void AEdmundGameState::NotifySelectCharacterType(ECharacterType CharacterType) const
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedCharacterType(CharacterType);
 	}
 }

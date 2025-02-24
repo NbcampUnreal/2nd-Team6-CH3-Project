@@ -56,6 +56,7 @@ public:
 	void ClickedBGMVolume(const float Volume) const;
 	void ClickedEffectVolume(const float Volume) const;
 	void ClickedSelectCharacter(const ECharacterType CharacterType) const;
+	void ClickedCancleSelectCharacter();
 	void ClickedSelectSkill(const int32 Index) const;
 	const FShopCatalogRow* ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const;
 
