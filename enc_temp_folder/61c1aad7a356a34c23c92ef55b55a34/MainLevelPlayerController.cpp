@@ -94,23 +94,24 @@ void AMainLevelPlayerController::MoveToTargetPoint()
 			bIsReturnByCharacter[TargetCharacter] = false;
 		}
 
-		if (100 >= FVector::Distance(MoveTargetPos, TargetCharacter->GetActorLocation()))
-		{
-			FVector CurrentTarget = TargetCharacter->GetActorLocation();
-			CurrentTarget = FVector(CurrentTarget.X, CurrentTarget.Y, 0);
-			FVector LookForwardDirection = LookAtTargetPos - CurrentTarget;
-			LookForwardDirection = LookForwardDirection / LookForwardDirection.Size();
-			FRotator LookRotator(0, LookForwardDirection.Rotation().Yaw, 0);
-			TargetCharacter->SetActorRotation(LookRotator);
-			return;
-		}
-
 		FVector Direction = MoveTargetPos - StartPosByCharacter[TargetCharacter];
 		Direction = Direction / Direction.Size();
 		FRotator NewLookRotator(0, Direction.Rotation().Yaw, 0);
 
 		TargetCharacter->SetActorRotation(NewLookRotator);
 		TargetCharacter->AddMovementInput(Direction, 0.3f);
+		
+		FVector CharacterPos = TargetCharacter->GetActorLocation();
+		CharacterPos = FVector(CharacterPos.X, CharacterPos.Y, 0);
+
+		if (30 >= FVector::Distance(MoveTargetPos, CharacterPos))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("In Near"));
+			FVector LookForwardDirection = LookAtTargetPos - TargetCharacter->GetActorLocation();
+			LookForwardDirection = LookForwardDirection / LookForwardDirection.Size();
+			FRotator LookRotator(0, LookForwardDirection.Rotation().Yaw, 0);
+			TargetCharacter->SetActorRotation(LookRotator);
+		}
 	}
 }
 
@@ -130,7 +131,7 @@ void AMainLevelPlayerController::MoveToStartPoint()
 		BaseCharacter.Key->SetActorRotation(NewLookAt);
 		BaseCharacter.Key->AddMovementInput(Direction, 0.3f);
 
-		if (FVector::Distance(BaseCharacter.Value, BaseCharacter.Key->GetActorLocation()) <= 100)
+		if (FVector::Distance(BaseCharacter.Value, BaseCharacter.Key->GetActorLocation()) <= 50)
 		{
 			bIsReturnByCharacter[BaseCharacter.Key] = false;
 			BaseCharacter.Key->SetActorLocation(BaseCharacter.Value);
@@ -181,7 +182,6 @@ void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacter
 		LookAtDirection = LookAtDirection / LookAtDirection.Size();
 		FRotator LookAtRotator(0, LookAtDirection.Rotation().Yaw, 0);
 		NewCharacter->SetActorRotation(LookAtRotator);
-		NewCharacter->AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	}
 
 	//TargetCharacter = CharacterSet[0]; // 나중에 수정 필요

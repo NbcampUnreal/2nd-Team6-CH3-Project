@@ -23,6 +23,7 @@ public:
 	virtual void ChangedPlayerAmmo(int32 Ammo) override;
 	virtual void ChangedPlayerMoney(int32 Money) override;
 	virtual void ChangedSkillList() override;
+	virtual void ChangedCharacterType(ECharacterType CharacterType) override;
 
 	virtual void InitWidget(UUIHandle* uiHandle);
 	virtual void Action();

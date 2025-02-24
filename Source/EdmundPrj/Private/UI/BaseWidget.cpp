@@ -33,6 +33,10 @@ void UBaseWidget::ChangedSkillList()
 {
 }
 
+void UBaseWidget::ChangedCharacterType(ECharacterType CharacterType)
+{
+}
+
 void UBaseWidget::InitWidget(UUIHandle* uiHandle)
 {
 	UIHandle = uiHandle;
