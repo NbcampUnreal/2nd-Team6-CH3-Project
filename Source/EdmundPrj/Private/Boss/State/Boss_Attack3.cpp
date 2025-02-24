@@ -88,7 +88,7 @@ void UBoss_Attack3::EndRangedComboAttack()
 {
     if (BossRef)
     {
-        BossRef->SetState(EBossState::Chase);
+        BossRef->SetState(EBossState::Idle);
     }
 }
 
@@ -121,5 +121,5 @@ void UBoss_Attack3::PlayAttack3Montage()
 void UBoss_Attack3::DelayedTransition()
 {
     if (!BossRef) return;
-    BossRef->SetState(EBossState::Chase);
+    BossRef->SetState(EBossState::Idle);
 }

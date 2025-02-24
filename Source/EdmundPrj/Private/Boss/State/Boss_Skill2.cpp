@@ -34,7 +34,7 @@ void UBoss_Skill2::EnterState(ABoss* Boss)
         World->GetTimerManager().SetTimer(SpawnTimerHandle, [this]()
             {
                 SpawnMonsters();
-                BossRef->SetState(EBossState::Idle);
+                BossRef->SetState(EBossState::Skill3);
             }, 2.0f, false);
     }
 }

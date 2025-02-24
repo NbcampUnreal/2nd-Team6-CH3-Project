@@ -10,7 +10,7 @@ void ABossAIController::BeginPlay()
 
     if (!ControllerBoss)
     {
-		UE_LOG(LogTemp, Error, TEXT("BossAIController NULL"));
+		UE_LOG(LogTemp, Error, TEXT("BossAIController: ControllerBoss is NULL"));
     }
 
     if (BossCharacter)

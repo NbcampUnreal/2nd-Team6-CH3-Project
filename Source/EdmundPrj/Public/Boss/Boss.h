@@ -20,6 +20,7 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     void SetState(EBossState NewState);
+
     void InitiallizeBullerPool();
     float GetMonsterMoveSpeed() const { return MonsterMoveSpeed; }
     float SetMonsterMoveSpeed(float NewSpeed);
@@ -87,5 +88,22 @@ public:
     TArray<TSubclassOf<AActor>> Skill2MonsterList;
 
     // ***********************Skill 3*************************
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
+    int32 Skill3WallCount = 3; // 소환할 벽의 개수 max = 10
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
+    float Skill3SpawnRadius = 2500.f; // 보스 주변 최대 소환 반경
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
+    float Skill3MinSpawnDistance = 1300.f; // 최소 소환 거리
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
+    float Skill3SpawnInterval = 0.5f; // 벽 소환 간격 (초)
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
+    TSubclassOf<AActor> Skill3WallClass; // 소환할 벽 BP 클래스
+
     // ***********************Skill 4*************************
+
 };
+

@@ -138,7 +138,7 @@ void UBoss_Attack2::TickState(float DeltaTime)
                 BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
             }
             UE_LOG(LogTemp, Log, TEXT("Boss finished descending"));
-            BossRef->SetState(EBossState::Chase);
+            BossRef->SetState(EBossState::Idle);
         }
         else
         {
