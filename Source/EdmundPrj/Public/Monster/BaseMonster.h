@@ -126,6 +126,9 @@ protected:
 	void UpdateMonsterOverHeadWidget();
 	void UpdateMonsterOverHeadWidgetEnd();
 
+	virtual void PlayParticle();
+	virtual void PlaySound();
+
 	UFUNCTION(BlueprintCallable)
 	void SetInitialSpawn();
 
