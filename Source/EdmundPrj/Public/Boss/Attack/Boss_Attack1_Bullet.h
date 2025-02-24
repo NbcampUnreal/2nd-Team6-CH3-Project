@@ -19,20 +19,20 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	// Hit 이벤트 (Block 충돌 시)
+	// Hit 이벤트
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	// Overlap 이벤트 (Pawn 등 Overlap 시)
+	// Overlap 이벤트
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	// 탄환 발사 시 호출되는 함수 (이전 ActivateBullet() 대신)
+	// 탄환 발사 시 호출되는 함수
 	void FireProjectile(FVector SpawnLocation, FRotator SpawnRotation, FVector Direction);
 
-	// 폭발 처리: 탄환을 숨기고, 폭발 파티클을 재생한 후 ExplosionDelay 후 ResetBullet() 호출
+	// 폭발 처리
 	void Explode();
 
 	// 탄환 초기화 및 풀에 반환
@@ -59,7 +59,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
 	float ExplosionDelay = 1.0f;
 
-	// 폭발 파티클 이펙트 컴포넌트 (에디터에서 파티클 템플릿 할당)
+	// 폭발 파티클 이펙트 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
 	UParticleSystemComponent* ExplosionEffect;
 
@@ -71,6 +71,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* BulletMesh;
 
-	// 탄환 풀 (재사용)
+	// 탄환 풀
 	static TArray<ABoss_Attack1_Bullet*> BulletPool;
 };

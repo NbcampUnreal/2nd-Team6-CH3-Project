@@ -5,6 +5,7 @@
 #include "Boss/State/Boss_Attack1.h"
 #include "Boss/State/Boss_Attack2.h"
 #include "Boss/State/Boss_Attack3.h"
+#include "Boss/State/Boss_Attack4.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
@@ -92,6 +93,10 @@ void ABoss::SetState(EBossState NewState)
         BossState = NewObject<UBoss_Attack3>();
         break;
 
+    case EBossState::Attack4:
+        BossState = NewObject<UBoss_Attack4>();
+        break;
+
     default:
         BossState = nullptr;
         break;
@@ -107,16 +112,24 @@ void ABoss::InitiallizeBullerPool()
 {
     if (!GetWorld()) return;
 
-    int32 PoolSize = 5;
+    
     for (int32 i = 0; i < PoolSize; ++i)
     {
         ABoss_Attack1_Bullet* Bullet = GetWorld()->SpawnActor<ABoss_Attack1_Bullet>(Attack1BulletClass);
+        ABoss_Attack4_Bullet* Bullet4 = GetWorld()->SpawnActor<ABoss_Attack4_Bullet>(Attack4BulletClass);
         if (Bullet)
         {
             Bullet->SetActorHiddenInGame(true);
             Bullet->SetActorEnableCollision(false);
         }
+        if (Bullet4)
+        {
+            Bullet4->SetActorHiddenInGame(true);
+            Bullet4->SetActorEnableCollision(false);
+        }
     }
+
+
 }
 
 void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -125,5 +138,6 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
     // Attack1 풀 정리
     ABoss_Attack1_Bullet::BulletPool.Empty();
+    ABoss_Attack4_Bullet::Bullet4Pool.Empty();
     
 }

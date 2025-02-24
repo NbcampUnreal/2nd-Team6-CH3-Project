@@ -6,6 +6,7 @@
 #include "Boss/Boss_AnimInstance.h"
 #include "Components/ArrowComponent.h"
 #include "Boss/Attack/Boss_Attack1_Bullet.h"
+#include "Boss/Attack/Boss_Attack4_Bullet.h"
 #include "Boss.generated.h"
 
 UCLASS()
@@ -33,6 +34,9 @@ private:
     UPROPERTY()
     UBoss_AnimInstance* AnimInstance;
 
+private:
+    int32 PoolSize = 5;
+
 public:
 
     // ***********************Attack 1*************************
@@ -46,7 +50,6 @@ public:
     // Attack1 탄환 클래스
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
     TSubclassOf<ABoss_Attack1_Bullet> Attack1BulletClass;
-
 
     // ***********************Attack 2*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
@@ -65,4 +68,10 @@ public:
     float Attack2_GroundZ = 0.0f;  // 하강 완료 기준 지면 높이
 
     // ***********************Attack 3*************************
+
+
+    // ***********************Attack 4*************************
+    // Attack4 탄환 클래스
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    TSubclassOf<ABoss_Attack4_Bullet> Attack4BulletClass;
 };

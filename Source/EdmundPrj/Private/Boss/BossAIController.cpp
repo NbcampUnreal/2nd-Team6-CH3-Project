@@ -15,7 +15,7 @@ void ABossAIController::BeginPlay()
 
     if (BossCharacter)
     {
-        BossCharacter->SetState(EBossState::Attack3);
+        BossCharacter->SetState(EBossState::Attack4);
     }
 }
 
