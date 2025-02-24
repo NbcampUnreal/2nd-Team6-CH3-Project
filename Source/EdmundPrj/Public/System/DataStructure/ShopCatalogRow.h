@@ -17,13 +17,25 @@ public:
 	FName AdvanceName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Price;
+	int32 OriginPrice;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AdvanceValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MultiplyValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentPrice;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTexture2D> SkillImage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString InfoString;

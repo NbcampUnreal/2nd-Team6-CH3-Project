@@ -3,7 +3,6 @@
 
 #include "System/UIHandle.h"
 #include "UI/BaseWidget.h"
-#include "UI/FadeWidget.h"
 #include "System/EdmundGameInstance.h"
 #include "System/Settings/UIHandleSettings.h"
 
@@ -203,7 +202,7 @@ void UUIHandle::FadeOut(const bool bIsNext, const ESceneType SceneType)
 	checkf(IsValid(FadeWidget), TEXT("FadeWidget is invalid"));
 
 	FadeWidget->AddToViewport(20);
-	FadeWidget->PlayFadeOutAnim(bIsNext, SceneType);
+	FadeWidget->PlayRemoveAnim(bIsNext, SceneType);
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
@@ -229,6 +228,30 @@ float UUIHandle::GetEffectVolumeByGameInstance() const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	return EdmundGameInstance->GetEffectVolume();
+}
+
+const TArray<FShopCatalogRow*>& UUIHandle::GetCurrentAdvance() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->GetAdvanceState();
+}
+
+const TArray<FPlayerSkillRow*>& UUIHandle::GetCurrentRandomSkill() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->GetRandomSkillSet();
+}
+
+const int32 UUIHandle::GetCurrentMoney() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->GetPossessMoney();
+}
+
+bool UUIHandle::CheckClearedMission(int32 Index) const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->CheckClearedMission(Index);
 }
 
 void UUIHandle::OpenOption()
@@ -369,8 +392,28 @@ void UUIHandle::ClickedSelectCharacter(const ECharacterType CharacterType) const
 	EdmundGameInstance->SetPlayerType(CharacterType);
 }
 
-void UUIHandle::ClickedSelectSkill() const
+void UUIHandle::ClickedSelectSkill(const int32 Index) const
 {
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->ApplySelectSkill(Index);
+}
+
+const FShopCatalogRow* UUIHandle::ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	bool bIsUpdated =  EdmundGameInstance->UpdateAdvanceState(TargetRow, UpdateValue);
+
+	if (bIsUpdated)
+	{
+		return EdmundGameInstance->GetAdvanceState(TargetRow);
+	}
+
+	return nullptr;
+}
+
+const TArray<TScriptInterface<IGameStateObserver>>& UUIHandle::GetUIObservers() const
+{
+	return UIObservers;
 }
 
 void UUIHandle::ClickedRetry() const
@@ -424,10 +467,12 @@ void UUIHandle::CreateBaseWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(UISettings->InGameWidgetClass), TEXT("InGmaeWidgetClass is invalid"));
 	InGameWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->InGameWidgetClass);
 	InGameWidget->InitWidget(this);
+	UIObservers.Add(InGameWidget);
 
 	checkf(IsValid(UISettings->EndingWidgetClass), TEXT("EndingWidgetClass is invalid"));
 	EndingWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->EndingWidgetClass);
 	EndingWidget->InitWidget(this);
+	UIObservers.Add(EndingWidget);
 }
 
 void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
@@ -435,7 +480,7 @@ void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 
 	checkf(IsValid(UISettings->FadeWidgetClass), TEXT("FadeWidgetClass is invalid"));
-	FadeWidget = Cast<UFadeWidget>(CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->FadeWidgetClass));
+	FadeWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->FadeWidgetClass);
 	FadeWidget->InitWidget(this);
 
 	checkf(IsValid(UISettings->OptionWidgetClass), TEXT("OptionWidgetClass is invalid"));
@@ -445,6 +490,7 @@ void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(UISettings->ResultWidgetClass), TEXT("ResultWidgetClass is invalid"));
 	ResultWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->ResultWidgetClass);
 	ResultWidget->InitWidget(this);
+	UIObservers.Add(ResultWidget);
 
 	checkf(IsValid(UISettings->ShopWidgetClass), TEXT("ShopWidgetClass is invalid"));
 	ShopWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->ShopWidgetClass);
@@ -461,6 +507,7 @@ void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(UISettings->SkillListWidgetClass), TEXT("SkillListWidgetClass is invalid"));
 	SkillListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->SkillListWidgetClass);
 	SkillListWidget->InitWidget(this);
+	UIObservers.Add(SkillListWidget);
 
 	checkf(IsValid(UISettings->MissionListWidgetClass), TEXT("MissionListWidgetClass is invalid"));
 	MissionListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->MissionListWidgetClass);

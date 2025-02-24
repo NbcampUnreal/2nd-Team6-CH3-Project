@@ -19,11 +19,17 @@ void UMissionListWidget::InitWidget(UUIHandle* NewUIHandle)
 	MissionButton4->OnClicked.AddDynamic(this, &ThisClass::OnClickedInfinity);
 	CloseButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedClose);
 	EnterButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedEnter);
+
+	MissionButton2->SetIsEnabled(false);
+	MissionButton3->SetIsEnabled(false);
+	MissionButton4->SetIsEnabled(false);
 }
 
 void UMissionListWidget::PlayAddAnim()
 {
 	Super::PlayAddAnim();
+	EnterButton->SetIsEnabled(false);
+	CheckCleard();
 	OnSelectedImage(0);
 }
 
@@ -42,24 +48,28 @@ void UMissionListWidget::EndRemoveAnim()
 
 void UMissionListWidget::OnClickedMission1()
 {
+	EnterButton->SetIsEnabled(true);
 	TargetScene = ESceneType::Mission1;
 	OnSelectedImage(1);
 }
 
 void UMissionListWidget::OnClickedMission2()
 {
+	EnterButton->SetIsEnabled(true);
 	TargetScene = ESceneType::Mission2;
 	OnSelectedImage(2);
 }
 
 void UMissionListWidget::OnClickedMission3()
 {
+	EnterButton->SetIsEnabled(true);
 	TargetScene = ESceneType::Mission3;
 	OnSelectedImage(3);
 }
 
 void UMissionListWidget::OnClickedInfinity()
 {
+	EnterButton->SetIsEnabled(true);
 	TargetScene = ESceneType::Infinity;
 	OnSelectedImage(4);
 }
@@ -107,5 +117,25 @@ void UMissionListWidget::OnSelectedImage(int32 Index)
 	default:
 		checkNoEntry();
 		break;
+	}
+}
+
+void UMissionListWidget::CheckCleard()
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+
+	if (UIHandle->CheckClearedMission(0))
+	{
+		MissionButton2->SetIsEnabled(true);
+	}
+
+	if (UIHandle->CheckClearedMission(1))
+	{
+		MissionButton3->SetIsEnabled(true);
+	}
+
+	if (UIHandle->CheckClearedMission(2))
+	{
+		MissionButton4->SetIsEnabled(true);
 	}
 }

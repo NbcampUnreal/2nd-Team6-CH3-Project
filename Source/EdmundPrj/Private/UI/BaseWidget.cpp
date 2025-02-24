@@ -29,6 +29,10 @@ void UBaseWidget::ChangedPlayerMoney(int32 Money)
 
 }
 
+void UBaseWidget::ChangedSkillList()
+{
+}
+
 void UBaseWidget::InitWidget(UUIHandle* uiHandle)
 {
 	UIHandle = uiHandle;
@@ -71,6 +75,15 @@ void UBaseWidget::PlayAddAnim()
 		return;
 	}
 	PlayAnimation(OpenAnimation);
+}
+
+void UBaseWidget::PlayRemoveAnim(bool bIsNext, ESceneType SceneType)
+{
+	if (bIsPlaying)
+	{
+		return;
+	}
+	PlayAnimation(CloseAnimation);
 }
 
 void UBaseWidget::PlayRemoveAnim()

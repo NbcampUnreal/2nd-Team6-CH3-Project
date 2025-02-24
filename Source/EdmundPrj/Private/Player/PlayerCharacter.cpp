@@ -22,31 +22,12 @@ void APlayerCharacter::BeginPlay()
 	}
 }
 
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		if (AEdmundPlayerController* PlayerController = Cast<AEdmundPlayerController>(GetController()))
-		{
-			if (PlayerController->FireAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->FireAction,
-					ETriggerEvent::Started,
-					this,
-					&APlayerCharacter::Fire
-				);
-			}
-		}
-	}
-}
-
-void APlayerCharacter::Fire(const FInputActionValue& value)
+bool APlayerCharacter::ActiveWeapon()
 {
 	if (IsValid(WeaponActor))
 	{
-		WeaponActor->Fire();
+		return WeaponActor->Fire();
 	}
+
+	return false;
 }
