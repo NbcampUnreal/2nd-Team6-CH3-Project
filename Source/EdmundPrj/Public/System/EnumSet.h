@@ -65,7 +65,10 @@ enum class ETableType : uint8
 UENUM(BlueprintType)
 enum class ECharacterType : uint8
 {
-	Gunner = 0
+	Gunner = 0,
+	Other1,
+	Other2,
+	Other3
 };
 
 UENUM(BlueprintType)

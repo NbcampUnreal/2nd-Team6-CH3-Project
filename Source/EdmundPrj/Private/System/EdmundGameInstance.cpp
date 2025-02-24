@@ -82,12 +82,6 @@ void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode) c
 	EdmundGameState->ChangeInputMode(InputMode);
 }
 
-void UEdmundGameInstance::ChangeSelectMode(const bool bIsSelect) const
-{
-	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
-	EdmundGameState->ChangeSelectMode(bIsSelect);
-}
-
 void UEdmundGameInstance::EndMission() const
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
@@ -151,6 +145,18 @@ void UEdmundGameInstance::SetPlayerType(const ECharacterType Type) const
 {
 	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
 	DataHandle->SetPlayerType(Type);
+}
+
+void UEdmundGameInstance::CancleSelectedType()
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->CancleSelectedCharacter();
+}
+
+const TArray<FCharacterDataRow*>& UEdmundGameInstance::GetCharacterData() const
+{
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetCharacterData();
 }
 
 void UEdmundGameInstance::AddPossessMoney(const int32 Value) const

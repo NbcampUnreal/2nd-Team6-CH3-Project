@@ -15,12 +15,14 @@ void UCharacterListWidget::InitWidget(UUIHandle* NewUIHandle)
 	SelectButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedSelect);
 	CancleButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedCancle);
 	CloseButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedClose);
+
+	SetEnableButton(false);
 }
 
 void UCharacterListWidget::PlayAddAnim()
 {
 	Super::PlayAddAnim();
-	SetEnableButton(false);
+	
 }
 
 void UCharacterListWidget::EndRemoveAnim()
@@ -29,21 +31,33 @@ void UCharacterListWidget::EndRemoveAnim()
 	UIHandle->RemoveCoverFromViewport(EWidgetType::CharacterListWidget);
 }
 
+void UCharacterListWidget::ChangedCharacterType(ECharacterType CharacterType)
+{
+	Super::ChangedCharacterType(CharacterType);
+	TargetCharacterType = CharacterType;
+	SetEnableButton(true);
+
+	UEnum* CharacterEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ECharacterType"));
+	FString TypeName = CharacterEnum->GetNameStringByValue((int64)CharacterType);
+	UE_LOG(LogTemp, Warning, TEXT("Selected Character Type is %s"), *TypeName);
+}
+
 void UCharacterListWidget::OnClickedSelect()
 {
-	SetEnableButton(false);
+	//SetEnableButton(false);
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 
-	UIHandle->ClickedSelectCharacter(CharacterType);
+	UIHandle->ClickedSelectCharacter(TargetCharacterType);
 	OnClickedCloseWidget(EWidgetType::CharacterListWidget);
 }
 
 void UCharacterListWidget::OnClickedCancle()
 {
-	//자리로 돌아가게 하기
-	SelectedCharacter = nullptr;
 	SetEnableButton(false);
-	CharacterType = ECharacterType::Gunner;
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+
+	UIHandle->ClickedCancleSelectCharacter();
+	TargetCharacterType = ECharacterType::Gunner;
 }
 
 void UCharacterListWidget::OnClickedClose()

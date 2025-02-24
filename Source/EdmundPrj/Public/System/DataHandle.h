@@ -12,6 +12,7 @@ class UDataHandleSettings;
 struct FShopCatalogRow;
 struct FPlayDataRow;
 struct FPlayerSkillRow;
+struct FCharacterDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UDataHandle : public UGameInstanceSubsystem
@@ -39,6 +40,9 @@ public:
 	//Controll Player Skill Data
 	const TArray<FPlayerSkillRow*>& GetPlayerSkillData() const;
 
+	// Controll Character Data
+	const TArray<FCharacterDataRow*>& GetCharacterData() const;
+
 	// Controll Play Data
 	void UpdateClearMission(const int32 Index);
 	const bool GetIsClearedMission(const int32 Index) const;
@@ -59,9 +63,13 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> PlayerSkillDataTable = nullptr;
 
+	UPROPERTY()
+	TObjectPtr<UDataTable> CharacterDataTable = nullptr;
+
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 
 	TArray<FShopCatalogRow*> CurrentAdvance;
 	TArray<FPlayDataRow*> PlayData;
 	TArray<FPlayerSkillRow*> PlayerSkillData;
+	TArray<FCharacterDataRow*> CharacterData;
 };
