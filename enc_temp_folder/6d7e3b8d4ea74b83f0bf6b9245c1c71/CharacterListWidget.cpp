@@ -17,6 +17,12 @@ void UCharacterListWidget::InitWidget(UUIHandle* NewUIHandle)
 	CloseButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedClose);
 }
 
+void UCharacterListWidget::PlayAddAnim()
+{
+	Super::PlayAddAnim();
+	SetEnableButton(false);
+}
+
 void UCharacterListWidget::EndRemoveAnim()
 {
 	Super::EndRemoveAnim();
@@ -25,7 +31,7 @@ void UCharacterListWidget::EndRemoveAnim()
 
 void UCharacterListWidget::OnClickedSelect()
 {
-	// 선택 된 것 없으면 비활성화 기능 구현해야함
+	SetEnableButton(false);
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 
 	UIHandle->ClickedSelectCharacter(CharacterType);
@@ -36,10 +42,17 @@ void UCharacterListWidget::OnClickedCancle()
 {
 	//자리로 돌아가게 하기
 	SelectedCharacter = nullptr;
+	SetEnableButton(false);
 	CharacterType = ECharacterType::Gunner;
 }
 
 void UCharacterListWidget::OnClickedClose()
 {
 	OnClickedCloseWidget(EWidgetType::CharacterListWidget);
+}
+
+void UCharacterListWidget::SetEnableButton(bool bIsEnable)
+{
+	SelectButton->SetIsEnabled(bIsEnable);
+	CancleButton->SetIsEnabled(bIsEnable);
 }
