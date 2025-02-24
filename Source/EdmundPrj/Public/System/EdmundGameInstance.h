@@ -14,6 +14,7 @@ class UDataHandle;
 class AEdmundGameState;
 struct FShopCatalogRow;
 struct FPlayerSkillRow;
+struct FCharacterDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UEdmundGameInstance : public UGameInstance
@@ -33,7 +34,6 @@ public:
 	void OnPause() const;
 	void ChangeCursorMode(const bool bIsVisible) const;
 	void ChangeInputMode(const FInputModeDataBase& InputMode) const;
-	void ChangeSelectMode(const bool bIsSelect) const;
 	void QuitGame() const;
 
 	// Current Mission Cleared or Fail 
@@ -55,6 +55,8 @@ public:
 	// Player Type Controll
 	ECharacterType GetPlayerType() const;
 	void SetPlayerType(const ECharacterType Type) const;
+	void CancleSelectedType();
+	const TArray<FCharacterDataRow*>& GetCharacterData() const;
 	//FMissionItemRow* GetCurrentMissionInfo() const;
 	// Player Money Controll
 	void AddPossessMoney(const int32 Value) const;

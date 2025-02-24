@@ -10,6 +10,7 @@
 class UEdmundGameInstance;
 class AEdmundGameMode;
 class IGameStateObserver;
+class ABaseCharacter;
 struct FPlayerSkillRow;
 
 UCLASS()
@@ -25,21 +26,24 @@ public:
 
 	void ChangeCursorMode(bool bIsValid);
 	void ChangeInputMode(const FInputModeDataBase& InputMode);
-	void OnClickedCharacter(const ECharacterType CharacterType);
-	void ChangeSelectMode(const bool bIsSelect) const;
 
 	void CreateRandomSkillSet();
 	const TArray<FPlayerSkillRow*>& GetRandomSkillSet() const;
-	void ApplySelectedSkill(const int32 Index); // 선택 완료 후 인덱스 넘어오면 랜덤 스킬 목록에서 인덱스로 추출 후 플레이어에 전달.
+	void ApplySelectedSkill(const int32 Index);
+
+	void SetSelectedCharacter(AActor* Character);
+	void CancleSelectedCharacter();
 
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 
 private:
+	void InitMainLevel();
 	void InitSkillData();
 	void CalculateSkillList(); 
 
 	void NotifyCreateRandomSkill() const;
+	void NotifySelectCharacterType(ECharacterType CharacterType) const;
 
 private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;

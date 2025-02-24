@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "System/EnumSet.h"
 #include "GameStateObserver.generated.h"
 
 UINTERFACE(MinimalAPI)
@@ -35,4 +36,7 @@ public:
 
 	UFUNCTION()
 	virtual void ChangedSkillList() = 0;
+
+	UFUNCTION()
+	virtual void ChangedCharacterType(ECharacterType CharacterType) = 0;
 };

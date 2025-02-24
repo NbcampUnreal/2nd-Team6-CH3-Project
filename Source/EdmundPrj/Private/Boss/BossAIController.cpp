@@ -10,12 +10,12 @@ void ABossAIController::BeginPlay()
 
     if (!ControllerBoss)
     {
-		UE_LOG(LogTemp, Error, TEXT("BossAIController: ControllerBoss is NULL"));
+		UE_LOG(LogTemp, Error, TEXT("BossAIController NULL"));
     }
 
     if (BossCharacter)
     {
-        BossCharacter->SetState(EBossState::Idle);
+        BossCharacter->SetState(EBossState::Skill2);
     }
 }
 
