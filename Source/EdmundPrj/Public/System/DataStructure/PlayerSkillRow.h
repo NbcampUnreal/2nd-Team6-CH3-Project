@@ -3,40 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include "ShopCatalogRow.generated.h"
+#include "PlayerSkillRow.generated.h"
 
 
 USTRUCT(BlueprintType)
-struct EDMUNDPRJ_API FShopCatalogRow : public FTableRowBase
+struct EDMUNDPRJ_API FPlayerSkillRow : public FTableRowBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName AdvanceName;
+	FName RowName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 OriginPrice;
+	FName SkillName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SkillValue;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float AdvanceValue;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MultiplyValue;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CurrentLevel;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CurrentPrice;
+	FString SkillInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTexture2D> SkillImage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString InfoString;
 };

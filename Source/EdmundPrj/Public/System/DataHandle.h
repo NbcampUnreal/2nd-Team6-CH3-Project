@@ -4,24 +4,64 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "System/EnumSet.h"
 #include "DataHandle.generated.h"
 
 class UEdmundGameInstance;
 class UDataHandleSettings;
+struct FShopCatalogRow;
+struct FPlayDataRow;
+struct FPlayerSkillRow;
 
 UCLASS()
 class EDMUNDPRJ_API UDataHandle : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
-	
+
 public:
-	//virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	//Initialize - LoadDataTable By DataHandleSettings / Initialize Arrays
 	void InitDataHandle(UEdmundGameInstance* NewGameInstance);
+
+	// Controll Player Advance State Data
+	const bool UpdateCurrentAdvance(const FName& TargetRow, const int32 UpdateValue);
+	const TArray<FShopCatalogRow*>& GetCurrentAdvance() const;
+	const FShopCatalogRow* GetCurrentAdvanceByRowName(const FName& TargetRow) const;
+
+	// Controll Player Money Data
+	void AddMoney(const int32 AddValue);
+	const int32 GetMoney() const;
+	const bool Consume(const int32 Price);
+
+	// Controll Player Type Data
+	void SetPlayerType(const ECharacterType CharacterType);
+	const ECharacterType GetPlayerType() const;
+
+	//Controll Player Skill Data
+	const TArray<FPlayerSkillRow*>& GetPlayerSkillData() const;
+
+	// Controll Play Data
+	void UpdateClearMission(const int32 Index);
+	const bool GetIsClearedMission(const int32 Index) const;
+	void UpdateShowedIntro(const bool bShowed);
+	const bool GetIsShowedIntro() const;
 
 private:
 	void LoadDataTables(const UDataHandleSettings* DataSettings);
+	FShopCatalogRow* SelectRow(const FName& TargetRow) const;
 
 private:
-	TObjectPtr<UEdmundGameInstance> EdmundGameInstance;
-	TObjectPtr<UDataTable> ShopCatalogDataTable;
+	UPROPERTY()
+	TObjectPtr<UDataTable> ShopCatalogDataTable = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> PlayDataTable = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> PlayerSkillDataTable = nullptr;
+
+	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
+
+	TArray<FShopCatalogRow*> CurrentAdvance;
+	TArray<FPlayDataRow*> PlayData;
+	TArray<FPlayerSkillRow*> PlayerSkillData;
 };

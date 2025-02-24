@@ -5,6 +5,8 @@
 #include "System/EdmundGameInstance.h"
 #include "System/EdmundGameMode.h"
 #include "System/MainLevelPlayerController.h"
+#include "System/DataStructure/PlayerSkillRow.h"
+#include "System/Observer/GameStateObserver.h"
 
 void AEdmundGameState::BeginPlay()
 {
@@ -17,6 +19,7 @@ void AEdmundGameState::BeginPlay()
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 
 	EdmundGameInstance->StartedGameState();
+	InitSkillData();
 
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 	
@@ -38,7 +41,8 @@ void AEdmundGameState::EndCurrentMission()
 	{
 		return;
 	}
-	EdmundGameInstance->EndMission();
+	CreateRandomSkillSet();
+	EdmundGameInstance->OnSkillListUI();
 }
 
 void AEdmundGameState::ChangeCursorMode(bool bIsValid)
@@ -65,4 +69,93 @@ void AEdmundGameState::ChangeSelectMode(const bool bIsSelect) const
 	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
 
 	//MainLevelPlayerController->
+}
+
+void AEdmundGameState::InitSkillData()
+{
+	SkillDataSet = EdmundGameInstance->GetPlayerSkillData();
+
+	for (FPlayerSkillRow* PlayerSkillRow : SkillDataSet)
+	{
+		CurrentSkillMap.Add({ PlayerSkillRow, 0 });
+	}
+
+	RandomSkillSet.Empty();
+}
+
+void AEdmundGameState::CalculateSkillList() // 성능 개선 필요
+{
+	int32 RandomNum = FMath::RandRange(0, SkillDataSet.Num() - 1);
+
+	FPlayerSkillRow* RandomSkill = SkillDataSet[RandomNum];
+
+	if (RandomSkillSet.Contains(RandomSkill))
+	{
+		CalculateSkillList();
+	}
+	else
+	{
+		if (RandomSkill->MaxLevel == CurrentSkillMap[RandomSkill])
+		{
+			CalculateSkillList();
+		}
+		else
+		{
+			RandomSkillSet.Add(RandomSkill);
+		}
+	}
+}
+
+void AEdmundGameState::CreateRandomSkillSet()
+{
+	RandomSkillSet.Empty();
+
+	for (int32 i = 0; i < 3; i++)
+	{
+		CalculateSkillList();
+	}
+
+	NotifyCreateRandomSkill();
+}
+
+const TArray<FPlayerSkillRow*>& AEdmundGameState::GetRandomSkillSet() const
+{
+	return RandomSkillSet;
+}
+
+void AEdmundGameState::ApplySelectedSkill(const int32 Index)
+{
+	if (Index >= RandomSkillSet.Num())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Selected Skill Index is invalid"));
+	}
+
+	FPlayerSkillRow* SelectedSkill = RandomSkillSet[Index];
+	
+	++CurrentSkillMap[SelectedSkill];
+
+	UE_LOG(LogTemp, Warning, TEXT("Selected Skill Name is %s"), *SelectedSkill->SkillName.ToString());
+	// 플레이어에 전달 필요
+}
+
+void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
+{
+	Observers.Add(Observer);
+}
+
+void AEdmundGameState::UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
+{
+	Observers.Remove(Observer);
+}
+
+void AEdmundGameState::NotifyCreateRandomSkill() const
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedSkillList();
+	}
 }
