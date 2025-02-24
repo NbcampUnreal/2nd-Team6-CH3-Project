@@ -29,7 +29,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Bullet")
     virtual void ResetBullet();
 
-    // Collision 이벤트
     UFUNCTION()
     void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
         UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
@@ -38,7 +37,6 @@ public:
     void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-    // 풀링을 위한 정적 함수
     static ABoss_Attack4_Bullet* GetBulletFromPool(UWorld* World, TSubclassOf<ABoss_Attack4_Bullet> BulletClass);
     static TArray<ABoss_Attack4_Bullet*> Bullet4Pool;
 
@@ -66,12 +64,11 @@ protected:
 
     float TraveledDistance;
 
-    // 호밍 관련
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
     UProjectileMovementComponent* ProjectileMovement;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4|Homing")
-    float HomingDuration; // 기본 5초 (조절 가능)
+    float HomingDuration;
 
     float HomingStartTime;
 
@@ -81,6 +78,5 @@ protected:
     bool bIsHoming;
 
 private:
-    // 호밍 종료 후 폭발 처리
     void StopHomingAndExplode();
 };

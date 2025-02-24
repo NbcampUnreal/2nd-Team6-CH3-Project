@@ -119,7 +119,6 @@ void ABoss_Attack4_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnR
         else
         {
             ProjectileMovement->bIsHomingProjectile = false;
-            UE_LOG(LogTemp, Warning, TEXT("Attack4Bullet: Player is NULL"));
         }
         bIsHoming = ProjectileMovement->bIsHomingProjectile;
         HomingStartTime = GetWorld()->GetTimeSeconds();
@@ -197,14 +196,10 @@ void ABoss_Attack4_Bullet::StopHomingAndExplode()
     }
 }
 
-// Collision 콜백 추가: 캐릭터나 액터와 충돌 시 폭발 처리하고, 불릿끼리의 충돌은 무시
 void ABoss_Attack4_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
     if (!bIsActive) return;
-
-    // 만약 OtherActor가 유효하고, 자신과 같은 불릿이 아니며 (예를 들어, 클래스가 다름) 
-    // 그리고 OtherActor가 플레이어나 다른 유효한 대상이면 폭발 처리
     if (OtherActor && OtherActor != this && !OtherActor->IsA(ABoss_Attack4_Bullet::StaticClass()))
     {
         Explode();
