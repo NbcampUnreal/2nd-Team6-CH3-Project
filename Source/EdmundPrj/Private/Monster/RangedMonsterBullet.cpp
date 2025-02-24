@@ -39,7 +39,7 @@ void ARangedMonsterBullet::SetMonsterBulletHidden(bool isHidden)
 			MonsterBulletLifeTimerHandle,
 			this,
 			&ARangedMonsterBullet::EndMonsterBulletLife,
-			10.0f,
+			5.0f,
 			false
 		);
 	}

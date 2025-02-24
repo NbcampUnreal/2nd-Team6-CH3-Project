@@ -16,7 +16,7 @@ ARangedMonster::ARangedMonster()
 void ARangedMonster::BeginPlay()
 {
     Super::BeginPlay();
-    InitializeMonsterBulletPool(20);
+    InitializeMonsterBulletPool(10);
 }
 
 void ARangedMonster::MonsterAttackCheck()
@@ -41,11 +41,15 @@ void ARangedMonster::InitializeMonsterBulletPool(int32 PoolSize)
 
         ARangedMonsterBullet* NewBullet = GetWorld()->SpawnActor<ARangedMonsterBullet>(MonsterBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
 
+        if (!NewBullet)
+        {
+            UE_LOG(LogTemp, Error, TEXT("There is No Bullet"))
+        }
+
         if (NewBullet)
         {
             NewBullet->SetActorHiddenInGame(true);
             BulletPool.Add(NewBullet);
-            UE_LOG(LogTemp, Error, TEXT("Bullet Add"));
         }
     }
 }
