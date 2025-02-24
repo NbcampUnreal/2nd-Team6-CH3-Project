@@ -6,6 +6,7 @@
 #include "System/Settings/DataHandleSettings.h"
 #include "System/DataStructure/ShopCatalogRow.h"
 #include "System/DataStructure/PlayDataRow.h"
+#include "System/DataStructure/PlayerSkillRow.h"
 
 
 void UDataHandle::InitDataHandle(UEdmundGameInstance* NewGameInstance)
@@ -22,18 +23,13 @@ const bool UDataHandle::UpdateCurrentAdvance(const FName& TargetRow, const int32
 {
 	bool bIsPossible = false;
 
-	for (FShopCatalogRow* ShopCatalog : CurrentAdvance)
+	FShopCatalogRow* ShopCatalog = SelectRow(TargetRow);
+
+	if (Consume(ShopCatalog->CurrentPrice))
 	{
-		if (ShopCatalog->AdvanceName == TargetRow)
-		{
-			if (Consume(ShopCatalog->CurrentPrice))
-			{
-				ShopCatalog->CurrentLevel += UpdateValue;
-				ShopCatalog->CurrentPrice += ShopCatalog->OriginPrice * UpdateValue;
-				bIsPossible = true;
-				break;
-			}
-		}
+		ShopCatalog->CurrentLevel += UpdateValue;
+		ShopCatalog->CurrentPrice += ShopCatalog->OriginPrice * UpdateValue;
+		bIsPossible = true;
 	}
 
 	return bIsPossible;
@@ -46,16 +42,7 @@ const TArray<FShopCatalogRow*>& UDataHandle::GetCurrentAdvance() const
 
 const FShopCatalogRow* UDataHandle::GetCurrentAdvanceByRowName(const FName& TargetRow) const
 {
-	FShopCatalogRow* Result = nullptr;
-
-	for (FShopCatalogRow* ShopCatalog : CurrentAdvance)
-	{
-		if (ShopCatalog->AdvanceName == TargetRow)
-		{
-			Result = ShopCatalog;
-		}
-	}
-	return Result;
+	return SelectRow(TargetRow);
 }
 
 void UDataHandle::AddMoney(const int32 AddValue)
@@ -89,6 +76,11 @@ const ECharacterType UDataHandle::GetPlayerType() const
 	return PlayData[0]->CharacterType;
 }
 
+const TArray<FPlayerSkillRow*>& UDataHandle::GetPlayerSkillData() const
+{
+	return PlayerSkillData;
+}
+
 void UDataHandle::UpdateClearMission(const int32 Index)
 {
 	switch (Index)
@@ -116,12 +108,12 @@ void UDataHandle::UpdateShowedIntro(const bool bShowed)
 	PlayData[0]->bShowedIntro = bShowed;
 }
 
-const bool UDataHandle::IsShowedIntro() const
+const bool UDataHandle::GetIsShowedIntro() const
 {
 	return PlayData[0]->bShowedIntro;
 }
 
-const bool UDataHandle::IsClearedMission(const int32 Index) const
+const bool UDataHandle::GetIsClearedMission(const int32 Index) const
 {
 	switch (Index)
 	{
@@ -145,39 +137,31 @@ const bool UDataHandle::IsClearedMission(const int32 Index) const
 	return false;
 }
 
-const UDataTable* UDataHandle::GetDataTable(const ETableType TableType) const
-{
-	switch (TableType)
-	{
-	case ETableType::MissionItem:
-
-		break;
-
-	case ETableType::PlayerSkill:
-
-		break;
-
-	case ETableType::ShopCatalog:
-		return ShopCatalogDataTable;
-		break;
-
-	default:
-		return nullptr;
-		break;
-	}
-
-	return nullptr;
-}
-
 void UDataHandle::LoadDataTables(const UDataHandleSettings* DataSettings)
 {
 	ShopCatalogDataTable = DataSettings->ShopCatalogDataTable.LoadSynchronous();
 	PlayDataTable = DataSettings->PlayDataTable.LoadSynchronous();
+	PlayerSkillDataTable = DataSettings->PlayerSkillDataTable.LoadSynchronous();
 
 	const FString DataContext(TEXT("Data ConText"));
 
 	ShopCatalogDataTable->GetAllRows(DataContext, CurrentAdvance);
 	PlayDataTable->GetAllRows(DataContext, PlayData);
+	PlayerSkillDataTable->GetAllRows(DataContext, PlayerSkillData);
 
 	UE_LOG(LogTemp, Warning, TEXT("Loaded Data"));
+}
+
+FShopCatalogRow* UDataHandle::SelectRow(const FName& TargetRow) const
+{
+	FShopCatalogRow* Result = nullptr;
+
+	for (FShopCatalogRow* ShopCatalog : CurrentAdvance)
+	{
+		if (ShopCatalog->AdvanceName == TargetRow)
+		{
+			Result = ShopCatalog;
+		}
+	}
+	return Result;
 }

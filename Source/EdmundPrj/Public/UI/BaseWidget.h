@@ -9,6 +9,7 @@
 #include "BaseWidget.generated.h"
 
 class UUIHandle;
+struct FPlayerSkillRow;
 
 UCLASS()
 class EDMUNDPRJ_API UBaseWidget : public UUserWidget, public IGameStateObserver
@@ -21,6 +22,8 @@ public:
 	virtual void ChangedPlayerMaxAmmo(int32 Ammo) override;
 	virtual void ChangedPlayerAmmo(int32 Ammo) override;
 	virtual void ChangedPlayerMoney(int32 Money) override;
+	virtual void ChangedSkillList() override;
+
 	virtual void InitWidget(UUIHandle* uiHandle);
 	virtual void Action();
 	virtual void Update();

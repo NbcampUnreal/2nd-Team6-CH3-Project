@@ -22,6 +22,7 @@ public: // GameState가 스킬 리스트 계산하면 Notify로 값 전달, GameInstance가 Add
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
 	virtual void PlayAddAnim() override;
 	virtual void EndRemoveAnim() override;
+	virtual void ChangedSkillList() override;
 
 	void OnClickedSkillButton(USkillWidget* SkillWidget);
 

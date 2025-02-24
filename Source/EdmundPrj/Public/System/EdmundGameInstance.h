@@ -13,6 +13,7 @@ class USoundHandle;
 class UDataHandle;
 class AEdmundGameState;
 struct FShopCatalogRow;
+struct FPlayerSkillRow;
 
 UCLASS()
 class EDMUNDPRJ_API UEdmundGameInstance : public UGameInstance
@@ -37,6 +38,7 @@ public:
 
 	// Current Mission Cleared or Fail 
 	void EndMission() const;
+	bool CheckClearedMission(const int32 Index) const;
 	void DestroyedGameState();
 
 	// Scene Move Controll
@@ -45,21 +47,24 @@ public:
 	void MoveNextScene() const;
 	ESceneType GetCurrentSceneName() const;
 
-	// Game Data Controll
-	const UDataTable* GetDataTable(const ETableType TableName) const;
+	// Shop and Player Advance State Controll
 	const TArray<FShopCatalogRow*>& GetAdvanceState() const;
 	const FShopCatalogRow* GetAdvanceState(const FName& TargetRow) const;
 	bool UpdateAdvanceState(const FName RowName, const int32 UpdateValue) const;
+
+	// Player Type Controll
 	ECharacterType GetPlayerType() const;
 	void SetPlayerType(const ECharacterType Type) const;
 	//FMissionItemRow* GetCurrentMissionInfo() const;
+	// Player Money Controll
 	void AddPossessMoney(const int32 Value) const;
 	int32 GetPossessMoney() const;
-	bool CheckClearedMission(const int32 Index) const;
 
 	// player skill apply
 	void OnSkillListUI() const;
 	void ApplySelectSkill(const int32 Index) const;
+	const TArray<FPlayerSkillRow*>& GetPlayerSkillData() const;
+	const TArray<FPlayerSkillRow*>& GetRandomSkillSet() const;
 
 	// Game Sound Controll
 	void SetBGMVolume(const float Volume) const;

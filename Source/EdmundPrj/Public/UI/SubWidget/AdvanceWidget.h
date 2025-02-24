@@ -22,6 +22,7 @@ public:
 	void UpdatePrice(int32 Price);
 	void UpdateInfo(const FString& Text);
 	const FName& GetElementName() const;
+	void ApplyMaxLevel();
 
 private:
 	UFUNCTION()

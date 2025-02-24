@@ -11,6 +11,7 @@ class UEdmundGameInstance;
 class UDataHandleSettings;
 struct FShopCatalogRow;
 struct FPlayDataRow;
+struct FPlayerSkillRow;
 
 UCLASS()
 class EDMUNDPRJ_API UDataHandle : public UGameInstanceSubsystem
@@ -21,30 +22,32 @@ public:
 	//Initialize - LoadDataTable By DataHandleSettings / Initialize Arrays
 	void InitDataHandle(UEdmundGameInstance* NewGameInstance);
 
-	// Control Player Advance State Data
+	// Controll Player Advance State Data
 	const bool UpdateCurrentAdvance(const FName& TargetRow, const int32 UpdateValue);
 	const TArray<FShopCatalogRow*>& GetCurrentAdvance() const;
 	const FShopCatalogRow* GetCurrentAdvanceByRowName(const FName& TargetRow) const;
 
-	// Control Player Money Data
+	// Controll Player Money Data
 	void AddMoney(const int32 AddValue);
 	const int32 GetMoney() const;
 	const bool Consume(const int32 Price);
 
-	// Control Player Type Data
+	// Controll Player Type Data
 	void SetPlayerType(const ECharacterType CharacterType);
 	const ECharacterType GetPlayerType() const;
 
+	//Controll Player Skill Data
+	const TArray<FPlayerSkillRow*>& GetPlayerSkillData() const;
+
+	// Controll Play Data
 	void UpdateClearMission(const int32 Index);
-	const bool IsClearedMission(const int32 Index) const;
-
+	const bool GetIsClearedMission(const int32 Index) const;
 	void UpdateShowedIntro(const bool bShowed);
-	const bool IsShowedIntro() const;
-
-	const UDataTable* GetDataTable(const ETableType TableType) const;
+	const bool GetIsShowedIntro() const;
 
 private:
 	void LoadDataTables(const UDataHandleSettings* DataSettings);
+	FShopCatalogRow* SelectRow(const FName& TargetRow) const;
 
 private:
 	UPROPERTY()
@@ -53,10 +56,12 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> PlayDataTable = nullptr;
 
+	UPROPERTY()
+	TObjectPtr<UDataTable> PlayerSkillDataTable = nullptr;
+
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 
 	TArray<FShopCatalogRow*> CurrentAdvance;
 	TArray<FPlayDataRow*> PlayData;
-
-	ECharacterType PlayerType = ECharacterType::Gunner;
+	TArray<FPlayerSkillRow*> PlayerSkillData;
 };

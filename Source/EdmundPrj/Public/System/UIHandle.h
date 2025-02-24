@@ -13,6 +13,7 @@ class UBaseWidget;
 class UFadeWidget;
 class IGameStateObserver;
 struct FShopCatalogRow;
+struct FPlayerSkillRow;
 
 UCLASS()
 class EDMUNDPRJ_API UUIHandle : public UGameInstanceSubsystem
@@ -40,6 +41,7 @@ public:
 
 	// Apply Current Data
 	const TArray<FShopCatalogRow*>& GetCurrentAdvance() const;
+	const TArray<FPlayerSkillRow*>& GetCurrentRandomSkill() const;
 	const int32 GetCurrentMoney() const;
 	bool CheckClearedMission(int32 Index) const;
 
@@ -56,6 +58,8 @@ public:
 	void ClickedSelectCharacter(const ECharacterType CharacterType) const;
 	void ClickedSelectSkill(const int32 Index) const;
 	const FShopCatalogRow* ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const;
+
+	const TArray<TScriptInterface<IGameStateObserver>>& GetUIObservers() const;
 
 private:
 	//Initialize Widgets : Load WidgetClass from UIHandleSettings(DeveloperSettings), and Create UserWidget from WidgetClass

@@ -43,6 +43,10 @@ void UEdmundGameInstance::BindGameStateObserver() const
 	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
 	checkf(UIHandle, TEXT("UIHandle is invalid"));
 
+	for (auto& Observer : UIHandle->GetUIObservers())
+	{
+		EdmundGameState->RegisterGameStateObserver(Observer);
+	}
 }
 
 void UEdmundGameInstance::QuitGame() const
@@ -87,9 +91,7 @@ void UEdmundGameInstance::ChangeSelectMode(const bool bIsSelect) const
 void UEdmundGameInstance::EndMission() const
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	// 소지금 등 데이터 저장 필요
 	//UIHandle->AddToViewportByCoverType(EWidgetType::ResultWidget);
-	UIHandle->AddToViewportByCoverType(EWidgetType::SkillListWidget);
 }
 
 void UEdmundGameInstance::DestroyedGameState() 
@@ -119,12 +121,6 @@ ESceneType UEdmundGameInstance::GetCurrentSceneName() const
 {
 	checkf(IsValid(SceneHandle), TEXT("SceneHandle is invalid"));
 	return SceneHandle->GetCurrentScene();
-}
-
-const UDataTable* UEdmundGameInstance::GetDataTable(const ETableType TableType) const
-{
-	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
-	return DataHandle->GetDataTable(TableType);
 }
 
 const TArray<FShopCatalogRow*>& UEdmundGameInstance::GetAdvanceState() const
@@ -172,7 +168,7 @@ int32 UEdmundGameInstance::GetPossessMoney() const
 bool UEdmundGameInstance::CheckClearedMission(const int32 Index) const
 {
 	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
-	return DataHandle->IsClearedMission(Index);
+	return DataHandle->GetIsClearedMission(Index);
 }
 
 void UEdmundGameInstance::OnSkillListUI() const
@@ -185,6 +181,18 @@ void UEdmundGameInstance::ApplySelectSkill(const int32 Index) const
 {
 	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
 	EdmundGameState->ApplySelectedSkill(Index);
+}
+
+const TArray<FPlayerSkillRow*>& UEdmundGameInstance::GetPlayerSkillData() const
+{
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetPlayerSkillData();
+}
+
+const TArray<FPlayerSkillRow*>& UEdmundGameInstance::GetRandomSkillSet() const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	return EdmundGameState->GetRandomSkillSet();
 }
 
 void UEdmundGameInstance::SetBGMVolume(const float Volume) const
