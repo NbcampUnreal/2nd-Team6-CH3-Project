@@ -236,6 +236,12 @@ const TArray<FShopCatalogRow*>& UUIHandle::GetCurrentAdvance() const
 	return EdmundGameInstance->GetAdvanceState();
 }
 
+const TArray<FPlayerSkillRow*>& UUIHandle::GetCurrentRandomSkill() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->GetRandomSkillSet();
+}
+
 const int32 UUIHandle::GetCurrentMoney() const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
@@ -405,6 +411,11 @@ const FShopCatalogRow* UUIHandle::ClickedBuyAgree(const FName& TargetRow, const 
 	return nullptr;
 }
 
+const TArray<TScriptInterface<IGameStateObserver>>& UUIHandle::GetUIObservers() const
+{
+	return UIObservers;
+}
+
 void UUIHandle::ClickedRetry() const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
@@ -456,10 +467,12 @@ void UUIHandle::CreateBaseWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(UISettings->InGameWidgetClass), TEXT("InGmaeWidgetClass is invalid"));
 	InGameWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->InGameWidgetClass);
 	InGameWidget->InitWidget(this);
+	UIObservers.Add(InGameWidget);
 
 	checkf(IsValid(UISettings->EndingWidgetClass), TEXT("EndingWidgetClass is invalid"));
 	EndingWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->EndingWidgetClass);
 	EndingWidget->InitWidget(this);
+	UIObservers.Add(EndingWidget);
 }
 
 void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
@@ -477,6 +490,7 @@ void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(UISettings->ResultWidgetClass), TEXT("ResultWidgetClass is invalid"));
 	ResultWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->ResultWidgetClass);
 	ResultWidget->InitWidget(this);
+	UIObservers.Add(ResultWidget);
 
 	checkf(IsValid(UISettings->ShopWidgetClass), TEXT("ShopWidgetClass is invalid"));
 	ShopWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->ShopWidgetClass);
@@ -493,6 +507,7 @@ void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(UISettings->SkillListWidgetClass), TEXT("SkillListWidgetClass is invalid"));
 	SkillListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->SkillListWidgetClass);
 	SkillListWidget->InitWidget(this);
+	UIObservers.Add(SkillListWidget);
 
 	checkf(IsValid(UISettings->MissionListWidgetClass), TEXT("MissionListWidgetClass is invalid"));
 	MissionListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->MissionListWidgetClass);

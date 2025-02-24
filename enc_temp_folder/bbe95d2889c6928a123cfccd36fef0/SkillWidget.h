@@ -9,7 +9,6 @@
 class UButton;
 class UTextBlock;
 class UImage;
-class UCanvasPanel;
 class USkillListWidget;
 
 UCLASS()
@@ -19,19 +18,13 @@ class EDMUNDPRJ_API USkillWidget : public UUserWidget
 	
 public:
 	void InitSkill(USkillListWidget* ListWidget, int32 SkillNum);
-	void UpdateSkill(UTexture2D* SkillImage, const FName& SkillName, const FString& SkillInfo);
+	void UpdateSkill(UTexture2D* SkillImage, const FName& SkillName);
 	void InvisibleBorder();
 	const int32 GetSkillNumber() const;
 
 private:
 	UFUNCTION()
 	void OnClickedButton();
-
-	UFUNCTION()
-	void OnHoveredButton();
-
-	UFUNCTION()
-	void OnUnhoveredButton();
 
 private:
 	UPROPERTY(Meta = (BindWidget))
@@ -42,12 +35,6 @@ private:
 
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UImage> Border;
-
-	UPROPERTY(Meta = (BindWidget))
-	TObjectPtr<UTextBlock> InfoText;
-
-	UPROPERTY(Meta = (BindWidget))
-	TObjectPtr<UCanvasPanel> SkillInfoBox;
 
 	TObjectPtr<USkillListWidget> SkillListWidget;
 	int32 SkillNumber = 0;

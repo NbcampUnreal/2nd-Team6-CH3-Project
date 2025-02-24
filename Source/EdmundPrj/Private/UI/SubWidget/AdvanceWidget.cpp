@@ -34,6 +34,12 @@ const FName& UAdvanceWidget::GetElementName() const
 	return ItemName;
 }
 
+void UAdvanceWidget::ApplyMaxLevel()
+{
+	BuyButtonText->SetText(FText::FromString(FString::Printf(TEXT("Max"))));
+	BuyButton->SetIsEnabled(false);
+}
+
 void UAdvanceWidget::OnClickedBuy()
 {
 	checkf(IsValid(ShopWidget), TEXT("ShopWidget is invalid"));

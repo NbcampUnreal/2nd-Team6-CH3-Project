@@ -19,4 +19,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
 	TSoftObjectPtr<UDataTable> PlayDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
+	TSoftObjectPtr<UDataTable> PlayerSkillDataTable;
 };

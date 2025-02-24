@@ -29,6 +29,10 @@ void UBaseWidget::ChangedPlayerMoney(int32 Money)
 
 }
 
+void UBaseWidget::ChangedSkillList()
+{
+}
+
 void UBaseWidget::InitWidget(UUIHandle* uiHandle)
 {
 	UIHandle = uiHandle;

@@ -112,8 +112,16 @@ void UShopWidget::OpenNotify(bool bIsSuccess)
 
 void UShopWidget::UpdateStates(const FShopCatalogRow* ResultRow)
 {
+	if (ResultRow->CurrentLevel == ResultRow->MaxLevel)
+	{
+		TargetElement->ApplyMaxLevel();
+	}
+	else
+	{
+		TargetElement->UpdatePrice(ResultRow->CurrentPrice);
+	}
+
 	MoneyText->SetText(FText::FromString(FString::FromInt(UIHandle->GetCurrentMoney())));
-	TargetElement->UpdatePrice(ResultRow->CurrentPrice);
 	PairAdvanceAndInfo[TargetElement]->UpdateInfoValue(ResultRow->AdvanceValue * ResultRow->CurrentLevel);
 }
 
@@ -154,8 +162,17 @@ void UShopWidget::InitElements(const FShopCatalogRow* RowData)
 
 	Contents->AddChild(NewElement);
 	Elements.Add(NewElement);
+
 	NewElement->InitWidget(RowData->AdvanceName, this);
-	NewElement->UpdatePrice(RowData->CurrentPrice);
 	NewElement->UpdateInfo(RowData->InfoString);
 	NewElement->UpdateSkillImage(RowData->SkillImage);
+
+	if (RowData->CurrentLevel == RowData->MaxLevel)
+	{
+		NewElement->ApplyMaxLevel();
+	}
+	else
+	{
+		NewElement->UpdatePrice(RowData->CurrentPrice);
+	}
 }

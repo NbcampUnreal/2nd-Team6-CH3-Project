@@ -47,7 +47,7 @@ void USkillListWidget::ChangedSkillList()
 	{
 		FPlayerSkillRow* SkillRow = RandomSkillSet[i];
 
-		SkillElements[i]->UpdateSkill(SkillRow->SkillImage, SkillRow->SkillName, SkillRow->SkillInfo);
+		SkillElements[i]->UpdateSkill(SkillRow->SkillImage, SkillRow->SkillName);
 	}
 }
 
