@@ -1,24 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Mjolnir.h"
-#include "Components\SphereComponent.h"
+#include "Player/Thunder.h"
 #include "Monster\BaseMonster.h"
+#include "Player\TimerSkillSpawnManagerComponent.h"
 #include "Player\ElectricEffectPool.h"
 #include "Kismet\GameplayStatics.h"
-AMjolnir::AMjolnir()
+AThunder::AThunder()
 {
-
+	PrimaryActorTick.bCanEverTick = false;
 }
-
-void AMjolnir::HitToMonster(TObjectPtr<ABaseMonster> monster)
+void AThunder::BeginPlay()
 {
-
-	ElectricEffectPool->ActivateElectricEffect(monster->GetActorLocation());
-}
-
-void AMjolnir::BeginPlay()
-{
+	Super::BeginPlay();
 	if (!IsValid(GetWorld())) return;
 	if (TObjectPtr<ACharacter> character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
 	{
@@ -27,9 +21,17 @@ void AMjolnir::BeginPlay()
 		ElectricEffectPool = electricEffectPool;
 	}
 }
+void AThunder::HitToMonster(TObjectPtr<ABaseMonster> Monster)
+{
+	if (Monster)
+	{
+		ElectricEffectPool->ActivateElectricEffect(Monster->GetActorLocation());
+	}
+}
 
-
-
-
+void AThunder::Deactivate()
+{
+	Super::Deactivate();
+}
 
 
