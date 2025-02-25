@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "BehaviorTree/BTTaskNode.h"
 #include "BossState.generated.h"
 
 class ABoss;
@@ -23,7 +23,7 @@ enum class EBossState : uint8 {
 
 // 보스 상태 기본 클래스
 UCLASS()
-class EDMUNDPRJ_API UBossState : public UObject
+class EDMUNDPRJ_API UBossState : public UBTTaskNode
 {
     GENERATED_BODY()
 

@@ -1,11 +1,7 @@
 #include "Boss/Boss.h"
 #include "Boss/BossState.h"
+#include "Boss/BossAIController.h"
 #include "Boss/State/Boss_Idle.h"
-#include "Boss/State/Boss_Chase.h"
-#include "Boss/State/Boss_Attack1.h"
-#include "Boss/State/Boss_Attack2.h"
-#include "Boss/State/Boss_Attack3.h"
-#include "Boss/State/Boss_Attack4.h"
 #include "Boss/State/Boss_Skill2.h"
 #include "Boss/State/Boss_Skill3.h"
 #include "GameFramework/Actor.h"
@@ -15,6 +11,9 @@
 ABoss::ABoss()
 {
     PrimaryActorTick.bCanEverTick = true;
+
+    AIControllerClass = ABossAIController::StaticClass();
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     BossState = nullptr;
     MonsterMoveSpeed = 500.0f;
@@ -73,48 +72,48 @@ void ABoss::SetState(EBossState NewState)
     switch (NewState)
     {
     case EBossState::Idle:
-        BossState = NewObject<UBoss_Idle>(this);
+        //BossState = NewObject<UBoss_Idle>(this);
         //if (AnimInstance) AnimInstance->bIsMoving = false;
         break;
 
     case EBossState::Chase:
-        BossState = NewObject<UBoss_Chase>();
+        //BossState = NewObject<UBoss_Chase>();
         GetCharacterMovement()->MaxWalkSpeed = MonsterMoveSpeed;
         //if (AnimInstance) AnimInstance->bIsMoving = true;
         break;
 
     case EBossState::Attack1:
-        BossState = NewObject<UBoss_Attack1>();
+        //BossState = NewObject<UBoss_Attack1>();
         break;
 
     case EBossState::Attack2:
-        BossState = NewObject<UBoss_Attack2>();
+        //BossState = NewObject<UBoss_Attack2>();
         break;
 
     case EBossState::Attack3:
-        BossState = NewObject<UBoss_Attack3>();
+        //BossState = NewObject<UBoss_Attack3>();
         break;
 
     case EBossState::Attack4:
-        BossState = NewObject<UBoss_Attack4>();
+        //BossState = NewObject<UBoss_Attack4>();
         break;
 
     case EBossState::Skill2:
-        BossState = NewObject<UBoss_Skill2>();
+        //BossState = NewObject<UBoss_Skill2>();
         break;
 
     case EBossState::Skill3:
-        BossState = NewObject<UBoss_Skill3>();
+        //BossState = NewObject<UBoss_Skill3>();
         break;
 
     default:
-        BossState = nullptr;
+        //BossState = nullptr;
         break;
     }
 
     if (BossState)
     {
-        BossState->EnterState(this);
+        //BossState->EnterState(this);
     }
 }
 
@@ -150,4 +149,26 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
     ABoss_Attack1_Bullet::BulletPool.Empty();
     ABoss_Attack4_Bullet::Bullet4Pool.Empty();
     
+}
+
+void ABoss::UpdateAttackCooldown(int32 AttackID)
+{
+    float CurrentTime = GetWorld()->GetTimeSeconds();
+    switch (AttackID)
+    {
+    case 1:
+        Attack1_CooldownEnd = CurrentTime + Attack1_CooldownDuration;
+        break;
+    case 2:
+        Attack2_CooldownEnd = CurrentTime + Attack2_CooldownDuration;
+        break;
+    case 3:
+        Attack3_CooldownEnd = CurrentTime + Attack3_CooldownDuration;
+        break;
+    case 4:
+        Attack4_CooldownEnd = CurrentTime + Attack4_CooldownDuration;
+        break;
+    default:
+        break;
+    }
 }
