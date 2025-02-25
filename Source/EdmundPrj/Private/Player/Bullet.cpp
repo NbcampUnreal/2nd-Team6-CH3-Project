@@ -64,4 +64,15 @@ void ABullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 	GetWorld()->GetTimerManager().ClearTimer(BulletLifeTimerHandle);
 
 	SetBulletHidden(true);
+
+	if (OtherActor && OtherActor->ActorHasTag("Monster"))
+	{
+		UGameplayStatics::ApplyDamage(
+			OtherActor,
+			30.0f,	// 수정필요
+			nullptr,
+			this,
+			UDamageType::StaticClass()
+		);
+	}
 }
