@@ -26,6 +26,8 @@ virtual void MonsterAttackCheck();
 
 void MonsterDead();
 
+void SetIsDead(bool bNewIsDead);
+
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
 

@@ -12,6 +12,7 @@ ASuicideMonster::ASuicideMonster()
 
 void ASuicideMonster::MonsterAttackCheck()
 {
+
     USkeletalMeshComponent* MeshComp = GetMesh();
     ABaseMonster* Monster = Cast<ABaseMonster>(this);
 
