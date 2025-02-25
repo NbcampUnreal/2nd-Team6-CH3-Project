@@ -15,6 +15,8 @@ class EDMUNDPRJ_API AMeleeMonster : public ABaseMonster
 	GENERATED_BODY()
 	
 public:
+	AMeleeMonster();
+
 	void MonsterAttackCheck() override;
 
 	UFUNCTION()
@@ -26,6 +28,6 @@ public:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 
-	void PlayParticle();
-	void PlaySound();
+	void PlayParticle() override;
+	void PlaySound() override;
 };

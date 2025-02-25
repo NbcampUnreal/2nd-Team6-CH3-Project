@@ -41,6 +41,7 @@ private:
 	void OnClickedEnter();
 
 	void OnSelectedImage(int32 Index);
+	void CheckCleard();
 
 private:
 	UPROPERTY(Meta = (BindWidget))

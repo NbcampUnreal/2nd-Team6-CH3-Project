@@ -3,9 +3,12 @@
 
 #include "UI/SkillListWidget.h"
 #include "System/UIHandle.h"
+#include "UI/SubWidget/SkillWidget.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Components/UniformGridPanel.h"
+#include "System/DataStructure/PlayerSkillRow.h"
 
 void USkillListWidget::InitWidget(UUIHandle* NewUIHandle)
 {
@@ -14,12 +17,17 @@ void USkillListWidget::InitWidget(UUIHandle* NewUIHandle)
 
 	Super::InitWidget(NewUIHandle);
 
-	SelectButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedSelectButton);
-	SelectButton1->OnClicked.AddDynamic(this, &ThisClass::OnClickedSkillButton1);
-	SelectButton2->OnClicked.AddDynamic(this, &ThisClass::OnClickedSkillButton2);
-	SelectButton3->OnClicked.AddDynamic(this, &ThisClass::OnClickedSkillButton3);
+	CreateSkillWidget();
+	InvisibleAllBorder();
 
-	OnSelectedImage(0);
+	SelectButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedSelectButton);
+}
+
+void USkillListWidget::PlayAddAnim()
+{
+	Super::PlayAddAnim();
+	InvisibleAllBorder();
+	SelectButton->SetIsEnabled(false);
 }
 
 void USkillListWidget::EndRemoveAnim()
@@ -28,55 +36,60 @@ void USkillListWidget::EndRemoveAnim()
 	UIHandle->RemoveCoverFromViewport(EWidgetType::SkillListWidget);
 }
 
+void USkillListWidget::ChangedSkillList()
+{
+	Super::ChangedSkillList();
+
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	TArray<FPlayerSkillRow*> RandomSkillSet = UIHandle->GetCurrentRandomSkill();
+
+	for (int32 i = 0; i < 3; i++)
+	{
+		FPlayerSkillRow* SkillRow = RandomSkillSet[i];
+
+		SkillElements[i]->UpdateSkill(SkillRow->SkillImage, SkillRow->SkillName, SkillRow->SkillInfo);
+	}
+}
+
+void USkillListWidget::OnClickedSkillButton(USkillWidget* SkillWidget)
+{
+	SelectedSkill = SkillWidget;
+	InvisibleAllBorder();
+	SelectButton->SetIsEnabled(true);
+}
+
 void USkillListWidget::OnClickedSelectButton()
 {
-	OnSelectedImage(0);
+	if (!IsValid(SelectedSkill))
+	{
+		return;
+	}
+
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	UIHandle->ClickedSelectSkill();
+	UIHandle->ClickedSelectSkill(SelectedSkill->GetSkillNumber());
+	SelectedSkill->InvisibleBorder();
+	SelectedSkill = nullptr;
 	OnClickedCloseWidget(EWidgetType::SkillListWidget);
 }
 
-void USkillListWidget::OnClickedSkillButton1()
+void USkillListWidget::CreateSkillWidget()
 {
-	OnSelectedImage(1);
-}
-
-void USkillListWidget::OnClickedSkillButton2()
-{
-	OnSelectedImage(2);
-}
-
-void USkillListWidget::OnClickedSkillButton3()
-{
-	OnSelectedImage(3);
-}
-
-void USkillListWidget::OnSelectedImage(int32 Index)
-{
-	Border1->SetVisibility(ESlateVisibility::Collapsed);
-	Border2->SetVisibility(ESlateVisibility::Collapsed);
-	Border3->SetVisibility(ESlateVisibility::Collapsed);
-
-	switch (Index)
+	SkillWidgetClass = BaseSkill->GetClass();
+	
+	for (int32 i = 0; i < 3; i++)
 	{
-	case 0:
+		TObjectPtr<USkillWidget> NewElement = CreateWidget<USkillWidget>(this, SkillWidgetClass);
+		SkillList->AddChildToUniformGrid(NewElement, 0, i);
+		SkillElements.Add(NewElement);
 
-		break;
+		NewElement->InitSkill(this, i);
+	}
+}
 
-	case 1:
-		Border1->SetVisibility(ESlateVisibility::Visible);
-		break;
-
-	case 2:
-		Border2->SetVisibility(ESlateVisibility::Visible);
-		break;
-
-	case 3:
-		Border3->SetVisibility(ESlateVisibility::Visible);
-		break;
-
-	default:
-		checkNoEntry();
-		break;
+void USkillListWidget::InvisibleAllBorder()
+{
+	for (USkillWidget* TargetSkillWidget : SkillElements)
+	{
+		TargetSkillWidget->InvisibleBorder();
 	}
 }

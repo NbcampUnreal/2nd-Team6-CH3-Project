@@ -6,6 +6,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
 
+ASuicideMonster::ASuicideMonster()
+{
+}
+
 void ASuicideMonster::MonsterAttackCheck()
 {
     USkeletalMeshComponent* MeshComp = GetMesh();

@@ -16,10 +16,11 @@ class EDMUNDPRJ_API UCharacterListWidget : public UBaseWidget
 	
 public:
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
+	virtual void PlayAddAnim() override;
 	virtual void EndRemoveAnim() override;
-	//virtual void ChangedClickedCharacter(AActor* Character) override;
+	virtual void ChangedCharacterType(ECharacterType CharacterType) override;
 
-private: // 선택한 캐릭터 타입 반환 필요, 캐릭터 선택 기능 구현
+private:
 	UFUNCTION()
 	void OnClickedSelect();
 	
@@ -28,6 +29,8 @@ private: // 선택한 캐릭터 타입 반환 필요, 캐릭터 선택 기능 구현
 
 	UFUNCTION()
 	void OnClickedClose();
+
+	void SetEnableButton(bool bIsEnable);
 
 private:
 	UPROPERTY(Meta = (BindWidget))
@@ -45,6 +48,5 @@ private:
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> CloseAnim;
 
-	ECharacterType CharacterType = ECharacterType::Gunner;
-	TObjectPtr<AActor> SelectedCharacter = nullptr;
+	ECharacterType TargetCharacterType = ECharacterType::Gunner;
 };

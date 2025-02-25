@@ -8,6 +8,8 @@
 
 class UInputMappingContext;
 class UInputAction;
+class ABaseCharacter;
+struct FCharacterDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API AMainLevelPlayerController : public APlayerController
@@ -21,9 +23,29 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputAction> LeftClickAction = nullptr;
 
+	AMainLevelPlayerController();
+	void SetTargetToNull();
+	void SetSelectMode(bool Value);
+	void InitMainLevelCharacters(const TArray<FCharacterDataRow*>& CharacterData);
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DelTime) override;
 	virtual void SetupInputComponent() override;
+
+private:
 	void InputLeftMouseButtonClick();
 	void CheckCollideCharacter();
+	void MoveToTargetPoint();
+	void MoveToStartPoint();
+	
+private:
+	TObjectPtr<ABaseCharacter> TargetCharacter;
+	TArray <TObjectPtr<ABaseCharacter>> CharacterSet;
+	TMap<TObjectPtr<ABaseCharacter>, FVector> StartPosByCharacter;
+	TMap<TObjectPtr<ABaseCharacter>, bool> bIsReturnByCharacter;
+	FVector MoveTargetPos;
+	FVector LookAtTargetPos;
+
+	bool bIsSelectMode = true;
 };
