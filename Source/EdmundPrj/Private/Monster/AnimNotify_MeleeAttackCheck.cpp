@@ -9,7 +9,6 @@
 
 void UAnimNotify_MeleeAttackCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-    UE_LOG(LogTemp, Warning, TEXT("AttackNotified"));
 
     if (MeshComp && MeshComp->GetOwner())
     {

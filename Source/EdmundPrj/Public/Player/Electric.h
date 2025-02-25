@@ -4,21 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ElectricEffect.generated.h"
+#include "Electric.generated.h"
 
 class ABaseMonster;
 class USphereComponent;
 class UStaticMeshComponent;
 class USplineComponent;
+class UElectricEffectPool;
 
 UCLASS()
-class EDMUNDPRJ_API AElectricEffect : public AActor
+class EDMUNDPRJ_API AElectric : public AActor
 {
 	GENERATED_BODY()
-
-public:
-	//함수
-	AElectricEffect();
+	
+public:	
+	AElectric();
+	virtual void BeginPlay() override;
+	// Sets default values for this actor's properties
 	UFUNCTION()
 	void FindMonster(
 		UPrimitiveComponent* overlappedComp,
@@ -27,18 +29,22 @@ public:
 		int32 otherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+	UFUNCTION()
 	void MoveToMonster(ABaseMonster* monster);
+	UFUNCTION()
 	void Move();
+	UFUNCTION()
 	void Attack(ABaseMonster* monster);
+	UFUNCTION()
+	void Activate();
+	UFUNCTION()
 	void Deactivate();
+	UFUNCTION()
 	void ResetSplineRotation();
-
+	UFUNCTION()
 	void AddSplinePoint(FVector NewPoint);
+	UFUNCTION()
 	void DeleteSplinePoint();
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:
 	//변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
@@ -47,7 +53,7 @@ public:
 	TObjectPtr<UStaticMeshComponent> Mesh = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
 	TObjectPtr<USphereComponent> EnemySearchCollision = nullptr;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
 	TObjectPtr<USplineComponent> SplineComponent = nullptr;
 
@@ -60,15 +66,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float Speed = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
-	float DestroyTime = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float PointDestroyTime = 0;
 	int CurrentElectricCount = 0;
 	TObjectPtr<ABaseMonster> TargetMonster;
-
 	FVector FirstEnemyPos = FVector::ZeroVector;
 	TArray<FVector> EnemyPosArray = TArray<FVector>();
 	bool isFirst = false;
 	FTimerHandle MoveTimer;
 	FTimerHandle DeactivateTimer;
+	TObjectPtr<UElectricEffectPool> ElectricEffectPool = nullptr;
 };

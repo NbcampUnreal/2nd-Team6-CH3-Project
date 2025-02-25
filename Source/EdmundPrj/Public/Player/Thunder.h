@@ -3,21 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/AttackSkill.h"
-#include "Mjolnir.generated.h"
+#include "Player/TimerSkill.h"
+#include "Thunder.generated.h"
+
 
 class AElectricEffect;
 class UElectricEffectPool;
 
 UCLASS()
-class EDMUNDPRJ_API AMjolnir : public AAttackSkill
+class EDMUNDPRJ_API AThunder : public ATimerSkill
 {
 	GENERATED_BODY()
-
 public:
-	AMjolnir();
-	virtual void HitToMonster(TObjectPtr<ABaseMonster> monster) override;
+	AThunder();
 	virtual void BeginPlay() override;
+	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster) override;
+	virtual void Deactivate() override;
 public:
 	TObjectPtr<UElectricEffectPool> ElectricEffectPool = nullptr;
 };

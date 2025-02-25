@@ -4,11 +4,13 @@
 #include "Player/TimerSkill.h"
 #include "Components\SphereComponent.h"
 #include "Monster\BaseMonster.h"
+#include "Player\TimerSkillSpawnManagerComponent.h"
+
 // Sets default values
 ATimerSkill::ATimerSkill()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	RootComponent = Scene;
@@ -17,9 +19,6 @@ ATimerSkill::ATimerSkill()
 	EnemySearchCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	EnemySearchCollision->SetupAttachment(RootComponent);
 	EnemySearchCollision->OnComponentBeginOverlap.AddDynamic(this, &ATimerSkill::BeginOverlaped);
-	EnemySearchCollision->OnComponentEndOverlap.AddDynamic(this, &ATimerSkill::EndOverlaped);
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetupAttachment(EnemySearchCollision);
 }
 
 void ATimerSkill::BeginOverlaped(
@@ -30,17 +29,24 @@ void ATimerSkill::BeginOverlaped(
 	bool bFromSweep, const 
 	FHitResult& SweepResult)
 {
-
+	if (otherActor && otherActor->ActorHasTag("Monster"))
+	{
+		if (TObjectPtr<ABaseMonster> Monster = Cast<ABaseMonster>(otherActor))
+		{
+			HitToMonster(Monster);
+		}
+	}
+	
 }
 
-void ATimerSkill::EndOverlaped(
-	UPrimitiveComponent* 
-	overlappedComponent, 
-	AActor* otherActor, 
-	UPrimitiveComponent* otherComp, 
-	int32 otherBodyIndex)
+void ATimerSkill::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 {
+}
 
+void ATimerSkill::Deactivate()
+{
+	if (!IsValid(TimerSkillSpanwManager)) return;
+	TimerSkillSpanwManager->DeactivateTimerSkill(this);
 }
 
 // Called when the game starts or when spawned
