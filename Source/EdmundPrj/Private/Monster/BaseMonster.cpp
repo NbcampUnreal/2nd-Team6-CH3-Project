@@ -87,6 +87,7 @@ void ABaseMonster::MonsterDestroy()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
 	DropReward();
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	Destroy();
 }
 
@@ -116,7 +117,7 @@ void ABaseMonster::MonsterHit()
 		{
 			bIsHit = true;
 
-			GetCharacterMovement()->DisableMovement();
+			GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0, 0, 1));
 			GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
 
 			AnimInstance->Montage_Play(HitAnimation);
@@ -147,7 +148,7 @@ void ABaseMonster::MonsterAttack()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
-			GetCharacterMovement()->DisableMovement();
+			GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0, 0, 1));
 
 			AnimInstance->Montage_Play(AttackAnimation);
 
