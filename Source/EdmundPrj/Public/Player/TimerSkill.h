@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class ABaseMonster;
+class UTimerSkillSpawnManagerComponent;
 
 UCLASS()
 class EDMUNDPRJ_API ATimerSkill : public AActor
@@ -25,12 +26,8 @@ public:
 		int32 otherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
-	UFUNCTION()
-	void EndOverlaped(
-		UPrimitiveComponent* overlappedComponent,
-		AActor* otherActor,
-		UPrimitiveComponent* otherComp,
-		int32 otherBodyIndex);
+	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster);
+	virtual void Deactivate();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,13 +35,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
 	TObjectPtr<USceneComponent> Scene = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
-	TObjectPtr<UStaticMeshComponent> Mesh = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
 	TObjectPtr<USphereComponent> EnemySearchCollision = nullptr;
+	UPROPERTY()
+	TObjectPtr<UTimerSkillSpawnManagerComponent> TimerSkillSpanwManager = nullptr;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float AttackRadius = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float DamageMultiplier = 0;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	float AttackCycleSeconds = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	float MoveSpeed = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	float DeactivateTime = 0;
 };
