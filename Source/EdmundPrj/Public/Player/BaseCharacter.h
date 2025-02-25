@@ -29,6 +29,7 @@ protected:
 
 	// 이동
 	void Move(const FInputActionValue& value);
+	void StopMove(const FInputActionValue& value);
 
 	// 마우스 회전
 	void Look(const FInputActionValue& value);
@@ -47,10 +48,11 @@ protected:
 
 	// 근접공격
 	void MeleeAttack(const FInputActionValue& value);
+	void EndMeleeAttack();
 
 	// 재장전
 	void ReloadAction(const FInputActionValue& value);
-	void Reload();
+	virtual void Reload();
 
 	// 상호작용
 	void Interaction(const FInputActionValue& value);
@@ -64,7 +66,11 @@ protected:
 	void StopCrouch(const FInputActionValue& value);
 
 	// 피격
-	void TakeDamage(float Damage);
+	virtual float TakeDamage(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser) override;
 
 	// 경험치 증가
 	void AddExp(int32 Exp);
@@ -96,9 +102,18 @@ protected:
 	// 강화해놓은 스테이터스값 받기
 	void GetUpgradeStatus();
 
+	// 죽음
+	void ActiveDieAction();
+
 public:
 	// 캐릭터 타입 반환
 	ECharacterType getCharacterType();
+
+	void MeleeAttackTrace();
+
+	// 공격 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UAnimMontage* AttackMontage;
 
 	// 캐릭터 타입
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -179,13 +194,50 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 RevivalCount;
 
-private:
 	// 달리는 중
 	bool IsSprint;
 
 	// 앉기 중
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	bool IsCrouch;
 
+	// 걷기 중
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	bool IsMove;
+
+	// 재장전 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	UAnimMontage* MeleeAttackMontage;
+
+	// 재장전 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	float MeleeAttackDelay;
+
+	// 피격 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	UAnimMontage* HitActionMontage;
+
+	// 죽음 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	UAnimMontage* DieActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
+	TObjectPtr<USoundBase> MeleeAttackSound;	// 근접공격 사운드
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
+	TObjectPtr<USoundBase> ReloadSound;			// 재장전 사운드
+
+private:
 	// 캡슐 높이 <- 앉기에서 사용
 	float CapsuleHeight;
+
+	FTimerHandle MeleeAttackDelayHandle;
+
+protected:
+	bool bIsMeleeAttack;
+	bool bIsAttack;
+	bool bIsReloading;
+	bool IsDie;
+
+	bool CheckAction();
 };
