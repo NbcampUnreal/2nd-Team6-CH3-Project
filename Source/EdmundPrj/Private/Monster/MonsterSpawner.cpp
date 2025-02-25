@@ -3,6 +3,14 @@
 
 #include "Monster/MonsterSpawner.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BTTaskNode.h"
+#include "GameFramework/Actor.h"
+
 
 // Sets default values
 AMonsterSpawner::AMonsterSpawner()
@@ -59,7 +67,7 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 
 	for (int32 i = 0; i < PoolSize; i++)
 	{
-		SpawnLocation.Z += 2000;
+		SpawnLocation.Z -= 2000;
 
 		if (AllMonsters.Num() > 0)
 		{
@@ -106,6 +114,18 @@ void AMonsterSpawner::SpawnMonster()
 		ABaseMonster* Monster = GetMonsterFromPool();
 		if (Monster)
 		{
+			AAIController* AIController = Cast<AAIController>(Monster->GetController());
+			if (AIController)
+			{
+				UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+				BlackboardComp->SetValueAsBool(TEXT("HasLineOfSight"), false);
+				BlackboardComp->SetValueAsObject(TEXT("PlayerActor"), nullptr);
+
+				AIController->SetActorTickEnabled(true);
+			}
+			Monster->SetIsDead(false);
+			Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			Monster->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 			Monster->SetActorLocation(GetSpawnVolume());
 		}
 	}

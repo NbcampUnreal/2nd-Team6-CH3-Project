@@ -10,6 +10,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "AIController.h"
 #include "Components/AudioComponent.h"
 
 // Sets default values
@@ -65,7 +66,7 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 // 죽는 애니메이션 재생 후 MonsterDestroy 호출
 void ABaseMonster::MonsterDead()
 {
-	bIsDead = true;
+	SetIsDead(true);
 
 	if (DeathAnimation)
 	{
@@ -82,13 +83,26 @@ void ABaseMonster::MonsterDead()
 	}
 }
 
+void ABaseMonster::SetIsDead(bool bNewIsDead)
+{
+	bIsDead = bNewIsDead;
+}
+
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
 	DropReward();
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	Destroy();
+	SetActorHiddenInGame(true);
+
+	FVector GoToHell = GetActorLocation() + FVector(0, 0, -2000.0f);
+	SetActorLocation(GoToHell);
+
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		AIController->SetActorTickEnabled(false);
+	}
 }
 
 void ABaseMonster::DropReward()
