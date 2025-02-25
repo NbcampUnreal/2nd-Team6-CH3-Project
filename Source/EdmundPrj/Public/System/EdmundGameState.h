@@ -37,8 +37,11 @@ public:
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 
+	APlayerController* GetPlayerController();
+	AActor* GetPlayerPawn();
+
 private:
-	void InitMainLevel();
+	void InitMainLevel(); // 게임 모드로 옮길 필요가 있음.
 	void InitSkillData();
 	void CalculateSkillList(); 
 
@@ -49,6 +52,7 @@ private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
 	TObjectPtr<APlayerController> PlayerController = nullptr;
+	TObjectPtr<AActor> PlayerPawn = nullptr;
 
 	TArray<TScriptInterface<IGameStateObserver>> Observers;
 

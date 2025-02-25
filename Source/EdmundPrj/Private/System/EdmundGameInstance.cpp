@@ -117,6 +117,12 @@ ESceneType UEdmundGameInstance::GetCurrentSceneName() const
 	return SceneHandle->GetCurrentScene();
 }
 
+const TArray<FMissionDataRow*>& UEdmundGameInstance::GetCurrentMissionData(ESceneType SceneType) const
+{
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetMissionDataBySceneType(SceneType);
+}
+
 const TArray<FShopCatalogRow*>& UEdmundGameInstance::GetAdvanceState() const
 {
 	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));

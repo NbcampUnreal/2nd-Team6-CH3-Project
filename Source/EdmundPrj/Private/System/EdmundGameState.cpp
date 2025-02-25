@@ -17,15 +17,19 @@ void AEdmundGameState::BeginPlay()
 	EdmundGameMode = GetWorld()->GetAuthGameMode<AEdmundGameMode>();
 	PlayerController = GetWorld()->GetPlayerControllerIterator()->Get();
 
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
+	PlayerPawn = PlayerController->GetPawn();
 
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->StartedGameState();
+
 	InitSkillData();
 	InitMainLevel();
 
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+	//Test
+	/*GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::EndCurrentMission, 5.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::EndCurrentMission, 5.0f, false);*/
 }
 
 void AEdmundGameState::BeginDestroy()
@@ -166,6 +170,16 @@ void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameSta
 void AEdmundGameState::UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
 {
 	Observers.Remove(Observer);
+}
+
+APlayerController* AEdmundGameState::GetPlayerController()
+{
+	return PlayerController;
+}
+
+AActor* AEdmundGameState::GetPlayerPawn()
+{
+	return PlayerPawn;
 }
 
 void AEdmundGameState::NotifyCreateRandomSkill() const
