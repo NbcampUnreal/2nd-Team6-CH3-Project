@@ -44,4 +44,6 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComponent;
+
+	bool bIsHidden;
 };

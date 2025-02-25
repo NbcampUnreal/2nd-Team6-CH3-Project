@@ -21,6 +21,8 @@ ABullet::ABullet()
 	ProjectileMovementComponent->MaxSpeed = 10000.0f;
 
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnBulletOverlap);
+
+	bIsHidden = false;
 }
 
 void ABullet::BeginPlay()
@@ -35,6 +37,8 @@ void ABullet::Tick(float DeltaTime)
 
 void ABullet::SetBulletHidden(bool IsHidden)
 {
+	bIsHidden = IsHidden;
+
 	// 3ÃÊ µÚ±îÁö ¿À¹ö·¦ ¾ÈµÉ °æ¿ì Ç®¸µ
 	if (!IsHidden)
 	{
@@ -46,7 +50,7 @@ void ABullet::SetBulletHidden(bool IsHidden)
 			false
 		);
 	}
-	SetActorHiddenInGame(IsHidden);  // ÃÑ¾Ë ¼û±è Ã³¸®
+	SetActorHiddenInGame(bIsHidden);  // ÃÑ¾Ë ¼û±è Ã³¸®
 }
 
 void ABullet::EndBulletLife()
@@ -61,11 +65,7 @@ void ABullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 		return;
 	}
 
-	GetWorld()->GetTimerManager().ClearTimer(BulletLifeTimerHandle);
-
-	SetBulletHidden(true);
-
-	if (OtherActor && OtherActor->ActorHasTag("Monster"))
+	if (OtherActor && OtherActor->ActorHasTag("Monster") && !bIsHidden)
 	{
 		UGameplayStatics::ApplyDamage(
 			OtherActor,
@@ -75,4 +75,8 @@ void ABullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 			UDamageType::StaticClass()
 		);
 	}
+
+	GetWorld()->GetTimerManager().ClearTimer(BulletLifeTimerHandle);
+
+	SetBulletHidden(true);
 }
