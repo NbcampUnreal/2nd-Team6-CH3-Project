@@ -9,7 +9,6 @@ UBoss_Attack1::UBoss_Attack1()
 
 void UBoss_Attack1::EnterState(ABoss* Boss)
 {
-	Super::EnterState(Boss);
 	UE_LOG(LogTemp, Log, TEXT("Boss is ATTACK1"));
 
 	if (!Boss) return;

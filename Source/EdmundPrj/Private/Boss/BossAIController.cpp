@@ -13,10 +13,15 @@ void ABossAIController::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("BossAIController NULL"));
     }
 
-    if (BossCharacter)
-    {
-        BossCharacter->SetState(EBossState::Skill2);
-    }
+    //if (BossCharacter)
+    //{
+    //    BossCharacter->SetState(EBossState::Skill2);
+    //}
+}
+
+void ABossAIController::OnPossess(APawn* InPawn)
+{
+    Super::OnPossess(InPawn);
 }
 
 void ABossAIController::Tick(float DeltaTime)

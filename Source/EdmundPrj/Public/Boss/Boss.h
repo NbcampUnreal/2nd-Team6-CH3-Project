@@ -76,6 +76,50 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
     TSubclassOf<ABoss_Attack4_Bullet> Attack4BulletClass;
 
+    // 탄환 발사 횟수를 관리하는 변수 (현재 발사된 탄환 수)
+    int32 Attack4_Attack4FiredCount = 0;
+
+    // 상승 전 대기 시간
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_WaitBeforeRise = 1.0f;
+
+    // 상승 속도
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_RiseSpeed = 400.0f;
+
+    // 목표 높이
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_TargetHeight = 1500.0f;
+
+    // 목표 높이에 도달한 후, 탄환 발사 전에 대기하는 시간
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_WaitAtTarget = 2.0f;
+
+    // 탄환 발사 지속 시간
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_FireDuration = 1.5f;
+
+    // 탄환 발사 간격
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_FireInterval = 0.2f;
+
+    // 발사할 탄환의 총 개수
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    int32 Attack4_FireBulletCount = 5;
+
+    // 유도 지속 시간
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_HomingDuration = 2.0f;
+
+    // 하강 속도
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_DescendSpeed = 600.0f;
+
+    // 착지 후 대기 시간
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
+    float Attack4_WaitAfterLanding = 1.0f;
+
+
     // ***********************Skill 1*************************
     // ***********************Skill 2*************************
 

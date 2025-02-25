@@ -1,21 +1,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Boss/BossState.h"  // 기존 상태 기본 클래스
+#include "Boss/BossState.h"
+#include "BehaviorTree/BTTaskNode.h"
 #include "Boss_Attack1.generated.h"
 
 class ABoss;
 
 UCLASS()
-class EDMUNDPRJ_API UBoss_Attack1 : public UBossState
+class EDMUNDPRJ_API UBoss_Attack1 : public UBTTaskNode
 {
 	GENERATED_BODY()
 
 public:
 	UBoss_Attack1();
 
-	virtual void EnterState(ABoss* Boss) override;
-	virtual void ExitState() override;
+	void EnterState(ABoss* Boss);
+	void ExitState();
 
 	// 탄환 발사를 수행하는 함수
 	void FireBullet();
