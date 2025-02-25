@@ -3,10 +3,12 @@
 
 #include "Monster/RangedMonster.h"
 #include "Monster/RangedMonsterBullet.h"
+#include "Monster/MonsterBulletPool.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/GameModeBase.h"
 #include "Engine/World.h"
 
 ARangedMonster::ARangedMonster()
@@ -16,57 +18,21 @@ ARangedMonster::ARangedMonster()
 void ARangedMonster::BeginPlay()
 {
     Super::BeginPlay();
-    InitializeMonsterBulletPool(10);
+
+    //   AGameModeBase* CurrentGameMode = GetWorld()->GetAuthGameMode();
+    //   if (CurrentGameMode)
+    //   {
+       //	MonsterBulletPool = CurrentGameMode->GetMonsterBulletPool();
+       //}
+    //   else
+    //   {
+    //       UE_LOG(LogTemp, Warning, TEXT("CurrentGameMode 없음"));
+    //   }
 }
 
 void ARangedMonster::MonsterAttackCheck()
 {
-    USkeletalMeshComponent* MeshComp = GetMesh();
-    ABaseMonster* Monster = Cast<ABaseMonster>(this);
-
     Fire();
-
-}
-
-void ARangedMonster::InitializeMonsterBulletPool(int32 PoolSize)
-{
-    FRotator SpawnRotation(0, 0, 0);
-    FVector SpawnLocation(0, 0, 0);
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
-
-    for (int32 i = 0; i < PoolSize; i++)
-    {
-        SpawnLocation.X += 2000;
-
-        ARangedMonsterBullet* NewBullet = GetWorld()->SpawnActor<ARangedMonsterBullet>(MonsterBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
-
-        if (!NewBullet)
-        {
-            UE_LOG(LogTemp, Error, TEXT("There is No Bullet"))
-        }
-
-        if (NewBullet)
-        {
-            NewBullet->SetActorHiddenInGame(true);
-            BulletPool.Add(NewBullet);
-        }
-    }
-}
-
-ARangedMonsterBullet* ARangedMonster::GetBulletFromPool()
-{
-    for (ARangedMonsterBullet* Bullet : BulletPool)
-    {
-        if (Bullet && Bullet->IsHidden())
-        {
-            Bullet->SetMonsterBulletHidden(false);
-            return Bullet;
-        }
-    }
-
-    UE_LOG(LogTemp, Error, TEXT("There is no MonsterBullet in the object pool."));
-    return nullptr;
 }
 
 void ARangedMonster::Fire()
@@ -74,27 +40,38 @@ void ARangedMonster::Fire()
     PlayParticle();
     PlaySound();
 
-    ARangedMonsterBullet* BulletToFire = GetBulletFromPool();
-
-    if (BulletToFire)
+    if (MonsterBulletPool)
     {
-        FVector SpawnLocation = this->GetActorLocation();
-        FRotator SpawnRotation = this->GetActorRotation();
-
-        BulletToFire->SetDamage(GetMonsterAttackDamage());
-
-        BulletToFire->SetActorLocation(SpawnLocation);
-        BulletToFire->SetActorRotation(SpawnRotation);
-
-        FVector ForwardDirection = SpawnRotation.Vector();
-
-        if (BulletToFire->ProjectileMovementComp)
+        ARangedMonsterBullet* BulletToFire = MonsterBulletPool->GetBulletFromPool();
         {
-            BulletToFire->ProjectileMovementComp->Velocity = ForwardDirection * BulletToFire->ProjectileMovementComp->InitialSpeed;
+            if (BulletToFire)
+            {
+                FVector SpawnLocation = this->GetActorLocation();
+                FRotator SpawnRotation = this->GetActorRotation();
+
+                BulletToFire->SetDamage(GetMonsterAttackDamage());
+
+                BulletToFire->SetActorLocation(SpawnLocation);
+                BulletToFire->SetActorRotation(SpawnRotation);
+
+                FVector ForwardDirection = SpawnRotation.Vector();
+
+                if (BulletToFire->ProjectileMovementComp)
+                {
+                    BulletToFire->ProjectileMovementComp->Velocity = ForwardDirection * BulletToFire->ProjectileMovementComp->InitialSpeed;
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("BulletToFire 없음"));
+            }
         }
     }
+    //else if (!MonsterBulletPool)
+    //{
+    //    UE_LOG(LogTemp, Warning, TEXT("MonsterBUlletPool 없음"));
+    //}
 }
-
 
 
 void ARangedMonster::PlayParticle()
