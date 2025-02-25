@@ -2,11 +2,6 @@
 #include "Boss/BossState.h"
 #include "Boss/BossAIController.h"
 #include "Boss/State/Boss_Idle.h"
-#include "Boss/State/Boss_Chase.h"
-#include "Boss/State/Boss_Attack1.h"
-#include "Boss/State/Boss_Attack2.h"
-#include "Boss/State/Boss_Attack3.h"
-#include "Boss/State/Boss_Attack4.h"
 #include "Boss/State/Boss_Skill2.h"
 #include "Boss/State/Boss_Skill3.h"
 #include "GameFramework/Actor.h"
@@ -154,4 +149,26 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
     ABoss_Attack1_Bullet::BulletPool.Empty();
     ABoss_Attack4_Bullet::Bullet4Pool.Empty();
     
+}
+
+void ABoss::UpdateAttackCooldown(int32 AttackID)
+{
+    float CurrentTime = GetWorld()->GetTimeSeconds();
+    switch (AttackID)
+    {
+    case 1:
+        Attack1_CooldownEnd = CurrentTime + Attack1_CooldownDuration;
+        break;
+    case 2:
+        Attack2_CooldownEnd = CurrentTime + Attack2_CooldownDuration;
+        break;
+    case 3:
+        Attack3_CooldownEnd = CurrentTime + Attack3_CooldownDuration;
+        break;
+    case 4:
+        Attack4_CooldownEnd = CurrentTime + Attack4_CooldownDuration;
+        break;
+    default:
+        break;
+    }
 }

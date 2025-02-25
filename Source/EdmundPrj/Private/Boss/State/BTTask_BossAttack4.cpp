@@ -198,5 +198,6 @@ void UBTTask_BossAttack4::DelayedTransition()
     {
         return;
     }
+    BossRef->UpdateAttackCooldown(4);
     FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
 }
