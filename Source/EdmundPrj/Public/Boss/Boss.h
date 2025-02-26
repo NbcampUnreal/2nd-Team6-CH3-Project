@@ -7,7 +7,9 @@
 #include "Components/ArrowComponent.h"
 #include "Boss/Attack/Boss_Attack1_Bullet.h"
 #include "Boss/Attack/Boss_Attack4_Bullet.h"
+#include "Boss/Attack/Boss_Skill3_Wall.h"
 #include "Boss.generated.h"
+
 
 UCLASS()
 class EDMUNDPRJ_API ABoss : public ABaseMonster {
@@ -40,7 +42,7 @@ private:
     
 
 private:
-    int32 PoolSize = 5;
+    int32 PoolSize = 15;
 
 public:
     float Chase_AcceptanceRadius = 1000.0f; // Chase 반경
@@ -160,7 +162,7 @@ public:
     float Skill3SpawnInterval = 0.5f; // 벽 소환 간격 (초)
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
-    TSubclassOf<AActor> Skill3WallClass; // 소환할 벽 BP 클래스
+    TSubclassOf<ABoss_Skill3_Wall> Skill3WallClass; // 소환할 벽 BP 클래스
 
     // ***********************Skill 4*************************
 

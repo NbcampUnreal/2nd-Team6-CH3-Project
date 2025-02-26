@@ -135,6 +135,7 @@ void ABoss::InitiallizeBullerPool()
     {
         ABoss_Attack1_Bullet* Bullet = GetWorld()->SpawnActor<ABoss_Attack1_Bullet>(Attack1BulletClass);
         ABoss_Attack4_Bullet* Bullet4 = GetWorld()->SpawnActor<ABoss_Attack4_Bullet>(Attack4BulletClass);
+        ABoss_Skill3_Wall* Wall = GetWorld()->SpawnActor<ABoss_Skill3_Wall>(Skill3WallClass);
         if (Bullet)
         {
             Bullet->SetActorHiddenInGame(true);
@@ -144,6 +145,11 @@ void ABoss::InitiallizeBullerPool()
         {
             Bullet4->SetActorHiddenInGame(true);
             Bullet4->SetActorEnableCollision(false);
+        }
+        if (Wall)
+        {
+            Wall->SetActorHiddenInGame(true);
+            Wall->SetActorEnableCollision(false);
         }
     }
 
@@ -157,6 +163,7 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
     // Attack1 풀 정리
     ABoss_Attack1_Bullet::BulletPool.Empty();
     ABoss_Attack4_Bullet::Bullet4Pool.Empty();
+    ABoss_Skill3_Wall::WallPool.Empty();
     
 }
 
