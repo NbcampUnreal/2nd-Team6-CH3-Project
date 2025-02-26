@@ -42,16 +42,22 @@ void ABossAIController::Tick(float DeltaTime)
         UBlackboardComponent* BBComp = GetBlackboardComponent();
         if (BBComp)
         {
-            // 체력 퍼센트
+            // --- [ 스킬 우선 로직 ] ---
+
+            // 체력 퍼센트 계산 (0~100)
             float HPPercent = 100.f;
             if (BossCharacter->GetMonsterMaxHP() > 0.f)
             {
-                HPPercent = (BossCharacter->GetMonsterHP() / BossCharacter->GetMonsterMaxHP()) * 100.f;
+                HPPercent = (BossCharacter->GetMonsterMaxHP() / BossCharacter->GetMonsterMaxHP()) * 100.f;
             }
+
+            // 이미 스킬을 썼는지 여부 (한 번만 실행)
             bool bS1Used = BossCharacter->GetbSkill1Used();
             bool bS2Used = BossCharacter->GetbSkill2Used();
             bool bS3Used = BossCharacter->GetbSkill3Used();
 
+            // 체력 조건: 75% 이하 스킬1, 50% 이하 스킬2, 25% 이하 스킬3
+            // 우선순위: 스킬3 > 스킬2 > 스킬1
             int32 NextAttack = 0; // 0이면 공격로직
 
             if (!bS3Used && HPPercent <= 25.f)
@@ -67,8 +73,13 @@ void ABossAIController::Tick(float DeltaTime)
                 NextAttack = 101; // 스킬1
             }
 
+            // 만약 NextAttack이 101~103(스킬)이면 공격로직 스킵,
+            // 아니면 기존 로직 실행
             if (NextAttack == 0)
             {
+                // --------------------------
+                //      [ 기존 코드 ]
+                // --------------------------
                 float CurrentTime = GetWorld()->GetTimeSeconds();
                 bool bAttack1Ready = (CurrentTime >= BossCharacter->Attack1_CooldownEnd);
                 bool bAttack2Ready = (CurrentTime >= BossCharacter->Attack2_CooldownEnd);
@@ -97,13 +108,17 @@ void ABossAIController::Tick(float DeltaTime)
                     FMath::Max(finalWeight2, FMath::Max(finalWeight3, finalWeight4))
                 );
 
-                int32 AttackID = 0;
+                int32 AttackID = 0; // 기본값
                 if (maxWeight == finalWeight4)      AttackID = 4;
                 else if (maxWeight == finalWeight3) AttackID = 3;
                 else if (maxWeight == finalWeight2) AttackID = 2;
                 else if (maxWeight == finalWeight1) AttackID = 1;
                 else                                 AttackID = 0;
+
+                // NextAttack = AttackID
                 NextAttack = AttackID;
+
+                // 남은 쿨타임 계산 (음수가 되지 않도록 처리)
                 float Attack1Remaining = FMath::Max(0.0f, BossCharacter->Attack1_CooldownEnd - CurrentTime);
                 float Attack2Remaining = FMath::Max(0.0f, BossCharacter->Attack2_CooldownEnd - CurrentTime);
                 float Attack3Remaining = FMath::Max(0.0f, BossCharacter->Attack3_CooldownEnd - CurrentTime);
@@ -124,17 +139,21 @@ void ABossAIController::Tick(float DeltaTime)
             }
             else
             {
+                // 스킬(101~103)인 경우 디버그 출력
                 if (GEngine)
                 {
                     GEngine->AddOnScreenDebugMessage(
                         99,
                         DeltaTime,
                         FColor::Red,
-                        FString::Printf(TEXT("Skill HP=%.1f => NextAttack=%d"), HPPercent, NextAttack)
+                        FString::Printf(TEXT("Skill triggered!! HP=%.1f => NextAttack=%d"), HPPercent, NextAttack)
                     );
                 }
             }
+
+            // Blackboard에 NextAttack 기록
             BBComp->SetValueAsInt("NextAttack", NextAttack);
         }
     }
 }
+

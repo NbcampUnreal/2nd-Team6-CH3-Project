@@ -28,16 +28,11 @@ public:
     float SetMonsterMoveSpeed(float NewSpeed);
     void UpdateAttackCooldown(int32 AttackID);
     void MonsterAttackCheck() override;
-    float GetMonsterHP() const { return MonsterHP; }
     float GetMonsterMaxHP() const { return MonsterMaxHP; }
     int32 GetAttack1Count() const { return Attack1Count; }
     bool GetbSkill1Used() const { return bSkill1Used; }
     bool GetbSkill2Used() const { return bSkill2Used; }
     bool GetbSkill3Used() const { return bSkill3Used; }
-    void SetbSkill1Used(bool bUsed) { bSkill1Used = bUsed; }
-    void SetbSkill2Used(bool bUsed) { bSkill2Used = bUsed; }
-    void SetbSkill3Used(bool bUsed) { bSkill3Used = bUsed; }
-    
     int32 SetAttack1Count(int32 NewCount);
 
 

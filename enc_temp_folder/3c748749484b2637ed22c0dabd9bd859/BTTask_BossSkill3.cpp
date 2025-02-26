@@ -19,6 +19,7 @@ UBTTask_BossSkill3::UBTTask_BossSkill3()
 
 EBTNodeResult::Type UBTTask_BossSkill3::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+    // Boss 참조 가져오기
     AAIController* AICon = OwnerComp.GetAIOwner();
     if (!AICon)
     {
@@ -30,17 +31,21 @@ EBTNodeResult::Type UBTTask_BossSkill3::ExecuteTask(UBehaviorTreeComponent& Owne
         return EBTNodeResult::Failed;
     }
     CachedOwnerComp = &OwnerComp;
+
+    // 보스 이동 정지
     if (BossRef->GetCharacterMovement())
     {
         BossRef->GetCharacterMovement()->StopMovementImmediately();
     }
 
+    // 스킬 애니메이션 재생
     PlaySkillAnimation();
 
     SpawnedWallCount = 0;
     UWorld* World = BossRef->GetWorld();
     if (World)
     {
+        // 1초 후부터 Skill3SpawnInterval 간격으로 SpawnWall() 호출
         World->GetTimerManager().SetTimer(SpawnTimerHandle, this, &UBTTask_BossSkill3::SpawnWall, BossRef->Skill3SpawnInterval, true, 1.0f);
     }
     else
@@ -88,14 +93,17 @@ void UBTTask_BossSkill3::SpawnWall()
     if (!World)
         return;
 
+    // 소환 위치 계산
     float Distance = FMath::RandRange(BossRef->Skill3MinSpawnDistance, BossRef->Skill3SpawnRadius);
     FVector RandomDirection = FMath::VRand();
     RandomDirection.Z = 0.f;
     RandomDirection.Normalize();
     FVector SpawnLocation = BossRef->GetActorLocation() + RandomDirection * Distance;
-    SpawnLocation.Z += 2000.0f;
+    SpawnLocation.Z += 2000.0f; // 위쪽에서 소환 후 중력 적용
 
     FRotator SpawnRotation = CalculateRandomRotation();
+
+    // TSubclassOf<AActor>를 TSubclassOf<ABoss_Skill3_Wall>로 캐스팅
     TSubclassOf<ABoss_Skill3_Wall> WallClass = TSubclassOf<ABoss_Skill3_Wall>(BossRef->Skill3WallClass.Get());
 
     ABoss_Skill3_Wall* SpawnedWall = ABoss_Skill3_Wall::GetWallFromPool(World, WallClass);
@@ -129,13 +137,11 @@ void UBTTask_BossSkill3::OnSpawnComplete()
         {
             World->GetTimerManager().ClearTimer(SpawnTimerHandle);
         }
-    }
-    if (BossRef)
-    {
-        BossRef->SetbSkill3Used(true);
+        BossRef->SetState(EBossState::Chase);
     }
     if (CachedOwnerComp)
     {
-        FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
+        BossRef->SetState(EBossState::Chase);
+        //FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
     }
 }

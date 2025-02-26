@@ -15,7 +15,7 @@ ABoss::ABoss()
 
     BossState = nullptr;
     MonsterMoveSpeed = 5000.0f;
-    MonsterHP = 500.0f;
+    MonsterHP = 1000.0f;
     MonsterMaxHP = 1000.0f;
 
     // 탄환 발사 위치

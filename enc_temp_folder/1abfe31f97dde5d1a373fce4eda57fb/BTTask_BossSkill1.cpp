@@ -200,10 +200,6 @@ void UBTTask_BossSkill1::OnGapEnd()
 
 void UBTTask_BossSkill1::EndTask()
 {
-    if (BossRef)
-    {
-        BossRef->SetbSkill1Used(true);
-    }
     if (CachedOwnerComp)
     {
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
