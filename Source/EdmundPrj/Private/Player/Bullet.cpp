@@ -65,7 +65,7 @@ void ABullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 		return;
 	}
 
-	if (OtherActor && OtherActor->ActorHasTag("Monster") && !bIsHidden)
+	if (OtherActor && (OtherActor->ActorHasTag("Monster") || OtherActor->ActorHasTag("MissionItem")) && !bIsHidden)
 	{
 		UGameplayStatics::ApplyDamage(
 			OtherActor,

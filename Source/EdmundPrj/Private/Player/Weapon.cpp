@@ -15,6 +15,9 @@ AWeapon::AWeapon()
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
 
+	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	CurrentAudioComp->SetupAttachment(RootComponent);
+
 	MuzzleOffset = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleOffset"));
 	MuzzleOffset->SetupAttachment(Mesh);
 
@@ -135,7 +138,9 @@ bool AWeapon::Fire()
 		// 醚家府 犁积
 		if (FireSound)
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			//UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			CurrentAudioComp->SetSound(FireSound);
+			CurrentAudioComp->Play();
 		}
 
 		// 醚 捞棋飘 犁积
