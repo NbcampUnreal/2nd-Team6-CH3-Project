@@ -22,6 +22,8 @@ public:
 
 	AGameModeBase* CurrentGameMode;
 
+	void InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Bullet")
 	AMonsterBulletPool* MonsterBulletPool;
 

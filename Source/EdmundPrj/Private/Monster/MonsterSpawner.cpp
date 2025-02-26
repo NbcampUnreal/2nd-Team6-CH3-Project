@@ -29,30 +29,40 @@ AMonsterSpawner::AMonsterSpawner()
 	SpawnerMeshComp->SetupAttachment(RootComp);
 }
 
-ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
+void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount)
 {
-		/*return CurrentGameMode->GetBulletFromPool();*/
-	return nullptr;
+	MonsterBulletPool = BulletPool;
+
+	SpawnTime = NewSpawnTime;
+	SpawnCount = NewSpawnCount;
+
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
 }
 
+ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
+{
+	return MonsterBulletPool->GetBulletFromPool();
+}
 
 
 void AMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
-	InitializeMonsterSpawnPool(SpawnCount);
+	//GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
 
-	CurrentGameMode = GetWorld()->GetAuthGameMode();
-	if (CurrentGameMode)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawner가 CurrentGameMode를 가져옴"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("CurrentGameMode 없음"));
-	}
+
+	//InitializeMonsterSpawnPool(SpawnCount);
+
+	//CurrentGameMode = GetWorld()->GetAuthGameMode();
+	//if (CurrentGameMode)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Spawner가 CurrentGameMode를 가져옴"));
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("CurrentGameMode 없음"));
+	//}
 }
 
 
