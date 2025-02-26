@@ -154,10 +154,13 @@ void AMonsterSpawner::SpawnMonster()
 
 				AIController->SetActorTickEnabled(true);
 			}
+
+			Monster->Tags.Add(FName("Monster"));
 			Monster->SetIsDead(false);
 			Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			Monster->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 			Monster->SetActorLocation(GetSpawnVolume());
+
 		}
 	}
 }
