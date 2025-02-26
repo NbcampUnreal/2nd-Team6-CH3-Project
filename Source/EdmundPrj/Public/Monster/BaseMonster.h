@@ -152,7 +152,7 @@ protected:
 	void MonsterAttack();
 
 	UFUNCTION(BlueprintCallable)
-	void SetChaseMod();
+	void SetChaseMode();
 
 	void MonsterAttackEnd();
 

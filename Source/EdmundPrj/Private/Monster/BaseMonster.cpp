@@ -169,7 +169,7 @@ void ABaseMonster::MonsterHit()
 		{
 			if (TakeDamageParticle)
 			{
-				SetChaseMod();
+				SetChaseMode();
 
 				UpdateMonsterOverHeadWidget();
 
@@ -235,7 +235,7 @@ void ABaseMonster::MonsterAttack()
 	}
 }
 
-void ABaseMonster::SetChaseMod()
+void ABaseMonster::SetChaseMode()
 {
 	AAIController* AIController = Cast<AAIController>(GetController());
 		if (AIController)
