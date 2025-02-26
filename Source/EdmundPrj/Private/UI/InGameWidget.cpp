@@ -30,13 +30,13 @@ void UInGameWidget::ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp)
 
 void UInGameWidget::ChangedPlayerOther(const int32 MaxValue, const int32 CurrentValue)
 {
-	HpText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentValue, MaxValue)));
+	OtherText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentValue, MaxValue)));
 	OtherBar->SetPercent((float)CurrentValue / (float)MaxValue);
 }
 
 void UInGameWidget::ChangedPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo)
 {
-	HpText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo)));
+	AmmoText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo)));
 }
 
 

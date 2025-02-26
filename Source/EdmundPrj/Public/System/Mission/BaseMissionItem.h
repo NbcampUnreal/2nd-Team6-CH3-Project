@@ -21,7 +21,7 @@ public:
 	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type,  const FString& MissionInfo);
 	virtual void ActionEventByPressedKey();
 
-	void SetIsStarted(bool Value);
+	void SetIsActive(bool Value);
 	void PrintMissionText();
 	
 protected:
@@ -39,6 +39,8 @@ protected:
 	virtual void ActionBeginOverlap();
 	virtual void ActionEndOverlap();
 	virtual void ActionOnHit();
+
+	void SetVisible(bool bIsVisible);
 
 	void ApplyOverlapCollision(bool bIsBlockedMesh);
 	void ApplyBlockCollision();
@@ -65,6 +67,6 @@ protected:
 	FName MissionType;
 	FString MissionText;
 	bool bIsPlayingInteraction = false;
-	bool bIsStarted = false;
+	bool bIsActive = false;
 	float ProgressValue = 1.0f;
 };
