@@ -41,6 +41,9 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 {
 	GetCharacterMovement()->Deactivate();
 
+	CurrentAudioComp->SetSound(TakeDamageSound);
+	CurrentAudioComp->Play();
+
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
@@ -163,16 +166,6 @@ void ABaseMonster::MonsterHit()
 				UE_LOG(LogTemp, Warning, TEXT("TakeDamageParticle이 없습니다."));
 			}
 
-			if (TakeDamageSound)
-			{
-				CurrentAudioComp->SetSound(TakeDamageSound);
-				CurrentAudioComp->Play();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
-			}
-
 			bIsHit = true;
 
 			GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0, 0, 1));
@@ -194,6 +187,7 @@ void ABaseMonster::MonsterHitEnd()
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.1f, HitAnimation);
 	GetCharacterMovement()->Activate();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	UE_LOG(LogTemp, Warning, TEXT("HitEnd"));
 }
 
 void ABaseMonster::MonsterAttack()
