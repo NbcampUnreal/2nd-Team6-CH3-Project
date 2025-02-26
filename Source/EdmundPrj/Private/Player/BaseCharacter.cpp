@@ -36,7 +36,6 @@ ABaseCharacter::ABaseCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	IsSprint = false;
 	IsCrouch = false;
-	IsMove = false;
 
 	MeleeAttackDelay = 0.7f;
 
@@ -224,13 +223,6 @@ void ABaseCharacter::Move(const FInputActionValue& value)
 	{
 		AddMovementInput(GetActorRightVector(), MoveInput.Y);
 	}
-
-	IsMove = true;
-}
-
-void ABaseCharacter::StopMove(const FInputActionValue& value)
-{
-	IsMove = false;
 }
 
 void ABaseCharacter::Look(const FInputActionValue& value)

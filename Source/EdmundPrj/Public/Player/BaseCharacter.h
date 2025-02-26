@@ -202,10 +202,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	bool IsCrouch;
 
-	// 걷기 중
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	bool IsMove;
-
 	// 재장전 애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	UAnimMontage* MeleeAttackMontage;
