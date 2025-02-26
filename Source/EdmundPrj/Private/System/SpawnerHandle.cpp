@@ -38,9 +38,13 @@ void ASpawnerHandle::ApplySpawnerDataInLevel()
 	{
 		UClass* SpawnClass = SpawnerDataRow->SpawnerClass.Get();
 
-		for (const FVector& SpawnPos : SpawnerDataRow->SpawnLocationSet)
+		for (int32 i = 0; i < SpawnerDataRow->SpawnLocationSet.Num(); i++)
 		{
-			SpawnMonsterSpawner(SpawnClass, SpawnPos);
+			FVector SpawnPos = SpawnerDataRow->SpawnLocationSet[i];
+			float SpawnTime = SpawnerDataRow->SpawnTimeSet[i];
+			int32 SpawnCount = SpawnerDataRow->SpawnCountSet[i];
+
+			SpawnMonsterSpawner(SpawnClass, SpawnPos, SpawnTime, SpawnCount);
 		}
 	}
 }
@@ -51,7 +55,7 @@ void ASpawnerHandle::BeginPlay()
 	
 }
 
-void ASpawnerHandle::SpawnMonsterSpawner(UClass* SpawnClass, const FVector& SpawnPos)
+void ASpawnerHandle::SpawnMonsterSpawner(UClass* SpawnClass, const FVector& SpawnPos, const float SpawnTime, const int32 SpawnCount)
 {
 	checkf(IsValid(SpawnClass), TEXT("Spawner Spawn Class is invalid"));
 
@@ -59,6 +63,7 @@ void ASpawnerHandle::SpawnMonsterSpawner(UClass* SpawnClass, const FVector& Spaw
 
 	AMonsterSpawner* NewMonsterSpawner = GetWorld()->SpawnActor<AMonsterSpawner>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
 
+	NewMonsterSpawner->InitSpawner(MonsterBulletPool, SpawnTime, SpawnCount);
 	MonsterSpawnerSet.Add(NewMonsterSpawner);
 }
 

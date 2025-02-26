@@ -25,4 +25,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FVector> SpawnLocationSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<float> SpawnTimeSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> SpawnCountSet;
 };

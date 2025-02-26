@@ -24,7 +24,7 @@ public:
 
 private:
 	virtual void BeginPlay() override;
-	void SpawnMonsterSpawner(UClass* SpawnClass, const FVector& SpawnPos);
+	void SpawnMonsterSpawner(UClass* SpawnClass, const FVector& SpawnPos, const float SpawnTime, const int32 SpawnCount);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ObjectPool")
