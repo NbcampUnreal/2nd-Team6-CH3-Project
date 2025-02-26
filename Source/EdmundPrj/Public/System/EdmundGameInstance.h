@@ -12,10 +12,12 @@ class UUIHandle;
 class USoundHandle;
 class UDataHandle;
 class AEdmundGameState;
+class AEdmundGameMode;
 struct FShopCatalogRow;
 struct FPlayerSkillRow;
 struct FCharacterDataRow;
 struct FMissionDataRow;
+struct FSpawnerDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UEdmundGameInstance : public UGameInstance
@@ -27,7 +29,9 @@ public:
 	virtual void Init() override;
 
 	// GameState By Current Level Ready Complete. Bind Observers and Add To Viewport Widget
-	void StartedGameState();
+	void RequestGameStart(AEdmundGameMode* NewGameMode, AEdmundGameState* NewGameState);
+	void ApplyCurrentDataToGameMode();
+	void StartMission(ESceneType SceneType);
 	void BindGameStateObserver() const;
 	void OnUIByScene() const;
 
@@ -47,9 +51,6 @@ public:
 	void MoveScene(const ESceneType SceneType) const;
 	void MoveNextScene() const;
 	ESceneType GetCurrentSceneName() const;
-
-	// Mission Data Controll
-	const TArray<FMissionDataRow*>& GetCurrentMissionData(ESceneType SceneType) const;
 
 	// Shop and Player Advance State Controll
 	const TArray<FShopCatalogRow*>& GetAdvanceState() const;
@@ -81,19 +82,19 @@ public:
 	void PlayUISound(const int32 Index) const;
 	void PlayEffectSound(const UAudioComponent* AudioComp, const ESoundType SoundCategory, const int32 Index) const;
 
-protected:
-	
-
 private:
-
+	// Level Data Controll
+	const TArray<FMissionDataRow*>& GetCurrentMissionData(ESceneType SceneType) const;
+	const TArray<FSpawnerDataRow*>& GetCurrentSpawnerData(ESceneType SceneType) const;
 	
 public:
 
 
-protected:
+private:
 	TObjectPtr<USceneHandle> SceneHandle;
 	TObjectPtr<UUIHandle> UIHandle;
 	TObjectPtr<USoundHandle> SoundHandle;
 	TObjectPtr<UDataHandle> DataHandle;
 	TObjectPtr<AEdmundGameState> EdmundGameState;
+	TObjectPtr<AEdmundGameMode> EdmundGameMode;
 };

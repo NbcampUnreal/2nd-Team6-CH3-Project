@@ -50,8 +50,6 @@ void ABaseMissionItem::BeginPlay()
 
 void ABaseMissionItem::ActionBeginOverlap()
 {
-	ProgressValue = 1.0f;
-	InteractionWidget->UpdateProgressBar(ProgressValue);
 	MissionHandle->OnBeginOverlapedItem(this);
 }
 
@@ -64,6 +62,11 @@ void ABaseMissionItem::ActionEndOverlap()
 void ABaseMissionItem::ActionOnHit()
 {
 
+}
+
+void ABaseMissionItem::CompleteProgress()
+{
+	InteractionWidget->VisibleProgressBar(false);
 }
 
 void ABaseMissionItem::SetVisible(bool bIsVisible)

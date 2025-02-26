@@ -22,10 +22,9 @@ private:
 	virtual void ActionBeginOverlap() override;
 	virtual void ActionEndOverlap() override;
 	virtual void Tick(float DeltaTime) override;
-
-	void CompleteProgress();
+	virtual void CompleteProgress() override;
 
 private:
 	float CurrentTime = 0.0f;
-	float TargetTime = 0.2f;
+	float TargetTime = 0.1f;
 };
