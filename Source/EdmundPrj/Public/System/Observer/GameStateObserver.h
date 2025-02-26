@@ -20,23 +20,26 @@ class EDMUNDPRJ_API IGameStateObserver
 
 public:
 	UFUNCTION()
-	virtual void ChangedPlayerMaxHp(int32 Hp) = 0;
+	virtual void ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp) = 0;
 
 	UFUNCTION()
-	virtual void ChangedPlayerCurrentHp(int32 Hp) = 0;
+	virtual void ChangedPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo) = 0;
 
 	UFUNCTION()
-	virtual void ChangedPlayerMaxAmmo(int32 Ammo) = 0;
+	virtual void ChangedPlayerOther(const int32 MaxValue, const int32 CurrentValue) = 0;
 
 	UFUNCTION()
-	virtual void ChangedPlayerAmmo(int32 Ammo) = 0;
-
-	UFUNCTION()
-	virtual void ChangedPlayerMoney(int32 Money) = 0;
+	virtual void ChangedPlayerMoney(const int32 Money) = 0;
 
 	UFUNCTION()
 	virtual void ChangedSkillList() = 0;
 
 	UFUNCTION()
-	virtual void ChangedCharacterType(ECharacterType CharacterType) = 0;
+	virtual void ChangedCharacterType(const ECharacterType CharacterType) = 0;
+
+	UFUNCTION()
+	virtual void ChangedNotifyText(const FString& NotifyText) = 0;
+
+	UFUNCTION()
+	virtual void ChangedMissionText(const FString& MissionText) = 0;
 };

@@ -4,38 +4,6 @@
 #include "UI/BaseWidget.h"
 #include "System/UIHandle.h"
 
-void UBaseWidget::ChangedPlayerMaxHp(int32 Hp)
-{
-
-}
-
-void UBaseWidget::ChangedPlayerCurrentHp(int32 Hp)
-{
-
-}
-
-void UBaseWidget::ChangedPlayerMaxAmmo(int32 Ammo)
-{
-
-}
-
-void UBaseWidget::ChangedPlayerAmmo(int32 Ammo)
-{
-
-}
-
-void UBaseWidget::ChangedPlayerMoney(int32 Money)
-{
-
-}
-
-void UBaseWidget::ChangedSkillList()
-{
-}
-
-void UBaseWidget::ChangedCharacterType(ECharacterType CharacterType)
-{
-}
 
 void UBaseWidget::InitWidget(UUIHandle* uiHandle)
 {

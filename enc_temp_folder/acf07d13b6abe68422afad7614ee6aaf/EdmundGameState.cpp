@@ -192,6 +192,7 @@ void AEdmundGameState::NotifyUpdateNotifyText(const FString& NotifyText)
 
 void AEdmundGameState::NotifyUpdateMissionText(const FString& MissionText)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Observers Count : %d"), Observers.Num());
 	for (TScriptInterface<IGameStateObserver> Observer : Observers)
 	{
 		if (!IsValid(Observer.GetObject()))
@@ -199,6 +200,7 @@ void AEdmundGameState::NotifyUpdateMissionText(const FString& MissionText)
 			continue;
 		}
 		Observer->ChangedMissionText(MissionText);
+		UE_LOG(LogTemp, Warning, TEXT("Notify To Observer"));
 	}
 }
 

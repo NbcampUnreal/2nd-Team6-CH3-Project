@@ -31,7 +31,7 @@ void UCharacterListWidget::EndRemoveAnim()
 	UIHandle->RemoveCoverFromViewport(EWidgetType::CharacterListWidget);
 }
 
-void UCharacterListWidget::ChangedCharacterType(ECharacterType CharacterType)
+void UCharacterListWidget::ChangedCharacterType(const ECharacterType CharacterType)
 {
 	Super::ChangedCharacterType(CharacterType);
 	TargetCharacterType = CharacterType;

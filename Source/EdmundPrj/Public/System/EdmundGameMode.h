@@ -17,12 +17,13 @@ class EDMUNDPRJ_API AEdmundGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	
+	void RequestInteractionToMissionHandle();
+	void InitMission();
+	void EndMission();
 
 private:
 	virtual void BeginPlay() override;
 	void InitDefaultPawnByCharacterType();
-	void InitMission();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")

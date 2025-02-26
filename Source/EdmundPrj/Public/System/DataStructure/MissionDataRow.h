@@ -28,5 +28,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString MissionInfoText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName MissionType;
 	
 };

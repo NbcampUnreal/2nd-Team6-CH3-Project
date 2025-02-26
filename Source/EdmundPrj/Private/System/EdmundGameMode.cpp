@@ -6,19 +6,29 @@
 #include "System/EdmundGameState.h"
 #include "System/MissionHandle.h"
 
+void AEdmundGameMode::RequestInteractionToMissionHandle()
+{
+	checkf(IsValid(MissionHandle), TEXT("Mission Handle is invalid"));
+	MissionHandle->OnPressedKeyFromPlayer();
+}
+
+void AEdmundGameMode::EndMission()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->EndMission();
+}
+
 void AEdmundGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
 	EdmundGameInstance = GetGameInstance<UEdmundGameInstance>();
-	EdmundGameState = Cast<AEdmundGameState>(GameState);
-
+	EdmundGameState = GetGameState<AEdmundGameState>();
+	
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	checkf(IsValid(EdmundGameState), TEXT("GameState is invalid"));
 
 	CurrentScene = EdmundGameInstance->GetCurrentSceneName();
-
-	InitMission();
 }
 
 void AEdmundGameMode::InitDefaultPawnByCharacterType()
@@ -33,8 +43,6 @@ void AEdmundGameMode::InitDefaultPawnByCharacterType()
 
 void AEdmundGameMode::InitMission()
 {
-	MissionHandle = GetWorld()->SpawnActor<AMissionHandle>(MissionHandleClass);
-	
 	switch (CurrentScene)
 	{
 	case ESceneType::Title:
@@ -47,6 +55,7 @@ void AEdmundGameMode::InitMission()
 		return;
 
 	default:
+		MissionHandle = GetWorld()->SpawnActor<AMissionHandle>(MissionHandleClass);
 		MissionHandle->InitMissionHandle(EdmundGameInstance->GetCurrentMissionData(CurrentScene), this, EdmundGameState);
 	}
 }

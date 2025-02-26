@@ -18,7 +18,7 @@ public:
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
 	virtual void PlayAddAnim() override;
 	virtual void EndRemoveAnim() override;
-	virtual void ChangedCharacterType(ECharacterType CharacterType) override;
+	virtual void ChangedCharacterType(const ECharacterType CharacterType) override;
 
 private:
 	UFUNCTION()

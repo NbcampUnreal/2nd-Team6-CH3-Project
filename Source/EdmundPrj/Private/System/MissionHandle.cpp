@@ -18,7 +18,7 @@ void AMissionHandle::InitMissionHandle(const TArray<FMissionDataRow*>& MissionDa
 {
 	EdmundGameMode = EdGameMode;
 	EdmundGameState = EdGameState;
-
+	
 	if (MissionData.Num() == 0)
 	{
 		return;
@@ -26,7 +26,63 @@ void AMissionHandle::InitMissionHandle(const TArray<FMissionDataRow*>& MissionDa
 
 	MissionDataSet = MissionData;
 
-	//ApplyMissionDataInLevel();
+	ApplyMissionDataInLevel();
+}
+
+void AMissionHandle::OnBeginOverlapedItem(ABaseMissionItem* MissionItem)
+{
+	TargetMissionItem = MissionItem;
+
+	GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &ThisClass::OnPressedKeyFromPlayer, 2.0f, false);
+}
+
+void AMissionHandle::OnEndOverlapedItem()
+{
+	TargetMissionItem = nullptr;
+
+	GetWorld()->GetTimerManager().ClearTimer(TestTimer);
+}
+
+void AMissionHandle::OnPressedKeyFromPlayer()
+{
+	if (!IsValid(TargetMissionItem))
+	{
+		return;
+	}
+	TargetMissionItem->ActionEventByPressedKey();
+}
+
+void AMissionHandle::RequestUpdateMissionText(const FString& MissionText)
+{
+	checkf(IsValid(EdmundGameState), TEXT("GameState is invalid"));
+	EdmundGameState->NotifyUpdateMissionText(MissionText);
+}
+
+void AMissionHandle::RequestUpdateNotifyText(const FString& NotifyText)
+{
+	checkf(IsValid(EdmundGameState), TEXT("GameState is invalid"));
+	EdmundGameState->NotifyUpdateNotifyText(NotifyText);
+}
+
+void AMissionHandle::StartMainMission()
+{
+	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
+	MainMissionSet[MainMissionIndex]->PrintMissionText();
+	MainMissionSet[MainMissionIndex]->SetIsStarted(true);
+}
+
+void AMissionHandle::CompleteMission()
+{
+	++MainMissionIndex;
+
+	if (MainMissionIndex == MainMissionSet.Num())
+	{
+		EdmundGameMode->EndMission();
+	}
+	else
+	{
+		StartMainMission();
+	}
 }
 
 const FVector AMissionHandle::GetDirectionToPrison(const FVector& ActorPos) const
@@ -54,23 +110,32 @@ void AMissionHandle::ApplyMissionDataInLevel()
 	{
 		UClass* SpawnClass = MissionDataRow->MissionItemClass.Get();
 		TArray<FVector> SpawnPosSet = MissionDataRow->SpawnLocationSet;
+		FName MissionType = MissionDataRow->MissionType;
+		FString MissionInfo = MissionDataRow->MissionInfoText;
 
 		for (const FVector& SpawnPos : SpawnPosSet)
 		{
-			SpawnMissionItem(SpawnClass, SpawnPos);
+			SpawnMissionItem(SpawnClass, SpawnPos, MissionType, MissionInfo);
 		}
 	}
 
-	// UI에 Mission Info 출력 구현 필요
+	MainMissionIndex = 0;
+	StartMainMission();
 }
 
-void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos)
+void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo)
 {
 	FActorSpawnParameters SpawnParam;
 
 	ABaseMissionItem* NewMissionItem = GetWorld()->SpawnActor<ABaseMissionItem>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
 
-	MissionItems.Add(NewMissionItem);
-	NewMissionItem->InitMissionItem(this);
+	MissionItemSet.Add(NewMissionItem);
+	NewMissionItem->InitMissionItem(this, MissionType, MissionInfo);
+
+	if (MissionType == "Main")
+	{
+		MainMissionSet.Add(NewMissionItem);
+		NewMissionItem->SetIsStarted(false);
+	}
 }
 

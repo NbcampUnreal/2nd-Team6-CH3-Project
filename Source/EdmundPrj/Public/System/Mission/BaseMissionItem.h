@@ -7,7 +7,9 @@
 #include "BaseMissionItem.generated.h"
 
 class UBoxComponent;
+class UWidgetComponent;
 class AMissionHandle;
+class UInteractionWidget;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseMissionItem : public AActor
@@ -16,8 +18,12 @@ class EDMUNDPRJ_API ABaseMissionItem : public AActor
 	
 public:	
 	ABaseMissionItem();
-	void InitMissionItem(AMissionHandle* NewMissionHandle);
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type,  const FString& MissionInfo);
+	virtual void ActionEventByPressedKey();
 
+	void SetIsStarted(bool Value);
+	void PrintMissionText();
+	
 protected:
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -37,6 +43,9 @@ protected:
 	void ApplyOverlapCollision(bool bIsBlockedMesh);
 	void ApplyBlockCollision();
 
+	void UpdateMissionTextToUI();
+	void UpdateNotifyTextToUI();
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBoxComponent> CollisionComp = nullptr;
@@ -44,6 +53,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> MeshComp = nullptr;
 
-private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UWidgetComponent> WidgetComp = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
+	TSubclassOf<UInteractionWidget> InteractionWidgetClass = nullptr;
+
+protected:
 	TObjectPtr<AMissionHandle> MissionHandle;
+	TObjectPtr<UInteractionWidget> InteractionWidget;
+	FName MissionType;
+	FString MissionText;
+	bool bIsPlayingInteraction = false;
+	bool bIsStarted = false;
+	float ProgressValue = 1.0f;
 };

@@ -38,6 +38,15 @@ void UEdmundGameInstance::StartedGameState()
 	PlayBGMByScene();
 }
 
+void UEdmundGameInstance::StartedGameMode()
+{
+	EdmundGameState = GetWorld()->GetGameState<AEdmundGameState>();
+
+	BindGameStateObserver();
+	OnUIByScene();
+	PlayBGMByScene();
+}
+
 void UEdmundGameInstance::BindGameStateObserver() const
 {
 	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));

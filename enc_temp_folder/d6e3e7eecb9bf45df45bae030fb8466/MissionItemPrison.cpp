@@ -85,8 +85,7 @@ void AMissionItemPrison::CompleteProgress()
 	SetActorTickEnabled(false);
 	InteractionWidget->VisibleProgressBar(false);
 
-	UpdateNotifyTextToUI();
-	//MissionHandle->CompleteMission();
+	MissionHandle->CompleteMission();
 }
 
 
