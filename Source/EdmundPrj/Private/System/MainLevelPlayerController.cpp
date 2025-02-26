@@ -94,7 +94,7 @@ void AMainLevelPlayerController::MoveToTargetPoint()
 			bIsReturnByCharacter[TargetCharacter] = false;
 		}
 
-		if (100 >= FVector::Distance(MoveTargetPos, TargetCharacter->GetActorLocation()))
+		if (150 >= FVector::Distance(MoveTargetPos, TargetCharacter->GetActorLocation()))
 		{
 			FVector CurrentTarget = TargetCharacter->GetActorLocation();
 			CurrentTarget = FVector(CurrentTarget.X, CurrentTarget.Y, 0);
@@ -130,7 +130,7 @@ void AMainLevelPlayerController::MoveToStartPoint()
 		BaseCharacter.Key->SetActorRotation(NewLookAt);
 		BaseCharacter.Key->AddMovementInput(Direction, 0.3f);
 
-		if (FVector::Distance(BaseCharacter.Value, BaseCharacter.Key->GetActorLocation()) <= 100)
+		if (FVector::Distance(BaseCharacter.Value, BaseCharacter.Key->GetActorLocation()) <= 150)
 		{
 			bIsReturnByCharacter[BaseCharacter.Key] = false;
 			BaseCharacter.Key->SetActorLocation(BaseCharacter.Value);

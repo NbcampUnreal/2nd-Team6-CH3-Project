@@ -1,0 +1,70 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "BaseMissionItem.generated.h"
+
+class UBoxComponent;
+class UWidgetComponent;
+class AMissionHandle;
+class UInteractionWidget;
+
+UCLASS()
+class EDMUNDPRJ_API ABaseMissionItem : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	ABaseMissionItem();
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type,  const FString& MissionInfo);
+	virtual void ActionEventByPressedKey();
+
+	void SetIsStarted(bool Value);
+	void PrintMissionText();
+	
+protected:
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+	virtual void BeginPlay() override;
+	
+	virtual void ActionBeginOverlap();
+	virtual void ActionEndOverlap();
+	virtual void ActionOnHit();
+
+	void ApplyOverlapCollision(bool bIsBlockedMesh);
+	void ApplyBlockCollision();
+
+	void UpdateMissionTextToUI();
+	void UpdateNotifyTextToUI();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UBoxComponent> CollisionComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UStaticMeshComponent> MeshComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UWidgetComponent> WidgetComp = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget")
+	TSubclassOf<UInteractionWidget> InteractionWidgetClass = nullptr;
+
+protected:
+	TObjectPtr<AMissionHandle> MissionHandle;
+	TObjectPtr<UInteractionWidget> InteractionWidget;
+	FName MissionType;
+	FString MissionText;
+	bool bIsPlayingInteraction = false;
+	bool bIsStarted = false;
+	float ProgressValue = 1.0f;
+};
