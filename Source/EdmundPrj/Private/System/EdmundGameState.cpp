@@ -202,6 +202,57 @@ void AEdmundGameState::NotifyUpdateMissionText(const FString& MissionText)
 	}
 }
 
+void AEdmundGameState::NotifyPlayerHp(const int32 MaxHp, const int32 CurrentHp)
+{
+	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
+	{
+		return;
+	}
+
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedPlayerHp(MaxHp, CurrentHp);
+	}
+}
+
+void AEdmundGameState::NotifyPlayerOther(const int32 MaxValue, const int32 CurrentValue)
+{
+	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
+	{
+		return;
+	}
+
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedPlayerOther(MaxValue, CurrentValue);
+	}
+}
+
+void AEdmundGameState::NotifyPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo)
+{
+	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
+	{
+		return;
+	}
+
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedPlayerAmmo(MaxAmmo, CurrentAmmo);
+	}
+}
+
 APlayerController* AEdmundGameState::GetPlayerController()
 {
 	return PlayerController;

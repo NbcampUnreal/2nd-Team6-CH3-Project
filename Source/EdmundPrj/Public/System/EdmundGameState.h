@@ -42,6 +42,9 @@ public:
 
 	void NotifyUpdateNotifyText(const FString& NotifyText);
 	void NotifyUpdateMissionText(const FString& MissionText);
+	void NotifyPlayerHp(const int32 MaxHp, const int32 CurrentHp);
+	void NotifyPlayerOther(const int32 MaxValue, const int32 CurrentValue);
+	void NotifyPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo);
 
 	APlayerController* GetPlayerController();
 	AActor* GetPlayerPawn();
