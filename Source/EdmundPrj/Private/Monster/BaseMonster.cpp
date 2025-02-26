@@ -12,6 +12,8 @@
 #include "Sound/SoundBase.h"
 #include "AIController.h"
 #include "Components/AudioComponent.h"
+#include "Monster/MonsterSpawner.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 // Sets default values
 ABaseMonster::ABaseMonster()
@@ -45,9 +47,6 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
 
-	// OverHeadWidget 업데이트
-	UpdateMonsterOverHeadWidget();
-
 	if (MonsterHP <= 0)
 	{
 		MonsterDead();
@@ -64,7 +63,10 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 // 죽는 애니메이션 재생 후 MonsterDestroy 호출
 void ABaseMonster::MonsterDead()
 {
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 	if (!bIsDead)
 	{
 		SetIsDead(true);
@@ -73,11 +75,25 @@ void ABaseMonster::MonsterDead()
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			if (AnimInstance)
 			{
+<<<<<<< Updated upstream
 				GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
 				GetWorld()->GetTimerManager().ClearTimer(AttackAnimTimerHandle);
 
 				AnimInstance->Montage_Play(DeathAnimation);
 
+=======
+				MonsterHP = 0;
+
+				UpdateMonsterOverHeadWidget();
+
+				GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
+				GetWorld()->GetTimerManager().ClearTimer(AttackAnimTimerHandle);
+
+				GetCharacterMovement()->Deactivate();
+
+				AnimInstance->Montage_Play(DeathAnimation);
+
+>>>>>>> Stashed changes
 				float AnimDuration = DeathAnimation->GetPlayLength();
 
 				GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
@@ -94,6 +110,7 @@ void ABaseMonster::SetIsDead(bool bNewIsDead)
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
+<<<<<<< Updated upstream
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
 
 	DropReward();
@@ -113,10 +130,41 @@ void ABaseMonster::MonsterDestroy()
 
 	// 스폰될 때 까지 Tick 끄기
 	AAIController* AIController = Cast<AAIController>(GetController());
+=======
+
+	bIsDead = false;
+	bIsHit = false;
+
+	AAIController* AIController = Cast<AAIController>(this->GetController());
+>>>>>>> Stashed changes
 	if (AIController)
 	{
 		AIController->SetActorTickEnabled(false);
+
+		UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+		if (BlackboardComp)
+		{
+			BlackboardComp->SetValueAsBool(TEXT("HasLineOfSight"), false);
+			BlackboardComp->SetValueAsBool(TEXT("HasPlayerNearby"), false);
+			BlackboardComp->SetValueAsObject(TEXT("PlayerActor"), nullptr);
+		}
 	}
+
+	UpdateMonsterOverHeadWidgetEnd();
+
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
+
+	DropReward();
+
+	GetCharacterMovement()->Activate();
+
+	SetActorHiddenInGame(true);
+
+	MonsterHP = MonsterMaxHP;
+
+	// 사망 시 바닥으로
+	FVector GoToHell = GetActorLocation() + FVector(0, 0, -2000.0f);
+	SetActorLocation(GoToHell);
 }
 
 void ABaseMonster::DropReward()
@@ -145,6 +193,12 @@ void ABaseMonster::MonsterHit()
 		{
 			if (TakeDamageParticle)
 			{
+<<<<<<< Updated upstream
+=======
+				// OverHeadWidget 업데이트
+				UpdateMonsterOverHeadWidget();
+
+>>>>>>> Stashed changes
 				UParticleSystemComponent* Particle = nullptr;
 
 				FVector ParticleScale = FVector(2.0f, 2.0f, 2.0f);
@@ -253,7 +307,7 @@ void ABaseMonster::UpdateMonsterOverHeadWidget()
 		HPBar->SetPercent(HealthPercent);
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::MonsterAttackEnd, 3.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::UpdateMonsterOverHeadWidgetEnd, 1.0f, false);
 
 }
 
