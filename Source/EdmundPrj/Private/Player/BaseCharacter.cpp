@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "System/EdmundGameState.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -50,6 +51,8 @@ ABaseCharacter::ABaseCharacter()
 
 	IsDie = false;
 	DieActionMontage = nullptr;
+
+	CurrentGameState = nullptr;
 }
 
 void ABaseCharacter::BeginPlay()
@@ -66,6 +69,16 @@ void ABaseCharacter::BeginPlay()
 	if (IsValid(CapsuleComp))
 	{
 		CapsuleHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
+	}
+
+	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
+
+	CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 	}
 }
 
@@ -323,7 +336,11 @@ void ABaseCharacter::Attack(const FInputActionValue& value)
 		}
 
 		CurrentAmmo--;
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Ammo: %d/%d"), CurrentAmmo, MaxAmmo));
+	}
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 	}
 
 	if (CurrentAmmo <= 0)
@@ -357,8 +374,6 @@ void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
 		CurrentAudioComp->SetSound(MeleeAttackSound);
 		CurrentAudioComp->Play();
 	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Melee Attack Start")));
 
 	// 근접 공격 딜레이
 	GetWorld()->GetTimerManager().SetTimer(
@@ -428,7 +443,7 @@ void ABaseCharacter::MeleeAttackTrace()
 			// 충돌한 객체가 있다면
 			AActor* HitActor = Hit.GetActor();
 
-			if (!DamagedActors.Contains(HitActor) && HitActor && HitActor->ActorHasTag("Monster"))
+			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 			{
 				UGameplayStatics::ApplyDamage(
 					HitActor,
@@ -452,7 +467,7 @@ void ABaseCharacter::EndMeleeAttack()
 
 void ABaseCharacter::ReloadAction(const FInputActionValue& value)
 {
-	if (CheckAction() || IsDie)
+	if (CheckAction() || IsDie || CurrentAmmo == MaxAmmo)
 	{
 		return;
 	}
@@ -462,7 +477,6 @@ void ABaseCharacter::ReloadAction(const FInputActionValue& value)
 
 void ABaseCharacter::Reload()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Reload Start!!")));
 	CurrentAmmo = MaxAmmo;
 
 	if (IsValid(ReloadSound))
@@ -609,12 +623,15 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	// HP 음수 방지
 	HP = FMath::Max(0.0f, HP - ActualDamage);
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("HP: %f / %f"), HP, MaxHP));
-
 	if (HP == 0 && !IsDie)
 	{
 		IsDie = true;
 		ActiveDieAction();
+	}
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
 
 	return ActualDamage;
@@ -628,41 +645,56 @@ void ABaseCharacter::AddExp(int32 Exp)
 void ABaseCharacter::LevelUp()
 {
 	CurrentLevel++;
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
-float ABaseCharacter::GetHP() const
+int32 ABaseCharacter::GetHP() const
 {
 	return HP;
 }
 
-void ABaseCharacter::SetHP(float NewHP)
+void ABaseCharacter::SetHP(int32 NewHP)
 {
 	HP = FMath::Min(MaxHP, NewHP);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
-void ABaseCharacter::AmountHP(float AmountHP)
+void ABaseCharacter::AmountHP(int32 AmountHP)
 {
 	HP = FMath::Min(MaxHP, HP + AmountHP);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
 void ABaseCharacter::SetAmmo(int32 NewAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, NewAmmo);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+	}
 }
 
 void ABaseCharacter::AmountAmmo(int32 AmountAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, CurrentAmmo + AmountAmmo);
-}
 
-int32 ABaseCharacter::GetGold() const
-{
-	return CurrentGold;
-}
-
-void ABaseCharacter::AddGold(int32 Gold)
-{
-	CurrentGold += Gold;
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+	}
 }
 
 void ABaseCharacter::GetUpgradeStatus()
@@ -681,7 +713,7 @@ void ABaseCharacter::ActiveDieAction()
 	}
 }
 
-ECharacterType ABaseCharacter::getCharacterType()
+ECharacterType ABaseCharacter::GetCharacterType()
 {
 	return CharacterType;
 }
