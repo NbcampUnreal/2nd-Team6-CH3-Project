@@ -35,10 +35,9 @@ UAudioComponent* CurrentAudioComp;
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|BulletPool")
 AMonsterSpawner* MonsterSpawner;
 
-UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
-USphereComponent* MonsterAttackRange;
-
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
+	USphereComponent* MonsterAttackRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	int32 MonsterLevel = 1;

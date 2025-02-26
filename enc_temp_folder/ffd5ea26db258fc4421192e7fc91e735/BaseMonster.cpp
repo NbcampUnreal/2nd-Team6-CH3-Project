@@ -71,8 +71,6 @@ void ABaseMonster::MonsterDead()
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			if (AnimInstance)
 			{
-				this->Tags.Remove(FName("Monster"));
-
 				MonsterHP = 0;
 
 				UpdateMonsterOverHeadWidget();
@@ -97,9 +95,6 @@ void ABaseMonster::SetIsDead(bool bNewIsDead)
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
-	bIsDead = false;
-	bIsHit = false;
-
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
 
 	DropReward();
