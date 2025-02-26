@@ -7,6 +7,7 @@
 #include "Mjolnir.generated.h"
 
 class AElectricEffect;
+class UElectricEffectPool;
 
 UCLASS()
 class EDMUNDPRJ_API AMjolnir : public AAttackSkill
@@ -15,14 +16,8 @@ class EDMUNDPRJ_API AMjolnir : public AAttackSkill
 
 public:
 	AMjolnir();
-	void CreateElectricEffect(int createCount);
-	void ActivateElectricEffect(TObjectPtr<ABaseMonster> monster);
-	TObjectPtr<AElectricEffect> FindDeactivateElectricEffect();
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> monster) override;
-
+	virtual void BeginPlay() override;
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
-	TSubclassOf<AElectricEffect> ElectricEffectClass = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
-	TArray<TObjectPtr<AElectricEffect>> ElectricEffects = TArray<TObjectPtr<AElectricEffect>>();
+	TObjectPtr<UElectricEffectPool> ElectricEffectPool = nullptr;
 };

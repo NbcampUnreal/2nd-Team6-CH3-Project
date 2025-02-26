@@ -6,6 +6,11 @@
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	ReloadDelay = 2.0f;
+	IsReload = false;
+
+	ReloadMontage = nullptr;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -30,4 +35,39 @@ bool APlayerCharacter::ActiveWeapon()
 	}
 
 	return false;
+}
+
+void APlayerCharacter::Reload()
+{
+	if (IsReload)
+	{
+		return;
+	}
+
+	Super::Reload();
+
+	if (IsValid(ReloadMontage))
+	{
+		if (IsValid(ReloadMontage))
+		{
+			PlayAnimMontage(ReloadMontage);
+		}
+
+		IsReload = true;
+		bIsReloading = true;
+
+		GetWorld()->GetTimerManager().SetTimer(
+			ReloadDelayHandle,
+			this,
+			&APlayerCharacter::StopReload,
+			ReloadDelay,
+			false
+		);
+	}
+}
+
+void APlayerCharacter::StopReload()
+{
+	IsReload = false;
+	bIsReloading = false;
 }

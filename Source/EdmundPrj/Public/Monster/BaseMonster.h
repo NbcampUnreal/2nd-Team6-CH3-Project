@@ -26,6 +26,8 @@ virtual void MonsterAttackCheck();
 
 void MonsterDead();
 
+void SetIsDead(bool bNewIsDead);
+
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
 
@@ -125,6 +127,9 @@ protected:
 
 	void UpdateMonsterOverHeadWidget();
 	void UpdateMonsterOverHeadWidgetEnd();
+
+	virtual void PlayParticle();
+	virtual void PlaySound();
 
 	UFUNCTION(BlueprintCallable)
 	void SetInitialSpawn();

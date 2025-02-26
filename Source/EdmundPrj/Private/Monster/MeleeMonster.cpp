@@ -6,6 +6,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
 
+AMeleeMonster::AMeleeMonster()
+{
+}
+
 void AMeleeMonster::MonsterAttackCheck()
 {
     USkeletalMeshComponent* MeshComp = GetMesh();

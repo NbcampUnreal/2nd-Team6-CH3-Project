@@ -32,6 +32,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float AttackDelay;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TObjectPtr<USoundBase> FireSound;  // 총소리
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TObjectPtr<UParticleSystem> FireParticle;  // 총 이펙트
+
 private:
 
 	void InitializeBulletPool(int32 PoolSize);  // BulletPool을 초기화하는 함수

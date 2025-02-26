@@ -20,10 +20,24 @@ public:
 	// 총 쏘기
 	virtual bool ActiveWeapon() override;
 
-public:
+	// 재장전
+	void Reload() override;
+	void StopReload();
+
+	// 재장전 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
+	UAnimMontage* ReloadMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
+	float ReloadDelay;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
 	TSubclassOf<AWeapon> Weapon;
 
 	UPROPERTY()
 	TObjectPtr<AWeapon> WeaponActor;
+
+	FTimerHandle ReloadDelayHandle;
+
+	bool IsReload;
 };

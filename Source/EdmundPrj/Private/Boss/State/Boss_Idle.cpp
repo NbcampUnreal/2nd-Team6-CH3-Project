@@ -15,17 +15,13 @@ void UBoss_Idle::EnterState(ABoss* Boss)
 
     UE_LOG(LogTemp, Log, TEXT("Idle Start"));
 
-    // 5초 후 Chase 상태로 변경하는 타이머 설정
     Boss->GetWorld()->GetTimerManager().SetTimer(IdleTimerHandle, FTimerDelegate::CreateLambda([Boss]()
         {
             if (Boss)
             {
-                UE_LOG(LogTemp, Log, TEXT("Idle Timer Triggered, Changing to Chase"));
-                Boss->SetState(EBossState::Chase);
+                Boss->SetState(EBossState::Attack4);
             }
-        }), 5.0f, false);
-
-    UE_LOG(LogTemp, Log, TEXT("Idle Timer Set Successfully"));
+        }), 3.0f, false);
 }
 
 void UBoss_Idle::ExitState()

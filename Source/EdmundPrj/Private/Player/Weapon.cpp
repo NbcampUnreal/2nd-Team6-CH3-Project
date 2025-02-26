@@ -3,6 +3,10 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Player/BaseCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
+#include "Particles/ParticleSystem.h"
+
 
 AWeapon::AWeapon()
 {
@@ -127,6 +131,18 @@ bool AWeapon::Fire()
 			AttackDelay,
 			false
 		);
+
+		// ÃÑ¼Ò¸® Àç»ý
+		if (FireSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+		}
+
+		// ÃÑ ÀÌÆåÆ® Àç»ý
+		if (FireParticle)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireParticle, MuzzleOffset->GetComponentLocation(), MuzzleOffset->GetComponentRotation());
+		}
 	}
 
 	return true;

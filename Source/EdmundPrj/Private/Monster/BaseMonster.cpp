@@ -10,6 +10,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "AIController.h"
 #include "Components/AudioComponent.h"
 
 // Sets default values
@@ -32,6 +33,8 @@ ABaseMonster::ABaseMonster()
 	MonsterOverHeadWidget->SetVisibility(false, true);
 
 	GetCharacterMovement()->MaxWalkSpeed = MonsterMoveSpeed;
+
+	Tags.Add(FName("Monster"));
 }
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -63,7 +66,7 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 // 죽는 애니메이션 재생 후 MonsterDestroy 호출
 void ABaseMonster::MonsterDead()
 {
-	bIsDead = true;
+	SetIsDead(true);
 
 	if (DeathAnimation)
 	{
@@ -80,12 +83,26 @@ void ABaseMonster::MonsterDead()
 	}
 }
 
+void ABaseMonster::SetIsDead(bool bNewIsDead)
+{
+	bIsDead = bNewIsDead;
+}
+
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
 	DropReward();
-	Destroy();
+	SetActorHiddenInGame(true);
+
+	FVector GoToHell = GetActorLocation() + FVector(0, 0, -2000.0f);
+	SetActorLocation(GoToHell);
+
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		AIController->SetActorTickEnabled(false);
+	}
 }
 
 void ABaseMonster::DropReward()
@@ -114,7 +131,7 @@ void ABaseMonster::MonsterHit()
 		{
 			bIsHit = true;
 
-			GetCharacterMovement()->DisableMovement();
+			GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0, 0, 1));
 			GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
 
 			AnimInstance->Montage_Play(HitAnimation);
@@ -145,7 +162,7 @@ void ABaseMonster::MonsterAttack()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
-			GetCharacterMovement()->DisableMovement();
+			GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0, 0, 1));
 
 			AnimInstance->Montage_Play(AttackAnimation);
 
@@ -196,6 +213,14 @@ void ABaseMonster::UpdateMonsterOverHeadWidget()
 void ABaseMonster::UpdateMonsterOverHeadWidgetEnd()
 {
 	MonsterOverHeadWidget->SetVisibility(false, true);
+}
+
+void ABaseMonster::PlayParticle()
+{
+}
+
+void ABaseMonster::PlaySound()
+{
 }
 
 void ABaseMonster::SetInitialSpawn()
