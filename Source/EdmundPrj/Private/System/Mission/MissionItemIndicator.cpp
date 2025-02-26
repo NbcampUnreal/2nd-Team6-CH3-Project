@@ -9,28 +9,3 @@ void AMissionItemIndicator::InitMissionItem(AMissionHandle* NewMissionHandle, co
 
 	ApplyBlockCollision();
 }
-
-float AMissionItemIndicator::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	if (!bIsActive)
-	{
-		return 0.0;
-	}
-
-	--HitCount;
-
-	if (HitCount <= 0)
-	{
-		bIsActive = false;
-		PrintMissionText();
-		ShowDirectionToTarget();
-	}
-
-	return 0.0f;
-}
-
-void AMissionItemIndicator::ShowDirectionToTarget()
-{
-	//방향 표시
-	SetVisible(false);
-}
