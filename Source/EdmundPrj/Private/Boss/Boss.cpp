@@ -2,8 +2,6 @@
 #include "Boss/BossState.h"
 #include "Boss/BossAIController.h"
 #include "Boss/State/Boss_Idle.h"
-#include "Boss/State/Boss_Skill2.h"
-#include "Boss/State/Boss_Skill3.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
@@ -17,6 +15,8 @@ ABoss::ABoss()
 
     BossState = nullptr;
     MonsterMoveSpeed = 500.0f;
+    MonsterHP = 50.0f;
+    MonsterMaxHP = 50.0f;
 
     // 탄환 발사 위치
     MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
@@ -46,6 +46,15 @@ void ABoss::Tick(float DeltaTime)
     if (GetCharacterMovement())
     {
         GetCharacterMovement()->MaxWalkSpeed = MonsterChaseSpeed;
+    }
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(
+            -1,
+            DeltaTime,
+            FColor::Green,
+            FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
+        );
     }
 }
 
@@ -126,6 +135,7 @@ void ABoss::InitiallizeBullerPool()
     {
         ABoss_Attack1_Bullet* Bullet = GetWorld()->SpawnActor<ABoss_Attack1_Bullet>(Attack1BulletClass);
         ABoss_Attack4_Bullet* Bullet4 = GetWorld()->SpawnActor<ABoss_Attack4_Bullet>(Attack4BulletClass);
+        ABoss_Skill3_Wall* Wall = GetWorld()->SpawnActor<ABoss_Skill3_Wall>(Skill3WallClass);
         if (Bullet)
         {
             Bullet->SetActorHiddenInGame(true);
@@ -135,6 +145,11 @@ void ABoss::InitiallizeBullerPool()
         {
             Bullet4->SetActorHiddenInGame(true);
             Bullet4->SetActorEnableCollision(false);
+        }
+        if (Wall)
+        {
+            Wall->SetActorHiddenInGame(true);
+            Wall->SetActorEnableCollision(false);
         }
     }
 
@@ -148,6 +163,7 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
     // Attack1 풀 정리
     ABoss_Attack1_Bullet::BulletPool.Empty();
     ABoss_Attack4_Bullet::Bullet4Pool.Empty();
+    ABoss_Skill3_Wall::WallPool.Empty();
     
 }
 
@@ -171,4 +187,9 @@ void ABoss::UpdateAttackCooldown(int32 AttackID)
     default:
         break;
     }
+}
+
+void ABoss::MonsterAttackCheck()
+{
+
 }
