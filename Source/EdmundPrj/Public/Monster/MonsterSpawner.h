@@ -8,6 +8,8 @@
 #include "MonsterSpawner.generated.h"
 
 class UBoxComponent;
+class AMonsterBulletPool;
+class ARangedMonsterBullet;
 
 UCLASS()
 class EDMUNDPRJ_API AMonsterSpawner : public AActor
@@ -17,6 +19,11 @@ class EDMUNDPRJ_API AMonsterSpawner : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AMonsterSpawner();
+
+	AGameModeBase* CurrentGameMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Bullet")
+	AMonsterBulletPool* MonsterBulletPool;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Spawn")
 	TArray<ABaseMonster*> SpawnedMonstersPool;
@@ -43,6 +50,8 @@ public:
 	int32 SpawnCount = 10;
 
 	ABaseMonster* GetMonsterFromPool();
+
+	ARangedMonsterBullet* GetBulletFromSpawner();
 
 	void InitializeMonsterSpawnPool(int32 PoolSize);
 
