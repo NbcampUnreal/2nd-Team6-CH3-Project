@@ -3,11 +3,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "System/EnumSet.h"
+#include "Components/AudioComponent.h"
 #include "BaseCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 struct FInputActionValue;
+class AEdmundGameState;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseCharacter : public ACharacter
@@ -29,7 +31,6 @@ protected:
 
 	// 이동
 	void Move(const FInputActionValue& value);
-	void StopMove(const FInputActionValue& value);
 
 	// 마우스 회전
 	void Look(const FInputActionValue& value);
@@ -79,25 +80,19 @@ protected:
 	void LevelUp();
 
 	// 현재 체력 Getter
-	float GetHP() const;
+	int32 GetHP() const;
 
 	// 현재 체력 Setter
-	void SetHP(float NewHP);
+	void SetHP(int32 NewHP);
 
 	// 체력 회복
-	void AmountHP(float AmountHP);
+	void AmountHP(int32 AmountHP);
 
 	// 탄환 Setter
 	void SetAmmo(int32 NewAmmo);
 
 	// 탄환 더하기
 	void AmountAmmo(int32 AmountAmmo);
-
-	// 현재 골드 Getter
-	int32 GetGold() const;
-
-	// 골드 획득
-	void AddGold(int32 Gold);
 
 	// 강화해놓은 스테이터스값 받기
 	void GetUpgradeStatus();
@@ -107,7 +102,7 @@ protected:
 
 public:
 	// 캐릭터 타입 반환
-	ECharacterType getCharacterType();
+	ECharacterType GetCharacterType();
 
 	void MeleeAttackTrace();
 
@@ -121,11 +116,11 @@ public:
 
 	// 현재 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	float HP;
+	int32 HP;
 
 	// 최대 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	float MaxHP;
+	int32 MaxHP;
 
 	// 걷기 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -158,10 +153,6 @@ public:
 	// 현재 탄환
 	int32 CurrentAmmo;
 
-	// 보유 스킬
-	/*FVector<ActiveSkill> MyActiveSkill;
-	FVector<PassiveSkill> MyPassiveSkill;*/
-
 	// 치명타 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 CriticalProb;
@@ -186,10 +177,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 MaxLevel;
 
-	// 현재 골드
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	int32 CurrentGold;
-
 	// 부활 횟수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 RevivalCount;
@@ -200,10 +187,6 @@ public:
 	// 앉기 중
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	bool IsCrouch;
-
-	// 걷기 중
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	bool IsMove;
 
 	// 재장전 애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -227,6 +210,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	TObjectPtr<USoundBase> ReloadSound;			// 재장전 사운드
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
+	UAudioComponent* CurrentAudioComp;
+
 private:
 	// 캡슐 높이 <- 앉기에서 사용
 	float CapsuleHeight;
@@ -238,6 +224,9 @@ protected:
 	bool bIsAttack;
 	bool bIsReloading;
 	bool IsDie;
+	bool IsZoom;
+
+	AEdmundGameState* CurrentGameState;
 
 	bool CheckAction();
 };

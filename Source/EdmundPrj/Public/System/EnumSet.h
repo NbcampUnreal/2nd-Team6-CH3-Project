@@ -59,6 +59,8 @@ enum class ETableType : uint8
 {
 	PlayerSkill = 0,
 	ShopCatalog,
+	CharacterInfo,
+	PlayData,
 	MissionItem
 };
 

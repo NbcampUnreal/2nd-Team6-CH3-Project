@@ -17,15 +17,19 @@ void AEdmundGameState::BeginPlay()
 	EdmundGameMode = GetWorld()->GetAuthGameMode<AEdmundGameMode>();
 	PlayerController = GetWorld()->GetPlayerControllerIterator()->Get();
 
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
+	PlayerPawn = PlayerController->GetPawn();
 
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->StartedGameState();
+	EdmundGameMode->InitMission();
 	InitSkillData();
 	InitMainLevel();
 
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+	//Test
+	/*GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::EndCurrentMission, 5.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::EndCurrentMission, 5.0f, false);*/
 }
 
 void AEdmundGameState::BeginDestroy()
@@ -148,7 +152,7 @@ void AEdmundGameState::SetSelectedCharacter(AActor* Character)
 	checkf(IsValid(Character), TEXT("Selected Character is invalid"));
 
 	ABaseCharacter* TargetActor = Cast<ABaseCharacter>(Character);
-	NotifySelectCharacterType(TargetActor->getCharacterType());
+	NotifySelectCharacterType(TargetActor->GetCharacterType());
 }
 
 void AEdmundGameState::CancleSelectedCharacter()
@@ -156,6 +160,12 @@ void AEdmundGameState::CancleSelectedCharacter()
 	AMainLevelPlayerController* MainLevelPlayerController = Cast<AMainLevelPlayerController>(PlayerController);
 	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
 	MainLevelPlayerController->SetTargetToNull();
+}
+
+void AEdmundGameState::RequestInteraction()
+{
+	checkf(IsValid(EdmundGameMode), TEXT("Edmund Game Mode is invalid"));
+	EdmundGameMode->RequestInteractionToMissionHandle();
 }
 
 void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
@@ -166,6 +176,91 @@ void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameSta
 void AEdmundGameState::UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
 {
 	Observers.Remove(Observer);
+}
+
+void AEdmundGameState::NotifyUpdateNotifyText(const FString& NotifyText)
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedNotifyText(NotifyText);
+	}
+}
+
+void AEdmundGameState::NotifyUpdateMissionText(const FString& MissionText)
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedMissionText(MissionText);
+	}
+}
+
+void AEdmundGameState::NotifyPlayerHp(const int32 MaxHp, const int32 CurrentHp)
+{
+	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
+	{
+		return;
+	}
+
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedPlayerHp(MaxHp, CurrentHp);
+	}
+}
+
+void AEdmundGameState::NotifyPlayerOther(const int32 MaxValue, const int32 CurrentValue)
+{
+	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
+	{
+		return;
+	}
+
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedPlayerOther(MaxValue, CurrentValue);
+	}
+}
+
+void AEdmundGameState::NotifyPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo)
+{
+	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
+	{
+		return;
+	}
+
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedPlayerAmmo(MaxAmmo, CurrentAmmo);
+	}
+}
+
+APlayerController* AEdmundGameState::GetPlayerController()
+{
+	return PlayerController;
+}
+
+AActor* AEdmundGameState::GetPlayerPawn()
+{
+	return PlayerPawn;
 }
 
 void AEdmundGameState::NotifyCreateRandomSkill() const

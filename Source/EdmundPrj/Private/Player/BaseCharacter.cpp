@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "System/EdmundGameState.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -22,6 +23,9 @@ ABaseCharacter::ABaseCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
 
+	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	CurrentAudioComp->SetupAttachment(RootComponent);
+
 	WalkSpeed = 600.0f;
 	SprintSpeed = 1000.0f;
 	CrouchMoveSpeed = 300.0f;
@@ -33,7 +37,6 @@ ABaseCharacter::ABaseCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	IsSprint = false;
 	IsCrouch = false;
-	IsMove = false;
 
 	MeleeAttackDelay = 0.7f;
 
@@ -48,6 +51,8 @@ ABaseCharacter::ABaseCharacter()
 
 	IsDie = false;
 	DieActionMontage = nullptr;
+
+	CurrentGameState = nullptr;
 }
 
 void ABaseCharacter::BeginPlay()
@@ -58,12 +63,22 @@ void ABaseCharacter::BeginPlay()
 
 	HP = MaxHP;
 
-	// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½
+	// Ä¸½¶ ÄÝ¸®Àü Å©±â ÀúÀåÇÏ±â
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 	if (IsValid(CapsuleComp))
 	{
 		CapsuleHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
+	}
+
+	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
+
+	CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 	}
 }
 
@@ -221,13 +236,6 @@ void ABaseCharacter::Move(const FInputActionValue& value)
 	{
 		AddMovementInput(GetActorRightVector(), MoveInput.Y);
 	}
-
-	IsMove = true;
-}
-
-void ABaseCharacter::StopMove(const FInputActionValue& value)
-{
-	IsMove = false;
 }
 
 void ABaseCharacter::Look(const FInputActionValue& value)
@@ -238,6 +246,12 @@ void ABaseCharacter::Look(const FInputActionValue& value)
 	}
 
 	FVector2D LookInput = value.Get<FVector2D>();
+
+	// ÁÜ»óÅÂ¿¡¼­ ¸¶¿ì½º °¨µµ ³·Ãß±â
+	if (IsZoom)
+	{
+		LookInput /= 4;
+	}
 
 	AddControllerYawInput(LookInput.X);
 	AddControllerPitchInput(LookInput.Y);
@@ -280,7 +294,7 @@ void ABaseCharacter::StartSprint(const FInputActionValue& value)
 	{
 		IsSprint = true;
 
-		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½
+		// ¾ÉÀº »óÅÂ¿¡¼­´Â ´Þ¸®±â ºÒ°¡
 		if (!IsCrouch)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
@@ -299,7 +313,7 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 	{
 		IsSprint = false;
 
-		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½
+		// ¾ÉÀº »óÅÂ¿¡¼­´Â ´Þ¸®±â ºÒ°¡
 		if (!IsCrouch)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
@@ -322,7 +336,11 @@ void ABaseCharacter::Attack(const FInputActionValue& value)
 		}
 
 		CurrentAmmo--;
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Ammo: %d/%d"), CurrentAmmo, MaxAmmo));
+	}
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 	}
 
 	if (CurrentAmmo <= 0)
@@ -333,7 +351,7 @@ void ABaseCharacter::Attack(const FInputActionValue& value)
 
 bool ABaseCharacter::ActiveWeapon()
 {
-	// ï¿½Ú½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// ÀÚ½Ä Å¬·¡½ºÀÇ ÇÔ¼ö ½ÇÇà
 	return false;
 }
 
@@ -349,15 +367,15 @@ void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
 		PlayAnimMontage(MeleeAttackMontage);
 	}
 
-	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½ ï¿½ï¿½ï¿½
+	// ±ÙÁ¢°ø°Ý ¼Ò¸® Àç»ý
 	if (MeleeAttackSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, MeleeAttackSound, GetActorLocation());
+		//UGameplayStatics::PlaySoundAtLocation(this, MeleeAttackSound, GetActorLocation());
+		CurrentAudioComp->SetSound(MeleeAttackSound);
+		CurrentAudioComp->Play();
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Melee Attack Start")));
-
-	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ±ÙÁ¢ °ø°Ý µô·¹ÀÌ
 	GetWorld()->GetTimerManager().SetTimer(
 		MeleeAttackDelayHandle,
 		this,
@@ -371,30 +389,35 @@ void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
 
 void ABaseCharacter::MeleeAttackTrace()
 {
-	// Melee Attack ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	FVector ForwardVector = GetActorForwardVector(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	FVector Start = GetActorLocation() + (ForwardVector * 200.0f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
-	FVector End = Start + (ForwardVector * 200.0f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ä¡
+	// Melee Attack ¹üÀ§ ¼³Á¤
+	//FVector ForwardVector = GetActorForwardVector(); // °ø°Ý ¹æÇâ
 
-	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹ Ã¼Å©
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	FRotator ControlRotation = PlayerController->GetControlRotation();
+	FVector ForwardVector = ControlRotation.Vector();
+
+	FVector Start = GetActorLocation() + (ForwardVector * 200.0f); // °ø°Ý ½ÃÀÛ À§Ä¡
+	FVector End = Start + (ForwardVector * 200.0f); // °ø°Ý ³¡ À§Ä¡
+
+	// °ø°Ý ¹üÀ§ ³»¿¡¼­ Ãæµ¹ Ã¼Å©
 	float Radius = 150.0f;
-	FHitResult HitResult;
+	TArray<FHitResult> HitResults;
 
-	// Æ®ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// Æ®·¹ÀÌ½º ¼öÇà
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	QueryParams.AddIgnoredActor(this); // ÀÚ½ÅÀº ¹«½ÃÇÏµµ·Ï ¼³Á¤
 
-	bool bHit = GetWorld()->SweepSingleByChannel(
-		HitResult,
-		Start,               // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
-		End,                 // ï¿½ï¿½ ï¿½ï¿½Ä¡
-		FQuat::Identity,     // È¸ï¿½ï¿½ï¿½ï¿½ (È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
-		ECollisionChannel::ECC_GameTraceChannel1, // ï¿½æµ¹ Ã¤ï¿½ï¿½
-		FCollisionShape::MakeSphere(Radius), // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½)
+	bool bHit = GetWorld()->SweepMultiByChannel(
+		HitResults,
+		Start,               // ½ÃÀÛ À§Ä¡
+		End,                 // ³¡ À§Ä¡
+		FQuat::Identity,     // È¸Àü°ª (È¸Àü ¾øÀÌ)
+		ECollisionChannel::ECC_OverlapAll_Deprecated, // Ãæµ¹ Ã¤³Î
+		FCollisionShape::MakeSphere(Radius), // ¹üÀ§ ¼³Á¤ (±¸Ã¼ ¸ð¾ç)
 		QueryParams
 	);
 
-	// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½Ì°ï¿½ ï¿½Ï±ï¿½
+	// ±¸Ã¼ º¸ÀÌ°Ô ÇÏ±â
 	if (GEngine)
 	{
 		DrawDebugSphere(
@@ -402,18 +425,37 @@ void ABaseCharacter::MeleeAttackTrace()
 			Start,
 			Radius,
 			12,
-			FColor::Red,        // ï¿½ï¿½ï¿½ï¿½
-			false,              // ï¿½ï¿½ï¿½Ó¼ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
-			1.0f                // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
+			FColor::Red,        // »ö»ó
+			false,              // Áö¼Ó¼º (°ÔÀÓ Áß °è¼Ó Ç¥½ÃÇÒÁö ¿©ºÎ)
+			1.0f                // Áö¼Ó ½Ã°£
 		);
 	}
 
+	// µ¥¹ÌÁö¸¦ ÀÔÈù ¾×ÅÍ¸¦ ÃßÀûÇÒ Set (Áßº¹ ¹æÁö)
+	// SetÀÌ ¾øÀ¸¸é ±ÙÁ¢°ø°ÝÇÑ¹ø¿¡ ¿©·¯¹ø µ¥¹ÌÁö ¹Þ´Â Çö»ó ¹ß»ý
+	TSet<AActor*> DamagedActors;
+
 	if (bHit)
 	{
-		// ï¿½æµ¹ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½
-		if (AActor* HitActor = HitResult.GetActor())
+		// ¿©·¯ Ãæµ¹ °´Ã¼°¡ ÀÖ´Ù¸é
+		for (const FHitResult& Hit : HitResults)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Melee attack hit: %s"), *HitActor->GetName());
+			// Ãæµ¹ÇÑ °´Ã¼°¡ ÀÖ´Ù¸é
+			AActor* HitActor = Hit.GetActor();
+
+			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+			{
+				UGameplayStatics::ApplyDamage(
+					HitActor,
+					30.0f,	// ¼öÁ¤ÇÊ¿ä
+					nullptr,
+					this,
+					UDamageType::StaticClass()
+				);
+			}
+
+			// µ¥¹ÌÁö¸¦ ÀÔÈù ¾×ÅÍ¸¦ Set¿¡ Ãß°¡
+			DamagedActors.Add(HitActor);
 		}
 	}
 }
@@ -425,7 +467,7 @@ void ABaseCharacter::EndMeleeAttack()
 
 void ABaseCharacter::ReloadAction(const FInputActionValue& value)
 {
-	if (CheckAction() || IsDie)
+	if (CheckAction() || IsDie || CurrentAmmo == MaxAmmo)
 	{
 		return;
 	}
@@ -435,12 +477,13 @@ void ABaseCharacter::ReloadAction(const FInputActionValue& value)
 
 void ABaseCharacter::Reload()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Reload Start!!")));
 	CurrentAmmo = MaxAmmo;
 
 	if (IsValid(ReloadSound))
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
+		//UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
+		CurrentAudioComp->SetSound(ReloadSound);
+		CurrentAudioComp->Play();
 	}
 }
 
@@ -461,6 +504,7 @@ void ABaseCharacter::ZoomIn(const FInputActionValue& value)
 		return;
 	}
 
+	IsZoom = true;
 	SpringArmComp->TargetArmLength = -1000;
 	//SpringArmComp->SocketOffset = FVector(0, 40, 60);
 }
@@ -477,6 +521,7 @@ void ABaseCharacter::ZoomOut(const FInputActionValue& value)
 		return;
 	}
 
+	IsZoom = false;
 	SpringArmComp->TargetArmLength = 300;
 	//SpringArmComp->SocketOffset = FVector(0, 60, 60);
 }
@@ -492,27 +537,27 @@ void ABaseCharacter::StartCrouch(const FInputActionValue& value)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = CrouchMoveSpeed;
 
-		// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// Ä¸½¶ ÄÝ¸®Àü °¡Á®¿À±â
 		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 		if (IsValid(CapsuleComp))
 		{
 			float NewCapsuleHeight = CapsuleHeight * 0.7;
 
-			// Ä¸ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			// Ä¸½¶ Å©±â Á¶Á¤
 			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight * 0.8);
 
-			// ï¿½Þ½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+			// ¸Þ½¬ À§Ä¡ Á¶Á¤
 			FVector NewLocation = GetMesh()->GetRelativeLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			GetMesh()->SetRelativeLocation(NewLocation);
 
-			// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+			// Ä«¸Þ¶ó À§Ä¡ Á¶Á¤
 			NewLocation = SpringArmComp->GetRelativeLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			SpringArmComp->SetRelativeLocation(NewLocation);
 
-			// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			// ÀüÃ¼ ¾×ÅÍ Á¶Á¤
 			NewLocation = GetActorLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			SetActorLocation(NewLocation);
@@ -533,25 +578,25 @@ void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
-		// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// Ä¸½¶ ÄÝ¸®Àü °¡Á®¿À±â
 		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 		if (IsValid(CapsuleComp))
 		{
-			// Ä¸ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			// Ä¸½¶ Å©±â Á¶Á¤
 			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight);
 
-			// ï¿½Þ½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+			// ¸Þ½¬ À§Ä¡ Á¶Á¤
 			FVector NewLocation = GetMesh()->GetRelativeLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			GetMesh()->SetRelativeLocation(NewLocation);
 
-			// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+			// Ä«¸Þ¶ó À§Ä¡ Á¶Á¤
 			NewLocation = SpringArmComp->GetRelativeLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			SpringArmComp->SetRelativeLocation(NewLocation);
 
-			// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			// ÀüÃ¼ ¾×ÅÍ Á¶Á¤
 			NewLocation = GetActorLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			SetActorLocation(NewLocation);
@@ -568,22 +613,25 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
-	if (IsValid(HitActionMontage))
+	if (IsValid(HitActionMontage) && !CheckAction())
 	{
 		PlayAnimMontage(HitActionMontage);
 	}
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	// HP ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// HP À½¼ö ¹æÁö
 	HP = FMath::Max(0.0f, HP - ActualDamage);
-
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("HP: %f / %f"), HP, MaxHP));
 
 	if (HP == 0 && !IsDie)
 	{
 		IsDie = true;
 		ActiveDieAction();
+	}
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
 
 	return ActualDamage;
@@ -597,41 +645,56 @@ void ABaseCharacter::AddExp(int32 Exp)
 void ABaseCharacter::LevelUp()
 {
 	CurrentLevel++;
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
-float ABaseCharacter::GetHP() const
+int32 ABaseCharacter::GetHP() const
 {
 	return HP;
 }
 
-void ABaseCharacter::SetHP(float NewHP)
+void ABaseCharacter::SetHP(int32 NewHP)
 {
 	HP = FMath::Min(MaxHP, NewHP);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
-void ABaseCharacter::AmountHP(float AmountHP)
+void ABaseCharacter::AmountHP(int32 AmountHP)
 {
 	HP = FMath::Min(MaxHP, HP + AmountHP);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
 void ABaseCharacter::SetAmmo(int32 NewAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, NewAmmo);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+	}
 }
 
 void ABaseCharacter::AmountAmmo(int32 AmountAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, CurrentAmmo + AmountAmmo);
-}
 
-int32 ABaseCharacter::GetGold() const
-{
-	return CurrentGold;
-}
-
-void ABaseCharacter::AddGold(int32 Gold)
-{
-	CurrentGold += Gold;
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+	}
 }
 
 void ABaseCharacter::GetUpgradeStatus()
@@ -640,13 +703,17 @@ void ABaseCharacter::GetUpgradeStatus()
 
 void ABaseCharacter::ActiveDieAction()
 {
+	// ¸¸¾à ÁÜ»óÅÂ¶ó¸é
+	IsZoom = false;
+	SpringArmComp->TargetArmLength = 300;
+
 	if (IsValid(DieActionMontage))
 	{
 		PlayAnimMontage(DieActionMontage);
 	}
 }
 
-ECharacterType ABaseCharacter::getCharacterType()
+ECharacterType ABaseCharacter::GetCharacterType()
 {
 	return CharacterType;
 }

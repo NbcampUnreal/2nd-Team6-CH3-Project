@@ -11,6 +11,7 @@ class UEdmundGameInstance;
 class AEdmundGameMode;
 class IGameStateObserver;
 class ABaseCharacter;
+class ABaseMissionItem;
 struct FPlayerSkillRow;
 
 UCLASS()
@@ -34,11 +35,22 @@ public:
 	void SetSelectedCharacter(AActor* Character);
 	void CancleSelectedCharacter();
 
+	void RequestInteraction();
+
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 
+	void NotifyUpdateNotifyText(const FString& NotifyText);
+	void NotifyUpdateMissionText(const FString& MissionText);
+	void NotifyPlayerHp(const int32 MaxHp, const int32 CurrentHp);
+	void NotifyPlayerOther(const int32 MaxValue, const int32 CurrentValue);
+	void NotifyPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo);
+
+	APlayerController* GetPlayerController();
+	AActor* GetPlayerPawn();
+
 private:
-	void InitMainLevel();
+	void InitMainLevel(); // 게임 모드로 옮길 필요가 있음.
 	void InitSkillData();
 	void CalculateSkillList(); 
 
@@ -49,6 +61,9 @@ private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
 	TObjectPtr<APlayerController> PlayerController = nullptr;
+	TObjectPtr<AActor> PlayerPawn = nullptr;
+
+	TObjectPtr<ABaseMissionItem> OverlapedItem = nullptr;
 
 	TArray<TScriptInterface<IGameStateObserver>> Observers;
 
