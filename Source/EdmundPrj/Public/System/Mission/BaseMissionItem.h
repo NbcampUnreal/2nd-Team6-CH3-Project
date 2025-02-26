@@ -20,8 +20,8 @@ public:
 	ABaseMissionItem();
 	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type,  const FString& MissionInfo);
 	virtual void ActionEventByPressedKey();
+	virtual void SetIsActive(bool Value);
 
-	void SetIsActive(bool Value);
 	void PrintMissionText();
 	
 protected:
@@ -39,6 +39,7 @@ protected:
 	virtual void ActionBeginOverlap();
 	virtual void ActionEndOverlap();
 	virtual void ActionOnHit();
+	virtual void CompleteProgress();
 
 	void SetVisible(bool bIsVisible);
 

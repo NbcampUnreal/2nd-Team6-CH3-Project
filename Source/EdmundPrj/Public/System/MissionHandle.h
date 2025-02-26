@@ -19,6 +19,7 @@ class EDMUNDPRJ_API AMissionHandle : public AActor
 public:	
 	AMissionHandle();
 	void InitMissionHandle(const TArray<FMissionDataRow*>& MissionData, AEdmundGameMode* EdGameMode, AEdmundGameState* EdGameState);
+	void ApplyMissionDataInLevel();
 
 	void OnBeginOverlapedItem(ABaseMissionItem* MissionItem);
 	void OnEndOverlapedItem();
@@ -41,7 +42,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void ApplyMissionDataInLevel();
 	void SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo);
 
 private:

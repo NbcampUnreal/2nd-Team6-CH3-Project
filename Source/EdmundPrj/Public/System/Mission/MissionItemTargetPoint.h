@@ -16,4 +16,7 @@ class EDMUNDPRJ_API AMissionItemTargetPoint : public ABaseMissionItem
 	
 public:
 	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo) override;
+
+private:
+	virtual void ActionBeginOverlap() override;
 };

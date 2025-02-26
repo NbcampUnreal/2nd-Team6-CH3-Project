@@ -21,8 +21,8 @@ void AEdmundGameState::BeginPlay()
 	PlayerPawn = PlayerController->GetPawn();
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->StartedGameState();
-	EdmundGameMode->InitMission();
+	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
+
 	InitSkillData();
 	InitMainLevel();
 

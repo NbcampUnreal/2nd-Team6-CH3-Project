@@ -10,6 +10,9 @@
 class UEdmundGameInstance;
 class AEdmundGameState;
 class AMissionHandle;
+class ASpawnerHandle;
+struct FMissionDataRow;
+struct FSpawnerDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API AEdmundGameMode : public AGameMode
@@ -18,7 +21,8 @@ class EDMUNDPRJ_API AEdmundGameMode : public AGameMode
 
 public:
 	void RequestInteractionToMissionHandle();
-	void InitMission();
+	void InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet);
+	void StartMission(ESceneType CurrentScene);
 	void EndMission();
 
 private:
@@ -35,10 +39,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")
 	TSubclassOf<AActor> MissionHandleClass = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")
+	TSubclassOf<AActor> SpawnerHandleClass = nullptr;
+
 private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 	TObjectPtr<AEdmundGameState> EdmundGameState = nullptr;
 	TObjectPtr<AMissionHandle> MissionHandle = nullptr;
-
-	ESceneType CurrentScene = ESceneType::Title;
+	TObjectPtr<ASpawnerHandle> SpawnerHandle = nullptr;
 };
