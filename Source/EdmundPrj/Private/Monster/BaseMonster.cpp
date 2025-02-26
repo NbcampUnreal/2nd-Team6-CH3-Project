@@ -42,6 +42,19 @@ ABaseMonster::ABaseMonster()
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+
+	if (bIsDead) return 0;
+
+	if (TakeDamageSound)
+	{
+		CurrentAudioComp->SetSound(TakeDamageSound);
+		CurrentAudioComp->Play();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
+	}
+
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(DamageCauser);
 	if (PlayerCharacter)
 	{
@@ -176,16 +189,6 @@ void ABaseMonster::MonsterHit()
 			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT("TakeDamageParticle이 없습니다."));
-			}
-
-			if (TakeDamageSound)
-			{
-				CurrentAudioComp->SetSound(TakeDamageSound);
-				CurrentAudioComp->Play();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
 			}
 
 			bIsHit = true;
