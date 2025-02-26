@@ -8,6 +8,7 @@
 #include "RangedMonster.generated.h"
 
 class ARangedMonsterBullet;
+class AMonsterBulletPool;
 
 UCLASS()
 class EDMUNDPRJ_API ARangedMonster : public ABaseMonster
@@ -17,17 +18,11 @@ class EDMUNDPRJ_API ARangedMonster : public ABaseMonster
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Bullet")
-	TSubclassOf<ARangedMonsterBullet> MonsterBulletClass;
-
-	UPROPERTY()
-	TArray<ARangedMonsterBullet*> BulletPool;
+	AMonsterBulletPool* MonsterBulletPool;
 
 	ARangedMonster();
 
 	void MonsterAttackCheck() override;
-	void InitializeMonsterBulletPool(int32 PoolSize);
-
-	ARangedMonsterBullet* GetBulletFromPool();
 	void Fire();
 
 	void PlayParticle() override;
