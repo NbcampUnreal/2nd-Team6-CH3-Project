@@ -15,6 +15,7 @@ class AEdmundGameState;
 struct FShopCatalogRow;
 struct FPlayerSkillRow;
 struct FCharacterDataRow;
+struct FMissionDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UEdmundGameInstance : public UGameInstance
@@ -47,6 +48,9 @@ public:
 	void MoveNextScene() const;
 	ESceneType GetCurrentSceneName() const;
 
+	// Mission Data Controll
+	const TArray<FMissionDataRow*>& GetCurrentMissionData(ESceneType SceneType) const;
+
 	// Shop and Player Advance State Controll
 	const TArray<FShopCatalogRow*>& GetAdvanceState() const;
 	const FShopCatalogRow* GetAdvanceState(const FName& TargetRow) const;
@@ -57,7 +61,7 @@ public:
 	void SetPlayerType(const ECharacterType Type) const;
 	void CancleSelectedType();
 	const TArray<FCharacterDataRow*>& GetCharacterData() const;
-	//FMissionItemRow* GetCurrentMissionInfo() const;
+
 	// Player Money Controll
 	void AddPossessMoney(const int32 Value) const;
 	int32 GetPossessMoney() const;

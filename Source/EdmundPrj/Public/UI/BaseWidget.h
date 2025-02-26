@@ -17,13 +17,14 @@ class EDMUNDPRJ_API UBaseWidget : public UUserWidget, public IGameStateObserver
 	GENERATED_BODY()
 
 public:
-	virtual void ChangedPlayerMaxHp(int32 Hp) override;
-	virtual void ChangedPlayerCurrentHp(int32 Hp) override;
-	virtual void ChangedPlayerMaxAmmo(int32 Ammo) override;
-	virtual void ChangedPlayerAmmo(int32 Ammo) override;
-	virtual void ChangedPlayerMoney(int32 Money) override;
-	virtual void ChangedSkillList() override;
-	virtual void ChangedCharacterType(ECharacterType CharacterType) override;
+	virtual void ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp) override {};
+	virtual void ChangedPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo) override {};
+	virtual void ChangedPlayerOther(const int32 MaxValue, const int32 CurrentValue) override {};
+	virtual void ChangedPlayerMoney(const int32 Money) override {};
+	virtual void ChangedSkillList() override {};
+	virtual void ChangedCharacterType(const ECharacterType CharacterType) override {};
+	virtual void ChangedNotifyText(const FString& NotifyText) override {};
+	virtual void ChangedMissionText(const FString& MissionText) override {};
 
 	virtual void InitWidget(UUIHandle* uiHandle);
 	virtual void Action();
