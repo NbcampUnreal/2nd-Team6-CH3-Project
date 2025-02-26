@@ -37,6 +37,8 @@ public:
 	// Mission2
 
 	// Mission3
+	void DecressSpawnerCountFromBoss();
+	void LockToBossMonsterSkill(int32 SkillIndex);
 
 protected:
 	virtual void BeginPlay() override;
@@ -57,6 +59,7 @@ private:
 	FVector PrisonLocation = FVector::ZeroVector;
 
 	int32 MainMissionIndex = 0;
+	int32 SpawnerCountFromBoss = 0;
 
 	FTimerHandle TestTimer;
 };

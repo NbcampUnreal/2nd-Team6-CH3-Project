@@ -96,6 +96,16 @@ void AMissionHandle::SetPrisonLocation(const FVector& PrisonPos)
 	PrisonLocation = PrisonPos;
 }
 
+void AMissionHandle::DecressSpawnerCountFromBoss()
+{
+	--SpawnerCountFromBoss;
+}
+
+void AMissionHandle::LockToBossMonsterSkill(int32 SkillIndex)
+{
+
+}
+
 void AMissionHandle::BeginPlay()
 {
 	Super::BeginPlay();
@@ -123,6 +133,8 @@ void AMissionHandle::ApplyMissionDataInLevel()
 
 void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo)
 {
+	checkf(IsValid(SpawnClass), TEXT("Mission Item Class is invalid"));
+
 	FActorSpawnParameters SpawnParam;
 
 	ABaseMissionItem* NewMissionItem = GetWorld()->SpawnActor<ABaseMissionItem>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
