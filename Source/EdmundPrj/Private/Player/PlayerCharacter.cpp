@@ -2,6 +2,7 @@
 #include "Player/EdmundPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "Player/Weapon.h"
+#include "System/EdmundGameState.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -70,4 +71,9 @@ void APlayerCharacter::StopReload()
 {
 	IsReload = false;
 	bIsReloading = false;
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+	}
 }
