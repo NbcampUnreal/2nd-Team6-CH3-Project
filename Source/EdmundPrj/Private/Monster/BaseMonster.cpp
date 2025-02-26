@@ -2,6 +2,7 @@
 
 
 #include "Monster/BaseMonster.h"
+#include "Player/PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
@@ -41,6 +42,13 @@ ABaseMonster::ABaseMonster()
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(DamageCauser);
+	if (PlayerCharacter)
+	{
+		//캐릭터에서 AddEXP 구현시
+		//PlayerCharacter->AddEXP(MonsterExpReward);
+	}
+
 	GetCharacterMovement()->Deactivate();
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -148,6 +156,8 @@ void ABaseMonster::MonsterHit()
 		{
 			if (TakeDamageParticle)
 			{
+				SetChaseMod();
+
 				UpdateMonsterOverHeadWidget();
 
 				UParticleSystemComponent* Particle = nullptr;
@@ -221,6 +231,31 @@ void ABaseMonster::MonsterAttack()
 		}
 	}
 }
+
+void ABaseMonster::SetChaseMod()
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+		if (AIController)
+		{
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				APawn* PlayerPawn = PlayerController->GetPawn();
+
+				AIController->GetBlackboardComponent()->SetValueAsBool(FName("HasLineOfSight"), true);
+				AIController->GetBlackboardComponent()->SetValueAsObject(FName("PlayerActor"), PlayerPawn);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: PlayerController가 없습니다."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: AIController가 없습니다."));
+		}
+	}
+
 
 void ABaseMonster::MonsterAttackEnd()
 {

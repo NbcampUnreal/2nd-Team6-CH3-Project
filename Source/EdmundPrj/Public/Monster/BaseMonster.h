@@ -151,6 +151,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void MonsterAttack();
 
+	UFUNCTION(BlueprintCallable)
+	void SetChaseMod();
+
 	void MonsterAttackEnd();
 
 	FTimerHandle DeadAnimTimerHandle;
