@@ -75,12 +75,13 @@ void AMeleeMonster::PlayParticle()
 
     if (AttackParticle)
     {
-        FVector ParticleScale = FVector(8.0f, 8.0f, 8.0f);
+        FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
+        FVector ParticleLocation = GetActorLocation() + GetActorForwardVector() * 150.0f;
 
         Particle = UGameplayStatics::SpawnEmitterAtLocation(
             GetWorld(),
             AttackParticle,
-            GetActorLocation(),
+            ParticleLocation,
             GetActorRotation(),
             ParticleScale,
             false
