@@ -71,6 +71,10 @@ void ABaseMonster::MonsterDead()
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			if (AnimInstance)
 			{
+				MonsterHP = 0;
+
+				UpdateMonsterOverHeadWidget();
+
 				GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
 				GetWorld()->GetTimerManager().ClearTimer(AttackAnimTimerHandle);
 
@@ -100,9 +104,6 @@ void ABaseMonster::MonsterDestroy()
 	SetActorHiddenInGame(true);
 
 	MonsterHP = MonsterMaxHP;
-
-	// 위젯 수정 전 임시 호출!!!!!!!!!!!!!!
-	UpdateMonsterOverHeadWidget();
 
 	// 사망 시 바닥으로
 	FVector GoToHell = GetActorLocation() + FVector(0, 0, -2000.0f);
@@ -142,6 +143,8 @@ void ABaseMonster::MonsterHit()
 		{
 			if (TakeDamageParticle)
 			{
+				UpdateMonsterOverHeadWidget();
+
 				UParticleSystemComponent* Particle = nullptr;
 
 				FVector ParticleScale = FVector(2.0f, 2.0f, 2.0f);

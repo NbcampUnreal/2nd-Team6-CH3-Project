@@ -37,6 +37,8 @@ void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawn
 	SpawnCount = NewSpawnCount;
 
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
+
+	InitializeMonsterSpawnPool(SpawnCount);
 }
 
 ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
@@ -50,9 +52,6 @@ void AMonsterSpawner::BeginPlay()
 	Super::BeginPlay();
 
 	//GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
-
-
-	//InitializeMonsterSpawnPool(SpawnCount);
 
 	//CurrentGameMode = GetWorld()->GetAuthGameMode();
 	//if (CurrentGameMode)

@@ -70,7 +70,7 @@ void ARangedMonster::PlayParticle()
 
     if (AttackParticle)
     {
-        FVector ParticleScale = FVector(8.0f, 8.0f, 8.0f);
+        FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
 
         Particle = UGameplayStatics::SpawnEmitterAtLocation(
             GetWorld(),
