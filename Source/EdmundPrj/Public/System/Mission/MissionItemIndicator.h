@@ -14,11 +14,4 @@ class EDMUNDPRJ_API AMissionItemIndicator : public ABaseMissionItem
 	
 public:
 	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo) override;
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
-private:
-	void ShowDirectionToTarget();
-
-private:
-	int32 HitCount = 5;
 };

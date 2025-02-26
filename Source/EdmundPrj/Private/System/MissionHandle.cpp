@@ -68,7 +68,7 @@ void AMissionHandle::StartMainMission()
 {
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
 	MainMissionSet[MainMissionIndex]->PrintMissionText();
-	MainMissionSet[MainMissionIndex]->SetIsActive(true);
+	MainMissionSet[MainMissionIndex]->SetIsStarted(true);
 }
 
 void AMissionHandle::CompleteMission()
@@ -131,12 +131,11 @@ void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPo
 
 	MissionItemSet.Add(NewMissionItem);
 	NewMissionItem->InitMissionItem(this, MissionType, MissionInfo);
-	NewMissionItem->SetIsActive(true);
 
 	if (MissionType == "Main")
 	{
 		MainMissionSet.Add(NewMissionItem);
-		NewMissionItem->SetIsActive(false);
+		NewMissionItem->SetIsStarted(false);
 	}
 }
 

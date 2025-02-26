@@ -14,6 +14,4 @@ class EDMUNDPRJ_API AMissionItemTargetPoint : public ABaseMissionItem
 {
 	GENERATED_BODY()
 	
-public:
-	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo) override;
 };

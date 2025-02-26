@@ -152,7 +152,7 @@ void AEdmundGameState::SetSelectedCharacter(AActor* Character)
 	checkf(IsValid(Character), TEXT("Selected Character is invalid"));
 
 	ABaseCharacter* TargetActor = Cast<ABaseCharacter>(Character);
-	NotifySelectCharacterType(TargetActor->GetCharacterType());
+	NotifySelectCharacterType(TargetActor->getCharacterType());
 }
 
 void AEdmundGameState::CancleSelectedCharacter()

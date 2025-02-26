@@ -32,7 +32,7 @@ AMissionItemPrison::AMissionItemPrison() : Super()
 
 void AMissionItemPrison::ActionBeginOverlap()
 {
-	if (!bIsActive)
+	if (!bIsStarted)
 	{
 		return;
 	}
@@ -45,7 +45,7 @@ void AMissionItemPrison::ActionBeginOverlap()
 
 void AMissionItemPrison::ActionEndOverlap()
 {
-	if (!bIsActive)
+	if (!bIsStarted)
 	{
 		return;
 	}
@@ -82,10 +82,11 @@ void AMissionItemPrison::Tick(float DeltaTime)
 
 void AMissionItemPrison::CompleteProgress()
 {
+	SetActorTickEnabled(false);
 	InteractionWidget->VisibleProgressBar(false);
-	SetVisible(false);
-	//UpdateNotifyTextToUI();
-	MissionHandle->CompleteMission();
+
+	UpdateNotifyTextToUI();
+	//MissionHandle->CompleteMission();
 }
 
 
