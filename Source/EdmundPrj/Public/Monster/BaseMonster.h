@@ -8,6 +8,7 @@
 #include "Components/AudioComponent.h"
 #include "BaseMonster.generated.h"
 
+class AMonsterSpawner;
 class USphereComponent;
 class UWidgetComponent;
 
@@ -30,6 +31,9 @@ void SetIsDead(bool bNewIsDead);
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|BulletPool")
+AMonsterSpawner* MonsterSpawner;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")

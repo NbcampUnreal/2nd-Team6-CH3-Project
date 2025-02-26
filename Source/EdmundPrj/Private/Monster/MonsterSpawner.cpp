@@ -7,9 +7,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "BehaviorTree/BehaviorTreeComponent.h"
-#include "BehaviorTree/BTTaskNode.h"
+#include "Monster/MonsterBulletPool.h"
+#include "GameFramework/GameModeBase.h"
 #include "GameFramework/Actor.h"
+#include "Monster/RangedMonsterBullet.h"
 
 
 // Sets default values
@@ -28,14 +29,41 @@ AMonsterSpawner::AMonsterSpawner()
 	SpawnerMeshComp->SetupAttachment(RootComp);
 }
 
+void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount)
+{
+	MonsterBulletPool = BulletPool;
+
+	SpawnTime = NewSpawnTime;
+	SpawnCount = NewSpawnCount;
+
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
+}
+
+ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
+{
+	return MonsterBulletPool->GetBulletFromPool();
+}
+
+
 void AMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
-	InitializeMonsterSpawnPool(SpawnCount);
-}
+	//GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
 
+
+	//InitializeMonsterSpawnPool(SpawnCount);
+
+	//CurrentGameMode = GetWorld()->GetAuthGameMode();
+	//if (CurrentGameMode)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Spawner가 CurrentGameMode를 가져옴"));
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("CurrentGameMode 없음"));
+	//}
+}
 
 
 ABaseMonster* AMonsterSpawner::GetMonsterFromPool()
@@ -88,6 +116,9 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 			{
 				ABaseMonster* NewMonster = GetWorld()->SpawnActor<ABaseMonster>(MonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
 
+				// 몬스터가 자신의 스포너를 참조하게 설정
+				NewMonster->MonsterSpawner = this;
+
 				if (!NewMonster)
 				{
 					UE_LOG(LogTemp, Error, TEXT("There is No Monster"))
@@ -118,9 +149,9 @@ void AMonsterSpawner::SpawnMonster()
 			AAIController* AIController = Cast<AAIController>(Monster->GetController());
 			if (AIController)
 			{
-				UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
-				BlackboardComp->SetValueAsBool(TEXT("HasLineOfSight"), false);
-				BlackboardComp->SetValueAsObject(TEXT("PlayerActor"), nullptr);
+				//UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+				//BlackboardComp->SetValueAsBool(TEXT("HasLineOfSight"), false);
+				//BlackboardComp->SetValueAsObject(TEXT("PlayerActor"), nullptr);
 
 				AIController->SetActorTickEnabled(true);
 			}
