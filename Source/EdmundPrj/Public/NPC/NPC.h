@@ -11,7 +11,8 @@ class EDMUNDPRJ_API ANPC : public ACharacter
 
 public:
 	ANPC();
+	virtual void BeginPlay() override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+protected:
 
 };

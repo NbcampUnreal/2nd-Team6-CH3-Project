@@ -93,6 +93,30 @@ enum class EMonsterState : uint8
 	Die
 };
 
+UENUM(BlueprintType)
+enum class ENPCState : uint8
+{
+	Idle = 0,
+	Trace,
+	Attack,
+	Hit,
+	Die
+};
+
+UENUM(BlueprintType)
+enum class EBossState : uint8 {
+	Idle,
+	Chase,
+	Attack1,
+	Attack2,
+	Attack3,
+	Attack4,
+	Skill1,
+	Skill2,
+	Skill3,
+	Dead
+};
+
 UCLASS()
 class EDMUNDPRJ_API UEnumSet : public UObject
 {

@@ -1,4 +1,5 @@
 #include "NPC/NPCAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 void ANPCAIController::OnPossess(APawn* InPawn)
 {
@@ -7,7 +8,12 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 
 void ANPCAIController::BeginPlay()
 {
-
+	Super::BeginPlay();
+	if (BehaviorTreeAsset)
+	{
+		UE_LOG(LogTemp, Error, TEXT("asdsadasdasdadasda"));
+		return;
+	}
 }
 
 //void ANPCAIController::Chase()
