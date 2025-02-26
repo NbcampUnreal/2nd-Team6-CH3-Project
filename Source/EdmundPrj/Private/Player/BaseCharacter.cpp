@@ -378,9 +378,7 @@ void ABaseCharacter::MeleeAttackTrace()
 	//FVector ForwardVector = GetActorForwardVector(); // 공격 방향
 
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-
 	FRotator ControlRotation = PlayerController->GetControlRotation();
-
 	FVector ForwardVector = ControlRotation.Vector();
 
 	FVector Start = GetActorLocation() + (ForwardVector * 200.0f); // 공격 시작 위치

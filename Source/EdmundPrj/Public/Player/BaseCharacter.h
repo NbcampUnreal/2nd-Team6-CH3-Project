@@ -30,7 +30,6 @@ protected:
 
 	// 이동
 	void Move(const FInputActionValue& value);
-	void StopMove(const FInputActionValue& value);
 
 	// 마우스 회전
 	void Look(const FInputActionValue& value);
