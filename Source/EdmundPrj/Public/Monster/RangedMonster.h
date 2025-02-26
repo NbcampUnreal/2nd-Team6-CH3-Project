@@ -7,7 +7,7 @@
 #include "UObject/Class.h"
 #include "RangedMonster.generated.h"
 
-class ARangedMonsterBullet;
+class AMonsterSpawner;
 class AMonsterBulletPool;
 
 UCLASS()
@@ -16,9 +16,6 @@ class EDMUNDPRJ_API ARangedMonster : public ABaseMonster
 	GENERATED_BODY()
 
 public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Bullet")
-	AMonsterBulletPool* MonsterBulletPool;
 
 	ARangedMonster();
 

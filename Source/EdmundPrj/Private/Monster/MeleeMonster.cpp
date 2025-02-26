@@ -34,8 +34,8 @@ void AMeleeMonster::MonsterAttackCheck()
 
 
        //  공격 Collision Visible 활성화
-        FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-        DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
+        //FVector CapsuleLocation = CollisionComp->GetComponentLocation();
+        //DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
 
 
         // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
@@ -75,12 +75,13 @@ void AMeleeMonster::PlayParticle()
 
     if (AttackParticle)
     {
-        FVector ParticleScale = FVector(8.0f, 8.0f, 8.0f);
+        FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
+        FVector ParticleLocation = GetActorLocation() + GetActorForwardVector() * 150.0f;
 
         Particle = UGameplayStatics::SpawnEmitterAtLocation(
             GetWorld(),
             AttackParticle,
-            GetActorLocation(),
+            ParticleLocation,
             GetActorRotation(),
             ParticleScale,
             false

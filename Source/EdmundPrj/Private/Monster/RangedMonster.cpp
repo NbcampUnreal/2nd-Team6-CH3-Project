@@ -3,12 +3,11 @@
 
 #include "Monster/RangedMonster.h"
 #include "Monster/RangedMonsterBullet.h"
-#include "Monster/MonsterBulletPool.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
-#include "GameFramework/GameModeBase.h"
+#include "Monster/MonsterSpawner.h"
 #include "Engine/World.h"
 
 ARangedMonster::ARangedMonster()
@@ -18,16 +17,6 @@ ARangedMonster::ARangedMonster()
 void ARangedMonster::BeginPlay()
 {
     Super::BeginPlay();
-
-    //   AGameModeBase* CurrentGameMode = GetWorld()->GetAuthGameMode();
-    //   if (CurrentGameMode)
-    //   {
-       //	MonsterBulletPool = CurrentGameMode->GetMonsterBulletPool();
-       //}
-    //   else
-    //   {
-    //       UE_LOG(LogTemp, Warning, TEXT("CurrentGameMode 없음"));
-    //   }
 }
 
 void ARangedMonster::MonsterAttackCheck()
@@ -40,9 +29,9 @@ void ARangedMonster::Fire()
     PlayParticle();
     PlaySound();
 
-    if (MonsterBulletPool)
+    if (MonsterSpawner)
     {
-        ARangedMonsterBullet* BulletToFire = MonsterBulletPool->GetBulletFromPool();
+        ARangedMonsterBullet* BulletToFire = MonsterSpawner->GetBulletFromSpawner();
         {
             if (BulletToFire)
             {
@@ -63,7 +52,7 @@ void ARangedMonster::Fire()
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("BulletToFire 없음"));
+                UE_LOG(LogTemp, Warning, TEXT("BulletToFire 없음. GameMode Pool에 있는 GetBulletFromPool이 없을 수 있음"));
             }
         }
     }

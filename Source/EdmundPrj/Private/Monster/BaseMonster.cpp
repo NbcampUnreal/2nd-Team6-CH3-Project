@@ -12,6 +12,8 @@
 #include "Sound/SoundBase.h"
 #include "AIController.h"
 #include "Components/AudioComponent.h"
+#include "Monster/MonsterSpawner.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 // Sets default values
 ABaseMonster::ABaseMonster()
@@ -39,16 +41,11 @@ ABaseMonster::ABaseMonster()
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-
-	CurrentAudioComp->SetSound(TakeDamageSound);
-	CurrentAudioComp->Play();
+	GetCharacterMovement()->Deactivate();
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
-
-	// OverHeadWidget 업데이트
-	UpdateMonsterOverHeadWidget();
 
 	if (MonsterHP <= 0)
 	{
@@ -66,19 +63,22 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 // 죽는 애니메이션 재생 후 MonsterDestroy 호출
 void ABaseMonster::MonsterDead()
 {
-	SetIsDead(true);
-
-	if (DeathAnimation)
+	if (!bIsDead)
 	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance)
+		SetIsDead(true);
+		if (DeathAnimation)
 		{
-			GetCharacterMovement()->DisableMovement();
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance)
+			{
+				GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
+				GetWorld()->GetTimerManager().ClearTimer(AttackAnimTimerHandle);
 
-			AnimInstance->Montage_Play(DeathAnimation);
+				AnimInstance->Montage_Play(DeathAnimation);
+				float AnimDuration = DeathAnimation->GetPlayLength();
 
-			float AnimDuration = DeathAnimation->GetPlayLength();
-			GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
+				GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
+			}
 		}
 	}
 }
@@ -92,12 +92,23 @@ void ABaseMonster::SetIsDead(bool bNewIsDead)
 void ABaseMonster::MonsterDestroy()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
+
 	DropReward();
+
+	GetCharacterMovement()->Activate();
+
 	SetActorHiddenInGame(true);
 
+	MonsterHP = MonsterMaxHP;
+
+	// 위젯 수정 전 임시 호출!!!!!!!!!!!!!!
+	UpdateMonsterOverHeadWidget();
+
+	// 사망 시 바닥으로
 	FVector GoToHell = GetActorLocation() + FVector(0, 0, -2000.0f);
 	SetActorLocation(GoToHell);
 
+	// 스폰될 때 까지 Tick 끄기
 	AAIController* AIController = Cast<AAIController>(GetController());
 	if (AIController)
 	{
@@ -129,6 +140,36 @@ void ABaseMonster::MonsterHit()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
+			if (TakeDamageParticle)
+			{
+				UParticleSystemComponent* Particle = nullptr;
+
+				FVector ParticleScale = FVector(2.0f, 2.0f, 2.0f);
+
+				Particle = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					TakeDamageParticle,
+					GetActorLocation(),
+					GetActorRotation(),
+					ParticleScale,
+					false
+				);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("TakeDamageParticle이 없습니다."));
+			}
+
+			if (TakeDamageSound)
+			{
+				CurrentAudioComp->SetSound(TakeDamageSound);
+				CurrentAudioComp->Play();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
+			}
+
 			bIsHit = true;
 
 			GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0, 0, 1));
@@ -148,8 +189,8 @@ void ABaseMonster::MonsterHitEnd()
 	bIsHit = false;
 
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.1f, HitAnimation);
+	GetCharacterMovement()->Activate();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	UE_LOG(LogTemp, Warning, TEXT("HitEnd"));
 }
 
 void ABaseMonster::MonsterAttack()
@@ -176,7 +217,10 @@ void ABaseMonster::MonsterAttack()
 void ABaseMonster::MonsterAttackEnd()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.3f, AttackAnimation);
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	//주석 처리를 했는데 왜 움직일까?
+	//GetCharacterMovement()->Activate();
+	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void ABaseMonster::MonsterAttackCheck()
@@ -206,7 +250,7 @@ void ABaseMonster::UpdateMonsterOverHeadWidget()
 		HPBar->SetPercent(HealthPercent);
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::MonsterAttackEnd, 3.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::UpdateMonsterOverHeadWidgetEnd, 1.0f, false);
 
 }
 
