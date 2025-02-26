@@ -22,6 +22,9 @@ ABaseCharacter::ABaseCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
 
+	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	CurrentAudioComp->SetupAttachment(RootComponent);
+
 	WalkSpeed = 600.0f;
 	SprintSpeed = 1000.0f;
 	CrouchMoveSpeed = 300.0f;
@@ -239,6 +242,12 @@ void ABaseCharacter::Look(const FInputActionValue& value)
 
 	FVector2D LookInput = value.Get<FVector2D>();
 
+	// 줌상태에서 마우스 감도 낮추기
+	if (IsZoom)
+	{
+		LookInput /= 4;
+	}
+
 	AddControllerYawInput(LookInput.X);
 	AddControllerPitchInput(LookInput.Y);
 }
@@ -352,7 +361,9 @@ void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
 	// 근접공격 소리 재생
 	if (MeleeAttackSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, MeleeAttackSound, GetActorLocation());
+		//UGameplayStatics::PlaySoundAtLocation(this, MeleeAttackSound, GetActorLocation());
+		CurrentAudioComp->SetSound(MeleeAttackSound);
+		CurrentAudioComp->Play();
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Melee Attack Start")));
@@ -372,24 +383,31 @@ void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
 void ABaseCharacter::MeleeAttackTrace()
 {
 	// Melee Attack 범위 설정
-	FVector ForwardVector = GetActorForwardVector(); // 공격 방향
+	//FVector ForwardVector = GetActorForwardVector(); // 공격 방향
+
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+
+	FRotator ControlRotation = PlayerController->GetControlRotation();
+
+	FVector ForwardVector = ControlRotation.Vector();
+
 	FVector Start = GetActorLocation() + (ForwardVector * 200.0f); // 공격 시작 위치
 	FVector End = Start + (ForwardVector * 200.0f); // 공격 끝 위치
 
 	// 공격 범위 내에서 충돌 체크
 	float Radius = 150.0f;
-	FHitResult HitResult;
+	TArray<FHitResult> HitResults;
 
 	// 트레이스 수행
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this); // 자신은 무시하도록 설정
 
-	bool bHit = GetWorld()->SweepSingleByChannel(
-		HitResult,
+	bool bHit = GetWorld()->SweepMultiByChannel(
+		HitResults,
 		Start,               // 시작 위치
 		End,                 // 끝 위치
 		FQuat::Identity,     // 회전값 (회전 없이)
-		ECollisionChannel::ECC_GameTraceChannel1, // 충돌 채널
+		ECollisionChannel::ECC_OverlapAll_Deprecated, // 충돌 채널
 		FCollisionShape::MakeSphere(Radius), // 범위 설정 (구체 모양)
 		QueryParams
 	);
@@ -408,12 +426,31 @@ void ABaseCharacter::MeleeAttackTrace()
 		);
 	}
 
+	// 데미지를 입힌 액터를 추적할 Set (중복 방지)
+	// Set이 없으면 근접공격한번에 여러번 데미지 받는 현상 발생
+	TSet<AActor*> DamagedActors;
+
 	if (bHit)
 	{
-		// 충돌한 객체가 있다면
-		if (AActor* HitActor = HitResult.GetActor())
+		// 여러 충돌 객체가 있다면
+		for (const FHitResult& Hit : HitResults)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Melee attack hit: %s"), *HitActor->GetName());
+			// 충돌한 객체가 있다면
+			AActor* HitActor = Hit.GetActor();
+
+			if (!DamagedActors.Contains(HitActor) && HitActor && HitActor->ActorHasTag("Monster"))
+			{
+				UGameplayStatics::ApplyDamage(
+					HitActor,
+					30.0f,	// 수정필요
+					nullptr,
+					this,
+					UDamageType::StaticClass()
+				);
+			}
+
+			// 데미지를 입힌 액터를 Set에 추가
+			DamagedActors.Add(HitActor);
 		}
 	}
 }
@@ -440,7 +477,9 @@ void ABaseCharacter::Reload()
 
 	if (IsValid(ReloadSound))
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
+		//UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
+		CurrentAudioComp->SetSound(ReloadSound);
+		CurrentAudioComp->Play();
 	}
 }
 
@@ -461,6 +500,7 @@ void ABaseCharacter::ZoomIn(const FInputActionValue& value)
 		return;
 	}
 
+	IsZoom = true;
 	SpringArmComp->TargetArmLength = -1000;
 	//SpringArmComp->SocketOffset = FVector(0, 40, 60);
 }
@@ -477,6 +517,7 @@ void ABaseCharacter::ZoomOut(const FInputActionValue& value)
 		return;
 	}
 
+	IsZoom = false;
 	SpringArmComp->TargetArmLength = 300;
 	//SpringArmComp->SocketOffset = FVector(0, 60, 60);
 }
@@ -568,7 +609,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
-	if (IsValid(HitActionMontage))
+	if (IsValid(HitActionMontage) && !CheckAction())
 	{
 		PlayAnimMontage(HitActionMontage);
 	}
@@ -640,6 +681,10 @@ void ABaseCharacter::GetUpgradeStatus()
 
 void ABaseCharacter::ActiveDieAction()
 {
+	// 만약 줌상태라면
+	IsZoom = false;
+	SpringArmComp->TargetArmLength = 300;
+
 	if (IsValid(DieActionMontage))
 	{
 		PlayAnimMontage(DieActionMontage);

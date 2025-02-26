@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "System/EnumSet.h"
+#include "Components/AudioComponent.h"
 #include "BaseCharacter.generated.h"
 
 class USpringArmComponent;
@@ -227,6 +228,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	TObjectPtr<USoundBase> ReloadSound;			// 재장전 사운드
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
+	UAudioComponent* CurrentAudioComp;
+
 private:
 	// 캡슐 높이 <- 앉기에서 사용
 	float CapsuleHeight;
@@ -238,6 +242,7 @@ protected:
 	bool bIsAttack;
 	bool bIsReloading;
 	bool IsDie;
+	bool IsZoom;
 
 	bool CheckAction();
 };
