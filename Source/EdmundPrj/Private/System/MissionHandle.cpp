@@ -25,8 +25,6 @@ void AMissionHandle::InitMissionHandle(const TArray<FMissionDataRow*>& MissionDa
 	}
 
 	MissionDataSet = MissionData;
-
-	ApplyMissionDataInLevel();
 }
 
 void AMissionHandle::OnBeginOverlapedItem(ABaseMissionItem* MissionItem)
@@ -131,12 +129,15 @@ void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPo
 
 	MissionItemSet.Add(NewMissionItem);
 	NewMissionItem->InitMissionItem(this, MissionType, MissionInfo);
-	NewMissionItem->SetIsActive(true);
 
 	if (MissionType == "Main")
 	{
 		MainMissionSet.Add(NewMissionItem);
 		NewMissionItem->SetIsActive(false);
+	}
+	else
+	{
+		NewMissionItem->SetIsActive(true);
 	}
 }
 

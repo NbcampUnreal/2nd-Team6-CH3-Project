@@ -9,6 +9,7 @@
 #include "System/DataStructure/PlayerSkillRow.h"
 #include "System/DataStructure/CharacterDataRow.h"
 #include "System/DataStructure/MissionDataRow.h"
+#include "System/DataStructure/SpawnerDataRow.h"
 
 
 void UDataHandle::InitDataHandle(UEdmundGameInstance* NewGameInstance)
@@ -103,6 +104,21 @@ const TArray<FMissionDataRow*>& UDataHandle::GetMissionDataBySceneType(const ESc
 	return CurrentMissionData;
 }
 
+const TArray<FSpawnerDataRow*>& UDataHandle::GetSpawnerDataBySceneType(const ESceneType SceneType)
+{
+	CurrentSpawnerData.Empty();
+
+	for (FSpawnerDataRow* SpawnerDataRow : SpawnerData)
+	{
+		if (SpawnerDataRow->InSceneType == SceneType)
+		{
+			CurrentSpawnerData.Add(SpawnerDataRow);
+		}
+	}
+	
+	return CurrentSpawnerData;
+}
+
 void UDataHandle::UpdateClearMission(const int32 Index)
 {
 	switch (Index)
@@ -166,6 +182,7 @@ void UDataHandle::LoadDataTables(const UDataHandleSettings* DataSettings)
 	PlayerSkillDataTable = DataSettings->PlayerSkillDataTable.LoadSynchronous();
 	CharacterDataTable = DataSettings->CharacterDataTable.LoadSynchronous();
 	MissionDataTable = DataSettings->MissionDataTable.LoadSynchronous();
+	SpawnerDataTable = DataSettings->SpawnerDataTable.LoadSynchronous();
 
 	const FString DataContext(TEXT("Data ConText"));
 
@@ -174,6 +191,7 @@ void UDataHandle::LoadDataTables(const UDataHandleSettings* DataSettings)
 	PlayerSkillDataTable->GetAllRows(DataContext, PlayerSkillData);
 	CharacterDataTable->GetAllRows(DataContext, CharacterData);
 	MissionDataTable->GetAllRows(DataContext, MissionData);
+	SpawnerDataTable->GetAllRows(DataContext, SpawnerData);
 }
 
 FShopCatalogRow* UDataHandle::SelectRow(const FName& TargetRow) const
