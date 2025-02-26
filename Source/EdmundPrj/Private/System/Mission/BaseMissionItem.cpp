@@ -21,6 +21,7 @@ ABaseMissionItem::ABaseMissionItem()
 	WidgetComp->SetupAttachment(MeshComp);
 	WidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
 	
+	Tags.Add("MissionItem");
 }
 
 void ABaseMissionItem::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
@@ -63,6 +64,22 @@ void ABaseMissionItem::ActionEndOverlap()
 void ABaseMissionItem::ActionOnHit()
 {
 
+}
+
+void ABaseMissionItem::SetVisible(bool bIsVisible)
+{
+	if (bIsVisible)
+	{
+		SetActorHiddenInGame(false);
+		SetActorTickEnabled(true);
+		SetActorEnableCollision(true);
+	}
+	else
+	{
+		SetActorHiddenInGame(true);
+		SetActorTickEnabled(false);
+		SetActorEnableCollision(false);
+	}
 }
 
 void ABaseMissionItem::ActionEventByPressedKey()
@@ -113,7 +130,10 @@ void ABaseMissionItem::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor*
 
 void ABaseMissionItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-
+	if (!Hit.bBlockingHit)
+	{
+		return;
+	}
 
 	ActionOnHit();
 }
@@ -145,9 +165,9 @@ void ABaseMissionItem::ApplyBlockCollision()
 	CollisionComp->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
 }
 
-void ABaseMissionItem::SetIsStarted(bool Value)
+void ABaseMissionItem::SetIsActive(bool Value)
 {
-	bIsStarted = Value;
+	bIsActive = Value;
 }
 
 void ABaseMissionItem::PrintMissionText()
