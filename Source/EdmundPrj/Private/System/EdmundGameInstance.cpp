@@ -85,7 +85,7 @@ void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode) c
 void UEdmundGameInstance::EndMission() const
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	//UIHandle->AddToViewportByCoverType(EWidgetType::ResultWidget);
+	UIHandle->AddToViewportByCoverType(EWidgetType::ResultWidget);
 }
 
 void UEdmundGameInstance::DestroyedGameState() 
@@ -115,6 +115,12 @@ ESceneType UEdmundGameInstance::GetCurrentSceneName() const
 {
 	checkf(IsValid(SceneHandle), TEXT("SceneHandle is invalid"));
 	return SceneHandle->GetCurrentScene();
+}
+
+const TArray<FMissionDataRow*>& UEdmundGameInstance::GetCurrentMissionData(ESceneType SceneType) const
+{
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetMissionDataBySceneType(SceneType);
 }
 
 const TArray<FShopCatalogRow*>& UEdmundGameInstance::GetAdvanceState() const
