@@ -3,3 +3,6 @@
 
 #include "System/Mission/MissionItemTargetPoint.h"
 
+void AMissionItemTargetPoint::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+{
+}
