@@ -2,8 +2,6 @@
 #include "Boss/BossState.h"
 #include "Boss/BossAIController.h"
 #include "Boss/State/Boss_Idle.h"
-#include "Boss/State/Boss_Skill2.h"
-#include "Boss/State/Boss_Skill3.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
@@ -17,6 +15,8 @@ ABoss::ABoss()
 
     BossState = nullptr;
     MonsterMoveSpeed = 500.0f;
+    MonsterHP = 50.0f;
+    MonsterMaxHP = 50.0f;
 
     // 탄환 발사 위치
     MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
@@ -46,6 +46,15 @@ void ABoss::Tick(float DeltaTime)
     if (GetCharacterMovement())
     {
         GetCharacterMovement()->MaxWalkSpeed = MonsterChaseSpeed;
+    }
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(
+            -1,
+            DeltaTime,
+            FColor::Green,
+            FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
+        );
     }
 }
 
@@ -171,4 +180,9 @@ void ABoss::UpdateAttackCooldown(int32 AttackID)
     default:
         break;
     }
+}
+
+void ABoss::MonsterAttackCheck()
+{
+
 }

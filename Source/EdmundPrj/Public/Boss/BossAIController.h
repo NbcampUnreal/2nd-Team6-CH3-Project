@@ -17,7 +17,7 @@ public:
     virtual void BeginPlay() override;
     virtual void OnPossess(APawn* InPawn) override;
     virtual void Tick(float DeltaTime) override;
-
+    //void OnAttackTaskComplete(int32 AttackID);
     
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Boss")

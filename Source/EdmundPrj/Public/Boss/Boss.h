@@ -25,6 +25,7 @@ public:
     float GetMonsterMoveSpeed() const { return MonsterMoveSpeed; }
     float SetMonsterMoveSpeed(float NewSpeed);
     void UpdateAttackCooldown(int32 AttackID);
+    void MonsterAttackCheck() override;
 
     int32 GetAttack1Count() const { return Attack1Count; }
     int32 SetAttack1Count(int32 NewCount);

@@ -58,7 +58,7 @@ void ABaseCharacter::BeginPlay()
 
 	HP = MaxHP;
 
-	// Ä¸½¶ ÄÝ¸®Àü Å©±â ÀúÀåÇÏ±â
+	// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 	if (IsValid(CapsuleComp))
@@ -280,7 +280,7 @@ void ABaseCharacter::StartSprint(const FInputActionValue& value)
 	{
 		IsSprint = true;
 
-		// ¾ÉÀº »óÅÂ¿¡¼­´Â ´Þ¸®±â ºÒ°¡
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½
 		if (!IsCrouch)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
@@ -299,7 +299,7 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 	{
 		IsSprint = false;
 
-		// ¾ÉÀº »óÅÂ¿¡¼­´Â ´Þ¸®±â ºÒ°¡
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½
 		if (!IsCrouch)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
@@ -333,7 +333,7 @@ void ABaseCharacter::Attack(const FInputActionValue& value)
 
 bool ABaseCharacter::ActiveWeapon()
 {
-	// ÀÚ½Ä Å¬·¡½ºÀÇ ÇÔ¼ö ½ÇÇà
+	// ï¿½Ú½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½
 	return false;
 }
 
@@ -349,7 +349,7 @@ void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
 		PlayAnimMontage(MeleeAttackMontage);
 	}
 
-	// ±ÙÁ¢°ø°Ý ¼Ò¸® Àç»ý
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½ ï¿½ï¿½ï¿½
 	if (MeleeAttackSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, MeleeAttackSound, GetActorLocation());
@@ -357,7 +357,7 @@ void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
 
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Melee Attack Start")));
 
-	// ±ÙÁ¢ °ø°Ý µô·¹ÀÌ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 	GetWorld()->GetTimerManager().SetTimer(
 		MeleeAttackDelayHandle,
 		this,
@@ -371,30 +371,30 @@ void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
 
 void ABaseCharacter::MeleeAttackTrace()
 {
-	// Melee Attack ¹üÀ§ ¼³Á¤
-	FVector ForwardVector = GetActorForwardVector(); // °ø°Ý ¹æÇâ
-	FVector Start = GetActorLocation() + (ForwardVector * 200.0f); // °ø°Ý ½ÃÀÛ À§Ä¡
-	FVector End = Start + (ForwardVector * 200.0f); // °ø°Ý ³¡ À§Ä¡
+	// Melee Attack ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	FVector ForwardVector = GetActorForwardVector(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	FVector Start = GetActorLocation() + (ForwardVector * 200.0f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+	FVector End = Start + (ForwardVector * 200.0f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ä¡
 
-	// °ø°Ý ¹üÀ§ ³»¿¡¼­ Ãæµ¹ Ã¼Å©
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹ Ã¼Å©
 	float Radius = 150.0f;
 	FHitResult HitResult;
 
-	// Æ®·¹ÀÌ½º ¼öÇà
+	// Æ®ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // ÀÚ½ÅÀº ¹«½ÃÇÏµµ·Ï ¼³Á¤
+	QueryParams.AddIgnoredActor(this); // ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult,
-		Start,               // ½ÃÀÛ À§Ä¡
-		End,                 // ³¡ À§Ä¡
-		FQuat::Identity,     // È¸Àü°ª (È¸Àü ¾øÀÌ)
-		ECollisionChannel::ECC_GameTraceChannel1, // Ãæµ¹ Ã¤³Î
-		FCollisionShape::MakeSphere(Radius), // ¹üÀ§ ¼³Á¤ (±¸Ã¼ ¸ð¾ç)
+		Start,               // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+		End,                 // ï¿½ï¿½ ï¿½ï¿½Ä¡
+		FQuat::Identity,     // È¸ï¿½ï¿½ï¿½ï¿½ (È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+		ECollisionChannel::ECC_GameTraceChannel1, // ï¿½æµ¹ Ã¤ï¿½ï¿½
+		FCollisionShape::MakeSphere(Radius), // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½)
 		QueryParams
 	);
 
-	// ±¸Ã¼ º¸ÀÌ°Ô ÇÏ±â
+	// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½Ì°ï¿½ ï¿½Ï±ï¿½
 	if (GEngine)
 	{
 		DrawDebugSphere(
@@ -402,15 +402,15 @@ void ABaseCharacter::MeleeAttackTrace()
 			Start,
 			Radius,
 			12,
-			FColor::Red,        // »ö»ó
-			false,              // Áö¼Ó¼º (°ÔÀÓ Áß °è¼Ó Ç¥½ÃÇÒÁö ¿©ºÎ)
-			1.0f                // Áö¼Ó ½Ã°£
+			FColor::Red,        // ï¿½ï¿½ï¿½ï¿½
+			false,              // ï¿½ï¿½ï¿½Ó¼ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+			1.0f                // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
 		);
 	}
 
 	if (bHit)
 	{
-		// Ãæµ¹ÇÑ °´Ã¼°¡ ÀÖ´Ù¸é
+		// ï¿½æµ¹ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½
 		if (AActor* HitActor = HitResult.GetActor())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Melee attack hit: %s"), *HitActor->GetName());
@@ -492,27 +492,27 @@ void ABaseCharacter::StartCrouch(const FInputActionValue& value)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = CrouchMoveSpeed;
 
-		// Ä¸½¶ ÄÝ¸®Àü °¡Á®¿À±â
+		// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 		if (IsValid(CapsuleComp))
 		{
 			float NewCapsuleHeight = CapsuleHeight * 0.7;
 
-			// Ä¸½¶ Å©±â Á¶Á¤
+			// Ä¸ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight * 0.8);
 
-			// ¸Þ½¬ À§Ä¡ Á¶Á¤
+			// ï¿½Þ½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 			FVector NewLocation = GetMesh()->GetRelativeLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			GetMesh()->SetRelativeLocation(NewLocation);
 
-			// Ä«¸Þ¶ó À§Ä¡ Á¶Á¤
+			// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 			NewLocation = SpringArmComp->GetRelativeLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			SpringArmComp->SetRelativeLocation(NewLocation);
 
-			// ÀüÃ¼ ¾×ÅÍ Á¶Á¤
+			// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			NewLocation = GetActorLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			SetActorLocation(NewLocation);
@@ -533,25 +533,25 @@ void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
-		// Ä¸½¶ ÄÝ¸®Àü °¡Á®¿À±â
+		// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 		if (IsValid(CapsuleComp))
 		{
-			// Ä¸½¶ Å©±â Á¶Á¤
+			// Ä¸ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight);
 
-			// ¸Þ½¬ À§Ä¡ Á¶Á¤
+			// ï¿½Þ½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 			FVector NewLocation = GetMesh()->GetRelativeLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			GetMesh()->SetRelativeLocation(NewLocation);
 
-			// Ä«¸Þ¶ó À§Ä¡ Á¶Á¤
+			// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 			NewLocation = SpringArmComp->GetRelativeLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			SpringArmComp->SetRelativeLocation(NewLocation);
 
-			// ÀüÃ¼ ¾×ÅÍ Á¶Á¤
+			// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			NewLocation = GetActorLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			SetActorLocation(NewLocation);
@@ -575,7 +575,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	// HP À½¼ö ¹æÁö
+	// HP ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	HP = FMath::Max(0.0f, HP - ActualDamage);
 
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("HP: %f / %f"), HP, MaxHP));
