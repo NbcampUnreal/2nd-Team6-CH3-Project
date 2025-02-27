@@ -2,6 +2,7 @@
 
 
 #include "Monster/BaseMonster.h"
+#include "Player/PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
@@ -41,6 +42,26 @@ ABaseMonster::ABaseMonster()
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+
+	if (bIsDead) return 0;
+
+	if (TakeDamageSound)
+	{
+		CurrentAudioComp->SetSound(TakeDamageSound);
+		CurrentAudioComp->Play();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
+	}
+
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(DamageCauser);
+	if (PlayerCharacter)
+	{
+		//캐릭터에서 AddEXP 구현시
+		//PlayerCharacter->AddEXP(MonsterExpReward);
+	}
+
 	GetCharacterMovement()->Deactivate();
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -71,6 +92,8 @@ void ABaseMonster::MonsterDead()
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			if (AnimInstance)
 			{
+				this->Tags.Remove(FName("Monster"));
+
 				MonsterHP = 0;
 
 				UpdateMonsterOverHeadWidget();
@@ -95,6 +118,9 @@ void ABaseMonster::SetIsDead(bool bNewIsDead)
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
+	bIsDead = false;
+	bIsHit = false;
+
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
 
 	DropReward();
@@ -143,6 +169,8 @@ void ABaseMonster::MonsterHit()
 		{
 			if (TakeDamageParticle)
 			{
+				SetChaseMode();
+
 				UpdateMonsterOverHeadWidget();
 
 				UParticleSystemComponent* Particle = nullptr;
@@ -161,16 +189,6 @@ void ABaseMonster::MonsterHit()
 			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT("TakeDamageParticle이 없습니다."));
-			}
-
-			if (TakeDamageSound)
-			{
-				CurrentAudioComp->SetSound(TakeDamageSound);
-				CurrentAudioComp->Play();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
 			}
 
 			bIsHit = true;
@@ -216,6 +234,31 @@ void ABaseMonster::MonsterAttack()
 		}
 	}
 }
+
+void ABaseMonster::SetChaseMode()
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+		if (AIController)
+		{
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				APawn* PlayerPawn = PlayerController->GetPawn();
+
+				AIController->GetBlackboardComponent()->SetValueAsBool(FName("HasLineOfSight"), true);
+				AIController->GetBlackboardComponent()->SetValueAsObject(FName("PlayerActor"), PlayerPawn);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: PlayerController가 없습니다."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: AIController가 없습니다."));
+		}
+	}
+
 
 void ABaseMonster::MonsterAttackEnd()
 {
