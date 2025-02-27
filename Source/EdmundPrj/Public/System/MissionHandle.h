@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "System/EnumSet.h"
 #include "MissionHandle.generated.h"
 
 class AEdmundGameMode;
@@ -40,10 +41,15 @@ public:
 	void ApplyNpcEquip();
 
 	// Mission3
-	void DecressSpawnerCountFromBoss();
+	void ApplyBossWeaken();
 	void AddAlter(ABaseMissionItem* Alter);
 	void LockToBossMonsterSkill(ABaseMissionItem* Alter);
-	void AddDimentionPortalSet(ABaseMissionItem* DimentionPortal);
+	void AddDimensionPortalSet(ABaseMissionItem* DimentionPortal);
+	void RemoveDimensionPortalSet(ABaseMissionItem* DimentionPortal);
+
+	// Boss
+	bool GetWeakenBoss() const;
+	EBossState GetLockedSkill() const;
 	void RequestSpawnToSpawnerHandle();
 
 protected:
@@ -57,7 +63,7 @@ private:
 	TArray<ABaseMissionItem*> MissionItemSet;
 	TArray<ABaseMissionItem*> MainMissionSet;
 	TArray<ABaseMissionItem*> AlterSet;
-	TArray<ABaseMissionItem*> DimentionPortalSet;
+	TArray<ABaseMissionItem*> DimensionPortalSet;
 
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
 	TObjectPtr<AEdmundGameState> EdmundGameState = nullptr;
@@ -69,9 +75,9 @@ private:
 
 	int32 MainMissionIndex = 0;
 	int32 SpawnerCountFromBoss = 0;
-	
-
+	EBossState LockTarget = EBossState::Idle;
 	bool bGetNpcEquip = false;
+	bool bWeakenBoss = false;
 
 	FTimerHandle TestTimer;
 };

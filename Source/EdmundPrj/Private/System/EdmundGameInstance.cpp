@@ -90,7 +90,8 @@ void UEdmundGameInstance::OnUIByScene() const
 
 void UEdmundGameInstance::OnPause() const
 {
-
+	checkf(UIHandle, TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::OptionWidget);
 }
 
 void UEdmundGameInstance::ChangeCursorMode(const bool bIsVisible) const

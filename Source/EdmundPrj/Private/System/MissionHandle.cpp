@@ -31,14 +31,14 @@ void AMissionHandle::OnBeginOverlapedItem(ABaseMissionItem* MissionItem)
 {
 	TargetMissionItem = MissionItem;
 
-	GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &ThisClass::OnPressedKeyFromPlayer, 2.0f, false);
+	//GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &ThisClass::OnPressedKeyFromPlayer, 2.0f, false);
 }
 
 void AMissionHandle::OnEndOverlapedItem()
 {
 	TargetMissionItem = nullptr;
 
-	GetWorld()->GetTimerManager().ClearTimer(TestTimer);
+	//GetWorld()->GetTimerManager().ClearTimer(TestTimer);
 }
 
 void AMissionHandle::OnPressedKeyFromPlayer()
@@ -120,6 +120,12 @@ void AMissionHandle::ApplyNpcEquip()
 	// npc가 도움 주게 변경 필요
 }
 
+void AMissionHandle::ApplyBossWeaken()
+{
+	bWeakenBoss = true;
+	// boss 초기화 시 확인 필요
+}
+
 void AMissionHandle::AddAlter(ABaseMissionItem* Alter)
 {
 	if (!IsValid(Alter))
@@ -128,11 +134,6 @@ void AMissionHandle::AddAlter(ABaseMissionItem* Alter)
 	}
 
 	AlterSet.Add(Alter);
-}
-
-void AMissionHandle::DecressSpawnerCountFromBoss()
-{
-	--SpawnerCountFromBoss;
 }
 
 void AMissionHandle::LockToBossMonsterSkill(ABaseMissionItem* Alter)
@@ -148,23 +149,70 @@ void AMissionHandle::LockToBossMonsterSkill(ABaseMissionItem* Alter)
 	}
 
 	int32 SkillIndex = AlterSet.Find(Alter);
-	// 보스에 전달 필요
+	
+	switch (SkillIndex)
+	{
+	case 0:
+		LockTarget = EBossState::Attack1;
+		break;
+
+	case 1:
+		LockTarget = EBossState::Attack2;
+		break;
+
+	case 2:
+		LockTarget = EBossState::Attack3;
+		break;
+
+	case 3:
+		LockTarget = EBossState::Attack4;
+		break;
+
+	default:
+		LockTarget = EBossState::Idle;
+		break;
+	}
 }
 
-void AMissionHandle::AddDimentionPortalSet(ABaseMissionItem* DimentionPortal)
+void AMissionHandle::AddDimensionPortalSet(ABaseMissionItem* DimentionPortal)
 {
 	if (!IsValid(DimentionPortal))
 	{
 		return;
 	}
 
-	DimentionPortalSet.Add(DimentionPortal);
-	++SpawnerCountFromBoss;
+	DimensionPortalSet.Add(DimentionPortal);
+}
+
+void AMissionHandle::RemoveDimensionPortalSet(ABaseMissionItem* DimentionPortal)
+{
+	if (!IsValid(DimentionPortal))
+	{
+		return;
+	}
+
+	DimensionPortalSet.Remove(DimentionPortal);
+}
+
+bool AMissionHandle::GetWeakenBoss() const
+{
+	return bWeakenBoss;
+}
+
+EBossState AMissionHandle::GetLockedSkill() const
+{
+	return LockTarget;
 }
 
 void AMissionHandle::RequestSpawnToSpawnerHandle()
 {
+	checkf(IsValid(EdmundGameState), TEXT("GameState is invalid"));
+	EdmundGameState->SpawnMonsterAtDimensionPortal(DimensionPortalSet);
 
+	for (ABaseMissionItem* Dimension : DimensionPortalSet)
+	{
+		Dimension->SetIsActive(false);
+	}
 }
 
 void AMissionHandle::BeginPlay()
