@@ -13,11 +13,12 @@ class EDMUNDPRJ_API AMissionItemTeleportMachine : public ABaseMissionItem
 	GENERATED_BODY()
 
 public:
-	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo);
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type);
 	virtual void ActionEventByPressedKey();
 
 private:
 	virtual void ActionBeginOverlap() override;
 	virtual void ActionEndOverlap() override;
 	
+	void ActiveTeleportMachine();
 };

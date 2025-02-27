@@ -35,22 +35,29 @@ public:
 	void SetPrisonLocation(const FVector& PrisonPos);
 
 	// Mission2
+	void SetTargetPointLocation(const FVector& TargetPointPos);
+	void TeleportPlayerToTargetPoint();
 	void ApplyNpcEquip();
 
 	// Mission3
 	void DecressSpawnerCountFromBoss();
-	void LockToBossMonsterSkill(int32 SkillIndex);
+	void AddAlter(ABaseMissionItem* Alter);
+	void LockToBossMonsterSkill(ABaseMissionItem* Alter);
+	void AddDimentionPortalSet(ABaseMissionItem* DimentionPortal);
+	void RequestSpawnToSpawnerHandle();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	void SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo);
+	void SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FMissionDataRow* MissionData);
 
 private:
 	TArray<FMissionDataRow*> MissionDataSet;
 	TArray<ABaseMissionItem*> MissionItemSet;
 	TArray<ABaseMissionItem*> MainMissionSet;
+	TArray<ABaseMissionItem*> AlterSet;
+	TArray<ABaseMissionItem*> DimentionPortalSet;
 
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
 	TObjectPtr<AEdmundGameState> EdmundGameState = nullptr;
@@ -58,9 +65,11 @@ private:
 	TObjectPtr<ABaseMissionItem> TargetMissionItem = nullptr;
 
 	FVector PrisonLocation = FVector::ZeroVector;
+	FVector TargetPointLocation = FVector::ZeroVector;
 
 	int32 MainMissionIndex = 0;
 	int32 SpawnerCountFromBoss = 0;
+	
 
 	bool bGetNpcEquip = false;
 

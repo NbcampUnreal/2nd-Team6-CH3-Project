@@ -15,7 +15,7 @@ class EDMUNDPRJ_API AMissionItemMainAltar : public ABaseMissionItem
 public:
 	AMissionItemMainAltar();
 
-	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo) override;
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
 	virtual void ActionEventByPressedKey() override;
 
 private:

@@ -13,7 +13,7 @@ class EDMUNDPRJ_API AMissionItemPrison : public ABaseMissionItem
 	GENERATED_BODY()
 	
 public:
-	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo) override;
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
 	virtual void ActionEventByPressedKey() override;
 
 	AMissionItemPrison();

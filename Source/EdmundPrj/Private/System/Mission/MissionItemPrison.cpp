@@ -5,12 +5,14 @@
 #include "System/MissionHandle.h"
 #include "UI/3DWidget/InteractionWidget.h"
 
-void AMissionItemPrison::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemPrison::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(true);
 	SetActorTickEnabled(false);
+
+	MissionHandle->SetPrisonLocation(GetActorLocation());
 }
 
 void AMissionItemPrison::ActionEventByPressedKey()
@@ -43,6 +45,7 @@ void AMissionItemPrison::ActionBeginOverlap()
 	ProgressValue = 1.0f;
 	InteractionWidget->UpdateProgressBar(ProgressValue);
 	InteractionWidget->VisibleNotify(true);
+	PrintMissionActiveText();
 }
 
 void AMissionItemPrison::ActionEndOverlap()

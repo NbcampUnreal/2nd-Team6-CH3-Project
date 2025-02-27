@@ -7,9 +7,9 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
-void AMissionItemBossSpawnPoint::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemBossSpawnPoint::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(false);
 }
@@ -21,6 +21,7 @@ void AMissionItemBossSpawnPoint::SetIsActive(bool Value)
 	if (Value)
 	{
 		SpawnBoss();
+		PrintMissionActiveText();
 	}
 }
 
