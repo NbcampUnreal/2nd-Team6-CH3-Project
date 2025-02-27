@@ -115,10 +115,9 @@ void UBTTask_BossSkill3::OnSpawnComplete()
         if (World)
         {
             World->GetTimerManager().ClearTimer(SpawnTimerHandle);
+            World->GetTimerManager().SetTimer(DelayedStartTimer, this, &UBTTask_BossSkill3::StartDetection, BossRef->Skill3StartDelay, false);
         }
     }
-
-    StartDetection();
 }
 
 void UBTTask_BossSkill3::StartDetection()
@@ -128,8 +127,12 @@ void UBTTask_BossSkill3::StartDetection()
     UWorld* World = BossRef->GetWorld();
     if (!World) return;
 
-    World->GetTimerManager().SetTimer(DetectionTimer, this, &UBTTask_BossSkill3::PerformDetection, 0.1f, true, 0.0f);
+    if (BossRef->Skill3Particle)
+    {
+        BossRef->Skill3Particle->Activate(true);
+    }
 
+    World->GetTimerManager().SetTimer(DetectionTimer, this, &UBTTask_BossSkill3::PerformDetection, 0.1f, true, 0.0f);
     World->GetTimerManager().SetTimer(EndTimer, this, &UBTTask_BossSkill3::StopDetection, 1.0f, false);
 }
 
@@ -184,16 +187,17 @@ void UBTTask_BossSkill3::PerformDetection()
 
             if (bWallBlocking && WallHit.GetActor() && WallHit.GetActor()->ActorHasTag("Skill3Wall"))
             {
-                UE_LOG(LogTemp, Warning, TEXT("[Wall Blocked]: %s"), *WallHit.GetActor()->GetName());
+                //UE_LOG(LogTemp, Warning, TEXT("[Wall Blocked]: %s"), *WallHit.GetActor()->GetName());
                 continue;
             }
 
             bCharacterDetected = true;
+            UGameplayStatics::ApplyDamage(HitActor, 999999.f, nullptr, BossRef, UDamageType::StaticClass());
             DetectedActorsLog += HitActor->GetName() + TEXT(" ");
         }
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("HitResults Count: %d"), HitResults.Num());
+    //UE_LOG(LogTemp, Warning, TEXT("HitResults Count: %d"), HitResults.Num());
 
     UE_LOG(LogTemp, Warning, TEXT("%s"),bCharacterDetected ? TEXT("Player Die") : TEXT("Hide"));
 
@@ -208,4 +212,9 @@ void UBTTask_BossSkill3::StopDetection()
     if (!World) return;
 
     World->GetTimerManager().ClearTimer(DetectionTimer);
+
+    if (BossRef->Skill3Particle)
+    {
+        BossRef->Skill3Particle->Deactivate();
+    }
 }

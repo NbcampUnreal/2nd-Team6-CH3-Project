@@ -28,7 +28,7 @@ protected:
     void StopDetection();
     FTimerHandle DetectionTimer;
     FTimerHandle EndTimer;
-
+    FTimerHandle DelayedStartTimer;
 
 private:
     ABoss* BossRef;

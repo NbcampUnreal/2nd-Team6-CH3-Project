@@ -8,6 +8,7 @@
 #include "Boss/Attack/Boss_Attack1_Bullet.h"
 #include "Boss/Attack/Boss_Attack4_Bullet.h"
 #include "Boss/Attack/Boss_Skill3_Wall.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Boss.generated.h"
 
 
@@ -185,6 +186,13 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
     float Skill3DetectionRadius = 1000.0f; // 감지 반경 (원형)
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
+    UParticleSystemComponent* Skill3Particle; // 폭발 이펙트
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
+    float Skill3StartDelay = 3.0f; // 벽 스폰 후 딜레이 시간
+
 
     // ***********************Skill 4*************************
 

@@ -19,6 +19,12 @@ ABoss::ABoss()
     MonsterHP = 500.0f;
     MonsterMaxHP = 1000.0f;
 
+    //
+    Skill3Particle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Skill3Particle"));
+    Skill3Particle->SetupAttachment(RootComponent);
+    Skill3Particle->bAutoActivate = false;
+
+    // 공격 스폰 위치
     MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
     MuzzleLocation->SetupAttachment(GetMesh(), TEXT("MuzzleSocket"));
 }
