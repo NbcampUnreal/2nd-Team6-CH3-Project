@@ -27,8 +27,12 @@ void AHealingItem::ActivateItem(AActor* Actor)
 		ABaseCharacter* Player = Cast<ABaseCharacter>(Actor);
 		if (Player)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Healing Item Activated"));
-			//Player->(Player->MaxHP * HealingPercent / 100.0f);
+			float HealAmount = Player->MaxHP * HealingPercent / 100.0f;
+
+			Player->AmountHP(HealAmount);
+
+			UE_LOG(LogTemp, Warning, TEXT("%f 만큼 회복"), HealAmount);
+
 			PlaySound();
 		}
 	}

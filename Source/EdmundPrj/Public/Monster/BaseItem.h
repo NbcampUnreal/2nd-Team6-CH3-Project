@@ -18,6 +18,10 @@ public:
 	// Sets default values for this actor's properties
 	ABaseItem();
 
+	void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Component")
 	UStaticMeshComponent* StaticMeshComp;
 
@@ -44,6 +48,8 @@ public:
 	virtual void PlaySound();
 
 	void ItemDestroy();
+
+	bool bIsItemActived = false;
 
 	FTimerHandle SoundDurationTimerHandle;
 

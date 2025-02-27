@@ -3,37 +3,61 @@
 
 #include "Monster/BaseItem.h"
 #include "Player/BaseCharacter.h"
+#include "Components/PrimitiveComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
 ABaseItem::ABaseItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	SetRootComponent(StaticMeshComp);
 
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
-	CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	CollisionComp->SetupAttachment(StaticMeshComp);
 
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseItem::OnItemOverlap);
 
 	PickupSoundComp = CreateDefaultSubobject<UAudioComponent>(TEXT("PickupSound"));
 	PickupSoundComp->SetupAttachment(StaticMeshComp);
+
+
 }
+
+void ABaseItem::BeginPlay()
+{
+	Super::BeginPlay();
+	StaticMeshComp->SetSimulatePhysics(true);  // 물리 활성화
+	StaticMeshComp->AddImpulse(FVector(0.0f, 0.0f, 500.0f), NAME_None, true);
+}
+
+void ABaseItem::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	FRotator NewRotator = GetActorRotation();
+	NewRotator.Yaw += 100.0f * DeltaTime;
+	SetActorRotation(NewRotator);
+}
+
+
 
 void ABaseItem::OnItemOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor->ActorHasTag("Player"))
+	if (!bIsItemActived)
 	{
-		ABaseCharacter* Player = Cast<ABaseCharacter>(OtherActor);
-		if (Player)
+		if (OtherActor && OtherActor->ActorHasTag("Player"))
 		{
-			SetActorHiddenInGame(true);
-			CollisionComp->Deactivate();
-			ActivateItem(OtherActor);
+			ABaseCharacter* Player = Cast<ABaseCharacter>(OtherActor);
+			if (Player)
+			{
+				SetActorHiddenInGame(true);
+				ActivateItem(OtherActor);
+				bIsItemActived = true;
+			}
 		}
 	}
 }
@@ -44,14 +68,22 @@ void ABaseItem::ActivateItem(AActor* Actor)
 
 void ABaseItem::PlaySound()
 {
-	UE_LOG(LogTemp, Warning, TEXT("사운드재생"));
 	PickupSoundComp->SetSound(PickupSound);
 
-	float SoundDuration = PickupSoundComp->Sound->GetDuration();
+	if (PickupSound)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("사운드재생"));
 
-	PickupSoundComp->Play();
+		float SoundDuration = PickupSoundComp->Sound->GetDuration();
 
-	GetWorld()->GetTimerManager().SetTimer(SoundDurationTimerHandle, this, &ABaseItem::ItemDestroy, SoundDuration, false);
+		PickupSoundComp->Play();
+
+		GetWorld()->GetTimerManager().SetTimer(SoundDurationTimerHandle, this, &ABaseItem::ItemDestroy, SoundDuration, false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PickupSound가 없습니다."));
+	}
 }
 
 void ABaseItem::ItemDestroy()
