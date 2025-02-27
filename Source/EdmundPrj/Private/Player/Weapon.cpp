@@ -111,7 +111,7 @@ bool AWeapon::Fire()
 		PC->DeprojectScreenPositionToWorld(x / 2.0f, y / 2.0f, WorldCenter, WorldDirection);
 
 		// WorldCenter에서 WorldDirection 방향으로 발사
-		FVector TargetLocation = WorldCenter + WorldDirection * 10000;
+		FVector TargetLocation = WorldCenter + WorldDirection * 3500;
 		SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, TargetLocation);
 
 		BulletToFire->SetActorLocation(SpawnLocation + WorldDirection * 100);
