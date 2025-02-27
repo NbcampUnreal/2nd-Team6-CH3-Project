@@ -14,6 +14,7 @@ class ABaseCharacter;
 class AMissionHandle;
 class ASpawnerHandle;
 struct FPlayerSkillRow;
+struct FShopCatalogRow;
 
 UCLASS()
 class EDMUNDPRJ_API AEdmundGameState : public AGameState
@@ -26,6 +27,8 @@ public:
 
 	void SetMissionHandle(AMissionHandle* NewMissionHandle);
 	void SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle);
+
+	const TArray<FShopCatalogRow*>& GetPlayerAdvancedData() const;
 
 	void ChangeCursorMode(bool bIsValid);
 	void ChangeInputMode(const FInputModeDataBase& InputMode);

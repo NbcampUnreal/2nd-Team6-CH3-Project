@@ -14,6 +14,13 @@ class EDMUNDPRJ_API AMissionItemWeakenBoss : public ABaseMissionItem
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type);
+	virtual void ActionEventByPressedKey() override;
+
 private:
-	
+	virtual void ActionBeginOverlap() override;
+	virtual void ActionEndOverlap() override;
+
+	void FindWeaken();
 };
