@@ -27,30 +27,11 @@ void AEdmundGameState::BeginPlay()
 
 	InitSkillData();
 	InitMainLevel();
-
-	//Test
-	/*GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::EndCurrentMission, 5.0f, false);*/
 }
 
 void AEdmundGameState::BeginDestroy()
 {
 	Super::BeginDestroy();
-}
-
-void AEdmundGameState::EndCurrentMission()
-{
-	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Title)
-	{
-		return;
-	}
-	else if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
-	{
-		return;
-	}
-	CreateRandomSkillSet();
-	EdmundGameInstance->OnSkillListUI();
 }
 
 void AEdmundGameState::ChangeCursorMode(bool bIsValid)
@@ -127,6 +108,7 @@ void AEdmundGameState::CreateRandomSkillSet()
 	}
 
 	NotifyCreateRandomSkill();
+	EdmundGameInstance->OnSkillListUI();
 }
 
 const TArray<FPlayerSkillRow*>& AEdmundGameState::GetRandomSkillSet() const
@@ -174,10 +156,23 @@ void AEdmundGameState::SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle)
 	SpawnerHandle = NewSpawnerHandle;
 }
 
+void AEdmundGameState::OnPressedPauseKey()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("Game Instance is invalid"));
+	EdmundGameInstance->OnPause();
+	ChangeCursorMode(true);
+	ChangeInputMode(FInputModeUIOnly());
+}
+
 void AEdmundGameState::RequestInteraction()
 {
 	checkf(IsValid(MissionHandle), TEXT("Mission Handle is invalid"));
 	MissionHandle->OnPressedKeyFromPlayer();
+}
+
+void AEdmundGameState::SpawnMonsterAtDimensionPortal(const TArray<ABaseMissionItem*>& ActiveDimensionSet)
+{
+	// call spawner handle
 }
 
 void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)

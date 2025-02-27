@@ -22,7 +22,25 @@ void AMissionItemBossSpawnPoint::SetIsActive(bool Value)
 	{
 		SpawnBoss();
 		PrintMissionActiveText();
+
+		//Test
+		SpawnMonster();
 	}
+}
+
+bool AMissionItemBossSpawnPoint::GetWeakend() const
+{
+	return MissionHandle->GetWeakenBoss();
+}
+
+EBossState AMissionItemBossSpawnPoint::GetLockSkill() const
+{
+	return MissionHandle->GetLockedSkill();
+}
+
+void AMissionItemBossSpawnPoint::SpawnMonster() const
+{
+	MissionHandle->RequestSpawnToSpawnerHandle();
 }
 
 void AMissionItemBossSpawnPoint::ClearBoss()

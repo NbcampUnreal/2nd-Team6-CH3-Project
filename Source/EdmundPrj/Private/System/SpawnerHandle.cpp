@@ -49,6 +49,11 @@ void ASpawnerHandle::ApplySpawnerDataInLevel()
 	}
 }
 
+void ASpawnerHandle::DestroyAllSpawner()
+{
+
+}
+
 void ASpawnerHandle::BeginPlay()
 {
 	Super::BeginPlay();

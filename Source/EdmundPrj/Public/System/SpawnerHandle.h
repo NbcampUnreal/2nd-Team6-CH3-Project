@@ -21,6 +21,7 @@ public:
 	ASpawnerHandle();
 	void InitSpawnerHandle(AEdmundGameMode* NewGameMode, AEdmundGameState* NewGameState, const TArray<FSpawnerDataRow*>& CurrentSpawnerData);
 	void ApplySpawnerDataInLevel();
+	void DestroyAllSpawner();
 
 private:
 	virtual void BeginPlay() override;

@@ -256,7 +256,7 @@ bool UUIHandle::CheckClearedMission(int32 Index) const
 
 void UUIHandle::OpenOption()
 {
-	RequestChangeCursorMode(true, FInputModeUIOnly());
+	//RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseOption()
