@@ -5,9 +5,9 @@
 #include "System/MissionHandle.h"
 #include "UI/3DWidget/InteractionWidget.h"
 
-void AMissionItemTeleportMachine::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemTeleportMachine::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(true);
 }
@@ -20,6 +20,8 @@ void AMissionItemTeleportMachine::ActionEventByPressedKey()
 	}
 
 	Super::ActionEventByPressedKey();
+
+	ActiveTeleportMachine();
 }
 
 void AMissionItemTeleportMachine::ActionBeginOverlap()
@@ -30,6 +32,9 @@ void AMissionItemTeleportMachine::ActionBeginOverlap()
 	}
 
 	Super::ActionBeginOverlap();
+
+	InteractionWidget->VisibleNotify(true);
+	PrintMissionActiveText();
 }
 
 void AMissionItemTeleportMachine::ActionEndOverlap()
@@ -40,4 +45,13 @@ void AMissionItemTeleportMachine::ActionEndOverlap()
 	}
 
 	Super::ActionEndOverlap();
+
+	InteractionWidget->VisibleNotify(false);
 }
+
+void AMissionItemTeleportMachine::ActiveTeleportMachine()
+{
+	PrintMissionClearText();
+	MissionHandle->TeleportPlayerToTargetPoint();
+}
+

@@ -3,9 +3,9 @@
 
 #include "System/Mission/MissionItemIndicator.h"
 
-void AMissionItemIndicator::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemIndicator::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyBlockCollision();
 }
@@ -22,7 +22,7 @@ float AMissionItemIndicator::TakeDamage(float DamageAmount, FDamageEvent const& 
 	if (HitCount <= 0)
 	{
 		bIsActive = false;
-		PrintMissionText();
+		PrintMissionClearText();
 		ShowDirectionToTarget();
 	}
 

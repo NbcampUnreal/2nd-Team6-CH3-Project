@@ -12,6 +12,8 @@ class AEdmundGameMode;
 class IGameStateObserver;
 class ABaseCharacter;
 class ABaseMissionItem;
+class AMissionHandle;
+class ASpawnerHandle;
 struct FPlayerSkillRow;
 
 UCLASS()
@@ -35,6 +37,8 @@ public:
 	void SetSelectedCharacter(AActor* Character);
 	void CancleSelectedCharacter();
 
+	void SetMissionHandle(AMissionHandle* NewMissionHandle);
+	void SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle);
 	void RequestInteraction();
 
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
@@ -62,6 +66,9 @@ private:
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
 	TObjectPtr<APlayerController> PlayerController = nullptr;
 	TObjectPtr<AActor> PlayerPawn = nullptr;
+
+	TObjectPtr<AMissionHandle> MissionHandle;
+	TObjectPtr<ASpawnerHandle> SpawnerHandle;
 
 	TObjectPtr<ABaseMissionItem> OverlapedItem = nullptr;
 

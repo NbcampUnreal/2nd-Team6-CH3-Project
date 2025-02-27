@@ -5,9 +5,9 @@
 #include "System/MissionHandle.h"
 #include "UI/3DWidget/InteractionWidget.h"
 
-void AMissionItemNPCEquipment::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemNPCEquipment::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(false);
 }
@@ -22,6 +22,7 @@ void AMissionItemNPCEquipment::ActionBeginOverlap()
 	Super::ActionBeginOverlap();
 
 	InteractionWidget->VisibleNotify(true);
+	PrintMissionActiveText();
 }
 
 void AMissionItemNPCEquipment::ActionEndOverlap()
@@ -46,7 +47,7 @@ void AMissionItemNPCEquipment::ActionEventByPressedKey()
 	Super::ActionEventByPressedKey();
 
 	MissionHandle->ApplyNpcEquip();
-	PrintMissionText();
+	PrintMissionClearText();
 	SetVisible(false);
 	SetIsActive(false);
 }
