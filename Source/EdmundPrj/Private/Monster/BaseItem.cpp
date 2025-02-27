@@ -72,8 +72,6 @@ void ABaseItem::PlaySound()
 
 	if (PickupSound)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("사운드재생"));
-
 		float SoundDuration = PickupSoundComp->Sound->GetDuration();
 
 		PickupSoundComp->Play();
