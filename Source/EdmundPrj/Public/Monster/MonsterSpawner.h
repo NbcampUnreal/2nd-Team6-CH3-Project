@@ -26,6 +26,19 @@ public:
 
 	void BossSpawn();
 
+	void SetBossMode(bool NewMode);
+
+	bool bCheckAllDead();
+
+	void AddDeadCount();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Spawn")
+	int32 DeadMonsterCount = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Spawn")
+	bool bBossMode = false;
+
+
 	AGameModeBase* CurrentGameMode;
 
 	void InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount);

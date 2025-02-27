@@ -150,6 +150,15 @@ void ABaseMonster::MonsterDestroy()
 
 	SetChaseMode(false);
 
+	if (MonsterSpawner)
+	{
+		MonsterSpawner->AddDeadCount();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MonsterSpawner가 없습니다."));
+	}
+	
 	GetCharacterMovement()->Activate();
 
 	SetActorHiddenInGame(true);

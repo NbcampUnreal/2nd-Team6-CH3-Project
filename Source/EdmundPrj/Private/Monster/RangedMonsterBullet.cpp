@@ -39,7 +39,7 @@ void ARangedMonsterBullet::SetMonsterBulletHidden(bool isHidden)
 			MonsterBulletLifeTimerHandle,
 			this,
 			&ARangedMonsterBullet::EndMonsterBulletLife,
-			2.0f,
+			1.5f,
 			false
 		);
 	}
@@ -47,6 +47,7 @@ void ARangedMonsterBullet::SetMonsterBulletHidden(bool isHidden)
 
 void ARangedMonsterBullet::EndMonsterBulletLife()
 {
+	AddActorLocalOffset(FVector(0.0f, 0.0f, -500.0f));
 	SetMonsterBulletHidden(true);
 }
 

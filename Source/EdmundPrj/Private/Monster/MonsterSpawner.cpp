@@ -39,6 +39,8 @@ void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawn
 	InitializeMonsterSpawnPool(SpawnCount);
 
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
+
+	SetBossMode(false);
 }
 
 void AMonsterSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -59,6 +61,35 @@ void AMonsterSpawner::BossSpawn()
 	{
 		SpawnMonster();
 	}
+	SetBossMode(true);
+}
+
+void AMonsterSpawner::SetBossMode(bool NewMode)
+{
+	bBossMode = NewMode;
+}
+
+bool AMonsterSpawner::bCheckAllDead()
+{
+	return (SpawnCount <= DeadMonsterCount);
+}
+
+void AMonsterSpawner::AddDeadCount()
+{
+	if (!bBossMode) return;
+
+	DeadMonsterCount++;
+
+	if (bCheckAllDead())
+	{
+		//다 죽었을 때 호출 될 함수
+		UE_LOG(LogTemp, Warning, TEXT("모든 몬스터 사망"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("남은 몬스터 수: %d"), SpawnCount - DeadMonsterCount);
+	}
+
 }
 
 ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
