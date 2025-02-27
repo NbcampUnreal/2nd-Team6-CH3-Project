@@ -5,7 +5,7 @@
 #include "BTTask_BossSkill3.generated.h"
 
 class ABoss;
-class ABoss_Skill3_Wall; // 추가: 전방 선언
+class ABoss_Skill3_Wall; // 🔹 추가: 전방 선언 (Wall 클래스 인식 문제 해결)
 
 UCLASS()
 class EDMUNDPRJ_API UBTTask_BossSkill3 : public UBTTaskNode
@@ -21,14 +21,9 @@ protected:
     void PlaySkillAnimation();
     void SpawnWall();
     void OnSpawnComplete();
+    void PerformAOEAttack();
     FRotator CalculateRandomRotation();
-
-    void StartDetection();
-    void PerformDetection();
-    void StopDetection();
-    FTimerHandle DetectionTimer;
-    FTimerHandle EndTimer;
-
+    bool CheckWallBlocking(UWorld* World, FVector BossLocation, FVector HitLocation, AActor* Wall, FCollisionQueryParams QueryParams);
 
 private:
     ABoss* BossRef;

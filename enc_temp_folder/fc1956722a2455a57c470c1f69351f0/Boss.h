@@ -183,9 +183,6 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
     TSubclassOf<ABoss_Skill3_Wall> Skill3WallClass; // 소환할 벽 BP 클래스
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
-    float Skill3DetectionRadius = 1000.0f; // 감지 반경 (원형)
-
     // ***********************Skill 4*************************
 
 

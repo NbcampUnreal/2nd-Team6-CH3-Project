@@ -19,6 +19,7 @@ ABoss::ABoss()
     MonsterHP = 500.0f;
     MonsterMaxHP = 1000.0f;
 
+    // 탄환 발사 위치
     MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
     MuzzleLocation->SetupAttachment(GetMesh(), TEXT("MuzzleSocket"));
 }

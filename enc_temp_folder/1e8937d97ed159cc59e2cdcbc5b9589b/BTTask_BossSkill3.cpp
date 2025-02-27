@@ -118,94 +118,147 @@ void UBTTask_BossSkill3::OnSpawnComplete()
         }
     }
 
-    StartDetection();
+    PerformAOEAttack();
 }
 
-void UBTTask_BossSkill3::StartDetection()
+bool UBTTask_BossSkill3::CheckWallBlocking(UWorld* World, FVector BossLocation, FVector HitLocation, AActor* Wall, FCollisionQueryParams QueryParams)
 {
-    if (!BossRef) return;
+    if (!Wall)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Wall is NULL"));
+        return false;
+    }
 
-    UWorld* World = BossRef->GetWorld();
-    if (!World) return;
+    if (!BossRef)
+    {
+        UE_LOG(LogTemp, Error, TEXT("BossRef is NULL in CheckWallBlocking"));
+        return false;
+    }
 
-    World->GetTimerManager().SetTimer(DetectionTimer, this, &UBTTask_BossSkill3::PerformDetection, 0.1f, true, 0.0f);
+    BossLocation.Z += 50.0f;
+    HitLocation.Z += 50.0f;
 
-    World->GetTimerManager().SetTimer(EndTimer, this, &UBTTask_BossSkill3::StopDetection, 1.0f, false);
+    QueryParams.AddIgnoredActor(BossRef);
+
+    UE_LOG(LogTemp, Warning, TEXT("Executing SphereTrace from Boss to Player"));
+
+    TArray<FHitResult> HitResults;
+    bool bWallBlocking = World->SweepMultiByChannel(
+        HitResults,
+        BossLocation,
+        HitLocation,
+        FQuat::Identity,
+        ECC_WorldStatic,
+        FCollisionShape::MakeSphere(50.0f),
+        QueryParams
+    );
+
+    DrawDebugSphere(World, BossLocation, 50.0f, 16, FColor::Red, true, 5.0f);
+
+    if (bWallBlocking)
+    {
+        for (const FHitResult& WallHit : HitResults)
+        {
+            AActor* HitWallActor = WallHit.GetActor();
+
+            if (!HitWallActor)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Wall Hit Actor is NULL"));
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Wall Detected: %s"), *HitWallActor->GetName());
+                if (HitWallActor == Wall)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("SphereTrace did not hit any walls"));
+
+    return false;
 }
 
-void UBTTask_BossSkill3::PerformDetection()
+
+
+
+void UBTTask_BossSkill3::PerformAOEAttack()
 {
-    if (!BossRef) return;
+    if (!BossRef || bHasAttacked) return; // 이미 공격했으면 실행 안 함
+
+    bHasAttacked = true; // 첫 실행 후 다시 실행되지 않도록 설정
 
     UWorld* World = BossRef->GetWorld();
     if (!World) return;
 
     FVector BossLocation = BossRef->GetActorLocation();
-    BossLocation.Z += 100.0f;
+    float AttackRadius = BossRef->Skill3AttackRadius;
 
-    float DetectionRadius = BossRef->Skill3DetectionRadius;
-
+    TArray<AActor*> FoundWalls;
     TArray<FHitResult> HitResults;
     FCollisionQueryParams QueryParams;
+
     QueryParams.AddIgnoredActor(BossRef);
+
+    if (BossRef->GetRootComponent())
+    {
+        QueryParams.AddIgnoredComponent(Cast<UPrimitiveComponent>(BossRef->GetRootComponent()));
+    }
+
+    APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+    if (PlayerPawn && PlayerPawn->GetRootComponent())
+    {
+        QueryParams.AddIgnoredComponent(Cast<UPrimitiveComponent>(PlayerPawn->GetRootComponent()));
+    }
+
+    UGameplayStatics::GetAllActorsOfClass(World, ABoss_Skill3_Wall::StaticClass(), FoundWalls);
 
     bool bHit = World->SweepMultiByChannel(
         HitResults,
         BossLocation,
         BossLocation,
         FQuat::Identity,
-        ECC_GameTraceChannel2,
-        FCollisionShape::MakeSphere(DetectionRadius),
+        ECC_WorldStatic,
+        FCollisionShape::MakeSphere(AttackRadius),
         QueryParams
     );
 
-    bool bCharacterDetected = false;
-    FString DetectedActorsLog = "";
+    DrawDebugSphere(World, BossLocation, AttackRadius, 32, FColor::Blue, true, 5.0f);
+    UE_LOG(LogTemp, Warning, TEXT("Detected %d Actors in AOE Range"), HitResults.Num());
 
     for (const FHitResult& Hit : HitResults)
     {
         AActor* HitActor = Hit.GetActor();
         if (!HitActor) continue;
-        if (!(HitActor->ActorHasTag("Player") || HitActor->ActorHasTag("Skill3Wall")))
+
+        UE_LOG(LogTemp, Warning, TEXT("Detected Actor: %s"), *HitActor->GetName());
+
+        if (HitActor == BossRef)
         {
+            UE_LOG(LogTemp, Warning, TEXT("Ignoring Boss: %s"), *HitActor->GetName());
             continue;
         }
 
-        if (HitActor->ActorHasTag("Player"))
+        FVector HitLocation = HitActor->GetActorLocation();
+        bool bBlocked = false;
+
+        for (AActor* WallActor : FoundWalls)
         {
-            FHitResult WallHit;
-            bool bWallBlocking = World->LineTraceSingleByChannel(
-                WallHit,
-                BossLocation,
-                HitActor->GetActorLocation(),
-                ECC_WorldStatic,
-                QueryParams
-            );
-
-            if (bWallBlocking && WallHit.GetActor() && WallHit.GetActor()->ActorHasTag("Skill3Wall"))
+            if (CheckWallBlocking(World, BossLocation, HitLocation, WallActor, QueryParams))
             {
-                UE_LOG(LogTemp, Warning, TEXT("[Wall Blocked]: %s"), *WallHit.GetActor()->GetName());
-                continue;
+                bBlocked = true;
+                break;
             }
-
-            bCharacterDetected = true;
-            DetectedActorsLog += HitActor->GetName() + TEXT(" ");
         }
+
+        DrawDebugString(World, HitLocation, bBlocked ? TEXT("Player (Blocked)") : TEXT("Player (Detected)"), nullptr, bBlocked ? FColor::Yellow : FColor::Green, 2.0f);
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("HitResults Count: %d"), HitResults.Num());
-
-    UE_LOG(LogTemp, Warning, TEXT("%s"),bCharacterDetected ? TEXT("Player Die") : TEXT("Hide"));
-
-    DrawDebugSphere(World, BossLocation, DetectionRadius, 32, bCharacterDetected ? FColor::Red : FColor::Blue, false, 0.5f);
+    if (CachedOwnerComp)
+    {
+        FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
+    }
 }
 
-void UBTTask_BossSkill3::StopDetection()
-{
-    if (!BossRef) return;
-
-    UWorld* World = BossRef->GetWorld();
-    if (!World) return;
-
-    World->GetTimerManager().ClearTimer(DetectionTimer);
-}
