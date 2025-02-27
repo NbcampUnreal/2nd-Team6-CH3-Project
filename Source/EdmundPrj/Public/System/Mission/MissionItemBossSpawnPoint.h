@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "System/Mission/BaseMissionItem.h"
+#include "System/EnumSet.h"
 #include "MissionItemBossSpawnPoint.generated.h"
 
 class ABoss;
@@ -18,6 +19,9 @@ public:
 	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
 	virtual void SetIsActive(bool Value) override;
 
+	bool GetWeakend() const;
+	EBossState GetLockSkill() const;
+	void SpawnMonster() const;
 	void ClearBoss();
 
 private:

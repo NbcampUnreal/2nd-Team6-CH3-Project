@@ -18,7 +18,6 @@ void UInGameWidget::ChangedNotifyText(const FString& NotifyText)
 
 void UInGameWidget::ChangedMissionText(const FString& MissionText)
 {
-	UE_LOG(LogTemp, Warning, TEXT("In Mission Text Notify"));
 	MissionInfoText->SetText(FText::FromString(MissionText));
 }
 

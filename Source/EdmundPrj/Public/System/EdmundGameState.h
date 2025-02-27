@@ -25,7 +25,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
 
-	void EndCurrentMission();
+	void SetMissionHandle(AMissionHandle* NewMissionHandle);
+	void SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle);
 
 	void ChangeCursorMode(bool bIsValid);
 	void ChangeInputMode(const FInputModeDataBase& InputMode);
@@ -37,9 +38,10 @@ public:
 	void SetSelectedCharacter(AActor* Character);
 	void CancleSelectedCharacter();
 
-	void SetMissionHandle(AMissionHandle* NewMissionHandle);
-	void SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle);
+	void OnPressedPauseKey();
 	void RequestInteraction();
+
+	void SpawnMonsterAtDimensionPortal(const TArray<ABaseMissionItem*>& ActiveDimensionSet);
 
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
