@@ -28,12 +28,14 @@ void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->EndMission(true);
+	EdmundGameState->EndCurrentLevel();
 }
 
 void AEdmundGameMode::FailMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->EndMission(false);
+	EdmundGameState->EndCurrentLevel();
 }
 
 void AEdmundGameMode::StartBossMission()

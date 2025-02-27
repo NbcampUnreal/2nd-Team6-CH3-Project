@@ -30,6 +30,8 @@ public:
 	void ChangeCursorMode(bool bIsValid);
 	void ChangeInputMode(const FInputModeDataBase& InputMode);
 
+	void AddCurrentLevelMoney(int32 Money);
+
 	void CreateRandomSkillSet();
 	const TArray<FPlayerSkillRow*>& GetRandomSkillSet() const;
 	void ApplySelectedSkill(const int32 Index);
@@ -38,7 +40,10 @@ public:
 	void CancleSelectedCharacter();
 
 	void OnPressedPauseKey();
+	void RequestEndPause();
 	void RequestInteraction();
+
+	void EndCurrentLevel();
 
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
@@ -76,4 +81,6 @@ private:
 	TMap<FPlayerSkillRow*, int32> CurrentSkillMap;
 
 	FTimerHandle TimerHandle;
+
+	int32 CurrentLevelMoney = 0;
 };
