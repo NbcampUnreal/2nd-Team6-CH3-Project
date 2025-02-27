@@ -17,6 +17,7 @@ class EDMUNDPRJ_API UResultWidget : public UBaseWidget
 	
 public: // add notify
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
+	virtual void ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp) override;
 
 private: 
 	UFUNCTION()

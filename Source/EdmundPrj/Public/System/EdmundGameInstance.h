@@ -12,9 +12,12 @@ class UUIHandle;
 class USoundHandle;
 class UDataHandle;
 class AEdmundGameState;
+class AEdmundGameMode;
 struct FShopCatalogRow;
 struct FPlayerSkillRow;
 struct FCharacterDataRow;
+struct FMissionDataRow;
+struct FSpawnerDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UEdmundGameInstance : public UGameInstance
@@ -26,18 +29,21 @@ public:
 	virtual void Init() override;
 
 	// GameState By Current Level Ready Complete. Bind Observers and Add To Viewport Widget
-	void StartedGameState();
+	void RequestGameStart(AEdmundGameMode* NewGameMode, AEdmundGameState* NewGameState);
+	void ApplyCurrentDataToGameMode();
+	void StartMission(ESceneType SceneType);
 	void BindGameStateObserver() const;
 	void OnUIByScene() const;
 
 	// Controll Game Tool
 	void OnPause() const;
+	void OnUnpause() const;
 	void ChangeCursorMode(const bool bIsVisible) const;
 	void ChangeInputMode(const FInputModeDataBase& InputMode) const;
 	void QuitGame() const;
 
 	// Current Mission Cleared or Fail 
-	void EndMission() const;
+	void EndMission(const bool bIsClear) const;
 	bool CheckClearedMission(const int32 Index) const;
 	void DestroyedGameState();
 
@@ -57,7 +63,7 @@ public:
 	void SetPlayerType(const ECharacterType Type) const;
 	void CancleSelectedType();
 	const TArray<FCharacterDataRow*>& GetCharacterData() const;
-	//FMissionItemRow* GetCurrentMissionInfo() const;
+
 	// Player Money Controll
 	void AddPossessMoney(const int32 Value) const;
 	int32 GetPossessMoney() const;
@@ -77,19 +83,19 @@ public:
 	void PlayUISound(const int32 Index) const;
 	void PlayEffectSound(const UAudioComponent* AudioComp, const ESoundType SoundCategory, const int32 Index) const;
 
-protected:
-	
-
 private:
-
+	// Level Data Controll
+	const TArray<FMissionDataRow*>& GetCurrentMissionData(ESceneType SceneType) const;
+	const TArray<FSpawnerDataRow*>& GetCurrentSpawnerData(ESceneType SceneType) const;
 	
 public:
 
 
-protected:
+private:
 	TObjectPtr<USceneHandle> SceneHandle;
 	TObjectPtr<UUIHandle> UIHandle;
 	TObjectPtr<USoundHandle> SoundHandle;
 	TObjectPtr<UDataHandle> DataHandle;
 	TObjectPtr<AEdmundGameState> EdmundGameState;
+	TObjectPtr<AEdmundGameMode> EdmundGameMode;
 };

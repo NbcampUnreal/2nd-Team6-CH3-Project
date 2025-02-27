@@ -41,6 +41,9 @@ public:
 
 	FTimerHandle BulletLifeTimerHandle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Particle")
+	TObjectPtr<UParticleSystem> BulletLandParticle;  // ÅºÂø ÆÄÆ¼Å¬
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComponent;

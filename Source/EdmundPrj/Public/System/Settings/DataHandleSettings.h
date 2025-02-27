@@ -25,4 +25,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
 	TSoftObjectPtr<UDataTable> CharacterDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
+	TSoftObjectPtr<UDataTable> MissionDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
+	TSoftObjectPtr<UDataTable> SpawnerDataTable;
 };

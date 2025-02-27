@@ -8,8 +8,10 @@
 #include "Components/AudioComponent.h"
 #include "BaseMonster.generated.h"
 
+class AMonsterSpawner;
 class USphereComponent;
 class UWidgetComponent;
+class ABaseItem;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseMonster : public ACharacter
@@ -24,16 +26,28 @@ float GetMonsterAttackDamage();
 
 virtual void MonsterAttackCheck();
 
-void MonsterDead();
+virtual void MonsterDead();
 
 void SetIsDead(bool bNewIsDead);
+
+void SetCanDropReward(bool NewState);
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
 
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|BulletPool")
+AMonsterSpawner* MonsterSpawner;
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
+USphereComponent* MonsterAttackRange;
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Spawn")
+TArray<TSubclassOf<ABaseItem>> AllItems;
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Spawn")
+TSubclassOf<ABaseItem> ItemClass;
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
-	USphereComponent* MonsterAttackRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	int32 MonsterLevel = 1;
@@ -71,6 +85,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
 	bool bIsInitialSpawn = true;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
+	bool bCanDropReward = true;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	FName MonsterType;	
 
@@ -105,10 +122,10 @@ protected:
 	float MonsterGoldReward = 3.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Item")
-	float MonsterHealKitProbability = 0.02f;
+	float MonsterHealKitProbability = 2.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Item")
-	float MonsterGoldProbability = 1.0f;
+	float MonsterGoldProbability = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|UI")
 	UWidgetComponent* MonsterOverHeadWidget;
@@ -145,6 +162,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void MonsterAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void SetChaseMode(bool Mode);
 
 	void MonsterAttackEnd();
 

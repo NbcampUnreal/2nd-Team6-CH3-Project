@@ -8,6 +8,8 @@
 #include "System/DataStructure/PlayDataRow.h"
 #include "System/DataStructure/PlayerSkillRow.h"
 #include "System/DataStructure/CharacterDataRow.h"
+#include "System/DataStructure/MissionDataRow.h"
+#include "System/DataStructure/SpawnerDataRow.h"
 
 
 void UDataHandle::InitDataHandle(UEdmundGameInstance* NewGameInstance)
@@ -87,19 +89,49 @@ const TArray<FCharacterDataRow*>& UDataHandle::GetCharacterData() const
 	return CharacterData;
 }
 
-void UDataHandle::UpdateClearMission(const int32 Index)
+const TArray<FMissionDataRow*>& UDataHandle::GetMissionDataBySceneType(const ESceneType SceneType)
 {
-	switch (Index)
+	CurrentMissionData.Empty();
+
+	for (FMissionDataRow* MissionDataRow : MissionData)
 	{
-	case 0:
+		if (MissionDataRow->InSceneType == SceneType)
+		{
+			CurrentMissionData.Add(MissionDataRow);
+		}
+	}
+
+	return CurrentMissionData;
+}
+
+const TArray<FSpawnerDataRow*>& UDataHandle::GetSpawnerDataBySceneType(const ESceneType SceneType)
+{
+	CurrentSpawnerData.Empty();
+
+	for (FSpawnerDataRow* SpawnerDataRow : SpawnerData)
+	{
+		if (SpawnerDataRow->InSceneType == SceneType)
+		{
+			CurrentSpawnerData.Add(SpawnerDataRow);
+		}
+	}
+	
+	return CurrentSpawnerData;
+}
+
+void UDataHandle::UpdateClearMission(const ESceneType SceneType)
+{
+	switch (SceneType)
+	{
+	case ESceneType::Mission1:
 		PlayData[0]->bClearedMission1 = true;
 		break;
 
-	case 1:
+	case ESceneType::Mission2:
 		PlayData[0]->bClearedMission2 = true;
 		break;
 
-	case 2:
+	case ESceneType::Mission3:
 		PlayData[0]->bClearedMission3 = true;
 		break;
 
@@ -149,6 +181,8 @@ void UDataHandle::LoadDataTables(const UDataHandleSettings* DataSettings)
 	PlayDataTable = DataSettings->PlayDataTable.LoadSynchronous();
 	PlayerSkillDataTable = DataSettings->PlayerSkillDataTable.LoadSynchronous();
 	CharacterDataTable = DataSettings->CharacterDataTable.LoadSynchronous();
+	MissionDataTable = DataSettings->MissionDataTable.LoadSynchronous();
+	SpawnerDataTable = DataSettings->SpawnerDataTable.LoadSynchronous();
 
 	const FString DataContext(TEXT("Data ConText"));
 
@@ -156,8 +190,8 @@ void UDataHandle::LoadDataTables(const UDataHandleSettings* DataSettings)
 	PlayDataTable->GetAllRows(DataContext, PlayData);
 	PlayerSkillDataTable->GetAllRows(DataContext, PlayerSkillData);
 	CharacterDataTable->GetAllRows(DataContext, CharacterData);
-
-	UE_LOG(LogTemp, Warning, TEXT("Loaded Data"));
+	MissionDataTable->GetAllRows(DataContext, MissionData);
+	SpawnerDataTable->GetAllRows(DataContext, SpawnerData);
 }
 
 FShopCatalogRow* UDataHandle::SelectRow(const FName& TargetRow) const

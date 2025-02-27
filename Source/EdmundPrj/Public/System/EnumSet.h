@@ -11,6 +11,8 @@ enum class ETimerSkillType : uint8
 {
 	Thunder = 0,
 	Meteor,
+	AttackPlants,
+	HealPlants,
 	Plants
 };
 
@@ -59,6 +61,8 @@ enum class ETableType : uint8
 {
 	PlayerSkill = 0,
 	ShopCatalog,
+	CharacterInfo,
+	PlayData,
 	MissionItem
 };
 
@@ -66,7 +70,7 @@ UENUM(BlueprintType)
 enum class ECharacterType : uint8
 {
 	Gunner = 0,
-	Other1,
+	Aurora,
 	Other2,
 	Other3
 };
@@ -91,6 +95,30 @@ enum class EMonsterState : uint8
 	Attack,
 	Hit,
 	Die
+};
+
+UENUM(BlueprintType)
+enum class ENPCState : uint8
+{
+	Idle = 0,
+	Trace,
+	Attack,
+	Hit,
+	Die
+};
+
+UENUM(BlueprintType)
+enum class EBossState : uint8 {
+	Idle,
+	Chase,
+	Attack1,
+	Attack2,
+	Attack3,
+	Attack4,
+	Skill1,
+	Skill2,
+	Skill3,
+	Dead
 };
 
 UCLASS()

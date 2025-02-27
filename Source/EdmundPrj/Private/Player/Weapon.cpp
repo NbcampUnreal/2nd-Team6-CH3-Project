@@ -7,13 +7,15 @@
 #include "Sound/SoundBase.h"
 #include "Particles/ParticleSystem.h"
 
-
 AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
+
+	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	CurrentAudioComp->SetupAttachment(RootComponent);
 
 	MuzzleOffset = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleOffset"));
 	MuzzleOffset->SetupAttachment(Mesh);
@@ -25,6 +27,22 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 현재 게임 모드에서 조종 중인 플레이어의 Pawn을 얻기
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0은 첫 번째 플레이어
+	if (PlayerController)
+	{
+		APawn* ControlledPawn = PlayerController->GetPawn();
+		if (ControlledPawn)
+		{
+			ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
+
+			if (IsValid(Player))
+			{
+				AttackDelay = Player->GetAttackDelay();
+			}
+		}
+	}
 
 	// BulletPool을 초기화합니다.
 	InitializeBulletPool(20);  // 총알 풀의 크기를 20으로 설정
@@ -84,11 +102,6 @@ bool AWeapon::Fire()
 
 	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 
-	if (IsValid(AnimInstance) && IsValid(FireMontage))
-	{
-		AnimInstance->Montage_Play(FireMontage);
-	}
-
 	// BulletPool에서 총알을 가져옴
 	ABullet* BulletToFire = GetBulletFromPool();
 	if (BulletToFire)
@@ -108,7 +121,7 @@ bool AWeapon::Fire()
 		PC->DeprojectScreenPositionToWorld(x / 2.0f, y / 2.0f, WorldCenter, WorldDirection);
 
 		// WorldCenter에서 WorldDirection 방향으로 발사
-		FVector TargetLocation = WorldCenter + WorldDirection * 10000;
+		FVector TargetLocation = WorldCenter + WorldDirection * 3500;
 		SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, TargetLocation);
 
 		BulletToFire->SetActorLocation(SpawnLocation + WorldDirection * 100);
@@ -135,7 +148,9 @@ bool AWeapon::Fire()
 		// 총소리 재생
 		if (FireSound)
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			//UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			CurrentAudioComp->SetSound(FireSound);
+			CurrentAudioComp->Play();
 		}
 
 		// 총 이펙트 재생

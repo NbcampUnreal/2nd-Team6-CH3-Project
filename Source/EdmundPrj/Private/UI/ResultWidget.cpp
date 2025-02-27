@@ -18,6 +18,20 @@ void UResultWidget::InitWidget(UUIHandle* NewUIHandle)
 	//UpdateResult(false);
 }
 
+void UResultWidget::ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp)
+{
+	Super::ChangedPlayerHp(MaxHp, CurrentHp);
+
+	if (CurrentHp <= 0)
+	{
+		UpdateResult(false);
+	}
+	else
+	{
+		UpdateResult(true);
+	}
+}
+
 void UResultWidget::UpdateResult(bool bIsClear) // notify를 통해 클리어 or 사망 값 전달 받고 그에 따라 변경
 {
 	// 게임 결과 텍스트들 출력하도록 구현 필요

@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "System/EdmundGameState.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -22,38 +23,36 @@ ABaseCharacter::ABaseCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
 
+	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	CurrentAudioComp->SetupAttachment(RootComponent);
+
 	WalkSpeed = 600.0f;
 	SprintSpeed = 1000.0f;
 	CrouchMoveSpeed = 300.0f;
 
-	CurrentAmmo = MaxAmmo = 40;
-
 	HP = MaxHP = 300.0f;
 
+	CriticalMultiplier = 2.0f;
+
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
 	IsSprint = false;
 	IsCrouch = false;
-	IsMove = false;
-
-	MeleeAttackDelay = 0.7f;
-
-	AttackMontage = nullptr;
-	MeleeAttackMontage = nullptr;
-
-	bIsMeleeAttack = false;
-	bIsAttack = false;
-	bIsReloading = false;
+	IsDie = false;
 
 	HitActionMontage = nullptr;
-
-	IsDie = false;
 	DieActionMontage = nullptr;
+	CurrentGameState = nullptr;
+
+	EvasionSuccessSound = nullptr;
+	RevivalSuccessSound = nullptr;
+	DeathSound = nullptr;
 }
 
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	CurrentAmmo = MaxAmmo;
+	
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
 	HP = MaxHP;
@@ -64,6 +63,15 @@ void ABaseCharacter::BeginPlay()
 	if (IsValid(CapsuleComp))
 	{
 		CapsuleHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
+	}
+
+	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
+
+	CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
 }
 
@@ -129,60 +137,13 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 				);
 			}
 
-			if (PlayerController->AttackAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->AttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&ABaseCharacter::Attack
-				);
-			}
-
-			if (PlayerController->MeleeAttackAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->MeleeAttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&ABaseCharacter::MeleeAttack
-				);
-			}
-
-			if (PlayerController->ReloadAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->ReloadAction,
-					ETriggerEvent::Triggered,
-					this,
-					&ABaseCharacter::ReloadAction
-				);
-			}
-
 			if (PlayerController->InteractionAction)
 			{
 				EnhancedInput->BindAction(
 					PlayerController->InteractionAction,
-					ETriggerEvent::Triggered,
-					this,
-					&ABaseCharacter::Interaction
-				);
-			}
-
-			if (PlayerController->ZoomAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->ZoomAction,
 					ETriggerEvent::Started,
 					this,
-					&ABaseCharacter::ZoomIn
-				);
-
-				EnhancedInput->BindAction(
-					PlayerController->ZoomAction,
-					ETriggerEvent::Completed,
-					this,
-					&ABaseCharacter::ZoomOut
+					&ABaseCharacter::Interaction
 				);
 			}
 
@@ -200,6 +161,16 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 					ETriggerEvent::Completed,
 					this,
 					&ABaseCharacter::StopCrouch
+				);
+			}
+
+			if (PlayerController->InteractionAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->PauseAction,
+					ETriggerEvent::Started,
+					this,
+					&ABaseCharacter::PauseAction
 				);
 			}
 		}
@@ -221,13 +192,6 @@ void ABaseCharacter::Move(const FInputActionValue& value)
 	{
 		AddMovementInput(GetActorRightVector(), MoveInput.Y);
 	}
-
-	IsMove = true;
-}
-
-void ABaseCharacter::StopMove(const FInputActionValue& value)
-{
-	IsMove = false;
 }
 
 void ABaseCharacter::Look(const FInputActionValue& value)
@@ -307,178 +271,10 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 	}
 }
 
-void ABaseCharacter::Attack(const FInputActionValue& value)
-{
-	if (CurrentAmmo <= 0 || CheckAction() || IsDie)
-	{
-		return;
-	}
-
-	if (ActiveWeapon())
-	{
-		if (IsValid(AttackMontage))
-		{
-			PlayAnimMontage(AttackMontage);
-		}
-
-		CurrentAmmo--;
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Ammo: %d/%d"), CurrentAmmo, MaxAmmo));
-	}
-
-	if (CurrentAmmo <= 0)
-	{
-		Reload();
-	}
-}
-
-bool ABaseCharacter::ActiveWeapon()
-{
-	// 자식 클래스의 함수 실행
-	return false;
-}
-
-void ABaseCharacter::MeleeAttack(const FInputActionValue& value)
-{
-	if (CheckAction() || IsDie)
-	{
-		return;
-	}
-
-	if (IsValid(MeleeAttackMontage))
-	{
-		PlayAnimMontage(MeleeAttackMontage);
-	}
-
-	// 근접공격 소리 재생
-	if (MeleeAttackSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, MeleeAttackSound, GetActorLocation());
-	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Melee Attack Start")));
-
-	// 근접 공격 딜레이
-	GetWorld()->GetTimerManager().SetTimer(
-		MeleeAttackDelayHandle,
-		this,
-		&ABaseCharacter::EndMeleeAttack,
-		MeleeAttackDelay,
-		false
-	);
-
-	bIsMeleeAttack = true;
-}
-
-void ABaseCharacter::MeleeAttackTrace()
-{
-	// Melee Attack 범위 설정
-	FVector ForwardVector = GetActorForwardVector(); // 공격 방향
-	FVector Start = GetActorLocation() + (ForwardVector * 200.0f); // 공격 시작 위치
-	FVector End = Start + (ForwardVector * 200.0f); // 공격 끝 위치
-
-	// 공격 범위 내에서 충돌 체크
-	float Radius = 150.0f;
-	FHitResult HitResult;
-
-	// 트레이스 수행
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // 자신은 무시하도록 설정
-
-	bool bHit = GetWorld()->SweepSingleByChannel(
-		HitResult,
-		Start,               // 시작 위치
-		End,                 // 끝 위치
-		FQuat::Identity,     // 회전값 (회전 없이)
-		ECollisionChannel::ECC_GameTraceChannel1, // 충돌 채널
-		FCollisionShape::MakeSphere(Radius), // 범위 설정 (구체 모양)
-		QueryParams
-	);
-
-	// 구체 보이게 하기
-	if (GEngine)
-	{
-		DrawDebugSphere(
-			GetWorld(),
-			Start,
-			Radius,
-			12,
-			FColor::Red,        // 색상
-			false,              // 지속성 (게임 중 계속 표시할지 여부)
-			1.0f                // 지속 시간
-		);
-	}
-
-	if (bHit)
-	{
-		// 충돌한 객체가 있다면
-		if (AActor* HitActor = HitResult.GetActor())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Melee attack hit: %s"), *HitActor->GetName());
-		}
-	}
-}
-
-void ABaseCharacter::EndMeleeAttack()
-{
-	bIsMeleeAttack = false;
-}
-
-void ABaseCharacter::ReloadAction(const FInputActionValue& value)
-{
-	if (CheckAction() || IsDie)
-	{
-		return;
-	}
-
-	Reload();
-}
-
-void ABaseCharacter::Reload()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Reload Start!!")));
-	CurrentAmmo = MaxAmmo;
-
-	if (IsValid(ReloadSound))
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
-	}
-}
-
 void ABaseCharacter::Interaction(const FInputActionValue& value)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Interaction Start!!")));
-}
-
-void ABaseCharacter::ZoomIn(const FInputActionValue& value)
-{
-	if (IsDie)
-	{
-		return;
-	}
-
-	if (!IsValid(SpringArmComp))
-	{
-		return;
-	}
-
-	SpringArmComp->TargetArmLength = -1000;
-	//SpringArmComp->SocketOffset = FVector(0, 40, 60);
-}
-
-void ABaseCharacter::ZoomOut(const FInputActionValue& value)
-{
-	if (IsDie)
-	{
-		return;
-	}
-
-	if (!IsValid(SpringArmComp))
-	{
-		return;
-	}
-
-	SpringArmComp->TargetArmLength = 300;
-	//SpringArmComp->SocketOffset = FVector(0, 60, 60);
+	CurrentGameState->RequestInteraction();
 }
 
 void ABaseCharacter::StartCrouch(const FInputActionValue& value)
@@ -561,6 +357,47 @@ void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 	}
 }
 
+void ABaseCharacter::PauseAction(const FInputActionValue& value)
+{
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->OnPressedPauseKey();
+	}
+}
+
+float ABaseCharacter::GetAttackDamage() const
+{
+	float Damage = AttackDamage;
+
+	int32 DamageProb = FMath::RandRange(1, 100);
+
+	// 크리티컬
+	if (DamageProb <= CriticalProb)
+	{
+		Damage *= CriticalMultiplier;
+	}
+
+	// 랜덤 데미지 적용
+	int32 RandomRange = 20;
+
+	float MinDamage = (100 - RandomRange) * Damage;
+	float MaxDamage = (100 + RandomRange) * Damage;
+
+	Damage = FMath::RandRange(MinDamage, MaxDamage);
+
+	return Damage;
+}
+
+void ABaseCharacter::SetAttackDamage(float NewAttackDamage)
+{
+	AttackDamage = NewAttackDamage;
+}
+
+float ABaseCharacter::GetAttackDelay() const
+{
+	return AttackDelay;
+}
+
 float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (IsDie)
@@ -568,22 +405,61 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
-	if (IsValid(HitActionMontage))
+	int32 DamageProb = FMath::RandRange(1, 100);
+
+	// 회피 성공
+	if (DamageProb <= EvasionProb)
+	{
+		// 회피 성공 사운드
+		if (IsValid(EvasionSuccessSound))
+		{
+			CurrentAudioComp->SetSound(EvasionSuccessSound);
+			CurrentAudioComp->Play();
+		}
+
+		return 0.0f;
+	}
+
+	if (IsValid(HitActionMontage) && !CheckAction())
 	{
 		PlayAnimMontage(HitActionMontage);
 	}
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	// 방어력 적용
+	ActualDamage = (100 - Defense) * ActualDamage / 100;
+	
+	// HP는 정수, 데미지는 소수?
 	// HP 음수 방지
 	HP = FMath::Max(0.0f, HP - ActualDamage);
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("HP: %f / %f"), HP, MaxHP));
-
 	if (HP == 0 && !IsDie)
 	{
-		IsDie = true;
-		ActiveDieAction();
+		// 부활 횟수가 있다면
+		if (RevivalCount >= 1)
+		{
+			RevivalCount--;
+			HP = MaxHP;
+
+			// 부활 사운드
+			if (IsValid(RevivalSuccessSound))
+			{
+				CurrentAudioComp->SetSound(RevivalSuccessSound);
+				CurrentAudioComp->Play();
+			}
+		}
+		// 부활 횟수가 없다면
+		else
+		{
+			IsDie = true;
+			ActiveDieAction();
+		}
+	}
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
 
 	return ActualDamage;
@@ -591,47 +467,64 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 void ABaseCharacter::AddExp(int32 Exp)
 {
+	if (CurrentLevel >= MaxLevel)
+	{
+		return;
+	}
+
 	CurrentExp += Exp;
+
+	if (CurrentExp >= MaxExp)
+	{
+		LevelUp();
+	}
 }
 
 void ABaseCharacter::LevelUp()
 {
+	if (CurrentLevel >= MaxLevel)
+	{
+		return;
+	}
+
 	CurrentLevel++;
+
+	HP = MaxHP;
+
+	CurrentExp -= MaxExp;
+	MaxExp += 50;
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->CreateRandomSkillSet();
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
-float ABaseCharacter::GetHP() const
+int32 ABaseCharacter::GetHP() const
 {
 	return HP;
 }
 
-void ABaseCharacter::SetHP(float NewHP)
+void ABaseCharacter::SetHP(int32 NewHP)
 {
 	HP = FMath::Min(MaxHP, NewHP);
+	HP = FMath::Max(0, HP);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
-void ABaseCharacter::AmountHP(float AmountHP)
+void ABaseCharacter::AmountHP(int32 AmountHP)
 {
 	HP = FMath::Min(MaxHP, HP + AmountHP);
-}
 
-void ABaseCharacter::SetAmmo(int32 NewAmmo)
-{
-	CurrentAmmo = FMath::Min(MaxAmmo, NewAmmo);
-}
-
-void ABaseCharacter::AmountAmmo(int32 AmountAmmo)
-{
-	CurrentAmmo = FMath::Min(MaxAmmo, CurrentAmmo + AmountAmmo);
-}
-
-int32 ABaseCharacter::GetGold() const
-{
-	return CurrentGold;
-}
-
-void ABaseCharacter::AddGold(int32 Gold)
-{
-	CurrentGold += Gold;
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}
 }
 
 void ABaseCharacter::GetUpgradeStatus()
@@ -640,18 +533,30 @@ void ABaseCharacter::GetUpgradeStatus()
 
 void ABaseCharacter::ActiveDieAction()
 {
+	// 회피 성공 사운드
+	if (IsValid(DeathSound))
+	{
+		CurrentAudioComp->SetSound(DeathSound);
+		CurrentAudioComp->Play();
+	}
+
 	if (IsValid(DieActionMontage))
 	{
 		PlayAnimMontage(DieActionMontage);
 	}
 }
 
-ECharacterType ABaseCharacter::getCharacterType()
+ECharacterType ABaseCharacter::GetCharacterType()
 {
 	return CharacterType;
 }
 
+void ABaseCharacter::AttackTrace()
+{
+	// 자식 클래스 함수 실행
+}
+
 bool ABaseCharacter::CheckAction()
 {
-	return bIsAttack || bIsReloading || bIsMeleeAttack;
+	return IsDie;
 }

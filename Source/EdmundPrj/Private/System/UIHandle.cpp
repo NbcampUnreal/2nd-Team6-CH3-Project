@@ -256,11 +256,13 @@ bool UUIHandle::CheckClearedMission(int32 Index) const
 
 void UUIHandle::OpenOption()
 {
-	RequestChangeCursorMode(true, FInputModeUIOnly());
+	//RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseOption()
 {
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->OnUnpause();
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
