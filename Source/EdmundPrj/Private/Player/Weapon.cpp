@@ -7,7 +7,6 @@
 #include "Sound/SoundBase.h"
 #include "Particles/ParticleSystem.h"
 
-
 AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -28,6 +27,22 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 현재 게임 모드에서 조종 중인 플레이어의 Pawn을 얻기
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0은 첫 번째 플레이어
+	if (PlayerController)
+	{
+		APawn* ControlledPawn = PlayerController->GetPawn();
+		if (ControlledPawn)
+		{
+			ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
+
+			if (IsValid(Player))
+			{
+				AttackDelay = Player->GetAttackDelay();
+			}
+		}
+	}
 
 	// BulletPool을 초기화합니다.
 	InitializeBulletPool(20);  // 총알 풀의 크기를 20으로 설정
@@ -86,11 +101,6 @@ bool AWeapon::Fire()
 	}
 
 	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
-
-	if (IsValid(AnimInstance) && IsValid(FireMontage))
-	{
-		AnimInstance->Montage_Play(FireMontage);
-	}
 
 	// BulletPool에서 총알을 가져옴
 	ABullet* BulletToFire = GetBulletFromPool();

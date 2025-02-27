@@ -12,6 +12,7 @@ APlayerCharacterAurora::APlayerCharacterAurora()
 	IsAttack = false;
 	ComboCount = 0;
 	ResetDelay = 1.0f;
+	AttackRangeRadius = 300.0f;
 }
 
 void APlayerCharacterAurora::BeginPlay()
@@ -97,11 +98,9 @@ void APlayerCharacterAurora::AttackTrace()
 	FRotator ControlRotation = PlayerController->GetControlRotation();
 	FVector ForwardVector = ControlRotation.Vector();
 
-	FVector Start = GetActorLocation() + (ForwardVector * 300.0f); // 공격 시작 위치
-	FVector End = Start + (ForwardVector * 300.0f); // 공격 끝 위치
+	FVector Start = GetActorLocation() + (ForwardVector * AttackRangeRadius); // 공격 시작 위치
+	FVector End = Start + (ForwardVector * AttackRangeRadius); // 공격 끝 위치
 
-	// 공격 범위 내에서 충돌 체크
-	float Radius = 300.0f;
 	TArray<FHitResult> HitResults;
 
 	// 트레이스 수행
@@ -114,7 +113,7 @@ void APlayerCharacterAurora::AttackTrace()
 		End,                 // 끝 위치
 		FQuat::Identity,     // 회전값 (회전 없이)
 		ECollisionChannel::ECC_OverlapAll_Deprecated, // 충돌 채널
-		FCollisionShape::MakeSphere(Radius), // 범위 설정 (구체 모양)
+		FCollisionShape::MakeSphere(AttackRangeRadius), // 범위 설정 (구체 모양)
 		QueryParams
 	);
 
@@ -124,7 +123,7 @@ void APlayerCharacterAurora::AttackTrace()
 		DrawDebugSphere(
 			GetWorld(),
 			Start,
-			Radius,
+			AttackRangeRadius,
 			12,
 			FColor::Red,        // 색상
 			false,              // 지속성 (게임 중 계속 표시할지 여부)

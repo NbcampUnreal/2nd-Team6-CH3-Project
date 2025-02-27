@@ -26,9 +26,13 @@ public:
 	// Notify에서 호출하기 위해 public
 	void AttackTrace();
 
+	void NextCombo();
+
+	// 콤보 초기화 딜레이
 	float ResetDelay;
 
-	void NextCombo();
+	// 공격 크기
+	float AttackRangeRadius;
 
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
