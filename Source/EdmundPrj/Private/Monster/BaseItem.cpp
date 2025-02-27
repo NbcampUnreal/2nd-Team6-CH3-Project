@@ -30,8 +30,12 @@ ABaseItem::ABaseItem()
 void ABaseItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	float XPulse = FMath::RandRange(-300.0f, 300.0f);
+	float YPulse = FMath::RandRange(-300.0f, 300.0f);
+
 	StaticMeshComp->SetSimulatePhysics(true);  // 물리 활성화
-	StaticMeshComp->AddImpulse(FVector(0.0f, 0.0f, 500.0f), NAME_None, true);
+	StaticMeshComp->AddImpulse(FVector(XPulse, YPulse, 500.0f), NAME_None, true);
 }
 
 void ABaseItem::Tick(float DeltaTime)

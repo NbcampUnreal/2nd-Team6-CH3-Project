@@ -82,8 +82,7 @@ void ABaseMonster::MonsterDead()
 	{
 		SetIsDead(true);
 
-		AAIController* AIController = Cast<AAIController>(GetController());
-		if (AIController)
+		if (bCanDropReward)
 		{
 			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 			if (PlayerController)
@@ -133,15 +132,23 @@ void ABaseMonster::SetIsDead(bool bNewIsDead)
 	bIsDead = bNewIsDead;
 }
 
+void ABaseMonster::SetCanDropReward(bool NewState)
+{
+	bCanDropReward = NewState;
+}
+
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
 	bIsDead = false;
 	bIsHit = false;
 
-	SetChaseMode(false);
+	if (bCanDropReward)
+	{
+		DropReward();
+	}
 
-	DropReward();
+	SetChaseMode(false);
 
 	GetCharacterMovement()->Activate();
 
@@ -164,11 +171,11 @@ void ABaseMonster::MonsterDestroy()
 void ABaseMonster::DropReward()
 {
 
-
-
 	float RandomValue = FMath::RandRange(0, 100);
 
-	if (RandomValue <= MonsterGoldProbability)
+
+	//인덱스 0번(힐), 임시로 확률 50배
+	if (RandomValue <= MonsterHealKitProbability * 50.0f)
 	{
 		if (AllItems.Num() > 0)
 		{
@@ -188,9 +195,25 @@ void ABaseMonster::DropReward()
 		}
 	}
 
-	if (RandomValue <= MonsterHealKitProbability)
+	//인덱스 1번(골드)
+	if (RandomValue <= MonsterGoldProbability)
 	{
-		//바닥에 Healkit이 떨어짐
+		if (AllItems.Num() > 0)
+		{
+			if (IsValid(AllItems[1]))
+			{
+				ItemClass = AllItems[1];
+
+				if (IsValid(ItemClass))
+				{
+					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AllItems가 없습니다."));
+		}
 	}
 }
 
