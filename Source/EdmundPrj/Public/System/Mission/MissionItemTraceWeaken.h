@@ -4,23 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "System/Mission/BaseMissionItem.h"
-#include "MissionItemWeakenBoss.generated.h"
+#include "MissionItemTraceWeaken.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
-class EDMUNDPRJ_API AMissionItemWeakenBoss : public ABaseMissionItem
+class EDMUNDPRJ_API AMissionItemTraceWeaken : public ABaseMissionItem
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type);
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
 	virtual void ActionEventByPressedKey() override;
 
 private:
 	virtual void ActionBeginOverlap() override;
 	virtual void ActionEndOverlap() override;
 
-	void FindWeaken();
+	void FindTraceByPlayer();
 };

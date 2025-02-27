@@ -20,6 +20,12 @@ public:
 	// Sets default values for this actor's properties
 	AMonsterSpawner();
 
+	void EndPlay(const EEndPlayReason::Type EndPlayReason);
+
+	void ClearTimer();
+
+	void BossSpawn();
+
 	AGameModeBase* CurrentGameMode;
 
 	void InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount);

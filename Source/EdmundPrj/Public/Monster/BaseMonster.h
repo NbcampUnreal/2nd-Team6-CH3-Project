@@ -30,6 +30,8 @@ virtual void MonsterDead();
 
 void SetIsDead(bool bNewIsDead);
 
+void SetCanDropReward(bool NewState);
+
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
 
@@ -82,6 +84,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
 	bool bIsInitialSpawn = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
+	bool bCanDropReward = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	FName MonsterType;	

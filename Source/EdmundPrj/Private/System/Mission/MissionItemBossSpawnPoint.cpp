@@ -22,7 +22,7 @@ void AMissionItemBossSpawnPoint::SetIsActive(bool Value)
 	{
 		SpawnBoss();
 		PrintMissionActiveText();
-
+		MissionHandle->NotifyStartedBossStage();
 		//Test
 		SpawnMonster();
 	}

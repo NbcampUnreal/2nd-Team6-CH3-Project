@@ -13,7 +13,7 @@ ASuicideMonster::ASuicideMonster()
 void ASuicideMonster::MonsterAttackCheck()
 {
 
-    MonsterExpReward = 0;
+    SetCanDropReward(false);
 
     USkeletalMeshComponent* MeshComp = GetMesh();
     ABaseMonster* Monster = Cast<ABaseMonster>(this);

@@ -47,6 +47,16 @@ void AEdmundGameState::ChangeInputMode(const FInputModeDataBase& InputMode)
 	PlayerController->FlushPressedKeys();
 }
 
+void AEdmundGameState::AddCurrentLevelMoney(int32 Money)
+{
+	if (Money < 0)
+	{
+		return;
+	}
+
+	CurrentLevelMoney += Money;
+}
+
 void AEdmundGameState::InitMainLevel()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
@@ -156,12 +166,29 @@ void AEdmundGameState::SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle)
 	SpawnerHandle = NewSpawnerHandle;
 }
 
+const TArray<FShopCatalogRow*>& AEdmundGameState::GetPlayerAdvancedData() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("Game Instance is invalid"));
+	return EdmundGameInstance->GetAdvanceState();
+}
+
 void AEdmundGameState::OnPressedPauseKey()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("Game Instance is invalid"));
 	EdmundGameInstance->OnPause();
+	PlayerController->SetPause(true);
 	ChangeCursorMode(true);
 	ChangeInputMode(FInputModeUIOnly());
+}
+
+void AEdmundGameState::RequestOnPause()
+{
+	PlayerController->SetPause(true);
+}
+
+void AEdmundGameState::RequestEndPause()
+{
+	PlayerController->SetPause(false);
 }
 
 void AEdmundGameState::RequestInteraction()
@@ -170,9 +197,10 @@ void AEdmundGameState::RequestInteraction()
 	MissionHandle->OnPressedKeyFromPlayer();
 }
 
-void AEdmundGameState::SpawnMonsterAtDimensionPortal(const TArray<ABaseMissionItem*>& ActiveDimensionSet)
+void AEdmundGameState::EndCurrentLevel()
 {
-	// call spawner handle
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->AddPossessMoney(CurrentLevelMoney);
 }
 
 void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)

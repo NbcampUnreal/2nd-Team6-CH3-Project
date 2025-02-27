@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "System/Mission/MissionItemWeakenBoss.h"
+#include "System/Mission/MissionItemTraceWeaken.h"
 #include "System/MissionHandle.h"
 #include "UI/3DWidget/InteractionWidget.h"
 
-void AMissionItemWeakenBoss::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
+void AMissionItemTraceWeaken::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
 	Super::InitMissionItem(NewMissionHandle, Type);
 
-	ApplyOverlapCollision(true);
+	ApplyOverlapCollision(false);
 }
 
-void AMissionItemWeakenBoss::ActionEventByPressedKey()
+void AMissionItemTraceWeaken::ActionEventByPressedKey()
 {
 	if (bIsPlayingInteraction)
 	{
@@ -20,10 +20,11 @@ void AMissionItemWeakenBoss::ActionEventByPressedKey()
 	}
 
 	Super::ActionEventByPressedKey();
-	FindWeaken();
+
+	FindTraceByPlayer();
 }
 
-void AMissionItemWeakenBoss::ActionBeginOverlap()
+void AMissionItemTraceWeaken::ActionBeginOverlap()
 {
 	if (!bIsActive)
 	{
@@ -36,7 +37,7 @@ void AMissionItemWeakenBoss::ActionBeginOverlap()
 	InteractionWidget->VisibleNotify(true);
 }
 
-void AMissionItemWeakenBoss::ActionEndOverlap()
+void AMissionItemTraceWeaken::ActionEndOverlap()
 {
 	if (!bIsActive)
 	{
@@ -48,9 +49,9 @@ void AMissionItemWeakenBoss::ActionEndOverlap()
 	InteractionWidget->VisibleNotify(false);
 }
 
-void AMissionItemWeakenBoss::FindWeaken()
+void AMissionItemTraceWeaken::FindTraceByPlayer()
 {
-	MissionHandle->ApplyBossWeaken();
 	PrintMissionClearText();
 	SetIsActive(false);
+	SetVisible(false);
 }

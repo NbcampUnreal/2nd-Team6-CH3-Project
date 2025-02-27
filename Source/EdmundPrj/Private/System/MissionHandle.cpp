@@ -88,17 +88,18 @@ void AMissionHandle::CompleteMission()
 	}
 }
 
-const FVector AMissionHandle::GetDirectionToPrison(const FVector& ActorPos) const
+void AMissionHandle::SetPrison(ABaseMissionItem* NewPrison)
 {
-	FVector Direction = PrisonLocation - ActorPos;
-	Direction = Direction / Direction.Size();
-
-	return Direction;
+	Prison = NewPrison;
 }
 
-void AMissionHandle::SetPrisonLocation(const FVector& PrisonPos)
+ABaseMissionItem* AMissionHandle::GetPrison() const
 {
-	PrisonLocation = PrisonPos;
+	if (!IsValid(Prison))
+	{
+		return nullptr;
+	}
+	return Prison;
 }
 
 void AMissionHandle::SetTargetPointLocation(const FVector& TargetPointPos)
@@ -194,6 +195,11 @@ void AMissionHandle::RemoveDimensionPortalSet(ABaseMissionItem* DimentionPortal)
 	DimensionPortalSet.Remove(DimentionPortal);
 }
 
+void AMissionHandle::NotifyStartedBossStage()
+{
+	EdmundGameMode->StartBossMission();
+}
+
 bool AMissionHandle::GetWeakenBoss() const
 {
 	return bWeakenBoss;
@@ -206,13 +212,15 @@ EBossState AMissionHandle::GetLockedSkill() const
 
 void AMissionHandle::RequestSpawnToSpawnerHandle()
 {
-	checkf(IsValid(EdmundGameState), TEXT("GameState is invalid"));
-	EdmundGameState->SpawnMonsterAtDimensionPortal(DimensionPortalSet);
+	TArray<FVector> DimensionPosSet;
 
 	for (ABaseMissionItem* Dimension : DimensionPortalSet)
 	{
+		DimensionPosSet.Add(Dimension->GetActorLocation());
 		Dimension->SetIsActive(false);
 	}
+
+	EdmundGameMode->SpawnMonsterByBoss(DimensionPosSet);
 }
 
 void AMissionHandle::BeginPlay()

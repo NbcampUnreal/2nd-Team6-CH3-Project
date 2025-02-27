@@ -25,6 +25,9 @@ public:
 	void ClearMission();
 	void FailMission();
 
+	void StartBossMission();
+	void SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionPosSet);
+
 private:
 	virtual void BeginPlay() override;
 	void InitDefaultPawnByCharacterType();

@@ -70,7 +70,7 @@ UENUM(BlueprintType)
 enum class ECharacterType : uint8
 {
 	Gunner = 0,
-	Other1,
+	Aurora,
 	Other2,
 	Other3
 };

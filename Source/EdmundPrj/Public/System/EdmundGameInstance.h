@@ -37,6 +37,8 @@ public:
 
 	// Controll Game Tool
 	void OnPause() const;
+	void RequestPause() const;
+	void RequestUnpause() const;
 	void ChangeCursorMode(const bool bIsVisible) const;
 	void ChangeInputMode(const FInputModeDataBase& InputMode) const;
 	void QuitGame() const;
