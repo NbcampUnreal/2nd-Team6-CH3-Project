@@ -4,11 +4,13 @@
 #include "System/Mission/MissionItemTargetPoint.h"
 #include "System/MissionHandle.h"
 
-void AMissionItemTargetPoint::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemTargetPoint::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(false);
+
+	MissionHandle->SetTargetPointLocation(GetActorLocation());
 }
 
 void AMissionItemTargetPoint::ActionBeginOverlap()
@@ -23,4 +25,5 @@ void AMissionItemTargetPoint::ActionBeginOverlap()
 	bIsActive = false;
 	SetVisible(false);
 	MissionHandle->CompleteMission();
+	PrintMissionActiveText();
 }

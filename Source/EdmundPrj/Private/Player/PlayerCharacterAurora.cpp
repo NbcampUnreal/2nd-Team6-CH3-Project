@@ -1,0 +1,174 @@
+#include "Player/PlayerCharacterAurora.h"
+#include "Player/EdmundPlayerController.h"
+#include "EnhancedInputComponent.h"
+#include "Kismet/GameplayStatics.h"
+
+APlayerCharacterAurora::APlayerCharacterAurora()
+{
+	PrimaryActorTick.bCanEverTick = false;
+
+	AttackSound = nullptr;
+
+	IsAttack = false;
+	ComboCount = 0;
+	ResetDelay = 1.0f;
+}
+
+void APlayerCharacterAurora::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void APlayerCharacterAurora::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		if (AEdmundPlayerController* PlayerController = Cast<AEdmundPlayerController>(GetController()))
+		{
+			if (PlayerController->AttackAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->AttackAction,
+					ETriggerEvent::Triggered,
+					this,
+					&APlayerCharacterAurora::Attack
+				);
+			}
+		}
+	}
+}
+
+void APlayerCharacterAurora::Attack(const FInputActionValue& value)
+{
+	if (!IsAttack)
+	{
+		IsAttack = true;
+
+		switch (ComboCount)
+		{
+			case 0:
+				if (IsValid(AttackMontages[0]))
+				{
+					PlayAnimMontage(AttackMontages[0]);
+				}
+				break;
+
+			case 1:
+				if (IsValid(AttackMontages[1]))
+				{
+					PlayAnimMontage(AttackMontages[1]);
+				}
+				break;
+
+			case 2:
+				if (IsValid(AttackMontages[2]))
+				{
+					PlayAnimMontage(AttackMontages[2]);
+				}
+				break;
+
+			case 3:
+				if (IsValid(AttackMontages[3]))
+				{
+					PlayAnimMontage(AttackMontages[3]);
+				}
+				break;
+
+			default:
+				break;
+		}
+
+		// 콤보 공격 딜레이
+		GetWorld()->GetTimerManager().SetTimer(
+			ComboResetTimerHandle,
+			this,
+			&APlayerCharacterAurora::ResetCombo,
+			ResetDelay,
+			false
+		);
+	}
+}
+
+void APlayerCharacterAurora::AttackTrace()
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	FRotator ControlRotation = PlayerController->GetControlRotation();
+	FVector ForwardVector = ControlRotation.Vector();
+
+	FVector Start = GetActorLocation() + (ForwardVector * 300.0f); // 공격 시작 위치
+	FVector End = Start + (ForwardVector * 300.0f); // 공격 끝 위치
+
+	// 공격 범위 내에서 충돌 체크
+	float Radius = 300.0f;
+	TArray<FHitResult> HitResults;
+
+	// 트레이스 수행
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this); // 자신은 무시하도록 설정
+
+	bool bHit = GetWorld()->SweepMultiByChannel(
+		HitResults,
+		Start,               // 시작 위치
+		End,                 // 끝 위치
+		FQuat::Identity,     // 회전값 (회전 없이)
+		ECollisionChannel::ECC_OverlapAll_Deprecated, // 충돌 채널
+		FCollisionShape::MakeSphere(Radius), // 범위 설정 (구체 모양)
+		QueryParams
+	);
+
+	// 구체 보이게 하기
+	if (GEngine)
+	{
+		DrawDebugSphere(
+			GetWorld(),
+			Start,
+			Radius,
+			12,
+			FColor::Red,        // 색상
+			false,              // 지속성 (게임 중 계속 표시할지 여부)
+			1.0f                // 지속 시간
+		);
+	}
+
+	// 데미지를 입힌 액터를 추적할 Set (중복 방지)
+	// Set이 없으면 근접공격한번에 여러번 데미지 받는 현상 발생
+	TSet<AActor*> DamagedActors;
+
+	if (bHit)
+	{
+		// 여러 충돌 객체가 있다면
+		for (const FHitResult& Hit : HitResults)
+		{
+			// 충돌한 객체가 있다면
+			AActor* HitActor = Hit.GetActor();
+
+			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+			{
+				UGameplayStatics::ApplyDamage(
+					HitActor,
+					30.0f,	// 수정필요
+					nullptr,
+					this,
+					UDamageType::StaticClass()
+				);
+			}
+
+			// 데미지를 입힌 액터를 Set에 추가
+			DamagedActors.Add(HitActor);
+		}
+	}
+}
+
+void APlayerCharacterAurora::NextCombo()
+{
+	IsAttack = false;
+
+	ComboCount = ++ComboCount % 4;
+}
+
+void APlayerCharacterAurora::ResetCombo()
+{
+	ComboCount = 0;
+}

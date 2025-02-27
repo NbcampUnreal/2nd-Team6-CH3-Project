@@ -33,7 +33,7 @@ protected:
 	void Move(const FInputActionValue& value);
 
 	// 마우스 회전
-	void Look(const FInputActionValue& value);
+	virtual void Look(const FInputActionValue& value);
 
 	// 점프
 	void StartJump(const FInputActionValue& value);
@@ -43,24 +43,8 @@ protected:
 	void StartSprint(const FInputActionValue& value);
 	void StopSprint(const FInputActionValue& value);
 
-	// 공격
-	void Attack(const FInputActionValue& value);
-	virtual bool ActiveWeapon();
-
-	// 근접공격
-	void MeleeAttack(const FInputActionValue& value);
-	void EndMeleeAttack();
-
-	// 재장전
-	void ReloadAction(const FInputActionValue& value);
-	virtual void Reload();
-
 	// 상호작용
 	void Interaction(const FInputActionValue& value);
-
-	// 줌 인/아웃
-	void ZoomIn(const FInputActionValue& value);
-	void ZoomOut(const FInputActionValue& value);
 
 	// 앉기
 	void StartCrouch(const FInputActionValue& value);
@@ -88,27 +72,17 @@ protected:
 	// 체력 회복
 	void AmountHP(int32 AmountHP);
 
-	// 탄환 Setter
-	void SetAmmo(int32 NewAmmo);
-
-	// 탄환 더하기
-	void AmountAmmo(int32 AmountAmmo);
-
 	// 강화해놓은 스테이터스값 받기
 	void GetUpgradeStatus();
 
 	// 죽음
-	void ActiveDieAction();
+	virtual void ActiveDieAction();
 
 public:
 	// 캐릭터 타입 반환
 	ECharacterType GetCharacterType();
 
-	void MeleeAttackTrace();
-
-	// 공격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	UAnimMontage* AttackMontage;
+	virtual void AttackTrace();
 
 	// 캐릭터 타입
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -146,13 +120,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float AttackSpeed;
 
-	// 최대 탄환
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	int32 MaxAmmo;
-
-	// 현재 탄환
-	int32 CurrentAmmo;
-
 	// 치명타 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 CriticalProb;
@@ -188,14 +155,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	bool IsCrouch;
 
-	// 재장전 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	UAnimMontage* MeleeAttackMontage;
-
-	// 재장전 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	float MeleeAttackDelay;
-
 	// 피격 애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	UAnimMontage* HitActionMontage;
@@ -205,28 +164,16 @@ public:
 	UAnimMontage* DieActionMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> MeleeAttackSound;	// 근접공격 사운드
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> ReloadSound;			// 재장전 사운드
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	UAudioComponent* CurrentAudioComp;
 
 private:
 	// 캡슐 높이 <- 앉기에서 사용
 	float CapsuleHeight;
 
-	FTimerHandle MeleeAttackDelayHandle;
-
 protected:
-	bool bIsMeleeAttack;
-	bool bIsAttack;
-	bool bIsReloading;
 	bool IsDie;
-	bool IsZoom;
 
 	AEdmundGameState* CurrentGameState;
 
-	bool CheckAction();
+	virtual bool CheckAction();
 };

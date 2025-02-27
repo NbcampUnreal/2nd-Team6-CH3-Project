@@ -20,10 +20,10 @@ class EDMUNDPRJ_API AEdmundGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	void RequestInteractionToMissionHandle();
 	void InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet);
 	void StartMission(ESceneType CurrentScene);
-	void EndMission();
+	void ClearMission();
+	void FailMission();
 
 private:
 	virtual void BeginPlay() override;

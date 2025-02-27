@@ -42,7 +42,7 @@ public:
 	void QuitGame() const;
 
 	// Current Mission Cleared or Fail 
-	void EndMission() const;
+	void EndMission(const bool bIsClear) const;
 	bool CheckClearedMission(const int32 Index) const;
 	void DestroyedGameState();
 

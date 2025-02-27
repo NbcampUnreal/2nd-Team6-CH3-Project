@@ -52,7 +52,7 @@ public:
 	const TArray<FSpawnerDataRow*>& GetSpawnerDataBySceneType(const ESceneType SceneType);
 
 	// Controll Play Data
-	void UpdateClearMission(const int32 Index);
+	void UpdateClearMission(const ESceneType SceneType);
 	const bool GetIsClearedMission(const int32 Index) const;
 	void UpdateShowedIntro(const bool bShowed);
 	const bool GetIsShowedIntro() const;

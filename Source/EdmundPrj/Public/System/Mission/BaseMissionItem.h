@@ -18,11 +18,14 @@ class EDMUNDPRJ_API ABaseMissionItem : public AActor
 	
 public:	
 	ABaseMissionItem();
-	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type,  const FString& MissionInfo);
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type);
 	virtual void ActionEventByPressedKey();
 	virtual void SetIsActive(bool Value);
 
-	void PrintMissionText();
+	void SetMissionText(const FString& NewInfoText, const FString& NewActiveText, const FString& NewClearText);
+	void PrintMissionInfoText();
+	void PrintMissionActiveText();
+	void PrintMissionClearText();
 	
 protected:
 	UFUNCTION()
@@ -46,8 +49,8 @@ protected:
 	void ApplyOverlapCollision(bool bIsBlockedMesh);
 	void ApplyBlockCollision();
 
-	void UpdateMissionTextToUI();
-	void UpdateNotifyTextToUI();
+	void UpdateMissionTextToUI(const FString& TargetText, bool bIsClear = false);
+	void UpdateNotifyTextToUI(const FString& TargetText);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -66,7 +69,10 @@ protected:
 	TObjectPtr<AMissionHandle> MissionHandle;
 	TObjectPtr<UInteractionWidget> InteractionWidget;
 	FName MissionType;
-	FString MissionText;
+	FString MissionInfoText;
+	FString MissionActiveText;
+	FString MissionClearText;
+
 	bool bIsPlayingInteraction = false;
 	bool bIsActive = false;
 	float ProgressValue = 1.0f;

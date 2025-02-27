@@ -8,6 +8,8 @@
 #include "System/DataStructure/PlayerSkillRow.h"
 #include "System/Observer/GameStateObserver.h"
 #include "Player/BaseCharacter.h"
+#include "System/MissionHandle.h"
+#include "System/SpawnerHandle.h"
 
 void AEdmundGameState::BeginPlay()
 {
@@ -162,10 +164,20 @@ void AEdmundGameState::CancleSelectedCharacter()
 	MainLevelPlayerController->SetTargetToNull();
 }
 
+void AEdmundGameState::SetMissionHandle(AMissionHandle* NewMissionHandle)
+{
+	MissionHandle = NewMissionHandle;
+}
+
+void AEdmundGameState::SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle)
+{
+	SpawnerHandle = NewSpawnerHandle;
+}
+
 void AEdmundGameState::RequestInteraction()
 {
-	checkf(IsValid(EdmundGameMode), TEXT("Edmund Game Mode is invalid"));
-	EdmundGameMode->RequestInteractionToMissionHandle();
+	checkf(IsValid(MissionHandle), TEXT("Mission Handle is invalid"));
+	MissionHandle->OnPressedKeyFromPlayer();
 }
 
 void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
@@ -216,6 +228,11 @@ void AEdmundGameState::NotifyPlayerHp(const int32 MaxHp, const int32 CurrentHp)
 			continue;
 		}
 		Observer->ChangedPlayerHp(MaxHp, CurrentHp);
+	}
+
+	if (CurrentHp <= 0)
+	{
+		EdmundGameMode->FailMission();
 	}
 }
 

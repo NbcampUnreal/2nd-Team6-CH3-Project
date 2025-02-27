@@ -7,11 +7,6 @@
 #include "System/MissionHandle.h"
 #include "System/SpawnerHandle.h"
 
-void AEdmundGameMode::RequestInteractionToMissionHandle()
-{
-	checkf(IsValid(MissionHandle), TEXT("Mission Handle is invalid"));
-	MissionHandle->OnPressedKeyFromPlayer();
-}
 
 void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet)
 {
@@ -21,16 +16,24 @@ void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const T
 	checkf(IsValid(MissionHandleClass), TEXT("Mission Handle Class is invalid"));
 	MissionHandle = GetWorld()->SpawnActor<AMissionHandle>(MissionHandleClass);
 	MissionHandle->InitMissionHandle(MissionDataSet, this, EdmundGameState);
+	EdmundGameState->SetMissionHandle(MissionHandle);
 
 	checkf(IsValid(SpawnerHandleClass), TEXT("Spawner Handle Class is invalid"));
 	SpawnerHandle = GetWorld()->SpawnActor<ASpawnerHandle>(SpawnerHandleClass);
 	SpawnerHandle->InitSpawnerHandle(this, EdmundGameState, SpawnerDataSet);
+	EdmundGameState->SetSpawnerHandle(SpawnerHandle);
 }
 
-void AEdmundGameMode::EndMission()
+void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameInstance->EndMission();
+	EdmundGameInstance->EndMission(true);
+}
+
+void AEdmundGameMode::FailMission()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->EndMission(false);
 }
 
 void AEdmundGameMode::BeginPlay()
@@ -66,3 +69,4 @@ void AEdmundGameMode::StartMission(ESceneType CurrentScene)
 		SpawnerHandle->ApplySpawnerDataInLevel();
 	}
 }
+

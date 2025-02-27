@@ -11,6 +11,8 @@ enum class ETimerSkillType : uint8
 {
 	Thunder = 0,
 	Meteor,
+	AttackPlants,
+	HealPlants,
 	Plants
 };
 
