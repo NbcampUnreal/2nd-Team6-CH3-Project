@@ -361,7 +361,7 @@ void ABaseCharacter::PauseAction(const FInputActionValue& value)
 {
 	if (IsValid(CurrentGameState))
 	{
-		//CurrentGameState->OnPressedPauseKey();
+		CurrentGameState->OnPressedPauseKey();
 	}
 }
 
