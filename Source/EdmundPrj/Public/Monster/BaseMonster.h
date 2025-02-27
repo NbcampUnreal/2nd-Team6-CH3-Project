@@ -8,6 +8,7 @@
 #include "Components/AudioComponent.h"
 #include "BaseMonster.generated.h"
 
+class AMonsterSpawner;
 class USphereComponent;
 class UWidgetComponent;
 
@@ -31,9 +32,13 @@ void SetIsDead(bool bNewIsDead);
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
 
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|BulletPool")
+AMonsterSpawner* MonsterSpawner;
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
+USphereComponent* MonsterAttackRange;
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
-	USphereComponent* MonsterAttackRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	int32 MonsterLevel = 1;
@@ -145,6 +150,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void MonsterAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void SetChaseMode();
 
 	void MonsterAttackEnd();
 

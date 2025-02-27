@@ -7,19 +7,7 @@
 class ABoss;
 
 // 전역 보스 상태 열거형
-UENUM(BlueprintType)
-enum class EBossState : uint8 {
-    Idle        UMETA(DisplayName = "Idle"),
-    Chase       UMETA(DisplayName = "Chase"),
-    Attack1     UMETA(DisplayName = "Attack1"),
-    Attack2     UMETA(DisplayName = "Attack2"),
-    Attack3     UMETA(DisplayName = "Attack3"),
-    Attack4     UMETA(DisplayName = "Attack4"),
-    Skill1      UMETA(DisplayName = "Skill1"),
-    Skill2      UMETA(DisplayName = "Skill2"),
-    Skill3      UMETA(DisplayName = "Skill3"),
-    Dead        UMETA(DisplayName = "Dead")
-};
+
 
 // 보스 상태 기본 클래스
 UCLASS()

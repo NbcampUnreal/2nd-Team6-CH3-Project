@@ -21,8 +21,8 @@ void AEdmundGameState::BeginPlay()
 	PlayerPawn = PlayerController->GetPawn();
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->StartedGameState();
-	EdmundGameMode->InitMission();
+	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
+
 	InitSkillData();
 	InitMainLevel();
 
@@ -152,7 +152,7 @@ void AEdmundGameState::SetSelectedCharacter(AActor* Character)
 	checkf(IsValid(Character), TEXT("Selected Character is invalid"));
 
 	ABaseCharacter* TargetActor = Cast<ABaseCharacter>(Character);
-	NotifySelectCharacterType(TargetActor->getCharacterType());
+	NotifySelectCharacterType(TargetActor->GetCharacterType());
 }
 
 void AEdmundGameState::CancleSelectedCharacter()
@@ -216,6 +216,11 @@ void AEdmundGameState::NotifyPlayerHp(const int32 MaxHp, const int32 CurrentHp)
 			continue;
 		}
 		Observer->ChangedPlayerHp(MaxHp, CurrentHp);
+	}
+
+	if (CurrentHp <= 0)
+	{
+		EdmundGameMode->FailMission();
 	}
 }
 

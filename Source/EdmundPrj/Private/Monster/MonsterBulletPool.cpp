@@ -41,7 +41,6 @@ void AMonsterBulletPool::InitializeMonsterBulletPool(int32 PoolSize)
             {
                 NewBullet->SetActorHiddenInGame(true);
                 BulletPool.Add(NewBullet);
-                UE_LOG(LogTemp, Warning, TEXT("TT"));
             }
         }
         else
@@ -66,9 +65,10 @@ ARangedMonsterBullet* AMonsterBulletPool::GetBulletFromPool()
 
         UE_LOG(LogTemp, Warning, TEXT("모든 Bullet이 Hidden이 아님"));
     }
+
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("CC"));
+		UE_LOG(LogTemp, Error, TEXT("BulletPool안에 Bullet이 없음"));
     }
 
     UE_LOG(LogTemp, Error, TEXT("There is no MonsterBullet in the object pool."));

@@ -23,6 +23,7 @@ void AMissionItemPrison::ActionEventByPressedKey()
 	Super::ActionEventByPressedKey();
 
 	InteractionWidget->VisibleProgressBar(true);
+	SetActorTickEnabled(true);
 }
 
 AMissionItemPrison::AMissionItemPrison() : Super()
@@ -32,20 +33,21 @@ AMissionItemPrison::AMissionItemPrison() : Super()
 
 void AMissionItemPrison::ActionBeginOverlap()
 {
-	if (!bIsStarted)
+	if (!bIsActive)
 	{
 		return;
 	}
 
 	Super::ActionBeginOverlap();
 
+	ProgressValue = 1.0f;
+	InteractionWidget->UpdateProgressBar(ProgressValue);
 	InteractionWidget->VisibleNotify(true);
-	SetActorTickEnabled(true);
 }
 
 void AMissionItemPrison::ActionEndOverlap()
 {
-	if (!bIsStarted)
+	if (!bIsActive)
 	{
 		return;
 	}
@@ -70,7 +72,7 @@ void AMissionItemPrison::Tick(float DeltaTime)
 	if (CurrentTime >= TargetTime)
 	{
 		CurrentTime = 0.0f;
-		ProgressValue -= 0.1f;
+		ProgressValue -= TargetTime;
 		InteractionWidget->UpdateProgressBar(ProgressValue);
 
 		if (ProgressValue <= 0.0f)
@@ -82,11 +84,11 @@ void AMissionItemPrison::Tick(float DeltaTime)
 
 void AMissionItemPrison::CompleteProgress()
 {
-	SetActorTickEnabled(false);
-	InteractionWidget->VisibleProgressBar(false);
+	Super::CompleteProgress();
 
-	UpdateNotifyTextToUI();
-	//MissionHandle->CompleteMission();
+	SetVisible(false);
+	//UpdateNotifyTextToUI();
+	MissionHandle->CompleteMission();
 }
 
 

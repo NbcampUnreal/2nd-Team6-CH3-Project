@@ -5,6 +5,7 @@
 #include "System/EdmundGameInstance.h"
 #include "System/EdmundGameState.h"
 #include "System/MissionHandle.h"
+#include "System/SpawnerHandle.h"
 
 void AEdmundGameMode::RequestInteractionToMissionHandle()
 {
@@ -12,23 +13,35 @@ void AEdmundGameMode::RequestInteractionToMissionHandle()
 	MissionHandle->OnPressedKeyFromPlayer();
 }
 
-void AEdmundGameMode::EndMission()
+void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet)
+{
+	EdmundGameInstance = NewGameInstance;
+	EdmundGameState = Cast<AEdmundGameState>(GameState);
+
+	checkf(IsValid(MissionHandleClass), TEXT("Mission Handle Class is invalid"));
+	MissionHandle = GetWorld()->SpawnActor<AMissionHandle>(MissionHandleClass);
+	MissionHandle->InitMissionHandle(MissionDataSet, this, EdmundGameState);
+
+	checkf(IsValid(SpawnerHandleClass), TEXT("Spawner Handle Class is invalid"));
+	SpawnerHandle = GetWorld()->SpawnActor<ASpawnerHandle>(SpawnerHandleClass);
+	SpawnerHandle->InitSpawnerHandle(this, EdmundGameState, SpawnerDataSet);
+}
+
+void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameInstance->EndMission();
+	EdmundGameInstance->EndMission(true);
+}
+
+void AEdmundGameMode::FailMission()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->EndMission(false);
 }
 
 void AEdmundGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	EdmundGameInstance = GetGameInstance<UEdmundGameInstance>();
-	EdmundGameState = GetGameState<AEdmundGameState>();
-	
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	checkf(IsValid(EdmundGameState), TEXT("GameState is invalid"));
-
-	CurrentScene = EdmundGameInstance->GetCurrentSceneName();
 }
 
 void AEdmundGameMode::InitDefaultPawnByCharacterType()
@@ -41,7 +54,7 @@ void AEdmundGameMode::InitDefaultPawnByCharacterType()
 	// 찾아보고 해야할듯
 }
 
-void AEdmundGameMode::InitMission()
+void AEdmundGameMode::StartMission(ESceneType CurrentScene)
 {
 	switch (CurrentScene)
 	{
@@ -55,7 +68,8 @@ void AEdmundGameMode::InitMission()
 		return;
 
 	default:
-		MissionHandle = GetWorld()->SpawnActor<AMissionHandle>(MissionHandleClass);
-		MissionHandle->InitMissionHandle(EdmundGameInstance->GetCurrentMissionData(CurrentScene), this, EdmundGameState);
+		MissionHandle->ApplyMissionDataInLevel();
+		SpawnerHandle->ApplySpawnerDataInLevel();
 	}
 }
+

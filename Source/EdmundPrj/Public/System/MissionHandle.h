@@ -19,6 +19,7 @@ class EDMUNDPRJ_API AMissionHandle : public AActor
 public:	
 	AMissionHandle();
 	void InitMissionHandle(const TArray<FMissionDataRow*>& MissionData, AEdmundGameMode* EdGameMode, AEdmundGameState* EdGameState);
+	void ApplyMissionDataInLevel();
 
 	void OnBeginOverlapedItem(ABaseMissionItem* MissionItem);
 	void OnEndOverlapedItem();
@@ -34,14 +35,16 @@ public:
 	void SetPrisonLocation(const FVector& PrisonPos);
 
 	// Mission2
+	void ApplyNpcEquip();
 
 	// Mission3
+	void DecressSpawnerCountFromBoss();
+	void LockToBossMonsterSkill(int32 SkillIndex);
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	void ApplyMissionDataInLevel();
 	void SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo);
 
 private:
@@ -57,6 +60,9 @@ private:
 	FVector PrisonLocation = FVector::ZeroVector;
 
 	int32 MainMissionIndex = 0;
+	int32 SpawnerCountFromBoss = 0;
+
+	bool bGetNpcEquip = false;
 
 	FTimerHandle TestTimer;
 };

@@ -14,17 +14,29 @@ class EDMUNDPRJ_API ABoss_Skill3_Wall : public AActor
 public:
     ABoss_Skill3_Wall();
 
-protected:
     virtual void BeginPlay() override;
-
-public:
     virtual void Tick(float DeltaTime) override;
+
+    // 객체 풀을 위한 정적 변수
+    static TArray<ABoss_Skill3_Wall*> WallPool;
+
+    // 벽 활성화 상태
+    bool bIsActive;
+
+    // 풀에서 벽을 가져오는 함수
+    static ABoss_Skill3_Wall* GetWallFromPool(UWorld* World, TSubclassOf<ABoss_Skill3_Wall> WallClass);
+
+    // 벽을 활성화하는 함수 (위치, 회전 설정)
+    void ActivateWall(FVector SpawnLocation, FRotator SpawnRotation);
+
+    // 벽을 비활성화하고 풀로 반환하는 함수
+    void DeactivateWall();
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UStaticMeshComponent* MeshComp;
 
+    // 중력 시뮬레이션 관련
     FTimerHandle GravityTimerHandle;
-
     UFUNCTION()
     void SimulateGravity();
 
