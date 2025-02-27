@@ -52,5 +52,6 @@ void AMissionItemTraceWeaken::ActionEndOverlap()
 void AMissionItemTraceWeaken::FindTraceByPlayer()
 {
 	PrintMissionClearText();
+	SetIsActive(false);
 	SetVisible(false);
 }
