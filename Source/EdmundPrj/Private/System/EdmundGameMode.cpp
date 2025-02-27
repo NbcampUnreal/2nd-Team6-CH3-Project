@@ -27,10 +27,16 @@ void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const T
 	SpawnerHandle->InitSpawnerHandle(this, EdmundGameState, SpawnerDataSet);
 }
 
-void AEdmundGameMode::EndMission()
+void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameInstance->EndMission();
+	EdmundGameInstance->EndMission(true);
+}
+
+void AEdmundGameMode::FailMission()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->EndMission(false);
 }
 
 void AEdmundGameMode::BeginPlay()
@@ -66,3 +72,4 @@ void AEdmundGameMode::StartMission(ESceneType CurrentScene)
 		SpawnerHandle->ApplySpawnerDataInLevel();
 	}
 }
+

@@ -119,19 +119,19 @@ const TArray<FSpawnerDataRow*>& UDataHandle::GetSpawnerDataBySceneType(const ESc
 	return CurrentSpawnerData;
 }
 
-void UDataHandle::UpdateClearMission(const int32 Index)
+void UDataHandle::UpdateClearMission(const ESceneType SceneType)
 {
-	switch (Index)
+	switch (SceneType)
 	{
-	case 0:
+	case ESceneType::Mission1:
 		PlayData[0]->bClearedMission1 = true;
 		break;
 
-	case 1:
+	case ESceneType::Mission2:
 		PlayData[0]->bClearedMission2 = true;
 		break;
 
-	case 2:
+	case ESceneType::Mission3:
 		PlayData[0]->bClearedMission3 = true;
 		break;
 

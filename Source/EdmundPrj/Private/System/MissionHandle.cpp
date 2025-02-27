@@ -75,7 +75,7 @@ void AMissionHandle::CompleteMission()
 
 	if (MainMissionIndex == MainMissionSet.Num())
 	{
-		EdmundGameMode->EndMission();
+		EdmundGameMode->ClearMission();
 	}
 	else
 	{
@@ -94,6 +94,22 @@ const FVector AMissionHandle::GetDirectionToPrison(const FVector& ActorPos) cons
 void AMissionHandle::SetPrisonLocation(const FVector& PrisonPos)
 {
 	PrisonLocation = PrisonPos;
+}
+
+void AMissionHandle::ApplyNpcEquip()
+{
+	bGetNpcEquip = true;
+	// npc가 도움 주게 변경 필요
+}
+
+void AMissionHandle::DecressSpawnerCountFromBoss()
+{
+	--SpawnerCountFromBoss;
+}
+
+void AMissionHandle::LockToBossMonsterSkill(int32 SkillIndex)
+{
+
 }
 
 void AMissionHandle::BeginPlay()
@@ -123,6 +139,8 @@ void AMissionHandle::ApplyMissionDataInLevel()
 
 void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo)
 {
+	checkf(IsValid(SpawnClass), TEXT("Mission Item Class is invalid"));
+
 	FActorSpawnParameters SpawnParam;
 
 	ABaseMissionItem* NewMissionItem = GetWorld()->SpawnActor<ABaseMissionItem>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);

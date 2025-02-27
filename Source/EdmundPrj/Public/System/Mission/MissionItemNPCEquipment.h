@@ -14,4 +14,10 @@ class EDMUNDPRJ_API AMissionItemNPCEquipment : public ABaseMissionItem
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo) override;
+	virtual void ActionBeginOverlap() override;
+	virtual void ActionEndOverlap() override;
+	virtual void ActionEventByPressedKey() override;
+
 };

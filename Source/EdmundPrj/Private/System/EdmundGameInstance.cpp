@@ -105,10 +105,16 @@ void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode) c
 	EdmundGameState->ChangeInputMode(InputMode);
 }
 
-void UEdmundGameInstance::EndMission() const
+void UEdmundGameInstance::EndMission(const bool bIsClear) const
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 	UIHandle->AddToViewportByCoverType(EWidgetType::ResultWidget);
+
+	if (bIsClear)
+	{
+		checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+		DataHandle->UpdateClearMission(GetCurrentSceneName());
+	}
 }
 
 void UEdmundGameInstance::DestroyedGameState() 
