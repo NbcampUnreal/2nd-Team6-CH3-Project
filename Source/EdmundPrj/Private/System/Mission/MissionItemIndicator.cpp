@@ -31,6 +31,20 @@ float AMissionItemIndicator::TakeDamage(float DamageAmount, FDamageEvent const& 
 
 void AMissionItemIndicator::ShowDirectionToTarget()
 {
-	//방향 표시
+	if (!IsValid(PartsClass))
+	{
+		return;
+	}
+
+	FActorSpawnParameters SpawnParam;
+	FVector SpawnPos = GetActorLocation() + GetActorUpVector() * 200;
+
+	IndicatorParts = GetWorld()->SpawnActor<ABaseMissionItem>(PartsClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
+	
+	if (IsValid(IndicatorParts))
+	{
+		IndicatorParts->InitMissionItem(MissionHandle, "Parts");
+	}
+
 	SetVisible(false);
 }

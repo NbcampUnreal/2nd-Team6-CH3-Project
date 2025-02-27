@@ -19,6 +19,12 @@ public:
 private:
 	void ShowDirectionToTarget();
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parts")
+	TSubclassOf<ABaseMissionItem> PartsClass;
+
 private:
+	TObjectPtr<ABaseMissionItem> IndicatorParts;
+
 	int32 HitCount = 5;
 };
