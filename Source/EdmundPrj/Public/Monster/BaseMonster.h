@@ -11,6 +11,7 @@
 class AMonsterSpawner;
 class USphereComponent;
 class UWidgetComponent;
+class ABaseItem;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseMonster : public ACharacter
@@ -25,7 +26,7 @@ float GetMonsterAttackDamage();
 
 virtual void MonsterAttackCheck();
 
-void MonsterDead();
+virtual void MonsterDead();
 
 void SetIsDead(bool bNewIsDead);
 
@@ -37,6 +38,12 @@ AMonsterSpawner* MonsterSpawner;
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Component")
 USphereComponent* MonsterAttackRange;
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Spawn")
+TArray<TSubclassOf<ABaseItem>> AllItems;
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Spawn")
+TSubclassOf<ABaseItem> ItemClass;
 
 protected:
 
@@ -110,10 +117,10 @@ protected:
 	float MonsterGoldReward = 3.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Item")
-	float MonsterHealKitProbability = 0.02f;
+	float MonsterHealKitProbability = 2.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Item")
-	float MonsterGoldProbability = 1.0f;
+	float MonsterGoldProbability = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|UI")
 	UWidgetComponent* MonsterOverHeadWidget;
@@ -152,7 +159,7 @@ protected:
 	void MonsterAttack();
 
 	UFUNCTION(BlueprintCallable)
-	void SetChaseMode();
+	void SetChaseMode(bool Mode);
 
 	void MonsterAttackEnd();
 
