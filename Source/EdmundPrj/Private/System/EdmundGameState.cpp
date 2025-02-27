@@ -217,6 +217,11 @@ void AEdmundGameState::NotifyPlayerHp(const int32 MaxHp, const int32 CurrentHp)
 		}
 		Observer->ChangedPlayerHp(MaxHp, CurrentHp);
 	}
+
+	if (CurrentHp <= 0)
+	{
+		EdmundGameMode->FailMission();
+	}
 }
 
 void AEdmundGameState::NotifyPlayerOther(const int32 MaxValue, const int32 CurrentValue)

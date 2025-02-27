@@ -2,4 +2,51 @@
 
 
 #include "System/Mission/MissionItemNPCEquipment.h"
+#include "System/MissionHandle.h"
+#include "UI/3DWidget/InteractionWidget.h"
 
+void AMissionItemNPCEquipment::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+{
+	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+
+	ApplyOverlapCollision(false);
+}
+
+void AMissionItemNPCEquipment::ActionBeginOverlap()
+{
+	if (bIsPlayingInteraction)
+	{
+		return;
+	}
+
+	Super::ActionBeginOverlap();
+
+	InteractionWidget->VisibleNotify(true);
+}
+
+void AMissionItemNPCEquipment::ActionEndOverlap()
+{
+	if (!bIsActive)
+	{
+		return;
+	}
+
+	Super::ActionEndOverlap();
+
+	InteractionWidget->VisibleNotify(false);
+}
+
+void AMissionItemNPCEquipment::ActionEventByPressedKey()
+{
+	if (!bIsActive)
+	{
+		return;
+	}
+
+	Super::ActionEventByPressedKey();
+
+	MissionHandle->ApplyNpcEquip();
+	PrintMissionText();
+	SetVisible(false);
+	SetIsActive(false);
+}

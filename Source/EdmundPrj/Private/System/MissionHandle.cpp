@@ -75,7 +75,7 @@ void AMissionHandle::CompleteMission()
 
 	if (MainMissionIndex == MainMissionSet.Num())
 	{
-		EdmundGameMode->EndMission();
+		EdmundGameMode->ClearMission();
 	}
 	else
 	{
@@ -94,6 +94,12 @@ const FVector AMissionHandle::GetDirectionToPrison(const FVector& ActorPos) cons
 void AMissionHandle::SetPrisonLocation(const FVector& PrisonPos)
 {
 	PrisonLocation = PrisonPos;
+}
+
+void AMissionHandle::ApplyNpcEquip()
+{
+	bGetNpcEquip = true;
+	// npc가 도움 주게 변경 필요
 }
 
 void AMissionHandle::DecressSpawnerCountFromBoss()

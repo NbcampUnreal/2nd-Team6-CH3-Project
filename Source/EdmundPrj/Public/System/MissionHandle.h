@@ -35,6 +35,7 @@ public:
 	void SetPrisonLocation(const FVector& PrisonPos);
 
 	// Mission2
+	void ApplyNpcEquip();
 
 	// Mission3
 	void DecressSpawnerCountFromBoss();
@@ -60,6 +61,8 @@ private:
 
 	int32 MainMissionIndex = 0;
 	int32 SpawnerCountFromBoss = 0;
+
+	bool bGetNpcEquip = false;
 
 	FTimerHandle TestTimer;
 };
