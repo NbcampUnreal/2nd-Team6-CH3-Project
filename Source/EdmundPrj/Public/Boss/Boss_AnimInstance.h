@@ -54,4 +54,5 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Skill3Montage;
+
 };

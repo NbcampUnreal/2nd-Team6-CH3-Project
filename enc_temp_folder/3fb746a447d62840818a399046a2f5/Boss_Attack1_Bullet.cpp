@@ -82,19 +82,30 @@ void ABoss_Attack1_Bullet::Tick(float DeltaTime)
 
 void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnRotation, FVector Direction)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[FireProjectile] Called. SpawnLocation: %s, SpawnRotation: %s"), *SpawnLocation.ToString(), *SpawnRotation.ToString());
+
+	// 발사 위치 및 회전 설정
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
 
 	if (BossRef)
 	{
 		SetOwner(BossRef);
+		UE_LOG(LogTemp, Warning, TEXT("[FireProjectile] Owner set to Boss: %s"), *BossRef->GetName());
 		CollisionComp->IgnoreActorWhenMoving(BossRef, true);
+		UE_LOG(LogTemp, Warning, TEXT("[FireProjectile] Set to ignore collision with Boss."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[FireProjectile] BossRef is null."));
 	}
 
+	// 탄환 활성화 및 초기화
 	bIsActive = true;
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
+	UE_LOG(LogTemp, Warning, TEXT("[FireProjectile] Bullet activated."));
 }
 
 void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
@@ -103,7 +114,13 @@ void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* Othe
 	if (OtherActor && OtherActor != this && OtherActor != GetOwner() &&
 		!OtherActor->IsA(ABoss_Attack1_Bullet::StaticClass()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[OnHit] Bullet hit: %s"), *OtherActor->GetName());
 		Explode();
+	}
+	else
+	{
+		FString OtherName = OtherActor ? *OtherActor->GetName() : TEXT("NULL");
+		UE_LOG(LogTemp, Warning, TEXT("[OnHit] Ignored collision with: %s"), *OtherName);
 	}
 }
 
@@ -113,7 +130,13 @@ void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 	if (OtherActor && OtherActor != this && OtherActor != GetOwner() &&
 		!OtherActor->IsA(ABoss_Attack1_Bullet::StaticClass()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[OnOverlapBegin] Bullet overlapped with: %s"), *OtherActor->GetName());
 		Explode();
+	}
+	else
+	{
+		FString OtherName = OtherActor ? *OtherActor->GetName() : TEXT("NULL");
+		UE_LOG(LogTemp, Warning, TEXT("[OnOverlapBegin] Ignored overlap with: %s"), *OtherName);
 	}
 }
 
@@ -124,14 +147,24 @@ void ABoss_Attack1_Bullet::Explode()
 	if (!bIsActive)
 		return;
 
+	// 탄환은 즉시 숨기고 충돌 비활성화
 	bIsActive = false;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 
+	// 현재 위치에서 폭발 파티클 스폰 (ExplosionEffectTemplate이 에디터에서 할당되어 있어야 함)
 	if (ExplosionEffect->Template)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect->Template, GetActorLocation());
 	}
+	else
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("ExplosionEffect Template is not assigned!"));
+	}
+
+	//UE_LOG(LogTemp, Log, TEXT("Bullet exploded at: %s"), *GetActorLocation().ToString());
+
+	// ExplosionDelay 후에 ResetBullet() 호출하여 탄환을 풀에 반환
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss_Attack1_Bullet::ResetBullet, ExplosionDelay, false);
 }
@@ -139,11 +172,13 @@ void ABoss_Attack1_Bullet::Explode()
 
 void ABoss_Attack1_Bullet::ResetBullet()
 {
+	// 탄환 초기화
 	bIsActive = false;
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 
+	// 탄환 풀이 누락되었으면 추가
 	if (!BulletPool.Contains(this))
 	{
 		BulletPool.Add(this);
@@ -152,6 +187,7 @@ void ABoss_Attack1_Bullet::ResetBullet()
 
 ABoss_Attack1_Bullet* ABoss_Attack1_Bullet::GetBulletFromPool(UWorld* World, TSubclassOf<ABoss_Attack1_Bullet> BulletClass, ABoss* InBossRef)
 {
+	// 사용 중이지 않은 탄환 반환
 	for (ABoss_Attack1_Bullet* Bullet : BulletPool)
 	{
 		if (Bullet && !Bullet->bIsActive)
@@ -160,10 +196,11 @@ ABoss_Attack1_Bullet* ABoss_Attack1_Bullet::GetBulletFromPool(UWorld* World, TSu
 			return Bullet;
 		}
 	}
+	// 없으면 새로 생성 후 풀에 추가
 	if (World)
 	{
 		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = InBossRef;
+		SpawnParams.Owner = InBossRef; // 소유자를 보스로 설정
 		ABoss_Attack1_Bullet* NewBullet = World->SpawnActor<ABoss_Attack1_Bullet>(BulletClass, SpawnParams);
 		if (NewBullet)
 		{

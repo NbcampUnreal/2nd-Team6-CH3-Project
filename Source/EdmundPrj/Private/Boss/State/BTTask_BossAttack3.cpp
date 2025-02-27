@@ -126,7 +126,7 @@ void UBTTask_BossAttack3::ExecuteRangedComboAttack()
 	FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
 	FRotator TargetRotation = Direction.Rotation();
 
-	ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
+	ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass, BossRef);
 	if (Bullet)
 	{
 		Bullet->FireProjectile(SpawnLocation, TargetRotation, Direction);

@@ -24,7 +24,7 @@ float GetMonsterAttackDamage();
 
 virtual void MonsterAttackCheck();
 
-void MonsterDead();
+virtual void MonsterDead();
 
 void SetIsDead(bool bNewIsDead);
 

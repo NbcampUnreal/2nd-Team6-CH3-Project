@@ -3,6 +3,7 @@
 #include "Boss/BossAIController.h"
 #include "Boss/State/Boss_Idle.h"
 #include "GameFramework/Actor.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
 
@@ -193,3 +194,55 @@ void ABoss::MonsterAttackCheck()
 {
 
 }
+
+void ABoss::OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+    if (Montage == nullptr || bInterrupted)
+    {
+        return;
+    }
+    GetMesh()->bPauseAnims = true;
+}
+
+void ABoss::MonsterDead()
+{
+    if (bIsDead)
+    {
+        return;
+    }
+
+    SetIsDead(true);
+
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+    }
+
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->StopMovementImmediately();
+        GetCharacterMovement()->DisableMovement();
+    }
+
+    if (AAIController* AICon = Cast<AAIController>(GetController()))
+    {
+        if (AICon->BrainComponent)
+        {
+            AICon->BrainComponent->StopLogic(TEXT("Boss is dead"));
+        }
+        AICon->UnPossess();
+    }
+
+    if (USkeletalMeshComponent* MeshComp = GetMesh())
+    {
+        MeshComp->SetSimulatePhysics(true);
+        MeshComp->WakeAllRigidBodies();
+        MeshComp->bBlendPhysics = true;
+    }
+}
+
+
+void ABoss::MonsterDestroy()
+{
+}
+

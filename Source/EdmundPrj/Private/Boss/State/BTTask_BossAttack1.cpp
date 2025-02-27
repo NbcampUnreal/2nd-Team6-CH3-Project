@@ -37,6 +37,7 @@ EBTNodeResult::Type UBTTask_BossAttack1::ExecuteTask(UBehaviorTreeComponent& Own
 void UBTTask_BossAttack1::DelayedFire()
 {
 	if (!BossRef) return;
+
 	UBoss_AnimInstance* AnimInst = Cast<UBoss_AnimInstance>(BossRef->GetMesh()->GetAnimInstance());
 	float TransitionDelay = 1.0f;
 	if (AnimInst && AnimInst->Attack1Montage)
@@ -96,7 +97,7 @@ void UBTTask_BossAttack1::FireBullet()
 	FRotator TargetRotation = Direction.Rotation();
 	FRotator NewRotation = FMath::RInterpTo(BossRef->GetActorRotation(), TargetRotation, BossRef->GetWorld()->GetDeltaSeconds(), 5.0f);
 	BossRef->SetActorRotation(NewRotation);
-	ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
+	ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass, BossRef);
 	if (Bullet)
 	{
 		Bullet->FireProjectile(SpawnLocation, TargetRotation, Direction);

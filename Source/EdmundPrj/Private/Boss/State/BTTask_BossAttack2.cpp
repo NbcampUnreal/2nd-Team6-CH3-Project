@@ -5,6 +5,7 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Boss/Boss_AnimInstance.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 UBTTask_BossAttack2::UBTTask_BossAttack2()
@@ -79,9 +80,10 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		FVector NewLocation = CurrentLocation - FVector(0, 0, BossRef->Attack2_DescendSpeed * DeltaSeconds);
 		FHitResult HitResult;
 		FVector TraceStart = CurrentLocation;
-		FVector TraceEnd = CurrentLocation - FVector(0, 0, 5000.0f); // 예: 5000 유닛 아래까지
+		FVector TraceEnd = CurrentLocation - FVector(0, 0, 20000.0f); 
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(BossRef);
+
 		if (BossRef->GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 		{
 			float GroundZ = HitResult.Location.Z;
@@ -89,6 +91,10 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 			{
 				NewLocation.Z = GroundZ;
 				BossRef->SetActorLocation(NewLocation, false);
+				FRotator LandingRotation = UKismetMathLibrary::MakeRotFromZX(HitResult.Normal, BossRef->GetActorForwardVector());
+				LandingRotation.Pitch = 0.0f;
+				BossRef->SetActorRotation(LandingRotation);
+
 				if (BossRef->GetCharacterMovement())
 				{
 					BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -101,12 +107,9 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 				BossRef->SetActorLocation(NewLocation, false);
 			}
 		}
-		else
-		{
-			BossRef->SetActorLocation(NewLocation, false);
-		}
 		break;
 	}
+
 	default:
 		break;
 	}

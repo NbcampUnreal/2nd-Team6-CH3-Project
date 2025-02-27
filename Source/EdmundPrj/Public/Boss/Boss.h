@@ -22,12 +22,14 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     void SetState(EBossState NewState);
-
+    void OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted);
     void InitiallizeBullerPool();
     float GetMonsterMoveSpeed() const { return MonsterMoveSpeed; }
     float SetMonsterMoveSpeed(float NewSpeed);
     void UpdateAttackCooldown(int32 AttackID);
     void MonsterAttackCheck() override;
+    void MonsterDestroy();
+    virtual void MonsterDead() override;
     float GetMonsterHP() const { return MonsterHP; }
     float GetMonsterMaxHP() const { return MonsterMaxHP; }
     int32 GetAttack1Count() const { return Attack1Count; }

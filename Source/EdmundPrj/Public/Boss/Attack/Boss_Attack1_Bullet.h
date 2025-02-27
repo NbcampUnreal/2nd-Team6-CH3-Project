@@ -7,6 +7,7 @@
 class USphereComponent;
 class UStaticMeshComponent;
 class UParticleSystemComponent;
+class ABoss;
 
 UCLASS()
 class EDMUNDPRJ_API ABoss_Attack1_Bullet : public AActor
@@ -18,6 +19,8 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	ABoss* BossRef;
 
 	// Hit 이벤트
 	UFUNCTION()
@@ -39,7 +42,7 @@ public:
 	void ResetBullet();
 
 	// 총알 풀에서 사용 가능한 탄환을 가져오거나 없으면 새로 생성하는 함수
-	static ABoss_Attack1_Bullet* GetBulletFromPool(UWorld* World, TSubclassOf<ABoss_Attack1_Bullet> BulletClass);
+	static ABoss_Attack1_Bullet* GetBulletFromPool(UWorld* World, TSubclassOf<ABoss_Attack1_Bullet> BulletClass, ABoss* InBossRef);
 
 	// 탄환 활성 여부
 	bool bIsActive = false;
