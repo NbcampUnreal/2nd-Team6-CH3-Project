@@ -121,7 +121,7 @@ void ABaseMonster::MonsterDestroy()
 	bIsDead = false;
 	bIsHit = false;
 
-	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
+	SetChaseMode(false);
 
 	DropReward();
 
@@ -169,7 +169,7 @@ void ABaseMonster::MonsterHit()
 		{
 			if (TakeDamageParticle)
 			{
-				SetChaseMode();
+				SetChaseMode(true);
 
 				UpdateMonsterOverHeadWidget();
 
@@ -235,29 +235,29 @@ void ABaseMonster::MonsterAttack()
 	}
 }
 
-void ABaseMonster::SetChaseMode()
+void ABaseMonster::SetChaseMode(bool Mode)
 {
 	AAIController* AIController = Cast<AAIController>(GetController());
-		if (AIController)
+	if (AIController)
+	{
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
 		{
-			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-			if (PlayerController)
-			{
-				APawn* PlayerPawn = PlayerController->GetPawn();
+			APawn* PlayerPawn = PlayerController->GetPawn();
 
-				AIController->GetBlackboardComponent()->SetValueAsBool(FName("HasLineOfSight"), true);
-				AIController->GetBlackboardComponent()->SetValueAsObject(FName("PlayerActor"), PlayerPawn);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: PlayerController가 없습니다."));
-			}
+			AIController->GetBlackboardComponent()->SetValueAsBool(FName("HasLineOfSight"), Mode);
+			AIController->GetBlackboardComponent()->SetValueAsObject(FName("PlayerActor"), PlayerPawn);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: AIController가 없습니다."));
+			UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: PlayerController가 없습니다."));
 		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: AIController가 없습니다."));
+	}
+}
 
 
 void ABaseMonster::MonsterAttackEnd()
