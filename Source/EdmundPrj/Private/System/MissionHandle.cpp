@@ -65,12 +65,17 @@ void AMissionHandle::RequestUpdateNotifyText(const FString& NotifyText)
 void AMissionHandle::StartMainMission()
 {
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
-	MainMissionSet[MainMissionIndex]->PrintMissionText();
+	MainMissionSet[MainMissionIndex]->PrintMissionInfoText();
 	MainMissionSet[MainMissionIndex]->SetIsActive(true);
 }
 
 void AMissionHandle::CompleteMission()
 {
+	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
+	MainMissionSet[MainMissionIndex]->PrintMissionClearText();
+
+	
+
 	++MainMissionIndex;
 
 	if (MainMissionIndex == MainMissionSet.Num())
@@ -96,10 +101,33 @@ void AMissionHandle::SetPrisonLocation(const FVector& PrisonPos)
 	PrisonLocation = PrisonPos;
 }
 
+void AMissionHandle::SetTargetPointLocation(const FVector& TargetPointPos)
+{
+	TargetPointLocation = TargetPointPos;
+}
+
+void AMissionHandle::TeleportPlayerToTargetPoint()
+{
+	AActor* PlayerPawn = EdmundGameState->GetPlayerPawn();
+
+	FVector TargetVector = TargetPointLocation - FVector(-200, -200, 0);
+	PlayerPawn->SetActorLocation(TargetVector);
+}
+
 void AMissionHandle::ApplyNpcEquip()
 {
 	bGetNpcEquip = true;
 	// npc가 도움 주게 변경 필요
+}
+
+void AMissionHandle::AddAlter(ABaseMissionItem* Alter)
+{
+	if (!IsValid(Alter))
+	{
+		return;
+	}
+
+	AlterSet.Add(Alter);
 }
 
 void AMissionHandle::DecressSpawnerCountFromBoss()
@@ -107,7 +135,34 @@ void AMissionHandle::DecressSpawnerCountFromBoss()
 	--SpawnerCountFromBoss;
 }
 
-void AMissionHandle::LockToBossMonsterSkill(int32 SkillIndex)
+void AMissionHandle::LockToBossMonsterSkill(ABaseMissionItem* Alter)
+{
+	if (!IsValid(Alter))
+	{
+		return;
+	}
+
+	for (ABaseMissionItem* TargetAlter : AlterSet)
+	{
+		TargetAlter->SetIsActive(false);
+	}
+
+	int32 SkillIndex = AlterSet.Find(Alter);
+	// 보스에 전달 필요
+}
+
+void AMissionHandle::AddDimentionPortalSet(ABaseMissionItem* DimentionPortal)
+{
+	if (!IsValid(DimentionPortal))
+	{
+		return;
+	}
+
+	DimentionPortalSet.Add(DimentionPortal);
+	++SpawnerCountFromBoss;
+}
+
+void AMissionHandle::RequestSpawnToSpawnerHandle()
 {
 
 }
@@ -124,12 +179,10 @@ void AMissionHandle::ApplyMissionDataInLevel()
 	{
 		UClass* SpawnClass = MissionDataRow->MissionItemClass.Get();
 		TArray<FVector> SpawnPosSet = MissionDataRow->SpawnLocationSet;
-		FName MissionType = MissionDataRow->MissionType;
-		FString MissionInfo = MissionDataRow->MissionInfoText;
 
 		for (const FVector& SpawnPos : SpawnPosSet)
 		{
-			SpawnMissionItem(SpawnClass, SpawnPos, MissionType, MissionInfo);
+			SpawnMissionItem(SpawnClass, SpawnPos, MissionDataRow);
 		}
 	}
 
@@ -137,7 +190,7 @@ void AMissionHandle::ApplyMissionDataInLevel()
 	StartMainMission();
 }
 
-void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo)
+void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FMissionDataRow* MissionData)
 {
 	checkf(IsValid(SpawnClass), TEXT("Mission Item Class is invalid"));
 
@@ -146,7 +199,14 @@ void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPo
 	ABaseMissionItem* NewMissionItem = GetWorld()->SpawnActor<ABaseMissionItem>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
 
 	MissionItemSet.Add(NewMissionItem);
-	NewMissionItem->InitMissionItem(this, MissionType, MissionInfo);
+
+	FName MissionType = MissionData->MissionType;
+	FString InfoText = MissionData->MissionInfoText;
+	FString ActiveText = MissionData->MissionActiveText;
+	FString ClearText = MissionData->MissionClearText;
+
+	NewMissionItem->InitMissionItem(this, MissionType);
+	NewMissionItem->SetMissionText(InfoText, ActiveText, ClearText);
 
 	if (MissionType == "Main")
 	{

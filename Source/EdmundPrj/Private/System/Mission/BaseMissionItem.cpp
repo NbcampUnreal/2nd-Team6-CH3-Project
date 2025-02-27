@@ -24,11 +24,10 @@ ABaseMissionItem::ABaseMissionItem()
 	Tags.Add("MissionItem");
 }
 
-void ABaseMissionItem::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void ABaseMissionItem::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
 	MissionHandle = NewMissionHandle;
 	MissionType = Type;
-	MissionText = MissionInfo;
 	
 	if (!IsValid(InteractionWidgetClass))
 	{
@@ -91,14 +90,14 @@ void ABaseMissionItem::ActionEventByPressedKey()
 	InteractionWidget->VisibleNotify(false);
 }
 
-void ABaseMissionItem::UpdateMissionTextToUI()
+void ABaseMissionItem::UpdateMissionTextToUI(const FString& TargetText, bool bIsClear)
 {
-	MissionHandle->RequestUpdateMissionText(MissionText);
+	MissionHandle->RequestUpdateMissionText(TargetText);
 }
 
-void ABaseMissionItem::UpdateNotifyTextToUI()
+void ABaseMissionItem::UpdateNotifyTextToUI(const FString& TargetText)
 {
-	MissionHandle->RequestUpdateNotifyText(MissionText);
+	MissionHandle->RequestUpdateNotifyText(TargetText);
 }
 
 void ABaseMissionItem::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -173,16 +172,26 @@ void ABaseMissionItem::SetIsActive(bool Value)
 	bIsActive = Value;
 }
 
-void ABaseMissionItem::PrintMissionText()
+void ABaseMissionItem::SetMissionText(const FString& NewInfoText, const FString& NewActiveText, const FString& NewClearText)
 {
-	if (MissionType == "Main")
-	{
-		UpdateMissionTextToUI();
-	}
-	else
-	{
-		UpdateNotifyTextToUI();
-	}
+	MissionInfoText = NewInfoText;
+	MissionActiveText = NewActiveText;
+	MissionClearText = NewClearText;
+}
+
+void ABaseMissionItem::PrintMissionInfoText()
+{
+	UpdateMissionTextToUI(MissionInfoText);
+}
+
+void ABaseMissionItem::PrintMissionActiveText()
+{
+	UpdateNotifyTextToUI(MissionActiveText);
+}
+
+void ABaseMissionItem::PrintMissionClearText()
+{
+	UpdateNotifyTextToUI(MissionClearText);
 }
 
 

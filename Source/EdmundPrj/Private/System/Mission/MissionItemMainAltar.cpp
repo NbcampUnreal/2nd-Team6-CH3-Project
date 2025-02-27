@@ -11,9 +11,9 @@ AMissionItemMainAltar::AMissionItemMainAltar() : Super()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AMissionItemMainAltar::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemMainAltar::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(true);
 	SetActorTickEnabled(false);
@@ -39,6 +39,7 @@ void AMissionItemMainAltar::ActionBeginOverlap()
 	ProgressValue = 1.0f;
 	InteractionWidget->UpdateProgressBar(ProgressValue);
 	InteractionWidget->VisibleNotify(true);
+	PrintMissionActiveText();
 }
 
 void AMissionItemMainAltar::ActionEndOverlap()
@@ -79,6 +80,7 @@ void AMissionItemMainAltar::CompleteProgress()
 {
 	Super::CompleteProgress();
 
+	PrintMissionClearText();
 	SetVisible(false);
 	MissionHandle->CompleteMission();
 }

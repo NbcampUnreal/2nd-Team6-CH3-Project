@@ -5,9 +5,9 @@
 #include "System/MissionHandle.h"
 #include "UI/3DWidget/InteractionWidget.h"
 
-void AMissionItemDefenceArea::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemDefenceArea::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(false);
 }
@@ -60,6 +60,7 @@ void AMissionItemDefenceArea::ActionBeginOverlap()
 	bIsPlayingInteraction = true;
 	SetActorTickEnabled(true);
 	InteractionWidget->VisibleProgressBar(true);
+	PrintMissionActiveText();
 }
 
 void AMissionItemDefenceArea::ActionEndOverlap()

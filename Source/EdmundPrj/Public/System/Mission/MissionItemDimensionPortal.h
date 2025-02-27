@@ -14,4 +14,6 @@ class EDMUNDPRJ_API AMissionItemDimensionPortal : public ABaseMissionItem
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
 };

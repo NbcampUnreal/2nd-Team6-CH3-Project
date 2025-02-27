@@ -119,6 +119,7 @@ void UEdmundGameInstance::EndMission(const bool bIsClear) const
 
 void UEdmundGameInstance::DestroyedGameState() 
 {
+	EdmundGameMode = nullptr;
 	EdmundGameState = nullptr;
 }
 
