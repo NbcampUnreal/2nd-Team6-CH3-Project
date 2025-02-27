@@ -28,9 +28,6 @@ public:
 	TObjectPtr<USceneComponent> MuzzleOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	TObjectPtr<class UAnimMontage> FireMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float AttackDelay;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Sound")

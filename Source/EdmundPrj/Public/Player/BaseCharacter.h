@@ -25,6 +25,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera");
 	UCameraComponent* CameraComp;
 
+	// 공격력 Getter
+	float GetAttackDamage() const;
+
+	// 공격력 Setter
+	void SetAttackDamage(float NewAttackDamage);
+
+	// 공격력 Getter
+	float GetAttackDelay() const;
+
 	// 경험치 증가
 	void AddExp(int32 Exp);
 
@@ -64,6 +73,9 @@ protected:
 	// 앉기
 	void StartCrouch(const FInputActionValue& value);
 	void StopCrouch(const FInputActionValue& value);
+
+	// 상호작용
+	void PauseAction(const FInputActionValue& value);
 
 	// 피격
 	virtual float TakeDamage(
@@ -116,13 +128,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 Defense;
 
-	// 공격 속도
+	// 공격 딜레이 (공속)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	float AttackSpeed;
+	float AttackDelay;
 
 	// 치명타 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 CriticalProb;
+
+	// 치명타 확률
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	int32 CriticalMultiplier;
 
 	// 회피 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -165,6 +181,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	UAudioComponent* CurrentAudioComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
+	TObjectPtr<USoundBase> EvasionSuccessSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
+	TObjectPtr<USoundBase> RevivalSuccessSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
+	TObjectPtr<USoundBase> DeathSound;
 
 private:
 	// 캡슐 높이 <- 앉기에서 사용

@@ -35,6 +35,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float MeleeAttackDelay;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	float MeleeAttackRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	float MeleeAttackPushStrength;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
 	TSubclassOf<AWeapon> Weapon;
 

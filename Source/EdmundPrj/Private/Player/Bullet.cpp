@@ -4,6 +4,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/BaseCharacter.h"
 
 ABullet::ABullet()
 {
@@ -22,7 +23,9 @@ ABullet::ABullet()
 
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnBulletOverlap);
 
-	bIsHidden = false;
+	BulletLandParticle = nullptr;
+
+	bIsHidden = true;
 }
 
 void ABullet::BeginPlay()
@@ -60,16 +63,34 @@ void ABullet::EndBulletLife()
 
 void ABullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor->ActorHasTag("Player"))
+	if (OtherActor && (OtherActor->ActorHasTag("Player")))
 	{
 		return;
 	}
 
 	if (OtherActor && (OtherActor->ActorHasTag("Monster") || OtherActor->ActorHasTag("MissionItem")) && !bIsHidden)
 	{
+		float Damage = 30.0f;
+
+		// 현재 게임 모드에서 조종 중인 플레이어의 Pawn을 얻기
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0은 첫 번째 플레이어
+		if (PlayerController)
+		{
+			APawn* ControlledPawn = PlayerController->GetPawn();
+			if (ControlledPawn)
+			{
+				ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
+
+				if (IsValid(Player))
+				{
+					Damage = Player->GetAttackDamage();
+				}
+			}
+		}
+
 		UGameplayStatics::ApplyDamage(
 			OtherActor,
-			30.0f,	// 수정필요
+			Damage,
 			nullptr,
 			this,
 			UDamageType::StaticClass()
@@ -77,6 +98,12 @@ void ABullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 	}
 
 	GetWorld()->GetTimerManager().ClearTimer(BulletLifeTimerHandle);
+	
+	// 탄착 이펙트 재생
+	if (BulletLandParticle && !bIsHidden)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation());
+	}
 
 	SetBulletHidden(true);
 }
