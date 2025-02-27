@@ -82,8 +82,7 @@ void ABaseMonster::MonsterDead()
 	{
 		SetIsDead(true);
 
-		AAIController* AIController = Cast<AAIController>(GetController());
-		if (AIController)
+		if (bCanDropReward)
 		{
 			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 			if (PlayerController)

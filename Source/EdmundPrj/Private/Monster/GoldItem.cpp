@@ -2,6 +2,7 @@
 
 
 #include "Monster/GoldItem.h"
+#include "System/EdmundGameState.h"
 
 AGoldItem::AGoldItem()
 {
@@ -19,6 +20,8 @@ void AGoldItem::SetGoldAmount(float NewGold)
 
 void AGoldItem::ActivateItem(AActor* Actor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("골드획득"));
+	AEdmundGameState* GameState = GetWorld()->GetGameState<AEdmundGameState>();
+	GameState->AddCurrentLevelMoney(GoldAmount);
+	UE_LOG(LogTemp, Warning, TEXT("%f 골드획득"), GoldAmount);
 	PlaySound();
 }
