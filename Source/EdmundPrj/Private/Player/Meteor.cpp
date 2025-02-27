@@ -3,6 +3,8 @@
 
 #include "Player/Meteor.h"
 #include "Player\TimerSkillSpawnManagerComponent.h"
+#include "Monster\BaseMonster.h"
+#include "Kismet\GameplayStatics.h"
 AMeteor::AMeteor()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -10,6 +12,13 @@ AMeteor::AMeteor()
 
 void AMeteor::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 {
+	UGameplayStatics::ApplyDamage(
+		Monster,
+		30.0f,
+		nullptr,
+		this,
+		UDamageType::StaticClass()
+	);
 	Deactivate();
 }
 

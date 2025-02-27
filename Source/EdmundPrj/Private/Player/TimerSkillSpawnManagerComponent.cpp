@@ -166,7 +166,6 @@ void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillT
 	{
 		skill->TimerSkillSpanwManager = this;
 	}
-	FString skillName = FString::Printf(TEXT("SkillIsActivate"));
 	FTimerHandle DestroyHandler;
 	GetWorld()->GetTimerManager().SetTimer(DestroyHandler,
 		[skill] {
@@ -175,7 +174,6 @@ void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillT
 		},
 		skill->DeactivateTime,
 		false);
-	skill->SetActorLabel(skillName);
 	skill->SetActorLocation(skillLocation);
 	skill->SetActorEnableCollision(true);
 	skill->SetActorHiddenInGame(false);

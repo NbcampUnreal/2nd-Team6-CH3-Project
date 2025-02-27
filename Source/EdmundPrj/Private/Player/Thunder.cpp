@@ -23,6 +23,13 @@ void AThunder::BeginPlay()
 }
 void AThunder::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 {
+	UGameplayStatics::ApplyDamage(
+		Monster,
+		30.0f,
+		nullptr,
+		this,
+		UDamageType::StaticClass()
+	);
 	if (Monster)
 	{
 		ElectricEffectPool->ActivateElectricEffect(Monster->GetActorLocation());

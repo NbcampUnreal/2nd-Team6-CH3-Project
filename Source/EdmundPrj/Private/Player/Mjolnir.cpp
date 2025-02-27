@@ -6,10 +6,6 @@
 #include "Monster\BaseMonster.h"
 #include "Player\ElectricEffectPool.h"
 #include "Kismet\GameplayStatics.h"
-AMjolnir::AMjolnir()
-{
-
-}
 
 void AMjolnir::HitToMonster(TObjectPtr<ABaseMonster> monster)
 {

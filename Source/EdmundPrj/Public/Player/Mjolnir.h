@@ -15,7 +15,6 @@ class EDMUNDPRJ_API AMjolnir : public AAttackSkill
 	GENERATED_BODY()
 
 public:
-	AMjolnir();
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> monster) override;
 	virtual void BeginPlay() override;
 public:

@@ -3,6 +3,7 @@
 
 #include "Player/Freezing.h"
 #include "Monster\BaseMonster.h"
+#include "Kismet\GameplayStatics.h"
 void AFreezing::CreateFrozenEffect(int createCount)
 {
 	if (!FrozenEffectClass) return;
@@ -52,6 +53,13 @@ TObjectPtr<AActor> AFreezing::FindDeactivateFrozenEffect()
 void AFreezing::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 {
 	//Monster Ω∫≈œ
+	UGameplayStatics::ApplyDamage(
+		Monster,
+		3.f,
+		nullptr,
+		this,
+		UDamageType::StaticClass()
+	);
 	TWeakObjectPtr<AActor> frozen = ActivateFrozenEffect(Monster);
 	if (frozen == nullptr) return;
 	FTimerHandle EndFreezingTimer;
