@@ -25,6 +25,21 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera");
 	UCameraComponent* CameraComp;
 
+	// 경험치 증가
+	void AddExp(int32 Exp);
+
+	// 레벨업
+	void LevelUp();
+
+	// 현재 체력 Getter
+	int32 GetHP() const;
+
+	// 현재 체력 Setter
+	void SetHP(int32 NewHP);
+
+	// 체력 회복
+	void AmountHP(int32 AmountHP);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -56,21 +71,6 @@ protected:
 		struct FDamageEvent const& DamageEvent,
 		AController* EventInstigator,
 		AActor* DamageCauser) override;
-
-	// 경험치 증가
-	void AddExp(int32 Exp);
-
-	// 레벨업
-	void LevelUp();
-
-	// 현재 체력 Getter
-	int32 GetHP() const;
-
-	// 현재 체력 Setter
-	void SetHP(int32 NewHP);
-
-	// 체력 회복
-	void AmountHP(int32 AmountHP);
 
 	// 강화해놓은 스테이터스값 받기
 	void GetUpgradeStatus();

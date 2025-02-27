@@ -17,8 +17,8 @@ ABullet::ABullet()
 	Collision->SetupAttachment(StaticMeshComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	ProjectileMovementComponent->InitialSpeed = 10000.0f;
-	ProjectileMovementComponent->MaxSpeed = 10000.0f;
+	ProjectileMovementComponent->InitialSpeed = 15000.0f;
+	ProjectileMovementComponent->MaxSpeed = 15000.0f;
 
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnBulletOverlap);
 
