@@ -51,6 +51,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// 이동
@@ -101,12 +102,18 @@ public:
 	ECharacterType CharacterType;
 
 	// 현재 체력
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 HP;
 
 	// 최대 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 MaxHP;
+
+	// 현재 스태미나
+	int32 Stamina;
+
+	// 최대 스태미나
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	int32 MaxStamina;
 
 	// 걷기 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -123,6 +130,18 @@ public:
 	// 공격력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float AttackDamage;
+
+	// 스태미나 회복량
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	int32 StaminaRecoveryAmount;
+
+	// 스태미나 소모량
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	int32 StaminaConsumAmount;
+
+	// 스태미나 회복량
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	float StaminaRecoveryAndConsumDelay;
 
 	// 방어력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -168,11 +187,11 @@ public:
 	bool IsSprint;
 
 	// 앉기 중
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move|Anim")
 	bool IsCrouch;
 
 	// 피격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
 	UAnimMontage* HitActionMontage;
 
 	// 죽음 애니메이션
@@ -194,6 +213,11 @@ public:
 private:
 	// 캡슐 높이 <- 앉기에서 사용
 	float CapsuleHeight;
+
+	// 스태미나
+	FTimerHandle StaminaDelayHandle;
+
+	void UpdateStamina();
 
 protected:
 	bool IsDie;
