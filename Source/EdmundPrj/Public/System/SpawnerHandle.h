@@ -22,6 +22,7 @@ public:
 	void InitSpawnerHandle(AEdmundGameMode* NewGameMode, AEdmundGameState* NewGameState, const TArray<FSpawnerDataRow*>& CurrentSpawnerData);
 	void ApplySpawnerDataInLevel();
 	void DestroyAllSpawner();
+	void SpawnBossPatternSpawner(const TArray<FVector>& PosSet);
 
 private:
 	virtual void BeginPlay() override;

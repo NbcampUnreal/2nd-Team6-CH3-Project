@@ -11,7 +11,6 @@ class UEdmundGameInstance;
 class AEdmundGameMode;
 class IGameStateObserver;
 class ABaseCharacter;
-class ABaseMissionItem;
 class AMissionHandle;
 class ASpawnerHandle;
 struct FPlayerSkillRow;
@@ -31,6 +30,8 @@ public:
 	void ChangeCursorMode(bool bIsValid);
 	void ChangeInputMode(const FInputModeDataBase& InputMode);
 
+	void AddCurrentLevelMoney(int32 Money);
+
 	void CreateRandomSkillSet();
 	const TArray<FPlayerSkillRow*>& GetRandomSkillSet() const;
 	void ApplySelectedSkill(const int32 Index);
@@ -39,9 +40,10 @@ public:
 	void CancleSelectedCharacter();
 
 	void OnPressedPauseKey();
+	void RequestEndPause();
 	void RequestInteraction();
 
-	void SpawnMonsterAtDimensionPortal(const TArray<ABaseMissionItem*>& ActiveDimensionSet);
+	void EndCurrentLevel();
 
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
@@ -72,8 +74,6 @@ private:
 	TObjectPtr<AMissionHandle> MissionHandle;
 	TObjectPtr<ASpawnerHandle> SpawnerHandle;
 
-	TObjectPtr<ABaseMissionItem> OverlapedItem = nullptr;
-
 	TArray<TScriptInterface<IGameStateObserver>> Observers;
 
 	TArray<FPlayerSkillRow*> SkillDataSet;
@@ -81,4 +81,6 @@ private:
 	TMap<FPlayerSkillRow*, int32> CurrentSkillMap;
 
 	FTimerHandle TimerHandle;
+
+	int32 CurrentLevelMoney = 0;
 };

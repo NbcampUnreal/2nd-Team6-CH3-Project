@@ -15,6 +15,8 @@ APlayerCharacter::APlayerCharacter()
 
 	ReloadDelay = 2.0f;
 	MeleeAttackDelay = 0.7f;
+	MeleeAttackRadius = 100.0f;
+	MeleeAttackPushStrength = 1000.0f;
 
 	ReloadMontage = nullptr;
 
@@ -205,11 +207,11 @@ void APlayerCharacter::AttackTrace()
 	FRotator ControlRotation = PlayerController->GetControlRotation();
 	FVector ForwardVector = ControlRotation.Vector();
 
-	FVector Start = GetActorLocation() + (ForwardVector * 200.0f); // 공격 시작 위치
-	FVector End = Start + (ForwardVector * 200.0f); // 공격 끝 위치
+	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + 50)); // 공격 시작 위치
+	FVector End = Start + (ForwardVector * (MeleeAttackRadius + 50)); // 공격 끝 위치
 
 	// 공격 범위 내에서 충돌 체크
-	float Radius = 150.0f;
+	float Radius = MeleeAttackRadius;
 	TArray<FHitResult> HitResults;
 
 	// 트레이스 수행
@@ -273,14 +275,12 @@ void APlayerCharacter::AttackTrace()
 
 					if (HitPrimitive)
 					{
-						float PushStrength = 1000.0f; // 밀기 힘
-
 						ACharacter* HitCharacter = Cast<ACharacter>(HitActor);
 
 						if (HitCharacter)
 						{
 							HitCharacter->GetCharacterMovement()->StopMovementImmediately();
-							FVector LaunchVector = GetActorForwardVector() * PushStrength;
+							FVector LaunchVector = GetActorForwardVector() * MeleeAttackPushStrength;
 							LaunchVector.Z = 300;
 							HitCharacter->LaunchCharacter(LaunchVector, false, false);
 						}

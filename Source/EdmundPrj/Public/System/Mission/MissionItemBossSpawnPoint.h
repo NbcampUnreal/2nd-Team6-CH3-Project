@@ -11,7 +11,7 @@ class ABoss;
 class UBehaviorTree;
 
 UCLASS()
-class EDMUNDPRJ_API AMissionItemBossSpawnPoint : public ABaseMissionItem
+class EDMUNDPRJ_API AMissionItemBossSpawnPoint : public ABaseMissionItem // º¸½º¶û delegate?
 {
 	GENERATED_BODY()
 	

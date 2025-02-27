@@ -31,9 +31,10 @@ public:
 
 	void StartMainMission();
 	void CompleteMission();
+
 	// Mission1
-	const FVector GetDirectionToPrison(const FVector& ActorPos) const;
-	void SetPrisonLocation(const FVector& PrisonPos);
+	void SetPrison(ABaseMissionItem* NewPrison);
+	ABaseMissionItem* GetPrison() const;
 
 	// Mission2
 	void SetTargetPointLocation(const FVector& TargetPointPos);
@@ -48,6 +49,7 @@ public:
 	void RemoveDimensionPortalSet(ABaseMissionItem* DimentionPortal);
 
 	// Boss
+	void NotifyStartedBossStage();
 	bool GetWeakenBoss() const;
 	EBossState GetLockedSkill() const;
 	void RequestSpawnToSpawnerHandle();
@@ -69,8 +71,8 @@ private:
 	TObjectPtr<AEdmundGameState> EdmundGameState = nullptr;
 
 	TObjectPtr<ABaseMissionItem> TargetMissionItem = nullptr;
+	TObjectPtr<ABaseMissionItem> Prison = nullptr;
 
-	FVector PrisonLocation = FVector::ZeroVector;
 	FVector TargetPointLocation = FVector::ZeroVector;
 
 	int32 MainMissionIndex = 0;

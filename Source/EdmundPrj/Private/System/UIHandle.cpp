@@ -261,6 +261,8 @@ void UUIHandle::OpenOption()
 
 void UUIHandle::CloseOption()
 {
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->OnUnpause();
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 

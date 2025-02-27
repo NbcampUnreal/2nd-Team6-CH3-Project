@@ -12,7 +12,7 @@ void AMissionItemPrison::InitMissionItem(AMissionHandle* NewMissionHandle, const
 	ApplyOverlapCollision(true);
 	SetActorTickEnabled(false);
 
-	MissionHandle->SetPrisonLocation(GetActorLocation());
+	MissionHandle->SetPrison(this);
 }
 
 void AMissionItemPrison::ActionEventByPressedKey()

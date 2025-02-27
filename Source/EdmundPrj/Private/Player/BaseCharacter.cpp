@@ -32,6 +32,8 @@ ABaseCharacter::ABaseCharacter()
 
 	HP = MaxHP = 300.0f;
 
+	CriticalMultiplier = 2.0f;
+
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
 	IsSprint = false;
@@ -41,6 +43,10 @@ ABaseCharacter::ABaseCharacter()
 	HitActionMontage = nullptr;
 	DieActionMontage = nullptr;
 	CurrentGameState = nullptr;
+
+	EvasionSuccessSound = nullptr;
+	RevivalSuccessSound = nullptr;
+	DeathSound = nullptr;
 }
 
 void ABaseCharacter::BeginPlay()
@@ -155,6 +161,16 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 					ETriggerEvent::Completed,
 					this,
 					&ABaseCharacter::StopCrouch
+				);
+			}
+
+			if (PlayerController->InteractionAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->PauseAction,
+					ETriggerEvent::Started,
+					this,
+					&ABaseCharacter::PauseAction
 				);
 			}
 		}
@@ -341,10 +357,66 @@ void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 	}
 }
 
+void ABaseCharacter::PauseAction(const FInputActionValue& value)
+{
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->OnPressedPauseKey();
+	}
+}
+
+float ABaseCharacter::GetAttackDamage() const
+{
+	float Damage = AttackDamage;
+
+	int32 DamageProb = FMath::RandRange(1, 100);
+
+	// 크리티컬
+	if (DamageProb <= CriticalProb)
+	{
+		Damage *= CriticalMultiplier;
+	}
+
+	// 랜덤 데미지 적용
+	int32 RandomRange = 20;
+
+	float MinDamage = (100 - RandomRange) * Damage;
+	float MaxDamage = (100 + RandomRange) * Damage;
+
+	Damage = FMath::RandRange(MinDamage, MaxDamage);
+
+	return Damage;
+}
+
+void ABaseCharacter::SetAttackDamage(float NewAttackDamage)
+{
+	AttackDamage = NewAttackDamage;
+}
+
+float ABaseCharacter::GetAttackDelay() const
+{
+	return AttackDelay;
+}
+
 float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (IsDie)
 	{
+		return 0.0f;
+	}
+
+	int32 DamageProb = FMath::RandRange(1, 100);
+
+	// 회피 성공
+	if (DamageProb <= EvasionProb)
+	{
+		// 회피 성공 사운드
+		if (IsValid(EvasionSuccessSound))
+		{
+			CurrentAudioComp->SetSound(EvasionSuccessSound);
+			CurrentAudioComp->Play();
+		}
+
 		return 0.0f;
 	}
 
@@ -355,13 +427,34 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	// 방어력 적용
+	ActualDamage = (100 - Defense) * ActualDamage / 100;
+	
+	// HP는 정수, 데미지는 소수?
 	// HP 음수 방지
 	HP = FMath::Max(0.0f, HP - ActualDamage);
 
 	if (HP == 0 && !IsDie)
 	{
-		IsDie = true;
-		ActiveDieAction();
+		// 부활 횟수가 있다면
+		if (RevivalCount >= 1)
+		{
+			RevivalCount--;
+			HP = MaxHP;
+
+			// 부활 사운드
+			if (IsValid(RevivalSuccessSound))
+			{
+				CurrentAudioComp->SetSound(RevivalSuccessSound);
+				CurrentAudioComp->Play();
+			}
+		}
+		// 부활 횟수가 없다면
+		else
+		{
+			IsDie = true;
+			ActiveDieAction();
+		}
 	}
 
 	if (IsValid(CurrentGameState))
@@ -374,15 +467,36 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 void ABaseCharacter::AddExp(int32 Exp)
 {
+	if (CurrentLevel >= MaxLevel)
+	{
+		return;
+	}
+
 	CurrentExp += Exp;
+
+	if (CurrentExp >= MaxExp)
+	{
+		LevelUp();
+	}
 }
 
 void ABaseCharacter::LevelUp()
 {
+	if (CurrentLevel >= MaxLevel)
+	{
+		return;
+	}
+
 	CurrentLevel++;
+
+	HP = MaxHP;
+
+	CurrentExp -= MaxExp;
+	MaxExp += 50;
 
 	if (IsValid(CurrentGameState))
 	{
+		CurrentGameState->CreateRandomSkillSet();
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
 }
@@ -395,6 +509,7 @@ int32 ABaseCharacter::GetHP() const
 void ABaseCharacter::SetHP(int32 NewHP)
 {
 	HP = FMath::Min(MaxHP, NewHP);
+	HP = FMath::Max(0, HP);
 
 	if (IsValid(CurrentGameState))
 	{
@@ -418,6 +533,13 @@ void ABaseCharacter::GetUpgradeStatus()
 
 void ABaseCharacter::ActiveDieAction()
 {
+	// 회피 성공 사운드
+	if (IsValid(DeathSound))
+	{
+		CurrentAudioComp->SetSound(DeathSound);
+		CurrentAudioComp->Play();
+	}
+
 	if (IsValid(DieActionMontage))
 	{
 		PlayAnimMontage(DieActionMontage);

@@ -94,6 +94,12 @@ void UEdmundGameInstance::OnPause() const
 	UIHandle->AddToViewportByCoverType(EWidgetType::OptionWidget);
 }
 
+void UEdmundGameInstance::OnUnpause() const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->RequestEndPause();
+}
+
 void UEdmundGameInstance::ChangeCursorMode(const bool bIsVisible) const
 {
 	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));

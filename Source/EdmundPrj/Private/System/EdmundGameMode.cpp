@@ -28,12 +28,24 @@ void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->EndMission(true);
+	EdmundGameState->EndCurrentLevel();
 }
 
 void AEdmundGameMode::FailMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->EndMission(false);
+	EdmundGameState->EndCurrentLevel();
+}
+
+void AEdmundGameMode::StartBossMission()
+{
+	SpawnerHandle->DestroyAllSpawner();
+}
+
+void AEdmundGameMode::SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionPosSet)
+{
+	SpawnerHandle->SpawnBossPatternSpawner(ActiveDimensionPosSet);
 }
 
 void AEdmundGameMode::BeginPlay()
