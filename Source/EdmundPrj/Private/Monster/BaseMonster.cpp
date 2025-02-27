@@ -2,7 +2,8 @@
 
 
 #include "Monster/BaseMonster.h"
-#include "Player/PlayerCharacter.h"
+#include "Player/BaseCharacter.h"
+#include "Monster/HealingItem.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
@@ -55,13 +56,6 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
 	}
 
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(DamageCauser);
-	if (PlayerCharacter)
-	{
-		//캐릭터에서 AddEXP 구현시
-		//PlayerCharacter->AddEXP(MonsterExpReward);
-	}
-
 	GetCharacterMovement()->Deactivate();
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -87,6 +81,26 @@ void ABaseMonster::MonsterDead()
 	if (!bIsDead)
 	{
 		SetIsDead(true);
+
+		AAIController* AIController = Cast<AAIController>(GetController());
+		if (AIController)
+		{
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				APawn* PlayerPawn = PlayerController->GetPawn();
+				if (PlayerPawn)
+				{
+					ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
+					if (PlayerCharacter)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("%f EXP얻음"), MonsterExpReward);
+						PlayerCharacter->AddExp(MonsterExpReward);
+					}
+				}
+			}
+		}
+
 		if (DeathAnimation)
 		{
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -107,6 +121,10 @@ void ABaseMonster::MonsterDead()
 				GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
 			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DeathAnimation이 없습니다."));
+		}
 	}
 }
 
@@ -121,7 +139,7 @@ void ABaseMonster::MonsterDestroy()
 	bIsDead = false;
 	bIsHit = false;
 
-	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
+	SetChaseMode(false);
 
 	DropReward();
 
@@ -145,11 +163,29 @@ void ABaseMonster::MonsterDestroy()
 
 void ABaseMonster::DropReward()
 {
+
+
+
 	float RandomValue = FMath::RandRange(0, 100);
 
 	if (RandomValue <= MonsterGoldProbability)
 	{
-		//바닥에 Gold가 떨어짐
+		if (AllItems.Num() > 0)
+		{
+			if (IsValid(AllItems[0]))
+			{
+				ItemClass = AllItems[0];
+
+				if (IsValid(ItemClass))
+				{
+					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AllItems가 없습니다."));
+		}
 	}
 
 	if (RandomValue <= MonsterHealKitProbability)
@@ -169,7 +205,7 @@ void ABaseMonster::MonsterHit()
 		{
 			if (TakeDamageParticle)
 			{
-				SetChaseMode();
+				SetChaseMode(true);
 
 				UpdateMonsterOverHeadWidget();
 
@@ -235,29 +271,29 @@ void ABaseMonster::MonsterAttack()
 	}
 }
 
-void ABaseMonster::SetChaseMode()
+void ABaseMonster::SetChaseMode(bool Mode)
 {
 	AAIController* AIController = Cast<AAIController>(GetController());
-		if (AIController)
+	if (AIController)
+	{
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
 		{
-			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-			if (PlayerController)
-			{
-				APawn* PlayerPawn = PlayerController->GetPawn();
+			APawn* PlayerPawn = PlayerController->GetPawn();
 
-				AIController->GetBlackboardComponent()->SetValueAsBool(FName("HasLineOfSight"), true);
-				AIController->GetBlackboardComponent()->SetValueAsObject(FName("PlayerActor"), PlayerPawn);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: PlayerController가 없습니다."));
-			}
+			AIController->GetBlackboardComponent()->SetValueAsBool(FName("HasLineOfSight"), Mode);
+			AIController->GetBlackboardComponent()->SetValueAsObject(FName("PlayerActor"), PlayerPawn);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: AIController가 없습니다."));
+			UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: PlayerController가 없습니다."));
 		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: AIController가 없습니다."));
+	}
+}
 
 
 void ABaseMonster::MonsterAttackEnd()
