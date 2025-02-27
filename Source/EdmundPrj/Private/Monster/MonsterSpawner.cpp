@@ -36,9 +36,29 @@ void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawn
 	SpawnTime = NewSpawnTime;
 	SpawnCount = NewSpawnCount;
 
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
-
 	InitializeMonsterSpawnPool(SpawnCount);
+
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
+}
+
+void AMonsterSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	ClearTimer();
+}
+
+void AMonsterSpawner::ClearTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+}
+
+void AMonsterSpawner::BossSpawn()
+{
+	ClearTimer();
+	for (int i = 0; i < SpawnCount; ++i)
+	{
+		SpawnMonster();
+	}
 }
 
 ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
@@ -156,6 +176,7 @@ void AMonsterSpawner::SpawnMonster()
 			}
 
 			Monster->Tags.Add(FName("Monster"));
+			Monster->SetCanDropReward(true);
 			Monster->SetIsDead(false);
 			Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			Monster->GetCharacterMovement()->Velocity = FVector::ZeroVector;
