@@ -43,6 +43,7 @@ public:
 	void CancleSelectedCharacter();
 
 	void OnPressedPauseKey();
+	void RequestOnPause();
 	void RequestEndPause();
 	void RequestInteraction();
 

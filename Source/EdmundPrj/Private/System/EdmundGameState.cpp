@@ -181,6 +181,11 @@ void AEdmundGameState::OnPressedPauseKey()
 	ChangeInputMode(FInputModeUIOnly());
 }
 
+void AEdmundGameState::RequestOnPause()
+{
+	PlayerController->SetPause(true);
+}
+
 void AEdmundGameState::RequestEndPause()
 {
 	PlayerController->SetPause(false);
