@@ -2,7 +2,7 @@
 
 
 #include "Monster/BaseItem.h"
-#include "Player/PlayerCharacter.h"
+#include "Player/BaseCharacter.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -28,15 +28,33 @@ void ABaseItem::OnItemOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 {
 	if (OtherActor && OtherActor->ActorHasTag("Player"))
 	{
-		APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
+		ABaseCharacter* Player = Cast<ABaseCharacter>(OtherActor);
 		if (Player)
 		{
+			SetActorHiddenInGame(true);
+			CollisionComp->Deactivate();
 			ActivateItem(OtherActor);
-			Destroy();
 		}
 	}
 }
 
 void ABaseItem::ActivateItem(AActor* Actor)
 {
+}
+
+void ABaseItem::PlaySound()
+{
+	UE_LOG(LogTemp, Warning, TEXT("사운드재생"));
+	PickupSoundComp->SetSound(PickupSound);
+
+	float SoundDuration = PickupSoundComp->Sound->GetDuration();
+
+	PickupSoundComp->Play();
+
+	GetWorld()->GetTimerManager().SetTimer(SoundDurationTimerHandle, this, &ABaseItem::ItemDestroy, SoundDuration, false);
+}
+
+void ABaseItem::ItemDestroy()
+{
+	Destroy();
 }

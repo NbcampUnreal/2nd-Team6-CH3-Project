@@ -2,7 +2,7 @@
 
 
 #include "Monster/HealingItem.h"
-#include "Player/PlayerCharacter.h"
+#include "Player/BaseCharacter.h"
 
 AHealingItem::AHealingItem()
 {
@@ -14,15 +14,22 @@ float AHealingItem::GetHealingPercent() const
 	return HealingPercent;
 }
 
+void AHealingItem::SetHealingPercent(float NewPercent)
+{
+	HealingPercent = NewPercent;
+}
+
+
 void AHealingItem::ActivateItem(AActor* Actor)
 {
 	if (Actor)
 	{
-		APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
+		ABaseCharacter* Player = Cast<ABaseCharacter>(Actor);
 		if (Player)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Healing Item Activated"));
-			//Player->AddHP(Player->MaxHP * HealingPercent / 100.0f);
+			//Player->(Player->MaxHP * HealingPercent / 100.0f);
+			PlaySound();
 		}
 	}
 }

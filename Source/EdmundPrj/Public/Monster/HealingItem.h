@@ -17,10 +17,17 @@ class EDMUNDPRJ_API AHealingItem : public ABaseItem
 	AHealingItem();
 
 public:
-	void ActivateItem(AActor* Actor) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Healing")
 	float HealingPercent = 7.0f;
 
 	float GetHealingPercent() const;
+
+	void SetHealingPercent(float NewPercent);
+
+	void ActivateItem(AActor* Actor) override;
+
+
+
+
 };

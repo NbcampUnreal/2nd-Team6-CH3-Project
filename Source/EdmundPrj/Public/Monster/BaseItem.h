@@ -41,4 +41,10 @@ public:
 
 	virtual void ActivateItem(AActor* Actor);
 
+	virtual void PlaySound();
+
+	void ItemDestroy();
+
+	FTimerHandle SoundDurationTimerHandle;
+
 };
