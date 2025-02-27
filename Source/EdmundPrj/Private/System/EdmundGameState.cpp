@@ -170,11 +170,6 @@ void AEdmundGameState::RequestInteraction()
 	MissionHandle->OnPressedKeyFromPlayer();
 }
 
-void AEdmundGameState::SpawnMonsterAtDimensionPortal(const TArray<ABaseMissionItem*>& ActiveDimensionSet)
-{
-	// call spawner handle
-}
-
 void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
 {
 	Observers.Add(Observer);

@@ -11,7 +11,6 @@ class UEdmundGameInstance;
 class AEdmundGameMode;
 class IGameStateObserver;
 class ABaseCharacter;
-class ABaseMissionItem;
 class AMissionHandle;
 class ASpawnerHandle;
 struct FPlayerSkillRow;
@@ -41,8 +40,6 @@ public:
 	void OnPressedPauseKey();
 	void RequestInteraction();
 
-	void SpawnMonsterAtDimensionPortal(const TArray<ABaseMissionItem*>& ActiveDimensionSet);
-
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 
@@ -71,8 +68,6 @@ private:
 
 	TObjectPtr<AMissionHandle> MissionHandle;
 	TObjectPtr<ASpawnerHandle> SpawnerHandle;
-
-	TObjectPtr<ABaseMissionItem> OverlapedItem = nullptr;
 
 	TArray<TScriptInterface<IGameStateObserver>> Observers;
 

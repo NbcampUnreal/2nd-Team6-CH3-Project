@@ -54,6 +54,11 @@ void ASpawnerHandle::DestroyAllSpawner()
 
 }
 
+void ASpawnerHandle::SpawnBossPatternSpawner(const TArray<FVector>& PosSet)
+{
+
+}
+
 void ASpawnerHandle::BeginPlay()
 {
 	Super::BeginPlay();

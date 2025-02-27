@@ -36,6 +36,16 @@ void AEdmundGameMode::FailMission()
 	EdmundGameInstance->EndMission(false);
 }
 
+void AEdmundGameMode::StartBossMission()
+{
+	SpawnerHandle->DestroyAllSpawner();
+}
+
+void AEdmundGameMode::SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionPosSet)
+{
+	SpawnerHandle->SpawnBossPatternSpawner(ActiveDimensionPosSet);
+}
+
 void AEdmundGameMode::BeginPlay()
 {
 	Super::BeginPlay();
