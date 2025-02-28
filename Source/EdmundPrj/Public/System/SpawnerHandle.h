@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "System/EnumSet.h"
 #include "SpawnerHandle.generated.h"
 
 class AEdmundGameMode;
@@ -39,4 +40,6 @@ private:
 
 	TArray<FSpawnerDataRow*> SpawnerDataSet;
 	TArray<AMonsterSpawner*> MonsterSpawnerSet;
+
+	ESceneType CurrentMission = ESceneType::Mission1;
 };

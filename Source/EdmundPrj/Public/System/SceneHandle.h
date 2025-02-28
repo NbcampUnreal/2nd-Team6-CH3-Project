@@ -7,6 +7,7 @@
 #include "System/EnumSet.h"
 #include "SceneHandle.generated.h"
 
+class UEdmundGameInstance;
 
 UCLASS()
 class EDMUNDPRJ_API USceneHandle : public UGameInstanceSubsystem
@@ -14,7 +15,7 @@ class EDMUNDPRJ_API USceneHandle : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 public:
-	void InitSceneHandle();
+	void InitSceneHandle(UEdmundGameInstance* NewGameInstance);
 
 	//OpenLevel
 	void MoveNextScene();
@@ -41,4 +42,6 @@ protected:
 
 	const float FadeTime = 0.5f;
 	FTimerHandle TimerHandle;
+
+	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 };

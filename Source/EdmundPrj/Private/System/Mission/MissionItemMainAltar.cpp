@@ -82,5 +82,6 @@ void AMissionItemMainAltar::CompleteProgress()
 
 	PrintMissionClearText();
 	SetVisible(false);
+	MissionHandle->RequestSwapBgm(EBGMSoundType::Boss);
 	MissionHandle->CompleteMission();
 }

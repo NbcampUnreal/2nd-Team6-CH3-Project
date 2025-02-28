@@ -14,5 +14,21 @@ class EDMUNDPRJ_API USoundHandleSettings : public UDeveloperSettings
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
+	TSoftObjectPtr<UDataTable> BgmSoundDataTable;
 
+	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
+	TSoftObjectPtr<UDataTable> UISoundDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
+	TSoftObjectPtr<UDataTable> PlayerSoundDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
+	TSoftObjectPtr<UDataTable> MonsterSoundDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
+	TSoftObjectPtr<UDataTable> NpcSoundDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
+	TSoftObjectPtr<UDataTable> ItemSoundDataTable;
 };

@@ -32,6 +32,8 @@ public:
 	void StartMainMission();
 	void CompleteMission();
 
+	void RequestSwapBgm(EBGMSoundType Type);
+
 	// Mission1
 	void SetPrison(ABaseMissionItem* NewPrison);
 	ABaseMissionItem* GetPrison() const;

@@ -20,13 +20,10 @@ void AEdmundGameState::BeginPlay()
 	PlayerController = GetWorld()->GetPlayerControllerIterator()->Get();
 
 	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
-	PlayerPawn = PlayerController->GetPawn();
+	//PlayerPawn = PlayerController->GetPawn();
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
-
-	InitSkillData();
-	InitMainLevel();
 }
 
 void AEdmundGameState::BeginDestroy()
@@ -57,25 +54,25 @@ void AEdmundGameState::AddCurrentLevelMoney(int32 Money)
 	CurrentLevelMoney += Money;
 }
 
-void AEdmundGameState::InitMainLevel()
+void AEdmundGameState::InitMainLevelPlayerController()
 {
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	ESceneType CurrentScene = EdmundGameInstance->GetCurrentSceneName();
-
-	if (CurrentScene != ESceneType::Main)
-	{
-		return;
-	}
-
 	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
 	AMainLevelPlayerController* MainLevelPlayerController = Cast<AMainLevelPlayerController>(PlayerController);
 	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
-	MainLevelPlayerController->InitMainLevelCharacters(EdmundGameInstance->GetCharacterData());
+	MainLevelPlayerController->InitMainLevelCharacters(EdmundGameInstance->GetCharacterData(), EdmundGameInstance->GetPlayerType(), this);
 }
 
-void AEdmundGameState::InitSkillData()
+void AEdmundGameState::InitSoundMap(const TMap<ESoundType, TObjectPtr<USoundBase>> PlayerSound, const TMap<EMonsterType, TMap<ESoundType, TObjectPtr<USoundBase>>> MonsterSound, const TMap<ENpcType, TMap<ESoundType, TObjectPtr<USoundBase>>> NpcSound, const TMap<EItemType, TMap<ESoundType, TObjectPtr<USoundBase>>> ItemSound)
 {
-	SkillDataSet = EdmundGameInstance->GetPlayerSkillData();
+	PlayerSoundSet = PlayerSound;
+	MonsterSoundSet = MonsterSound;
+	NpcSoundSet = NpcSound;
+	ItemSoundSet = ItemSound;
+}
+
+void AEdmundGameState::InitSkillData(const TArray<FPlayerSkillRow*> PlayerSkillDataSet)
+{
+	SkillDataSet = PlayerSkillDataSet;
 
 	for (FPlayerSkillRow* PlayerSkillRow : SkillDataSet)
 	{
@@ -156,6 +153,13 @@ void AEdmundGameState::CancleSelectedCharacter()
 	MainLevelPlayerController->SetTargetToNull();
 }
 
+void AEdmundGameState::CheckClosedPlayerType(ECharacterType Type)
+{
+	AMainLevelPlayerController* MainLevelPlayerController = Cast<AMainLevelPlayerController>(PlayerController);
+	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
+	MainLevelPlayerController->CompareType(Type);
+}
+
 void AEdmundGameState::SetMissionHandle(AMissionHandle* NewMissionHandle)
 {
 	MissionHandle = NewMissionHandle;
@@ -164,6 +168,122 @@ void AEdmundGameState::SetMissionHandle(AMissionHandle* NewMissionHandle)
 void AEdmundGameState::SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle)
 {
 	SpawnerHandle = NewSpawnerHandle;
+}
+
+void AEdmundGameState::SetEffectVolume(const float Volume)
+{
+	EffectVolume = Volume;
+}
+
+void AEdmundGameState::PlayPlayerSound(UAudioComponent* AudioComp, ESoundType SoundType)
+{
+	if (!IsValid(AudioComp))
+	{
+		return;
+	}
+
+	if (!PlayerSoundSet.Contains(SoundType))
+	{
+		return;
+	}
+
+	USoundBase* SoundSource = PlayerSoundSet[SoundType];
+
+	if (!IsValid(SoundSource))
+	{
+		return;
+	}
+
+	AudioComp->SetSound(SoundSource);
+	AudioComp->SetVolumeMultiplier(EffectVolume);
+	AudioComp->Play();
+}
+
+void AEdmundGameState::PlayMonsterSound(UAudioComponent* AudioComp, EMonsterType MonsterType, ESoundType SoundType)
+{
+	if (!IsValid(AudioComp))
+	{
+		return;
+	}
+
+	if (!MonsterSoundSet.Contains(MonsterType))
+	{
+		return;
+	}
+
+	if (!MonsterSoundSet[MonsterType].Contains(SoundType))
+	{
+		return;
+	}
+
+	USoundBase* SoundSource = MonsterSoundSet[MonsterType][SoundType];
+
+	if (!IsValid(SoundSource))
+	{
+		return;
+	}
+
+	AudioComp->SetSound(SoundSource);
+	AudioComp->SetVolumeMultiplier(EffectVolume);
+	AudioComp->Play();
+}
+
+void AEdmundGameState::PlayNpcSound(UAudioComponent* AudioComp, ENpcType NpcType, ESoundType SoundType)
+{
+	if (!IsValid(AudioComp))
+	{
+		return;
+	}
+
+	if (!NpcSoundSet.Contains(NpcType))
+	{
+		return;
+	}
+
+	if (!NpcSoundSet[NpcType].Contains(SoundType))
+	{
+		return;
+	}
+
+	USoundBase* SoundSource = NpcSoundSet[NpcType][SoundType];
+
+	if (!IsValid(SoundSource))
+	{
+		return;
+	}
+
+	AudioComp->SetSound(SoundSource);
+	AudioComp->SetVolumeMultiplier(EffectVolume);
+	AudioComp->Play();
+}
+
+void AEdmundGameState::PlayItemSound(UAudioComponent* AudioComp, EItemType ItemType, ESoundType SoundType)
+{
+	if (!IsValid(AudioComp))
+	{
+		return;
+	}
+
+	if (!ItemSoundSet.Contains(ItemType))
+	{
+		return;
+	}
+
+	if (!ItemSoundSet[ItemType].Contains(SoundType))
+	{
+		return;
+	}
+
+	USoundBase* SoundSource = ItemSoundSet[ItemType][SoundType];
+
+	if (!IsValid(SoundSource))
+	{
+		return;
+	}
+
+	AudioComp->SetSound(SoundSource);
+	AudioComp->SetVolumeMultiplier(EffectVolume);
+	AudioComp->Play();
 }
 
 const TArray<FShopCatalogRow*>& AEdmundGameState::GetPlayerAdvancedData() const
