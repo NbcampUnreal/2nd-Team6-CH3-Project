@@ -4,6 +4,7 @@
 #include "Boss/State/Boss_Idle.h"
 #include "GameFramework/Actor.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
 
@@ -17,6 +18,13 @@ ABoss::ABoss()
     MonsterMoveSpeed = 5000.0f;
     MonsterHP = 500.0f;
     MonsterMaxHP = 1000.0f;
+
+    CapsuleComponent1 = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent1"));
+    CapsuleComponent1->SetupAttachment(GetMesh(), TEXT("Cap"));
+    CapsuleComponent2 = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent2"));
+    CapsuleComponent1->SetupAttachment(GetMesh(), TEXT("ytff"));
+    CapsuleComponent3 = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent3"));
+    CapsuleComponent1->SetupAttachment(GetMesh(), TEXT("iuhg"));
 
     //
     Skill3Particle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Skill3Particle"));
@@ -62,6 +70,25 @@ void ABoss::Tick(float DeltaTime)
             FColor::Green,
             FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
         );
+    }
+
+    if (CapsuleComponent1 && GetMesh())
+    {
+
+        FTransform SocketTransform = GetMesh()->GetSocketTransform(TEXT("Cap"));
+        CapsuleComponent1->SetWorldTransform(SocketTransform);
+    }
+
+    if (CapsuleComponent2 && GetMesh())
+    {
+        FTransform SocketTransform = GetMesh()->GetSocketTransform(TEXT("Socket2"));
+        CapsuleComponent2->SetWorldTransform(SocketTransform);
+    }
+
+    if (CapsuleComponent3 && GetMesh())
+    {
+        FTransform SocketTransform = GetMesh()->GetSocketTransform(TEXT("Socket3"));
+        CapsuleComponent3->SetWorldTransform(SocketTransform);
     }
 }
 

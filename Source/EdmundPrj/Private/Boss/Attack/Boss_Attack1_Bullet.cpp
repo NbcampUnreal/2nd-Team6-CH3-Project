@@ -88,7 +88,8 @@ void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
     }
 
     bool bIsIgnored = false;
-    if (!OtherActor || OtherActor == this || OtherActor->ActorHasTag("Boss") || OtherActor->ActorHasTag("Bullet"))
+    //if (!OtherActor || OtherActor == this || OtherActor->ActorHasTag("Boss") || OtherActor->ActorHasTag("Bullet"))
+    if (!OtherActor || OtherActor == this)
     {
         bIsIgnored = true;
     }
@@ -100,9 +101,6 @@ void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
         return;
     }
 
-    //UE_LOG(LogTemp, Log, TEXT("OnHit: Applying damage"));
-    ApplyDamage(OtherActor, BossRef ? BossRef->GetMonsterAttackDamage() : 10.0f);
-
     ACollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     BulletMesh->SetVisibility(false);
     BCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -112,14 +110,6 @@ void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
     GetWorld()->GetTimerManager().SetTimer(BCollisionDeactivateTimer, this, &ABoss_Attack1_Bullet::DeactivateBCollision, 0.5f, false);
 }
 
-
-
-void ABoss_Attack1_Bullet::ApplyDamage(AActor* Target, float DamageAmount)
-{
-    if (!Target) return;
-
-    UGameplayStatics::ApplyDamage(Target, DamageAmount, nullptr, this, nullptr);
-}
 
 void ABoss_Attack1_Bullet::ApplyBCollisionDamage()
 {
@@ -134,8 +124,7 @@ void ABoss_Attack1_Bullet::ApplyBCollisionDamage()
     BCollision->GetOverlappingActors(OverlapActorsB);
     for (AActor* Actor : OverlapActorsB)
     {
-        //UE_LOG(LogTemp, Log, TEXT("Collision B Overlap: %s"), *Actor->GetName());
-        ApplyDamage(Actor, BossRef ? BossRef->GetMonsterAttackDamage() : 5.0f);
+
     }
 }
 

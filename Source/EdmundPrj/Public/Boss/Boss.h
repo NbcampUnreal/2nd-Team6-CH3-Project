@@ -19,6 +19,15 @@ class EDMUNDPRJ_API ABoss : public ABaseMonster {
 public:
     ABoss();
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    UCapsuleComponent* CapsuleComponent1;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    UCapsuleComponent* CapsuleComponent2;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    UCapsuleComponent* CapsuleComponent3;
+
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
