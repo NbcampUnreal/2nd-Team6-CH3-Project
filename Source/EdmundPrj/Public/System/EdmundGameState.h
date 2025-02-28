@@ -28,6 +28,8 @@ public:
 	void SetMissionHandle(AMissionHandle* NewMissionHandle);
 	void SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle);
 
+	void InitMainLevelPlayerController();
+
 	void SetEffectVolume(const float Volume);
 
 	void InitSoundMap(
@@ -56,6 +58,7 @@ public:
 
 	void SetSelectedCharacter(AActor* Character);
 	void CancleSelectedCharacter();
+	void CheckClosedPlayerType(ECharacterType Type);
 
 	void OnPressedPauseKey();
 	void RequestOnPause();
@@ -77,7 +80,6 @@ public:
 	AActor* GetPlayerPawn();
 
 private:
-	void InitMainLevel(); // 게임 모드로 옮길 필요가 있음.
 	void CalculateSkillList(); 
 
 	void NotifyCreateRandomSkill() const;

@@ -20,12 +20,10 @@ void AEdmundGameState::BeginPlay()
 	PlayerController = GetWorld()->GetPlayerControllerIterator()->Get();
 
 	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
-	PlayerPawn = PlayerController->GetPawn();
+	//PlayerPawn = PlayerController->GetPawn();
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
-
-	InitMainLevel();
 }
 
 void AEdmundGameState::BeginDestroy()
@@ -56,20 +54,12 @@ void AEdmundGameState::AddCurrentLevelMoney(int32 Money)
 	CurrentLevelMoney += Money;
 }
 
-void AEdmundGameState::InitMainLevel()
+void AEdmundGameState::InitMainLevelPlayerController()
 {
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	ESceneType CurrentScene = EdmundGameInstance->GetCurrentSceneName();
-
-	if (CurrentScene != ESceneType::Main)
-	{
-		return;
-	}
-
 	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
 	AMainLevelPlayerController* MainLevelPlayerController = Cast<AMainLevelPlayerController>(PlayerController);
 	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
-	MainLevelPlayerController->InitMainLevelCharacters(EdmundGameInstance->GetCharacterData());
+	MainLevelPlayerController->InitMainLevelCharacters(EdmundGameInstance->GetCharacterData(), EdmundGameInstance->GetPlayerType(), this);
 }
 
 void AEdmundGameState::InitSoundMap(const TMap<ESoundType, TObjectPtr<USoundBase>> PlayerSound, const TMap<EMonsterType, TMap<ESoundType, TObjectPtr<USoundBase>>> MonsterSound, const TMap<ENpcType, TMap<ESoundType, TObjectPtr<USoundBase>>> NpcSound, const TMap<EItemType, TMap<ESoundType, TObjectPtr<USoundBase>>> ItemSound)
@@ -161,6 +151,13 @@ void AEdmundGameState::CancleSelectedCharacter()
 	AMainLevelPlayerController* MainLevelPlayerController = Cast<AMainLevelPlayerController>(PlayerController);
 	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
 	MainLevelPlayerController->SetTargetToNull();
+}
+
+void AEdmundGameState::CheckClosedPlayerType(ECharacterType Type)
+{
+	AMainLevelPlayerController* MainLevelPlayerController = Cast<AMainLevelPlayerController>(PlayerController);
+	checkf(IsValid(MainLevelPlayerController), TEXT("MainLevelPlayerController is Invalie"));
+	MainLevelPlayerController->CompareType(Type);
 }
 
 void AEdmundGameState::SetMissionHandle(AMissionHandle* NewMissionHandle)

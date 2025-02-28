@@ -62,6 +62,7 @@ public:
 	ECharacterType GetPlayerType() const;
 	void SetPlayerType(const ECharacterType Type) const;
 	void CancleSelectedType();
+	void CheckClosedPlayerType();
 	const TArray<FCharacterDataRow*>& GetCharacterData() const;
 
 	// Player Money Controll

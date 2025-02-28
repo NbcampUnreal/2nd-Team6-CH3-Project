@@ -319,6 +319,7 @@ void UUIHandle::CloseCharacterList()
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->CheckClosedPlayerType();
 	EdmundGameInstance->ChangeCursorMode(true);
 	EdmundGameInstance->ChangeInputMode(FInputModeUIOnly());
 }

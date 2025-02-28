@@ -11,6 +11,7 @@ class UEdmundGameInstance;
 class AEdmundGameState;
 class AMissionHandle;
 class ASpawnerHandle;
+class ABaseCharacter;
 struct FMissionDataRow;
 struct FSpawnerDataRow;
 
@@ -20,6 +21,7 @@ class EDMUNDPRJ_API AEdmundGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	//virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet);
 	void StartMission(ESceneType CurrentScene);
 	void ClearMission();
@@ -32,14 +34,14 @@ public:
 
 private:
 	virtual void BeginPlay() override;
-	void InitDefaultPawnByCharacterType();
+	void SpawnPlayerByCharacterType(ECharacterType Type);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")
-	TSubclassOf<AActor> GunnerClass = nullptr;
+	TSubclassOf<ABaseCharacter> GunnerClass = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")
-	TSubclassOf<APlayerController> TestPlayerController = nullptr;
+	TSubclassOf<ABaseCharacter> AuroraClass = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")
 	TSubclassOf<AActor> MissionHandleClass = nullptr;

@@ -26,7 +26,7 @@ void UEdmundGameInstance::Init()
 	checkf(IsValid(SoundHandle), TEXT("Fail Get SoundHandle"));
 	checkf(IsValid(DataHandle), TEXT("Fail Get DataHandle"));
 
-	SceneHandle->InitSceneHandle();
+	SceneHandle->InitSceneHandle(this);
 	DataHandle->InitDataHandle(this);
 	UIHandle->InitUIHandle(this);
 	SoundHandle->InitSoundHandle(this);
@@ -211,6 +211,12 @@ void UEdmundGameInstance::CancleSelectedType()
 {
 	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
 	EdmundGameState->CancleSelectedCharacter();
+}
+
+void UEdmundGameInstance::CheckClosedPlayerType()
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->CheckClosedPlayerType(GetPlayerType());
 }
 
 const TArray<FCharacterDataRow*>& UEdmundGameInstance::GetCharacterData() const

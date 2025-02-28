@@ -3,15 +3,17 @@
 
 #include "System/SceneHandle.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/EdmundGameInstance.h"
 
 //void USceneHandle::Initialize(FSubsystemCollectionBase& Collection)
 //{
 //	Super::Initialize(Collection);
 //}
 
-void USceneHandle::InitSceneHandle()
+void USceneHandle::InitSceneHandle(UEdmundGameInstance* NewGameInstance)
 {
 	CurrentScene = ESceneType::Title;
+	EdmundGameInstance = NewGameInstance;
 }
 
 void USceneHandle::MoveNextScene()
@@ -51,9 +53,12 @@ void USceneHandle::MoveNextScene()
 void USceneHandle::OpenScene(ESceneType SceneType)
 {
 	CurrentScene = SceneType;
-	/*UEnum* SceneEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ESceneType"));
-	FString name = SceneEnum->GetNameStringByValue((int64)CurrentScene);
-	UE_LOG(LogTemp, Warning, TEXT("Current Scene : %s"), *name);*/
+
+	UEnum* CharacterEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ECharacterType"));
+	ECharacterType CharacterType = EdmundGameInstance->GetPlayerType();
+	FString TypeName = CharacterEnum->GetNameStringByValue((int64)CharacterType);
+	UE_LOG(LogTemp, Warning, TEXT("Selected Character Type is %s"), *TypeName);
+
 	switch (CurrentScene)
 	{
 	case ESceneType::Title:
@@ -65,19 +70,19 @@ void USceneHandle::OpenScene(ESceneType SceneType)
 		break;
 
 	case ESceneType::Mission1:
-		UGameplayStatics::OpenLevel(GetWorld(), Mission1SceneName);
+		UGameplayStatics::OpenLevel(GetWorld(), Mission1SceneName, true, TypeName);
 		break;
 
 	case ESceneType::Mission2:
-		UGameplayStatics::OpenLevel(GetWorld(), Mission2SceneName);
+		UGameplayStatics::OpenLevel(GetWorld(), Mission2SceneName, true, TypeName);
 		break;
 
 	case ESceneType::Mission3:
-		UGameplayStatics::OpenLevel(GetWorld(), Mission3SceneName);
+		UGameplayStatics::OpenLevel(GetWorld(), Mission3SceneName, true, TypeName);
 		break;
 
 	case ESceneType::Infinity:
-		UGameplayStatics::OpenLevel(GetWorld(), InfinitySceneName);
+		UGameplayStatics::OpenLevel(GetWorld(), InfinitySceneName, true, TypeName);
 		break;
 
 	case ESceneType::Ending:

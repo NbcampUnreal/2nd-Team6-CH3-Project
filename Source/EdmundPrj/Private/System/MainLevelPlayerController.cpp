@@ -77,10 +77,14 @@ void AMainLevelPlayerController::CheckCollideCharacter()
 
 	bIsSelectMode = false;
 
+	if (IsValid(TargetCharacter))
+	{
+		bIsReturnByCharacter[TargetCharacter] = true;
+	}
+
 	TargetCharacter = Cast<ABaseCharacter>(Hit.GetActor());
 	UE_LOG(LogTemp, Warning, TEXT("Target Character Name is %s"), *TargetCharacter->GetName());
 
-	AEdmundGameState* EdmundGameState = GetWorld()->GetGameState<AEdmundGameState>();
 	checkf(IsValid(EdmundGameState), TEXT("GameState is invalid"));
 	EdmundGameState->SetSelectedCharacter(TargetCharacter);
 }
@@ -155,8 +159,9 @@ void AMainLevelPlayerController::SetSelectMode(bool Value)
 	bIsSelectMode = Value;
 }
 
-void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacterDataRow*>& CharacterData)
+void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacterDataRow*>& CharacterData, ECharacterType Type, AEdmundGameState* NewGameState)
 {
+	EdmundGameState = NewGameState;
 	MoveTargetPos = GetPawn()->GetActorLocation();
 	MoveTargetPos = FVector(MoveTargetPos.X, MoveTargetPos.Y, 0);
 	LookAtTargetPos = GetPawn()->GetComponentByClass<UCameraComponent>()->GetComponentLocation();
@@ -182,7 +187,31 @@ void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacter
 		FRotator LookAtRotator(0, LookAtDirection.Rotation().Yaw, 0);
 		NewCharacter->SetActorRotation(LookAtRotator);
 		NewCharacter->AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+		if (!IsValid(TargetCharacter))
+		{
+			if (CharacterDataRow->CharacterType == Type)
+			{
+				TargetCharacter = NewCharacter;
+				EdmundGameState->SetSelectedCharacter(TargetCharacter);
+			}
+		}
+	}
+}
+
+void AMainLevelPlayerController::CompareType(ECharacterType Type)
+{
+	if (TargetCharacter != nullptr)
+	{
+		return;
 	}
 
-	//TargetCharacter = CharacterSet[0]; // 나중에 수정 필요
+	for (ABaseCharacter* BaseCharacter : CharacterSet)
+	{
+		if (BaseCharacter->GetCharacterType() == Type)
+		{
+			TargetCharacter = BaseCharacter;
+			return;
+		}
+	}
 }
