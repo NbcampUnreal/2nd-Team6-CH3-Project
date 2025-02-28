@@ -1,7 +1,6 @@
 #include "Boss/State/BTTask_BossSkill2.h"
 #include "Boss/Boss.h"
 #include "Boss/Boss_AnimInstance.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -11,7 +10,6 @@ UBTTask_BossSkill2::UBTTask_BossSkill2()
     NodeName = TEXT("Boss Skill2");
     bNotifyTick = false;
     BossRef = nullptr;
-    CachedOwnerComp = nullptr;
 }
 
 EBTNodeResult::Type UBTTask_BossSkill2::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -27,26 +25,16 @@ EBTNodeResult::Type UBTTask_BossSkill2::ExecuteTask(UBehaviorTreeComponent& Owne
     {
         return EBTNodeResult::Failed;
     }
-    CachedOwnerComp = &OwnerComp;
-
-    if (BossRef->GetCharacterMovement())
-    {
-        BossRef->GetCharacterMovement()->StopMovementImmediately();
-    }
 
     PlaySkill2Animation();
 
-    UWorld* World = BossRef->GetWorld();
-    if (World)
+    if (BossRef && BossRef->Skill2NewMaterial)
     {
-        World->GetTimerManager().SetTimer(SpawnTimerHandle, this, &UBTTask_BossSkill2::OnSkill2Complete, 2.0f, false);
+        BossRef->SetbSkill2Used(true);
+        BossRef->SetbIsInvulnerable(true);
+        BossRef->GetMesh()->SetMaterial(0, BossRef->Skill2NewMaterial);
     }
-    else
-    {
-        return EBTNodeResult::Failed;
-    }
-
-    return EBTNodeResult::InProgress;
+    return EBTNodeResult::Succeeded;
 }
 
 void UBTTask_BossSkill2::PlaySkill2Animation()
@@ -54,16 +42,10 @@ void UBTTask_BossSkill2::PlaySkill2Animation()
     if (!BossRef) return;
 
     USkeletalMeshComponent* Mesh = BossRef->GetMesh();
-    if (!Mesh)
-    {
-        return;
-    }
+    if (!Mesh) return;
 
     UAnimInstance* AnimInst = Mesh->GetAnimInstance();
-    if (!AnimInst)
-    {
-        return;
-    }
+    if (!AnimInst) return;
 
     UBoss_AnimInstance* BossAnimInst = Cast<UBoss_AnimInstance>(AnimInst);
     if (BossAnimInst && BossAnimInst->Skill2Montage)
@@ -73,48 +55,5 @@ void UBTTask_BossSkill2::PlaySkill2Animation()
             AnimInst->Montage_Stop(0.1f, BossAnimInst->Skill2Montage);
         }
         AnimInst->Montage_Play(BossAnimInst->Skill2Montage);
-    }
-}
-
-void UBTTask_BossSkill2::SpawnMonsters()
-{
-    if (!BossRef) return;
-
-    UWorld* World = BossRef->GetWorld();
-    if (!World)
-    {
-        return;
-    }
-
-    for (int32 i = 0; i < BossRef->Skill2SpawnCount; i++)
-    {
-        int32 RandomIndex = FMath::RandRange(0, BossRef->Skill2MonsterList.Num() - 1);
-        TSubclassOf<AActor> MonsterClass = BossRef->Skill2MonsterList[RandomIndex];
-        if (!MonsterClass)
-        {
-            continue;
-        }
-
-        float Distance = FMath::RandRange(1000.0f, BossRef->Skill2SpawnRadius);
-        FVector RandomDirection = FMath::VRand();
-        RandomDirection.Z = 0.f;
-        RandomDirection.Normalize();
-        FVector SpawnLocation = BossRef->GetActorLocation() + RandomDirection * Distance;
-        FRotator SpawnRotation = FRotator::ZeroRotator;
-
-        World->SpawnActor<AActor>(MonsterClass, SpawnLocation, SpawnRotation);
-    }
-}
-
-void UBTTask_BossSkill2::OnSkill2Complete()
-{
-    if (BossRef)
-    {
-        BossRef->SetbSkill2Used(true);
-    }
-    SpawnMonsters();
-    if (CachedOwnerComp)
-    {
-        FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
     }
 }

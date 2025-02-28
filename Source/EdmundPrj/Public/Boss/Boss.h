@@ -29,7 +29,6 @@ public:
     float SetMonsterMoveSpeed(float NewSpeed);
     void UpdateAttackCooldown(int32 AttackID);
     void MonsterAttackCheck() override;
-    void MonsterDestroy();
     virtual void MonsterDead() override;
     float GetMonsterHP() const { return MonsterHP; }
     float GetMonsterMaxHP() const { return MonsterMaxHP; }
@@ -40,9 +39,9 @@ public:
     void SetbSkill1Used(bool bUsed) { bSkill1Used = bUsed; }
     void SetbSkill2Used(bool bUsed) { bSkill2Used = bUsed; }
     void SetbSkill3Used(bool bUsed) { bSkill3Used = bUsed; }
-    
+    float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
     int32 SetAttack1Count(int32 NewCount);
-
+    void SetbIsInvulnerable(bool NewIsInvulnerable) { bIsInvulnerable = NewIsInvulnerable; }
 
 private:
     UPROPERTY()
@@ -50,13 +49,13 @@ private:
 
     UPROPERTY()
     UBoss_AnimInstance* AnimInstance;
-    
 
 private:
     int32 PoolSize = 15;
     bool bSkill1Used = false;
     bool bSkill2Used = false;
     bool bSkill3Used = false;
+    bool bIsInvulnerable = false;
 
 public:
     float Chase_AcceptanceRadius = 1000.0f; // Chase 반경
@@ -160,13 +159,10 @@ public:
     // ***********************Skill 1*************************
     // ***********************Skill 2*************************
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
-    float Skill2SpawnRadius = 500.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UMaterialInterface* Skill2NewMaterial;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
-    int32 Skill2SpawnCount = 10;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
-    TArray<TSubclassOf<AActor>> Skill2MonsterList;
+
 
     // ***********************Skill 3*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")

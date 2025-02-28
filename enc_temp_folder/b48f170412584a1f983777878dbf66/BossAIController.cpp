@@ -122,6 +122,18 @@ void ABossAIController::Tick(float DeltaTime)
                     GEngine->AddOnScreenDebugMessage(1, DeltaTime, FColor::Green, DebugMsg);
                 }
             }
+            else
+            {
+                if (GEngine)
+                {
+                    GEngine->AddOnScreenDebugMessage(
+                        99,
+                        DeltaTime,
+                        FColor::Red,
+                        FString::Printf(TEXT("Skill HP=%.1f => NextAttack=%d"), HPPercent, NextAttack)
+                    );
+                }
+            }
             BBComp->SetValueAsInt("NextAttack", NextAttack);
         }
     }

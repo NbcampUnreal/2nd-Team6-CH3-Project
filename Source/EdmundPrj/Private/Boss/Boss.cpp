@@ -10,7 +10,6 @@
 ABoss::ABoss()
 {
     PrimaryActorTick.bCanEverTick = true;
-
     AIControllerClass = ABossAIController::StaticClass();
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
@@ -27,16 +26,18 @@ ABoss::ABoss()
     // 공격 스폰 위치
     MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
     MuzzleLocation->SetupAttachment(GetMesh(), TEXT("MuzzleSocket"));
+
 }
 
 void ABoss::BeginPlay()
 {
     Super::BeginPlay();
-
+    Tags.Add(TEXT("Boss"));
     if (GetMesh() && GetMesh()->GetAnimInstance())
     {
         AnimInstance = Cast<UBoss_AnimInstance>(GetMesh()->GetAnimInstance());
     }
+
     InitiallizeBullerPool();
 }
 
@@ -246,8 +247,11 @@ void ABoss::MonsterDead()
     }
 }
 
-
-void ABoss::MonsterDestroy()
+float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+    if (bIsInvulnerable)
+    {
+        return 0.f;
+    }
+    return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
-

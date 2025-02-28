@@ -12,7 +12,6 @@ UBTTask_BossChase::UBTTask_BossChase()
 	BossRef = nullptr;
 	CachedOwnerComp = nullptr;
 	AccumulatedTime = 0.0f;
-	
 }
 
 EBTNodeResult::Type UBTTask_BossChase::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -36,44 +35,43 @@ EBTNodeResult::Type UBTTask_BossChase::ExecuteTask(UBehaviorTreeComponent& Owner
 
 void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-    if (!BossRef)
-    {
-        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-        return;
-    }
+	if (!BossRef)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return;
+	}
 
-    AccumulatedTime += DeltaSeconds;
-    if (AccumulatedTime >= 0.5f)
-    {
-        AccumulatedTime = 0.0f;
-        AAIController* AICon = Cast<AAIController>(BossRef->GetController());
-        AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
-        if (!AICon || !Player)
-        {
-            FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-            return;
-        }
-        AICon->MoveToActor(Player, BossRef->Chase_AcceptanceRadius);
+	AccumulatedTime += DeltaSeconds;
+	if (AccumulatedTime >= FMath::RandRange(2.0f, 3.0f)) // 랜덤 2~3초 지속
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		return;
+	}
 
-        int32 NextAttack = 0;
-        if (UBlackboardComponent* BBComp = OwnerComp.GetBlackboardComponent())
-        {
-            NextAttack = BBComp->GetValueAsInt("NextAttack");
-        }
+	AAIController* AICon = Cast<AAIController>(BossRef->GetController());
+	AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
+	if (!AICon || !Player)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return;
+	}
 
-        if (NextAttack != 0)
-        {
-            FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-        }
-        /*
-        else
-        {
-            float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
-            if (Distance <= BossRef->Chase_AcceptanceRadius)
-            {
-                FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-            }
-        }
-        */
-    }
+	float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
+	if (Distance >= 1500.0f)
+	{
+		BossRef->Chase_AcceptanceRadius += 100.0f; // 거리가 1500 이상이면 속도 증가
+	}
+
+	AICon->MoveToActor(Player, BossRef->Chase_AcceptanceRadius);
+
+	int32 NextAttack = 0;
+	if (UBlackboardComponent* BBComp = OwnerComp.GetBlackboardComponent())
+	{
+		NextAttack = BBComp->GetValueAsInt("NextAttack");
+	}
+
+	if (NextAttack != 0 || Distance <= BossRef->Chase_AcceptanceRadius)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 }

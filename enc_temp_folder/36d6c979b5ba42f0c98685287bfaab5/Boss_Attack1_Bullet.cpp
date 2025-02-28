@@ -48,8 +48,10 @@ void ABoss_Attack1_Bullet::BeginPlay()
 {
     Super::BeginPlay();
 
+    // 보스 찾기
     BossRef = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 
+    // Attack4와 동일하게 초기 스폰 시 BulletPool에 등록
     if (!BulletPool.Contains(this))
     {
         BulletPool.Add(this);
@@ -97,7 +99,7 @@ void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
     if (bIsIgnored)
     {
         //UE_LOG(LogTemp, Log, TEXT("OnHit: Ignored collision; continuing flight without explosion"));
-        return;
+        return;  // 조건에 해당하면 후속 처리를 하지 않고 그대로 진행
     }
 
     //UE_LOG(LogTemp, Log, TEXT("OnHit: Applying damage"));
@@ -123,6 +125,7 @@ void ABoss_Attack1_Bullet::ApplyDamage(AActor* Target, float DamageAmount)
 
 void ABoss_Attack1_Bullet::ApplyBCollisionDamage()
 {
+    // Collision A에서 오버랩된 액터 로그 출력
     TArray<AActor*> OverlapActorsA;
     ACollision->GetOverlappingActors(OverlapActorsA);
     for (AActor* Actor : OverlapActorsA)
@@ -130,6 +133,7 @@ void ABoss_Attack1_Bullet::ApplyBCollisionDamage()
         //UE_LOG(LogTemp, Log, TEXT("Collision A Overlap: %s"), *Actor->GetName());
     }
 
+    // Collision B에서 오버랩된 액터 로그 출력 및 데미지 적용
     TArray<AActor*> OverlapActorsB;
     BCollision->GetOverlappingActors(OverlapActorsB);
     for (AActor* Actor : OverlapActorsB)
@@ -210,6 +214,7 @@ ABoss_Attack1_Bullet* ABoss_Attack1_Bullet::GetBulletFromPool(UWorld* World, TSu
         }
     }
 
+    // 풀에 총알이 없으면 새로 생성
     ABoss_Attack1_Bullet* NewBullet = World->SpawnActor<ABoss_Attack1_Bullet>(BulletClass);
     if (NewBullet)
     {

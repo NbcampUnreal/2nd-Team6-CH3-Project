@@ -6,6 +6,10 @@
 
 class ABoss;
 
+/**
+ * UBTTask_BossSkill2
+ * 기존 몬스터 스폰 기능 대신 보스의 스켈레탈 메시를 변경하는 동작을 수행하는 태스크.
+ */
 UCLASS()
 class EDMUNDPRJ_API UBTTask_BossSkill2 : public UBTTaskNode
 {
@@ -15,23 +19,19 @@ public:
     UBTTask_BossSkill2();
 
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-    // TickTask()가 별도로 필요 없으므로 생략할 수 있습니다.
-    // virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 protected:
-    // 타이머 핸들: 2초 후 몬스터 소환 및 태스크 완료
-    FTimerHandle SpawnTimerHandle;
+    void PlaySkill2Animation();
 
-    // Boss 참조 (AI 컨트롤러의 Pawn)
-    ABoss* BossRef;
-
-    // Behavior Tree 컴포넌트 캐시
+    UPROPERTY()
     UBehaviorTreeComponent* CachedOwnerComp;
 
-    // 내부 함수들
-    void PlaySkill2Animation();
-    void SpawnMonsters();
+    UPROPERTY()
+    ABoss* BossRef;
 
-    // 타이머 콜백: 스킬 실행 완료 후 호출
-    void OnSkill2Complete();
+private:
+    UMaterialInterface* OriginalMaterial = nullptr;
+
+public:
+
 };
