@@ -76,7 +76,7 @@ protected:
 	void Look(const FInputActionValue& value);
 
 	// 공격
-	void Attack(const FInputActionValue& value);
+	virtual void Attack(const FInputActionValue& value) override;
 	virtual bool ActiveWeapon();
 
 	// 근접공격
