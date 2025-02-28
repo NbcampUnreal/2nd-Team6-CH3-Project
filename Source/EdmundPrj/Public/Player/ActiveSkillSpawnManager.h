@@ -25,7 +25,7 @@ protected:
 public:	
 	void ActivateProbCalculate();
 	void CreateActiveSkill(TSubclassOf<AAttackSkill> attackSkill, EActiveSkillType skillType, int createCount);
-	void ActivateActiveSkill(EActiveSkillType skillType);
+	void ActivateActiveSkill(EActiveSkillType skillType, FVector ForwardVector);
 	TObjectPtr<AAttackSkill> FindDeactivateActiveSkill(EActiveSkillType skillType);
 
 public:

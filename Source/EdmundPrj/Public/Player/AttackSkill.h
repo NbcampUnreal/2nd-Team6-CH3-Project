@@ -48,5 +48,6 @@ public:
 	int ActivateProb = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float SkillRange = 0;
+	FVector CharForwardVector = FVector::ZeroVector;
 	FVector FinishPos = FVector::ZeroVector;
 };

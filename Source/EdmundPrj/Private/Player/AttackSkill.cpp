@@ -23,7 +23,7 @@ AAttackSkill::AAttackSkill()
 
 void AAttackSkill::MoveForward()
 {
-	FVector NewLocation = GetActorLocation() + GetActorForwardVector() * MoveSpeed;
+	FVector NewLocation = GetActorLocation() + CharForwardVector * MoveSpeed;
 	SetActorLocation(NewLocation);
 
 	float distance = FVector::Distance(NewLocation, FinishPos);

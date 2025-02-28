@@ -10,7 +10,7 @@ UActiveSkillSpawnManager::UActiveSkillSpawnManager()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	ActiveSkillClassMap.Empty();
 	// ...
 }
 
@@ -33,7 +33,7 @@ void UActiveSkillSpawnManager::ActivateProbCalculate()
 		int RandomInt = FMath::RandRange(1, 100);
 		if (RandomInt > ActivateProb)
 		{
-			ActivateActiveSkill(skillType);
+			ActivateActiveSkill(skillType, GetOwner()->GetActorForwardVector());
 		}
 
 	}
@@ -55,7 +55,7 @@ void UActiveSkillSpawnManager::CreateActiveSkill(TSubclassOf<AAttackSkill> attac
 	}
 }
 
-void UActiveSkillSpawnManager::ActivateActiveSkill(EActiveSkillType skillType)
+void UActiveSkillSpawnManager::ActivateActiveSkill(EActiveSkillType skillType, FVector ForwardVector)
 {
 	TWeakObjectPtr<AAttackSkill> skill = nullptr;
 	skill = FindDeactivateActiveSkill(skillType);
@@ -68,7 +68,8 @@ void UActiveSkillSpawnManager::ActivateActiveSkill(EActiveSkillType skillType)
 
 	FVector skillLocation = GetOwner()->GetActorLocation();
 
-	skill->FinishPos = GetOwner()->GetActorLocation() + (GetOwner()->GetActorForwardVector() * skill->SkillRange);
+	skill->CharForwardVector = GetOwner()->GetActorForwardVector();
+	skill->FinishPos = GetOwner()->GetActorLocation() + (skill->CharForwardVector * skill->SkillRange);
 	skill->SetActorLocation(skillLocation);
 	skill->SetActorEnableCollision(true);
 	skill->SetActorHiddenInGame(false);
