@@ -16,6 +16,7 @@
 #include "Components/AudioComponent.h"
 #include "Monster/MonsterSpawner.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "System/MissionHandle.h"
 
 // Sets default values
 ABaseMonster::ABaseMonster()
@@ -39,6 +40,13 @@ ABaseMonster::ABaseMonster()
 	GetCharacterMovement()->MaxWalkSpeed = MonsterMoveSpeed;
 
 	Tags.Add(FName("Monster"));
+
+	MonsterLevel = 1; // 미션핸들에서 레벨정보 받아올 것
+	MonsterHP = 100 + (MonsterLevel * 50);
+	MonsterMaxHP = 100 + (MonsterLevel * 50);
+	MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+	MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+
 }
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -56,9 +64,38 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
 	}
 
+	if (TakeDamageParticle)
+	{
+		SetChaseMode(true);
+
+		UpdateMonsterOverHeadWidget();
+
+		UParticleSystemComponent* Particle = nullptr;
+
+		FVector ParticleScale = FVector(2.0f, 2.0f, 2.0f);
+
+		Particle = UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			TakeDamageParticle,
+			GetActorLocation(),
+			GetActorRotation(),
+			ParticleScale,
+			false
+		);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TakeDamageParticle이 없습니다."));
+	}
+
 	GetCharacterMovement()->Deactivate();
 
-	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float TakeDamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float ActualDamage = TakeDamageAmount * (1.0f - MonsterArmor / 100.0f);
+
+	UE_LOG(LogTemp, Warning, TEXT("원래 피해량: %f"), TakeDamageAmount);
+
+	UE_LOG(LogTemp, Warning, TEXT("감소된 피해량: %f"), ActualDamage);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
 
@@ -235,30 +272,6 @@ void ABaseMonster::MonsterHit()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
-			if (TakeDamageParticle)
-			{
-				SetChaseMode(true);
-
-				UpdateMonsterOverHeadWidget();
-
-				UParticleSystemComponent* Particle = nullptr;
-
-				FVector ParticleScale = FVector(2.0f, 2.0f, 2.0f);
-
-				Particle = UGameplayStatics::SpawnEmitterAtLocation(
-					GetWorld(),
-					TakeDamageParticle,
-					GetActorLocation(),
-					GetActorRotation(),
-					ParticleScale,
-					false
-				);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("TakeDamageParticle이 없습니다."));
-			}
-
 			bIsHit = true;
 
 			GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0, 0, 1));

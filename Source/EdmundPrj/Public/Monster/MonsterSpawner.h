@@ -43,6 +43,9 @@ public:
 
 	void InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
+	UParticleSystem* SpawnParticle;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Bullet")
 	AMonsterBulletPool* MonsterBulletPool;
 

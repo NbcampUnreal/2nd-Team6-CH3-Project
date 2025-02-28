@@ -11,6 +11,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/Actor.h"
 #include "Monster/RangedMonsterBullet.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -212,6 +213,22 @@ void AMonsterSpawner::SpawnMonster()
 			Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			Monster->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 			Monster->SetActorLocation(GetSpawnVolume());
+
+			if (SpawnParticle)
+			{
+				UParticleSystemComponent* Particle = nullptr;
+
+				FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
+
+				Particle = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					SpawnParticle,
+					Monster->GetActorLocation(),
+					Monster->GetActorRotation(),
+					ParticleScale,
+					false
+				);
+			}
 
 		}
 	}

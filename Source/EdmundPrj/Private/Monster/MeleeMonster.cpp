@@ -17,7 +17,6 @@ void AMeleeMonster::MonsterAttackCheck()
 
     if (Monster)
     {
-        PlayParticle();
         PlaySound();
 
         UCapsuleComponent* CollisionComp = NewObject<UCapsuleComponent>(this);
@@ -50,6 +49,8 @@ void AMeleeMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
 {
     if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
     {
+        PlayParticle();
+
         UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
         AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
         ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
@@ -82,7 +83,7 @@ void AMeleeMonster::PlayParticle()
             GetWorld(),
             AttackParticle,
             ParticleLocation,
-            GetActorRotation(),
+            GetActorRotation() + FRotator(0.f, 180.f, 0.f),
             ParticleScale,
             false
         );

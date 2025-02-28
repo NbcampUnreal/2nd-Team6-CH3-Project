@@ -50,19 +50,19 @@ TSubclassOf<ABaseItem> ItemClass;
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	int32 MonsterLevel = 1;
+	int32 MonsterLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	float MonsterHP = 100 + (MonsterLevel * 50);
+	float MonsterHP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	float MonsterMaxHP = 100 + (MonsterLevel * 50);
+	float MonsterMaxHP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	float MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+	float MonsterAttackDamage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	float MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+	float MonsterArmor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float MonsterMoveSpeed = 43.0f;
