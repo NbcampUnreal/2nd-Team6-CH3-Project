@@ -336,6 +336,7 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 
 void ABaseCharacter::Attack(const FInputActionValue& value)
 {
+	ActiveSkillSpawnManager->ActivateProbCalculate();
 }
 
 void ABaseCharacter::Interaction(const FInputActionValue& value)
