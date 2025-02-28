@@ -13,6 +13,7 @@ class AEdmundGameState;
 class USkillManager;
 class UTimerSkillSpawnManagerComponent;
 class UActiveSkillSpawnManager;
+class UElectricEffectPool;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseCharacter : public ACharacter
@@ -36,6 +37,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
 	UActiveSkillSpawnManager* ActiveSkillSpawnManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<UElectricEffectPool> ElectricEffectPool;
 
 	// °ø°Ý·Â Getter
 	float GetAttackDamage() const;
@@ -234,6 +238,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	TObjectPtr<USoundBase> DeathSound;
+
+
 
 private:
 	// Ä¸½¶ ³ôÀÌ <- ¾É±â¿¡¼­ »ç¿ë

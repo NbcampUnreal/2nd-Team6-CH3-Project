@@ -103,3 +103,8 @@ void AAttackPlant::RotationToTarget()
 		GetWorldTimerManager().ClearTimer(RotationHandle);
 	}
 }
+
+void AAttackPlant::SpawnTimerSkill()
+{
+	Super::SpawnTimerSkill();
+}

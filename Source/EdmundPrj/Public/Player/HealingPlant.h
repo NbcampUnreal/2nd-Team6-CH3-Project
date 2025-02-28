@@ -14,22 +14,8 @@ class EDMUNDPRJ_API AHealingPlant : public ATimerSkill
 	GENERATED_BODY()
 public:
 	AHealingPlant();
-	UFUNCTION()
-	void BeginOverlapCharacter(
-		UPrimitiveComponent* overlappedComp,
-		AActor* otherActor,
-		UPrimitiveComponent* otherComp,
-		int32 otherBodyIndex,
-		bool bFromSweep, const
-		FHitResult& SweepResult);
-	UFUNCTION()
-	void EndOverlapCharacter(UPrimitiveComponent*
-		overlappedComponent,
-		AActor* otherActor,
-		UPrimitiveComponent* otherComp,
-		int32 otherBodyIndex);
 	void HealingCharacter();
-	void SpawnHealingPlant();
+	virtual void SpawnTimerSkill() override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	TObjectPtr<USphereComponent> CheckCharacterCollision = nullptr;

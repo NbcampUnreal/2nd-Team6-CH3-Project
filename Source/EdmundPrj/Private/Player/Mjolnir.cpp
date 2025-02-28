@@ -15,6 +15,7 @@ void AMjolnir::HitToMonster(TObjectPtr<ABaseMonster> monster)
 
 void AMjolnir::BeginPlay()
 {
+	Super::BeginPlay();
 	if (!IsValid(GetWorld())) return;
 	if (TObjectPtr<ACharacter> character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
 	{

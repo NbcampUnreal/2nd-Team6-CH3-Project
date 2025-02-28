@@ -13,6 +13,7 @@
 #include "Player/SkillManager.h"
 #include "Player/TimerSkillSpawnManagerComponent.h"
 #include "Player/ActiveSkillSpawnManager.h"
+#include "Player\ElectricEffectPool.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -37,6 +38,8 @@ ABaseCharacter::ABaseCharacter()
 
 	ActiveSkillSpawnManager = CreateDefaultSubobject<UActiveSkillSpawnManager>(TEXT("ActiveSkillManager"));
 	ActiveSkillSpawnManager->SetupAttachment(RootComponent);
+
+	ElectricEffectPool = CreateDefaultSubobject<UElectricEffectPool>(TEXT("ElectricEffectPool"));
 
 	WalkSpeed = 600.0f;
 	SprintSpeed = 1000.0f;

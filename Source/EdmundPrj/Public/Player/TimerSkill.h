@@ -29,6 +29,7 @@ public:
 		const FHitResult& SweepResult);
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster);
 	virtual void Deactivate();
+	virtual void SpawnTimerSkill();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -51,4 +52,8 @@ public:
 	float MoveSpeed = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float DeactivateTime = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	float SpawnPosZ = 0;
+
+	FTimerHandle DestroyHandler;
 };

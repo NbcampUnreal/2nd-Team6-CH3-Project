@@ -16,6 +16,7 @@ class EDMUNDPRJ_API AMeteor : public ATimerSkill
 	AMeteor();
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster) override;
 	void Deactivate();
+	virtual void SpawnTimerSkill() override;
 	virtual void Tick(float deltaTime);
 public:
 

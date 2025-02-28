@@ -9,92 +9,48 @@
 // Sets default values for this component's properties
 UTimerSkillSpawnManagerComponent::UTimerSkillSpawnManagerComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
-	EnemySearchCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SkllTimerCollision"));
+	EnemySearchCollision = CreateDefaultSubobject<USphereComponent>(TEXT("EnemySearchCollision"));
 	EnemySearchCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	EnemySearchCollision->OnComponentBeginOverlap.AddDynamic(this, &UTimerSkillSpawnManagerComponent::BeginOverlaped);
-	EnemySearchCollision->OnComponentEndOverlap.AddDynamic(this, &UTimerSkillSpawnManagerComponent::EndOverlaped);
 	EnemySearchCollision->SetupAttachment(this);
-}
-
-TSet<TObjectPtr<ABaseMonster>> InsideMonster;
-
-void UTimerSkillSpawnManagerComponent::BeginOverlaped(
-	UPrimitiveComponent* overlappedComp,
-	AActor* otherActor,
-	UPrimitiveComponent* otherComp,
-	int32 otherBodyIndex,
-	bool bFromSweep, const
-	FHitResult& SweepResult)
-{
-	if (otherActor && otherActor->ActorHasTag("Monster"))
-	{
-		if (TObjectPtr<ABaseMonster> Monster = Cast<ABaseMonster>(otherActor))
-		{
-			InsideMonster.Add(Monster);
-		}
-	}
-}
-
-void UTimerSkillSpawnManagerComponent::EndOverlaped(
-	UPrimitiveComponent*
-	overlappedComponent,
-	AActor* otherActor,
-	UPrimitiveComponent* otherComp,
-	int32 otherBodyIndex)
-{
-	if (otherActor && otherActor->ActorHasTag("Monster"))
-	{
-		if (TObjectPtr<ABaseMonster> monster = Cast<ABaseMonster>(otherActor))
-		{
-			if (InsideMonster.Contains(monster))
-			{
-				InsideMonster.Remove(monster);
-			}
-		}
-	}
 }
 
 FVector UTimerSkillSpawnManagerComponent::GetRandomMonsterLocation()
 {
-	// 몬스터 리스트가 비어있는지 확인
-	if (InsideMonster.IsEmpty()) return FVector::ZeroVector;
-
-	// `InsideMonster`를 `TArray`로 변환
-	TArray<TObjectPtr<ABaseMonster>> MonsterArray = InsideMonster.Array();
-	MonsterArray.RemoveAll([](TWeakObjectPtr<ABaseMonster> Monster) {
-		return !Monster.IsValid(); // `IsValid()`가 false면 제거
-		});
-	// 변환된 배열이 비어 있는지 확인
-	if (MonsterArray.IsEmpty() || MonsterArray.Num() == 0) return FVector::ZeroVector;
-
-	// 랜덤한 인덱스 선택
-	int RandomIndex = FMath::RandRange(0, MonsterArray.Num() - 1);
-
-	if (MonsterArray.IsValidIndex(RandomIndex)) // 배열의 유효한 인덱스인지 확인
+	TObjectPtr<ABaseMonster> Monster;
+	TArray<AActor*> overlappingActors;
+	EnemySearchCollision->GetOverlappingActors(overlappingActors);
+	int randomIndex = FMath::RandRange(0, overlappingActors.Num() - 1);
+	int currentIndex = 0;
+	for (AActor* activator : overlappingActors)
 	{
-		TWeakObjectPtr<ABaseMonster> RandomMonster = MonsterArray[RandomIndex];
-		if (TObjectPtr<ABaseMonster> MonsterPtr = RandomMonster.Get())
+		if (activator && activator->ActorHasTag("Monster"))
 		{
-			if (IsValid(MonsterPtr)) 
+			if (currentIndex == randomIndex)
 			{
-				FVector MonsterLocation = MonsterPtr->GetActorLocation();
-				RandomMonster.Reset();
-				return MonsterLocation;
+				if (Monster = Cast<ABaseMonster>(activator))
+				{
+					break;
+				}
 			}
 		}
+		currentIndex++;
 	}
-
-	// 모든 조건이 실패하면 기본값 반환
+	if (Monster != nullptr) return Monster->GetActorLocation();
 	return FVector::ZeroVector;
 }
 
 void UTimerSkillSpawnManagerComponent::SetSkillTimer(ETimerSkillType skillType)
 {
+	if (!TimerSkillClassMap.Contains(skillType) || !IsValid(TimerSkillClassMap[skillType]))
+	{
+		UE_LOG(LogTemp, Error, TEXT("TimerSkillClassMap[%d] is NULL!!!"), (int32)skillType);
+		return;
+	}
+
 	FTimerHandle& SkillTimer = SkillTimerMap.FindOrAdd(skillType);
+	if (!IsValid(TimerSkillClassMap[skillType])) return;
 	CreateTimerSkill(TimerSkillClassMap[skillType], skillType, 10);
 	TObjectPtr<ATimerSkill> skill = FindDeactivateTimerSkill(skillType);
 	if (skill == nullptr) return;
@@ -123,6 +79,8 @@ void UTimerSkillSpawnManagerComponent::ClearSkillTimer()
 void UTimerSkillSpawnManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	EnemySearchCollision->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+	SetSkillTimer(ETimerSkillType::HealPlants);
 }
 
 void UTimerSkillSpawnManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -132,7 +90,6 @@ void UTimerSkillSpawnManagerComponent::EndPlay(const EEndPlayReason::Type EndPla
 	{
 		GetWorld()->GetTimerManager().ClearTimer(timerHandle.Value);
 	}
-	InsideMonster.Reset();
 }
 
 void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillType)
@@ -147,38 +104,29 @@ void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillT
 	if (!skill.IsValid()) return;
 	
 	FVector skillLocation = GetRandomMonsterLocation();
-	if (skillType != ETimerSkillType::Plants)
+	if (skillLocation == FVector::ZeroVector)
 	{
-		skillLocation.Z += 1000;
+		UE_LOG(LogTemp, Warning, TEXT("Target is Null"));
+		return;
 	}
+
+	skillLocation.Z = skill->SpawnPosZ;
 	if (skill->TimerSkillSpanwManager == nullptr)
 	{
 		skill->TimerSkillSpanwManager = this;
 	}
-	FTimerHandle DestroyHandler;
-	GetWorld()->GetTimerManager().SetTimer(DestroyHandler,
-		[skill] {
-			if (!skill.IsValid()) return;
-			skill->Deactivate();
-		},
-		skill->DeactivateTime,
-		false);
+	UE_LOG(LogTemp, Warning, TEXT("Spawn HealingPlant!!!"));
 	skill->SetActorLocation(skillLocation);
 	skill->SetActorEnableCollision(true);
 	skill->SetActorHiddenInGame(false);
 	skill->SetActorTickEnabled(true);
+	skill->SpawnTimerSkill();
 }
 
 void UTimerSkillSpawnManagerComponent::DeactivateTimerSkill(TObjectPtr<ATimerSkill> timerSkill)
-{
-	FString skillName = FString::Printf(TEXT("DeactivateThunder"));
+{;
 	TObjectPtr<ATimerSkill>& skill = timerSkill;
-	skill->SetActorLabel(skillName);
 	skill->SetActorHiddenInGame(true);
-	if (!skill->IsHidden())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ThisActorIsNotHidden!"));
-	}
 }
 
 void UTimerSkillSpawnManagerComponent::CreateTimerSkill(TSubclassOf<ATimerSkill> timerSkill, ETimerSkillType skillType, int createCount)

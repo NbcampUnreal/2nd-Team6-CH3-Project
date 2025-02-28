@@ -23,6 +23,7 @@ public:
 
 	// 회전
 	void RotationToTarget();
+	virtual void SpawnTimerSkill() override;
 public:
 	FTimerHandle ApplyDamageHandle;
 	// 공격 주기 타이머

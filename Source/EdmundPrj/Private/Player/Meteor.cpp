@@ -24,7 +24,12 @@ void AMeteor::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 
 void AMeteor::Deactivate()
 {
-	TimerSkillSpanwManager->DeactivateTimerSkill(this);
+	Super::Deactivate();
+}
+
+void AMeteor::SpawnTimerSkill()
+{
+	Super::SpawnTimerSkill();
 }
 
 void AMeteor::Tick(float deltaTime)

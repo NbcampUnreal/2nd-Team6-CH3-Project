@@ -20,12 +20,12 @@ void APlayerCharacterAurora::BeginPlay()
 
 void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 {
-	Super::Attack(value);
 
 	if (!IsAttack)
 	{
 		IsAttack = true;
 
+		Super::Attack(value);
 		switch (ComboCount)
 		{
 			case 0:

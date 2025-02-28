@@ -18,7 +18,6 @@ class EDMUNDPRJ_API USkillManager : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	USkillManager();
 	UFUNCTION(BlueprintCallable, Category = "Skill")
 	void ActivateSkill(FPlayerSkillRow& row);
@@ -30,8 +29,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<UTimerSkillSpawnManagerComponent> TimerSkillManager;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<UActiveSkillSpawnManager> ActiveSkillManager;
 };
