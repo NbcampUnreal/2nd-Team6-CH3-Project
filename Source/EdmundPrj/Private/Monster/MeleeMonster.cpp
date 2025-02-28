@@ -41,7 +41,10 @@ void AMeleeMonster::MonsterAttackCheck()
         FTimerHandle TimerHandle;
         this->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]()
             {
-                CollisionComp->DestroyComponent();
+                if (CollisionComp)
+                {
+                    CollisionComp->DestroyComponent();
+                }
             }), 0.01f, false);
     }
 }

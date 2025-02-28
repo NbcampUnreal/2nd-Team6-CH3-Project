@@ -41,12 +41,16 @@ ABaseMonster::ABaseMonster()
 
 	Tags.Add(FName("Monster"));
 
-	MonsterLevel = 1; // 미션핸들에서 레벨정보 받아올 것
+}
+
+void ABaseMonster::BeginPlay()
+{
+	Super::BeginPlay();
+
 	MonsterHP = 100 + (MonsterLevel * 50);
 	MonsterMaxHP = 100 + (MonsterLevel * 50);
 	MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
 	MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
-
 }
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -172,6 +176,11 @@ void ABaseMonster::SetIsDead(bool bNewIsDead)
 void ABaseMonster::SetCanDropReward(bool NewState)
 {
 	bCanDropReward = NewState;
+}
+
+void ABaseMonster::SetMonsterLevel(int32 NewLevel)
+{
+	MonsterLevel = NewLevel;
 }
 
 // DropReward 호출 후 Destroy

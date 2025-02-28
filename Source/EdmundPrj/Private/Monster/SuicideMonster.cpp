@@ -46,13 +46,19 @@ void ASuicideMonster::MonsterAttackCheck()
         FTimerHandle TimerHandle;
         this->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]()
             {
-                CollisionComp->DestroyComponent();
+                if (CollisionComp)
+                {
+                    CollisionComp->DestroyComponent();
+                }
             }), 0.01f, false);
 
         FTimerHandle DeadTimerHandle;
         this->GetWorldTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([=]()
             {
-                Monster->MonsterDead();
+                if (Monster)
+                {
+                    Monster->MonsterDead();
+                }
             }), 0.01f, false);
     }
 }

@@ -30,8 +30,27 @@ AMonsterSpawner::AMonsterSpawner()
 	SpawnerMeshComp->SetupAttachment(RootComp);
 }
 
+void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount, int32 NewLevelIndex)
+{
+	MonsterBulletPool = BulletPool;
+
+	LevelIndex = NewLevelIndex;
+
+	SpawnTime = NewSpawnTime;
+	SpawnCount = NewSpawnCount;
+
+	InitializeMonsterSpawnPool(SpawnCount);
+
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
+
+	SetBossMode(false);
+
+}
+
 void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount)
 {
+	UE_LOG(LogTemp, Warning, TEXT("InitSpawner에 NewLevelIndex가 없습니다. Monster의 레벨이 1이 됩니다."));
+
 	MonsterBulletPool = BulletPool;
 
 	SpawnTime = NewSpawnTime;
@@ -207,6 +226,7 @@ void AMonsterSpawner::SpawnMonster()
 				AIController->SetActorTickEnabled(true);
 			}
 
+			Monster->SetMonsterLevel(LevelIndex);
 			Monster->Tags.Add(FName("Monster"));
 			Monster->SetCanDropReward(true);
 			Monster->SetIsDead(false);
