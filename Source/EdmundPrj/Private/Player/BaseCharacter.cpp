@@ -30,7 +30,10 @@ ABaseCharacter::ABaseCharacter()
 	SprintSpeed = 1000.0f;
 	CrouchMoveSpeed = 300.0f;
 
-	HP = MaxHP = 300.0f;
+	HP = MaxHP = 300;
+	Stamina = MaxStamina = 100;
+	StaminaRecoveryAmount = StaminaConsumAmount = 0.0f;
+	StaminaRecoveryAndConsumDelay = 1.0f;
 
 	CriticalMultiplier = 2.0f;
 
@@ -56,6 +59,7 @@ void ABaseCharacter::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
 	HP = MaxHP;
+	Stamina = MaxStamina;
 
 	// 캡슐 콜리전 크기 저장하기
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
@@ -73,6 +77,21 @@ void ABaseCharacter::BeginPlay()
 	{
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
+
+	GetWorld()->GetTimerManager().SetTimer(
+		StaminaDelayHandle,
+		this,
+		&ABaseCharacter::UpdateStamina,
+		StaminaRecoveryAndConsumDelay,
+		true
+	);
+}
+
+void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetTimerManager().ClearTimer(StaminaDelayHandle);
 }
 
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -237,6 +256,12 @@ void ABaseCharacter::StartSprint(const FInputActionValue& value)
 {
 	if (IsDie)
 	{
+		return;
+	}
+
+	if (Stamina < 4)
+	{
+		StopSprint(value);
 		return;
 	}
 
@@ -554,6 +579,23 @@ ECharacterType ABaseCharacter::GetCharacterType()
 void ABaseCharacter::AttackTrace()
 {
 	// 자식 클래스 함수 실행
+}
+
+void ABaseCharacter::UpdateStamina()
+{
+	if (IsSprint && !IsCrouch)
+	{
+		Stamina -= StaminaConsumAmount;
+	}
+
+	else
+	{
+		Stamina += StaminaRecoveryAmount;
+	}
+
+	Stamina = FMath::Clamp(Stamina, 0, MaxStamina);
+
+	CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
 }
 
 bool ABaseCharacter::CheckAction()

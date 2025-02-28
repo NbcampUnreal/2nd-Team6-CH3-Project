@@ -166,6 +166,12 @@ void AEdmundGameState::SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle)
 	SpawnerHandle = NewSpawnerHandle;
 }
 
+const TArray<FShopCatalogRow*>& AEdmundGameState::GetPlayerAdvancedData() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("Game Instance is invalid"));
+	return EdmundGameInstance->GetAdvanceState();
+}
+
 void AEdmundGameState::OnPressedPauseKey()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("Game Instance is invalid"));
@@ -173,6 +179,11 @@ void AEdmundGameState::OnPressedPauseKey()
 	PlayerController->SetPause(true);
 	ChangeCursorMode(true);
 	ChangeInputMode(FInputModeUIOnly());
+}
+
+void AEdmundGameState::RequestOnPause()
+{
+	PlayerController->SetPause(true);
 }
 
 void AEdmundGameState::RequestEndPause()
