@@ -41,8 +41,6 @@ public:
 	float AttackRangeRadius;
 
 protected:
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	// АјАн
 	virtual void Attack(const FInputActionValue& value) override;
 
