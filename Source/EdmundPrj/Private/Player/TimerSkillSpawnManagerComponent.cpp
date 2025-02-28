@@ -137,15 +137,6 @@ void UTimerSkillSpawnManagerComponent::EndPlay(const EEndPlayReason::Type EndPla
 	InsideMonster.Reset();
 }
 
-
-// Called every frame
-void UTimerSkillSpawnManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillType)
 {
 	TWeakObjectPtr<ATimerSkill> skill = nullptr;

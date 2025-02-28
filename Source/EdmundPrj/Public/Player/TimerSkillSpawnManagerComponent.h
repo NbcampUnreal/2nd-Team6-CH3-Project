@@ -37,7 +37,6 @@ class EDMUNDPRJ_API UTimerSkillSpawnManagerComponent : public USceneComponent
 
 		void SetSkillTimer(ETimerSkillType skillType);
 		void ClearSkillTimer();
-		virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction) override;
 		void CreateTimerSkill(TSubclassOf<ATimerSkill> timerSkill, ETimerSkillType skillType, int createCount);
 		void ActivateTimerSkill(ETimerSkillType skillType);
 		void DeactivateTimerSkill(TObjectPtr<ATimerSkill> timerSkill);

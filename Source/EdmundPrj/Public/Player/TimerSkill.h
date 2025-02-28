@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "BaseSkill.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TimerSkill.generated.h"
@@ -11,7 +12,7 @@ class ABaseMonster;
 class UTimerSkillSpawnManagerComponent;
 
 UCLASS()
-class EDMUNDPRJ_API ATimerSkill : public AActor
+class EDMUNDPRJ_API ATimerSkill : public ABaseSkill
 {
 	GENERATED_BODY()
 	

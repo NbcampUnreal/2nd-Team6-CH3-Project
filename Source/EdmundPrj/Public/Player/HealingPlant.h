@@ -3,18 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/Plant.h"
-#include "HealPlant.generated.h"
+#include "Player/TimerSkill.h"
+#include "HealingPlant.generated.h"
 
 class ABaseCharacter;
 
 UCLASS()
-class EDMUNDPRJ_API AHealPlant : public APlant
+class EDMUNDPRJ_API AHealingPlant : public ATimerSkill
 {
 	GENERATED_BODY()
-	
 public:
-	AHealPlant();
+	AHealingPlant();
 	UFUNCTION()
 	void BeginOverlapCharacter(
 		UPrimitiveComponent* overlappedComp,
@@ -30,10 +29,12 @@ public:
 		UPrimitiveComponent* otherComp,
 		int32 otherBodyIndex);
 	void HealingCharacter();
+	void SpawnHealingPlant();
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	TObjectPtr<USphereComponent> CheckCharacterCollision = nullptr;
 	FTimerHandle HealCycleHandle;
+	FTimerHandle SpawnShakeHandle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float HealAmount = 0;
 };

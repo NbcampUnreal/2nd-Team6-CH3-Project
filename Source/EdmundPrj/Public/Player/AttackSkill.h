@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "BaseSkill.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "AttackSkill.generated.h"
@@ -10,7 +11,7 @@ class USphereComponent;
 class ABaseMonster;
 
 UCLASS()
-class EDMUNDPRJ_API AAttackSkill : public AActor
+class EDMUNDPRJ_API AAttackSkill : public ABaseSkill
 {
 	GENERATED_BODY()
 	
