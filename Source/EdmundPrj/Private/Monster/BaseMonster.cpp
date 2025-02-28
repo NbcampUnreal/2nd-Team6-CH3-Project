@@ -93,9 +93,9 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	float TakeDamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	float ActualDamage = TakeDamageAmount * (1.0f - MonsterArmor / 100.0f);
 
-	UE_LOG(LogTemp, Warning, TEXT("원래 피해량: %f"), TakeDamageAmount);
+	//UE_LOG(LogTemp, Warning, TEXT("원래 피해량: %f"), TakeDamageAmount);
 
-	UE_LOG(LogTemp, Warning, TEXT("감소된 피해량: %f"), ActualDamage);
+	//UE_LOG(LogTemp, Warning, TEXT("감소된 피해량: %f"), ActualDamage);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
 
