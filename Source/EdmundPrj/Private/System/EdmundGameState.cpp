@@ -8,6 +8,8 @@
 #include "System/DataStructure/PlayerSkillRow.h"
 #include "System/Observer/GameStateObserver.h"
 #include "Player/BaseCharacter.h"
+#include "System/MissionHandle.h"
+#include "System/SpawnerHandle.h"
 
 void AEdmundGameState::BeginPlay()
 {
@@ -21,34 +23,15 @@ void AEdmundGameState::BeginPlay()
 	PlayerPawn = PlayerController->GetPawn();
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->StartedGameState();
-	EdmundGameMode->InitMission();
+	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
+
 	InitSkillData();
 	InitMainLevel();
-
-	//Test
-	/*GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::EndCurrentMission, 5.0f, false);*/
 }
 
 void AEdmundGameState::BeginDestroy()
 {
 	Super::BeginDestroy();
-}
-
-void AEdmundGameState::EndCurrentMission()
-{
-	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Title)
-	{
-		return;
-	}
-	else if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
-	{
-		return;
-	}
-	CreateRandomSkillSet();
-	EdmundGameInstance->OnSkillListUI();
 }
 
 void AEdmundGameState::ChangeCursorMode(bool bIsValid)
@@ -62,6 +45,16 @@ void AEdmundGameState::ChangeInputMode(const FInputModeDataBase& InputMode)
 	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
 	PlayerController->SetInputMode(InputMode);
 	PlayerController->FlushPressedKeys();
+}
+
+void AEdmundGameState::AddCurrentLevelMoney(int32 Money)
+{
+	if (Money < 0)
+	{
+		return;
+	}
+
+	CurrentLevelMoney += Money;
 }
 
 void AEdmundGameState::InitMainLevel()
@@ -125,6 +118,7 @@ void AEdmundGameState::CreateRandomSkillSet()
 	}
 
 	NotifyCreateRandomSkill();
+	EdmundGameInstance->OnSkillListUI();
 }
 
 const TArray<FPlayerSkillRow*>& AEdmundGameState::GetRandomSkillSet() const
@@ -162,10 +156,51 @@ void AEdmundGameState::CancleSelectedCharacter()
 	MainLevelPlayerController->SetTargetToNull();
 }
 
+void AEdmundGameState::SetMissionHandle(AMissionHandle* NewMissionHandle)
+{
+	MissionHandle = NewMissionHandle;
+}
+
+void AEdmundGameState::SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle)
+{
+	SpawnerHandle = NewSpawnerHandle;
+}
+
+const TArray<FShopCatalogRow*>& AEdmundGameState::GetPlayerAdvancedData() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("Game Instance is invalid"));
+	return EdmundGameInstance->GetAdvanceState();
+}
+
+void AEdmundGameState::OnPressedPauseKey()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("Game Instance is invalid"));
+	EdmundGameInstance->OnPause();
+	PlayerController->SetPause(true);
+	ChangeCursorMode(true);
+	ChangeInputMode(FInputModeUIOnly());
+}
+
+void AEdmundGameState::RequestOnPause()
+{
+	PlayerController->SetPause(true);
+}
+
+void AEdmundGameState::RequestEndPause()
+{
+	PlayerController->SetPause(false);
+}
+
 void AEdmundGameState::RequestInteraction()
 {
-	checkf(IsValid(EdmundGameMode), TEXT("Edmund Game Mode is invalid"));
-	EdmundGameMode->RequestInteractionToMissionHandle();
+	checkf(IsValid(MissionHandle), TEXT("Mission Handle is invalid"));
+	MissionHandle->OnPressedKeyFromPlayer();
+}
+
+void AEdmundGameState::EndCurrentLevel()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->AddPossessMoney(CurrentLevelMoney);
 }
 
 void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
@@ -216,6 +251,11 @@ void AEdmundGameState::NotifyPlayerHp(const int32 MaxHp, const int32 CurrentHp)
 			continue;
 		}
 		Observer->ChangedPlayerHp(MaxHp, CurrentHp);
+	}
+
+	if (CurrentHp <= 0)
+	{
+		EdmundGameMode->FailMission();
 	}
 }
 

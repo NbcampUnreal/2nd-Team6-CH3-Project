@@ -13,6 +13,8 @@ ASuicideMonster::ASuicideMonster()
 void ASuicideMonster::MonsterAttackCheck()
 {
 
+    SetCanDropReward(false);
+
     USkeletalMeshComponent* MeshComp = GetMesh();
     ABaseMonster* Monster = Cast<ABaseMonster>(this);
 
@@ -36,8 +38,8 @@ void ASuicideMonster::MonsterAttackCheck()
 
 
         //  공격 Collision Visible 활성화
-         FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-         DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
+         /*FVector CapsuleLocation = CollisionComp->GetComponentLocation();
+         DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);*/
 
 
          // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,

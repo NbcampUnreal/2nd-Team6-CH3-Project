@@ -11,8 +11,10 @@ class UEdmundGameInstance;
 class AEdmundGameMode;
 class IGameStateObserver;
 class ABaseCharacter;
-class ABaseMissionItem;
+class AMissionHandle;
+class ASpawnerHandle;
 struct FPlayerSkillRow;
+struct FShopCatalogRow;
 
 UCLASS()
 class EDMUNDPRJ_API AEdmundGameState : public AGameState
@@ -23,10 +25,15 @@ public:
 	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
 
-	void EndCurrentMission();
+	void SetMissionHandle(AMissionHandle* NewMissionHandle);
+	void SetSpawnerHandle(ASpawnerHandle* NewSpawnerHandle);
+
+	const TArray<FShopCatalogRow*>& GetPlayerAdvancedData() const;
 
 	void ChangeCursorMode(bool bIsValid);
 	void ChangeInputMode(const FInputModeDataBase& InputMode);
+
+	void AddCurrentLevelMoney(int32 Money);
 
 	void CreateRandomSkillSet();
 	const TArray<FPlayerSkillRow*>& GetRandomSkillSet() const;
@@ -35,7 +42,12 @@ public:
 	void SetSelectedCharacter(AActor* Character);
 	void CancleSelectedCharacter();
 
+	void OnPressedPauseKey();
+	void RequestOnPause();
+	void RequestEndPause();
 	void RequestInteraction();
+
+	void EndCurrentLevel();
 
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
@@ -63,7 +75,8 @@ private:
 	TObjectPtr<APlayerController> PlayerController = nullptr;
 	TObjectPtr<AActor> PlayerPawn = nullptr;
 
-	TObjectPtr<ABaseMissionItem> OverlapedItem = nullptr;
+	TObjectPtr<AMissionHandle> MissionHandle;
+	TObjectPtr<ASpawnerHandle> SpawnerHandle;
 
 	TArray<TScriptInterface<IGameStateObserver>> Observers;
 
@@ -72,4 +85,6 @@ private:
 	TMap<FPlayerSkillRow*, int32> CurrentSkillMap;
 
 	FTimerHandle TimerHandle;
+
+	int32 CurrentLevelMoney = 0;
 };

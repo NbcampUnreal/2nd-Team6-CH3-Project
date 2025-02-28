@@ -7,10 +7,32 @@
 #include "EnumSet.generated.h"
 
 UENUM(BlueprintType)
+enum class ESkillType : uint8
+{
+	TimerSkill = 0,
+	ActiveSkill,
+	PassiveSkill
+};
+
+UENUM(BlueprintType)
+enum class EActiveSkillType : uint8
+{
+	Freezing = 0
+};
+
+UENUM(BlueprintType)
+enum class EPassiveSkillType : uint8
+{
+	Berserker = 0
+};
+
+UENUM(BlueprintType)
 enum class ETimerSkillType : uint8
 {
 	Thunder = 0,
 	Meteor,
+	AttackPlants,
+	HealPlants,
 	Plants
 };
 
@@ -44,14 +66,41 @@ enum class EWidgetType : uint8
 };
 
 UENUM(BlueprintType)
-enum class ESoundType : uint8
+enum class ESoundCategory : uint8
 {
 	BGM = 0,
 	UI,
 	Player,
 	Monster,
-	Item,
-	Etc
+	Npc,
+	Item
+};
+
+UENUM(BlueprintType)
+enum class ESoundType : uint8
+{
+	Attack = 0,
+	Hit,
+	Die
+};
+
+UENUM(BlueprintType)
+enum class EBGMSoundType : uint8
+{
+	Title = 0,
+	Main,
+	Mission1,
+	Mission2,
+	Mission3,
+	Infinity,
+	Ending
+};
+
+UENUM(BlueprintType)
+enum class EUISoundType : uint8
+{
+	Open = 0,
+	Click
 };
 
 UENUM(BlueprintType)
@@ -68,7 +117,7 @@ UENUM(BlueprintType)
 enum class ECharacterType : uint8
 {
 	Gunner = 0,
-	Other1,
+	Aurora,
 	Other2,
 	Other3
 };
@@ -85,6 +134,15 @@ enum class EPlayerState : uint8
 };
 
 UENUM(BlueprintType)
+enum class EMonsterType : uint8
+{
+	Melee = 0,
+	Ranger,
+	Suicide,
+	Boss
+};
+
+UENUM(BlueprintType)
 enum class EMonsterState : uint8
 {
 	Idle = 0,
@@ -93,6 +151,12 @@ enum class EMonsterState : uint8
 	Attack,
 	Hit,
 	Die
+};
+
+UENUM(BlueprintType)
+enum class ENpcType : uint8
+{
+	Baldor = 0
 };
 
 UENUM(BlueprintType)
@@ -117,6 +181,13 @@ enum class EBossState : uint8 {
 	Skill2,
 	Skill3,
 	Dead
+};
+
+UENUM(BlueprintType)
+enum class EItemType : uint8
+{
+	Gold = 0,
+	HealKit
 };
 
 UCLASS()

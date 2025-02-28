@@ -14,4 +14,18 @@ class EDMUNDPRJ_API AMissionItemDefenceArea : public ABaseMissionItem
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
+	virtual void SetIsActive(bool Value) override;
+	AMissionItemDefenceArea();
+
+private:
+	virtual void Tick(float DeltaTime) override;
+	virtual void ActionBeginOverlap() override;
+	virtual void ActionEndOverlap() override;
+	virtual void CompleteProgress() override;
+
+private:
+	float CurrentTime = 0.0f;
+	float TargetTime = 0.1f;
 };

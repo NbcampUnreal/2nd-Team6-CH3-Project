@@ -18,35 +18,39 @@ class EDMUNDPRJ_API ABaseMissionItem : public AActor
 	
 public:	
 	ABaseMissionItem();
-	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type,  const FString& MissionInfo);
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type);
 	virtual void ActionEventByPressedKey();
+	virtual void SetIsActive(bool Value);
 
-	void SetIsActive(bool Value);
-	void PrintMissionText();
+	void SetMissionText(const FString& NewInfoText, const FString& NewActiveText, const FString& NewClearText);
+	void PrintMissionInfoText();
+	void PrintMissionActiveText();
+	void PrintMissionClearText();
 	
 protected:
 	UFUNCTION()
-	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	UFUNCTION()
-	void OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 	virtual void BeginPlay() override;
 	
 	virtual void ActionBeginOverlap();
 	virtual void ActionEndOverlap();
 	virtual void ActionOnHit();
+	virtual void CompleteProgress();
 
 	void SetVisible(bool bIsVisible);
 
 	void ApplyOverlapCollision(bool bIsBlockedMesh);
 	void ApplyBlockCollision();
 
-	void UpdateMissionTextToUI();
-	void UpdateNotifyTextToUI();
+	void UpdateMissionTextToUI(const FString& TargetText, bool bIsClear = false);
+	void UpdateNotifyTextToUI(const FString& TargetText);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -65,7 +69,10 @@ protected:
 	TObjectPtr<AMissionHandle> MissionHandle;
 	TObjectPtr<UInteractionWidget> InteractionWidget;
 	FName MissionType;
-	FString MissionText;
+	FString MissionInfoText;
+	FString MissionActiveText;
+	FString MissionClearText;
+
 	bool bIsPlayingInteraction = false;
 	bool bIsActive = false;
 	float ProgressValue = 1.0f;

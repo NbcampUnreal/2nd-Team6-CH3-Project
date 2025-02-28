@@ -3,9 +3,9 @@
 
 #include "System/Mission/MissionItemIndicator.h"
 
-void AMissionItemIndicator::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemIndicator::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyBlockCollision();
 }
@@ -22,7 +22,7 @@ float AMissionItemIndicator::TakeDamage(float DamageAmount, FDamageEvent const& 
 	if (HitCount <= 0)
 	{
 		bIsActive = false;
-		PrintMissionText();
+		PrintMissionClearText();
 		ShowDirectionToTarget();
 	}
 
@@ -31,6 +31,20 @@ float AMissionItemIndicator::TakeDamage(float DamageAmount, FDamageEvent const& 
 
 void AMissionItemIndicator::ShowDirectionToTarget()
 {
-	//방향 표시
+	if (!IsValid(PartsClass))
+	{
+		return;
+	}
+
+	FActorSpawnParameters SpawnParam;
+	FVector SpawnPos = GetActorLocation() + GetActorUpVector() * 200;
+
+	IndicatorParts = GetWorld()->SpawnActor<ABaseMissionItem>(PartsClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
+	
+	if (IsValid(IndicatorParts))
+	{
+		IndicatorParts->InitMissionItem(MissionHandle, "Parts");
+	}
+
 	SetVisible(false);
 }

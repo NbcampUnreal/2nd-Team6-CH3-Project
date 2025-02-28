@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "System/EnumSet.h"
 #include "MissionHandle.generated.h"
 
 class AEdmundGameMode;
@@ -19,6 +20,7 @@ class EDMUNDPRJ_API AMissionHandle : public AActor
 public:	
 	AMissionHandle();
 	void InitMissionHandle(const TArray<FMissionDataRow*>& MissionData, AEdmundGameMode* EdGameMode, AEdmundGameState* EdGameState);
+	void ApplyMissionDataInLevel();
 
 	void OnBeginOverlapedItem(ABaseMissionItem* MissionItem);
 	void OnEndOverlapedItem();
@@ -29,34 +31,55 @@ public:
 
 	void StartMainMission();
 	void CompleteMission();
+
 	// Mission1
-	const FVector GetDirectionToPrison(const FVector& ActorPos) const;
-	void SetPrisonLocation(const FVector& PrisonPos);
+	void SetPrison(ABaseMissionItem* NewPrison);
+	ABaseMissionItem* GetPrison() const;
 
 	// Mission2
+	void SetTargetPointLocation(const FVector& TargetPointPos);
+	void TeleportPlayerToTargetPoint();
+	void ApplyNpcEquip();
 
 	// Mission3
+	void ApplyBossWeaken();
+	void AddAlter(ABaseMissionItem* Alter);
+	void LockToBossMonsterSkill(ABaseMissionItem* Alter);
+	void AddDimensionPortalSet(ABaseMissionItem* DimentionPortal);
+	void RemoveDimensionPortalSet(ABaseMissionItem* DimentionPortal);
+
+	// Boss
+	void NotifyStartedBossStage();
+	bool GetWeakenBoss() const;
+	EBossState GetLockedSkill() const;
+	void RequestSpawnToSpawnerHandle();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	void ApplyMissionDataInLevel();
-	void SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo);
+	void SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FMissionDataRow* MissionData);
 
 private:
 	TArray<FMissionDataRow*> MissionDataSet;
 	TArray<ABaseMissionItem*> MissionItemSet;
 	TArray<ABaseMissionItem*> MainMissionSet;
+	TArray<ABaseMissionItem*> AlterSet;
+	TArray<ABaseMissionItem*> DimensionPortalSet;
 
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
 	TObjectPtr<AEdmundGameState> EdmundGameState = nullptr;
 
 	TObjectPtr<ABaseMissionItem> TargetMissionItem = nullptr;
+	TObjectPtr<ABaseMissionItem> Prison = nullptr;
 
-	FVector PrisonLocation = FVector::ZeroVector;
+	FVector TargetPointLocation = FVector::ZeroVector;
 
 	int32 MainMissionIndex = 0;
+	int32 SpawnerCountFromBoss = 0;
+	EBossState LockTarget = EBossState::Idle;
+	bool bGetNpcEquip = false;
+	bool bWeakenBoss = false;
 
 	FTimerHandle TestTimer;
 };

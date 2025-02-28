@@ -25,22 +25,20 @@ void AMissionHandle::InitMissionHandle(const TArray<FMissionDataRow*>& MissionDa
 	}
 
 	MissionDataSet = MissionData;
-
-	ApplyMissionDataInLevel();
 }
 
 void AMissionHandle::OnBeginOverlapedItem(ABaseMissionItem* MissionItem)
 {
 	TargetMissionItem = MissionItem;
 
-	GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &ThisClass::OnPressedKeyFromPlayer, 2.0f, false);
+	//GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &ThisClass::OnPressedKeyFromPlayer, 2.0f, false);
 }
 
 void AMissionHandle::OnEndOverlapedItem()
 {
 	TargetMissionItem = nullptr;
 
-	GetWorld()->GetTimerManager().ClearTimer(TestTimer);
+	//GetWorld()->GetTimerManager().ClearTimer(TestTimer);
 }
 
 void AMissionHandle::OnPressedKeyFromPlayer()
@@ -67,17 +65,22 @@ void AMissionHandle::RequestUpdateNotifyText(const FString& NotifyText)
 void AMissionHandle::StartMainMission()
 {
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
-	MainMissionSet[MainMissionIndex]->PrintMissionText();
+	MainMissionSet[MainMissionIndex]->PrintMissionInfoText();
 	MainMissionSet[MainMissionIndex]->SetIsActive(true);
 }
 
 void AMissionHandle::CompleteMission()
 {
+	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
+	MainMissionSet[MainMissionIndex]->PrintMissionClearText();
+
+	
+
 	++MainMissionIndex;
 
 	if (MainMissionIndex == MainMissionSet.Num())
 	{
-		EdmundGameMode->EndMission();
+		EdmundGameMode->ClearMission();
 	}
 	else
 	{
@@ -85,17 +88,139 @@ void AMissionHandle::CompleteMission()
 	}
 }
 
-const FVector AMissionHandle::GetDirectionToPrison(const FVector& ActorPos) const
+void AMissionHandle::SetPrison(ABaseMissionItem* NewPrison)
 {
-	FVector Direction = PrisonLocation - ActorPos;
-	Direction = Direction / Direction.Size();
-
-	return Direction;
+	Prison = NewPrison;
 }
 
-void AMissionHandle::SetPrisonLocation(const FVector& PrisonPos)
+ABaseMissionItem* AMissionHandle::GetPrison() const
 {
-	PrisonLocation = PrisonPos;
+	if (!IsValid(Prison))
+	{
+		return nullptr;
+	}
+	return Prison;
+}
+
+void AMissionHandle::SetTargetPointLocation(const FVector& TargetPointPos)
+{
+	TargetPointLocation = TargetPointPos;
+}
+
+void AMissionHandle::TeleportPlayerToTargetPoint()
+{
+	AActor* PlayerPawn = EdmundGameState->GetPlayerPawn();
+
+	FVector TargetVector = TargetPointLocation - FVector(-200, -200, 0);
+	PlayerPawn->SetActorLocation(TargetVector);
+}
+
+void AMissionHandle::ApplyNpcEquip()
+{
+	bGetNpcEquip = true;
+	// npc가 도움 주게 변경 필요
+}
+
+void AMissionHandle::ApplyBossWeaken()
+{
+	bWeakenBoss = true;
+	// boss 초기화 시 확인 필요
+}
+
+void AMissionHandle::AddAlter(ABaseMissionItem* Alter)
+{
+	if (!IsValid(Alter))
+	{
+		return;
+	}
+
+	AlterSet.Add(Alter);
+}
+
+void AMissionHandle::LockToBossMonsterSkill(ABaseMissionItem* Alter)
+{
+	if (!IsValid(Alter))
+	{
+		return;
+	}
+
+	for (ABaseMissionItem* TargetAlter : AlterSet)
+	{
+		TargetAlter->SetIsActive(false);
+	}
+
+	int32 SkillIndex = AlterSet.Find(Alter);
+	
+	switch (SkillIndex)
+	{
+	case 0:
+		LockTarget = EBossState::Attack1;
+		break;
+
+	case 1:
+		LockTarget = EBossState::Attack2;
+		break;
+
+	case 2:
+		LockTarget = EBossState::Attack3;
+		break;
+
+	case 3:
+		LockTarget = EBossState::Attack4;
+		break;
+
+	default:
+		LockTarget = EBossState::Idle;
+		break;
+	}
+}
+
+void AMissionHandle::AddDimensionPortalSet(ABaseMissionItem* DimentionPortal)
+{
+	if (!IsValid(DimentionPortal))
+	{
+		return;
+	}
+
+	DimensionPortalSet.Add(DimentionPortal);
+}
+
+void AMissionHandle::RemoveDimensionPortalSet(ABaseMissionItem* DimentionPortal)
+{
+	if (!IsValid(DimentionPortal))
+	{
+		return;
+	}
+
+	DimensionPortalSet.Remove(DimentionPortal);
+}
+
+void AMissionHandle::NotifyStartedBossStage()
+{
+	EdmundGameMode->StartBossMission();
+}
+
+bool AMissionHandle::GetWeakenBoss() const
+{
+	return bWeakenBoss;
+}
+
+EBossState AMissionHandle::GetLockedSkill() const
+{
+	return LockTarget;
+}
+
+void AMissionHandle::RequestSpawnToSpawnerHandle()
+{
+	TArray<FVector> DimensionPosSet;
+
+	for (ABaseMissionItem* Dimension : DimensionPortalSet)
+	{
+		DimensionPosSet.Add(Dimension->GetActorLocation());
+		Dimension->SetIsActive(false);
+	}
+
+	EdmundGameMode->SpawnMonsterByBoss(DimensionPosSet);
 }
 
 void AMissionHandle::BeginPlay()
@@ -110,12 +235,10 @@ void AMissionHandle::ApplyMissionDataInLevel()
 	{
 		UClass* SpawnClass = MissionDataRow->MissionItemClass.Get();
 		TArray<FVector> SpawnPosSet = MissionDataRow->SpawnLocationSet;
-		FName MissionType = MissionDataRow->MissionType;
-		FString MissionInfo = MissionDataRow->MissionInfoText;
 
 		for (const FVector& SpawnPos : SpawnPosSet)
 		{
-			SpawnMissionItem(SpawnClass, SpawnPos, MissionType, MissionInfo);
+			SpawnMissionItem(SpawnClass, SpawnPos, MissionDataRow);
 		}
 	}
 
@@ -123,20 +246,32 @@ void AMissionHandle::ApplyMissionDataInLevel()
 	StartMainMission();
 }
 
-void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FName& MissionType, const FString& MissionInfo)
+void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FMissionDataRow* MissionData)
 {
+	checkf(IsValid(SpawnClass), TEXT("Mission Item Class is invalid"));
+
 	FActorSpawnParameters SpawnParam;
 
 	ABaseMissionItem* NewMissionItem = GetWorld()->SpawnActor<ABaseMissionItem>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
 
 	MissionItemSet.Add(NewMissionItem);
-	NewMissionItem->InitMissionItem(this, MissionType, MissionInfo);
-	NewMissionItem->SetIsActive(true);
+
+	FName MissionType = MissionData->MissionType;
+	FString InfoText = MissionData->MissionInfoText;
+	FString ActiveText = MissionData->MissionActiveText;
+	FString ClearText = MissionData->MissionClearText;
+
+	NewMissionItem->InitMissionItem(this, MissionType);
+	NewMissionItem->SetMissionText(InfoText, ActiveText, ClearText);
 
 	if (MissionType == "Main")
 	{
 		MainMissionSet.Add(NewMissionItem);
 		NewMissionItem->SetIsActive(false);
+	}
+	else
+	{
+		NewMissionItem->SetIsActive(true);
 	}
 }
 

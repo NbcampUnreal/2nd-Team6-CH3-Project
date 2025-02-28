@@ -15,5 +15,10 @@ class EDMUNDPRJ_API AMissionItemTargetPoint : public ABaseMissionItem
 	GENERATED_BODY()
 	
 public:
-	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo) override;
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
+	virtual void ActionEventByPressedKey() override;
+
+private:
+	virtual void ActionBeginOverlap() override;
+	virtual void ActionEndOverlap() override;
 };

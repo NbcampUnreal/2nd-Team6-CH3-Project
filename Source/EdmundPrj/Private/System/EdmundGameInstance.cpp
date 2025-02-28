@@ -8,6 +8,9 @@
 #include "System/DataHandle.h"
 #include "Kismet/GameplayStatics.h"
 #include "System/EdmundGameState.h"
+#include "System/EdmundGameMode.h"
+#include "System/DataStructure/MissionDataRow.h"
+#include "System/DataStructure/SpawnerDataRow.h"
 
 void UEdmundGameInstance::Init()
 {
@@ -29,13 +32,33 @@ void UEdmundGameInstance::Init()
 	SoundHandle->InitSoundHandle(this);
 }
 
-void UEdmundGameInstance::StartedGameState()
+void UEdmundGameInstance::RequestGameStart(AEdmundGameMode* NewGameMode, AEdmundGameState* NewGameState)
 {
-	EdmundGameState = GetWorld()->GetGameState<AEdmundGameState>();
+	EdmundGameMode = NewGameMode;
+	EdmundGameState = NewGameState;
 
+	ApplyCurrentDataToGameMode();
+}
+
+void UEdmundGameInstance::ApplyCurrentDataToGameMode()
+{
+	checkf(IsValid(EdmundGameMode), TEXT("EdmundGameMode is invalid"));
 	BindGameStateObserver();
+
+	ESceneType CurrentScene = GetCurrentSceneName();
+	const TArray<FMissionDataRow*> CurrentMissionData = GetCurrentMissionData(CurrentScene);
+	const TArray<FSpawnerDataRow*> CurrentSpawnerData = GetCurrentSpawnerData(CurrentScene);
+
+	EdmundGameMode->InitGameMode(this, CurrentMissionData, CurrentSpawnerData);
+
+	StartMission(CurrentScene);
+}
+
+void UEdmundGameInstance::StartMission(ESceneType SceneType)
+{
 	OnUIByScene();
 	PlayBGMByScene();
+	EdmundGameMode->StartMission(SceneType);
 }
 
 void UEdmundGameInstance::BindGameStateObserver() const
@@ -67,7 +90,20 @@ void UEdmundGameInstance::OnUIByScene() const
 
 void UEdmundGameInstance::OnPause() const
 {
+	checkf(UIHandle, TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::OptionWidget);
+}
 
+void UEdmundGameInstance::RequestPause() const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->RequestOnPause();
+}
+
+void UEdmundGameInstance::RequestUnpause() const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->RequestEndPause();
 }
 
 void UEdmundGameInstance::ChangeCursorMode(const bool bIsVisible) const
@@ -82,14 +118,21 @@ void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode) c
 	EdmundGameState->ChangeInputMode(InputMode);
 }
 
-void UEdmundGameInstance::EndMission() const
+void UEdmundGameInstance::EndMission(const bool bIsClear) const
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 	UIHandle->AddToViewportByCoverType(EWidgetType::ResultWidget);
+
+	if (bIsClear)
+	{
+		checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+		DataHandle->UpdateClearMission(GetCurrentSceneName());
+	}
 }
 
 void UEdmundGameInstance::DestroyedGameState() 
 {
+	EdmundGameMode = nullptr;
 	EdmundGameState = nullptr;
 }
 
@@ -121,6 +164,12 @@ const TArray<FMissionDataRow*>& UEdmundGameInstance::GetCurrentMissionData(EScen
 {
 	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
 	return DataHandle->GetMissionDataBySceneType(SceneType);
+}
+
+const TArray<FSpawnerDataRow*>& UEdmundGameInstance::GetCurrentSpawnerData(ESceneType SceneType) const
+{
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+	return DataHandle->GetSpawnerDataBySceneType(SceneType);
 }
 
 const TArray<FShopCatalogRow*>& UEdmundGameInstance::GetAdvanceState() const

@@ -5,12 +5,14 @@
 #include "System/MissionHandle.h"
 #include "UI/3DWidget/InteractionWidget.h"
 
-void AMissionItemPrison::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type, const FString& MissionInfo)
+void AMissionItemPrison::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
-	Super::InitMissionItem(NewMissionHandle, Type, MissionInfo);
+	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(true);
 	SetActorTickEnabled(false);
+
+	MissionHandle->SetPrison(this);
 }
 
 void AMissionItemPrison::ActionEventByPressedKey()
@@ -23,6 +25,7 @@ void AMissionItemPrison::ActionEventByPressedKey()
 	Super::ActionEventByPressedKey();
 
 	InteractionWidget->VisibleProgressBar(true);
+	SetActorTickEnabled(true);
 }
 
 AMissionItemPrison::AMissionItemPrison() : Super()
@@ -39,8 +42,10 @@ void AMissionItemPrison::ActionBeginOverlap()
 
 	Super::ActionBeginOverlap();
 
+	ProgressValue = 1.0f;
+	InteractionWidget->UpdateProgressBar(ProgressValue);
 	InteractionWidget->VisibleNotify(true);
-	SetActorTickEnabled(true);
+	PrintMissionActiveText();
 }
 
 void AMissionItemPrison::ActionEndOverlap()
@@ -70,7 +75,7 @@ void AMissionItemPrison::Tick(float DeltaTime)
 	if (CurrentTime >= TargetTime)
 	{
 		CurrentTime = 0.0f;
-		ProgressValue -= 0.1f;
+		ProgressValue -= TargetTime;
 		InteractionWidget->UpdateProgressBar(ProgressValue);
 
 		if (ProgressValue <= 0.0f)
@@ -82,7 +87,8 @@ void AMissionItemPrison::Tick(float DeltaTime)
 
 void AMissionItemPrison::CompleteProgress()
 {
-	InteractionWidget->VisibleProgressBar(false);
+	Super::CompleteProgress();
+
 	SetVisible(false);
 	//UpdateNotifyTextToUI();
 	MissionHandle->CompleteMission();

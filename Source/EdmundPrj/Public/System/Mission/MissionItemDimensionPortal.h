@@ -14,4 +14,19 @@ class EDMUNDPRJ_API AMissionItemDimensionPortal : public ABaseMissionItem
 {
 	GENERATED_BODY()
 	
+public:
+	AMissionItemDimensionPortal();
+
+	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
+	virtual void ActionEventByPressedKey() override;
+
+private:
+	virtual void Tick(float DeltaTime) override;
+	virtual void ActionBeginOverlap() override;
+	virtual void ActionEndOverlap() override;
+	virtual void CompleteProgress() override;
+
+private:
+	float CurrentTime = 0;
+	float TargetTime = 0.01f;
 };

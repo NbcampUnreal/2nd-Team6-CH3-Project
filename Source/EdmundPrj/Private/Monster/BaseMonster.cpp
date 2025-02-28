@@ -2,6 +2,8 @@
 
 
 #include "Monster/BaseMonster.h"
+#include "Player/BaseCharacter.h"
+#include "Monster/HealingItem.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
@@ -12,6 +14,8 @@
 #include "Sound/SoundBase.h"
 #include "AIController.h"
 #include "Components/AudioComponent.h"
+#include "Monster/MonsterSpawner.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 // Sets default values
 ABaseMonster::ABaseMonster()
@@ -40,15 +44,23 @@ ABaseMonster::ABaseMonster()
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 
-	CurrentAudioComp->SetSound(TakeDamageSound);
-	CurrentAudioComp->Play();
+	if (bIsDead) return 0;
+
+	if (TakeDamageSound)
+	{
+		CurrentAudioComp->SetSound(TakeDamageSound);
+		CurrentAudioComp->Play();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
+	}
+
+	GetCharacterMovement()->Deactivate();
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
-
-	// OverHeadWidget 업데이트
-	UpdateMonsterOverHeadWidget();
 
 	if (MonsterHP <= 0)
 	{
@@ -66,19 +78,51 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 // 죽는 애니메이션 재생 후 MonsterDestroy 호출
 void ABaseMonster::MonsterDead()
 {
-	SetIsDead(true);
-
-	if (DeathAnimation)
+	if (!bIsDead)
 	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance)
+		SetIsDead(true);
+
+		if (bCanDropReward)
 		{
-			GetCharacterMovement()->DisableMovement();
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				APawn* PlayerPawn = PlayerController->GetPawn();
+				if (PlayerPawn)
+				{
+					ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
+					if (PlayerCharacter)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("%f EXP얻음"), MonsterExpReward);
+						PlayerCharacter->AddExp(MonsterExpReward);
+					}
+				}
+			}
+		}
 
-			AnimInstance->Montage_Play(DeathAnimation);
+		if (DeathAnimation)
+		{
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance)
+			{
+				this->Tags.Remove(FName("Monster"));
 
-			float AnimDuration = DeathAnimation->GetPlayLength();
-			GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
+				MonsterHP = 0;
+
+				UpdateMonsterOverHeadWidget();
+
+				GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
+				GetWorld()->GetTimerManager().ClearTimer(AttackAnimTimerHandle);
+
+				AnimInstance->Montage_Play(DeathAnimation);
+				float AnimDuration = DeathAnimation->GetPlayLength();
+
+				GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DeathAnimation이 없습니다."));
 		}
 	}
 }
@@ -88,16 +132,35 @@ void ABaseMonster::SetIsDead(bool bNewIsDead)
 	bIsDead = bNewIsDead;
 }
 
+void ABaseMonster::SetCanDropReward(bool NewState)
+{
+	bCanDropReward = NewState;
+}
+
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {
-	GetMesh()->GetAnimInstance()->Montage_Stop(0.0f, DeathAnimation);
-	DropReward();
+	bIsDead = false;
+	bIsHit = false;
+
+	if (bCanDropReward)
+	{
+		DropReward();
+	}
+
+	SetChaseMode(false);
+
+	GetCharacterMovement()->Activate();
+
 	SetActorHiddenInGame(true);
 
+	MonsterHP = MonsterMaxHP;
+
+	// 사망 시 바닥으로
 	FVector GoToHell = GetActorLocation() + FVector(0, 0, -2000.0f);
 	SetActorLocation(GoToHell);
 
+	// 스폰될 때 까지 Tick 끄기
 	AAIController* AIController = Cast<AAIController>(GetController());
 	if (AIController)
 	{
@@ -107,16 +170,50 @@ void ABaseMonster::MonsterDestroy()
 
 void ABaseMonster::DropReward()
 {
+
 	float RandomValue = FMath::RandRange(0, 100);
 
-	if (RandomValue <= MonsterGoldProbability)
+
+	//인덱스 0번(힐), 임시로 확률 50배
+	if (RandomValue <= MonsterHealKitProbability * 50.0f)
 	{
-		//바닥에 Gold가 떨어짐
+		if (AllItems.Num() > 0)
+		{
+			if (IsValid(AllItems[0]))
+			{
+				ItemClass = AllItems[0];
+
+				if (IsValid(ItemClass))
+				{
+					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AllItems가 없습니다."));
+		}
 	}
 
-	if (RandomValue <= MonsterHealKitProbability)
+	//인덱스 1번(골드)
+	if (RandomValue <= MonsterGoldProbability)
 	{
-		//바닥에 Healkit이 떨어짐
+		if (AllItems.Num() > 0)
+		{
+			if (IsValid(AllItems[1]))
+			{
+				ItemClass = AllItems[1];
+
+				if (IsValid(ItemClass))
+				{
+					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AllItems가 없습니다."));
+		}
 	}
 }
 
@@ -129,6 +226,30 @@ void ABaseMonster::MonsterHit()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
+			if (TakeDamageParticle)
+			{
+				SetChaseMode(true);
+
+				UpdateMonsterOverHeadWidget();
+
+				UParticleSystemComponent* Particle = nullptr;
+
+				FVector ParticleScale = FVector(2.0f, 2.0f, 2.0f);
+
+				Particle = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					TakeDamageParticle,
+					GetActorLocation(),
+					GetActorRotation(),
+					ParticleScale,
+					false
+				);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("TakeDamageParticle이 없습니다."));
+			}
+
 			bIsHit = true;
 
 			GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0, 0, 1));
@@ -148,8 +269,8 @@ void ABaseMonster::MonsterHitEnd()
 	bIsHit = false;
 
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.1f, HitAnimation);
+	GetCharacterMovement()->Activate();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	UE_LOG(LogTemp, Warning, TEXT("HitEnd"));
 }
 
 void ABaseMonster::MonsterAttack()
@@ -173,10 +294,38 @@ void ABaseMonster::MonsterAttack()
 	}
 }
 
+void ABaseMonster::SetChaseMode(bool Mode)
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			APawn* PlayerPawn = PlayerController->GetPawn();
+
+			AIController->GetBlackboardComponent()->SetValueAsBool(FName("HasLineOfSight"), Mode);
+			AIController->GetBlackboardComponent()->SetValueAsObject(FName("PlayerActor"), PlayerPawn);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: PlayerController가 없습니다."));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: AIController가 없습니다."));
+	}
+}
+
+
 void ABaseMonster::MonsterAttackEnd()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.3f, AttackAnimation);
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	//주석 처리를 했는데 왜 움직일까?
+	//GetCharacterMovement()->Activate();
+	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void ABaseMonster::MonsterAttackCheck()
@@ -206,7 +355,7 @@ void ABaseMonster::UpdateMonsterOverHeadWidget()
 		HPBar->SetPercent(HealthPercent);
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::MonsterAttackEnd, 3.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::UpdateMonsterOverHeadWidgetEnd, 1.0f, false);
 
 }
 
