@@ -18,7 +18,6 @@ class EDMUNDPRJ_API AAttackSkill : public ABaseSkill
 public:	
 	// Sets default values for this actor's properties
 	AAttackSkill();
-	void ActivateProbCalculate();
 	virtual void ActivateSkill();
 	UFUNCTION()
 	void BeginOverlaped(

@@ -21,14 +21,6 @@ AAttackSkill::AAttackSkill()
 	Mesh->SetupAttachment(EnemySearchCollision);
 }
 
-void AAttackSkill::ActivateProbCalculate()
-{
-	int RandomInt = FMath::RandRange(1, 100);
-	if (RandomInt > ActivateProb)
-	{
-		ActivateSkill();
-	}
-}
 void AAttackSkill::MoveForward()
 {
 	FVector NewLocation = GetActorLocation() + GetActorForwardVector() * MoveSpeed;
@@ -56,7 +48,7 @@ void AAttackSkill::ActivateSkill()
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 	SetActorTickEnabled(true);
-	FinishPos = GetActorLocation() + (GetActorForwardVector() * SkillRange);
+	
 }
 
 void AAttackSkill::BeginOverlaped(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

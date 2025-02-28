@@ -3,10 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "System\EnumSet.h"
 #include "Components/ActorComponent.h"
 #include "SkillManager.generated.h"
 
+class UActiveSkillSpawnManager;
+class UTimerSkillSpawnManagerComponent;
 class ABaseSkill;
+struct FPlayerSkillRow;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EDMUNDPRJ_API USkillManager : public UActorComponent
@@ -16,12 +20,18 @@ class EDMUNDPRJ_API USkillManager : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	USkillManager();
-	void ActivateSkill(int SkillIndex);
+	UFUNCTION(BlueprintCallable, Category = "Skill")
+	void ActivateSkill(FPlayerSkillRow& row);
+	void ActivateTimerSkill(ETimerSkillType SkillType);
+	void ActivateActiveSkill(EActiveSkillType SkillType);
+	void ActivatePassiveSkill(EPassiveSkillType SkillType);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	TArray<TObjectPtr<ABaseSkill>> Skills = TArray<TObjectPtr<ABaseSkill>>();
-		
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<UTimerSkillSpawnManagerComponent> TimerSkillManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<UActiveSkillSpawnManager> ActiveSkillManager;
 };

@@ -123,8 +123,6 @@ void UTimerSkillSpawnManagerComponent::ClearSkillTimer()
 void UTimerSkillSpawnManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetSkillTimer(ETimerSkillType::Thunder);
-	SetSkillTimer(ETimerSkillType::Meteor);
 }
 
 void UTimerSkillSpawnManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -192,8 +190,6 @@ void UTimerSkillSpawnManagerComponent::CreateTimerSkill(TSubclassOf<ATimerSkill>
 		TObjectPtr<ATimerSkill> skill = GetWorld()->SpawnActor<ATimerSkill>(timerSkill);
 
 		if (!skill) continue;
-		FString skillName = FString::Printf(TEXT("CreateThunder"));
-		skill->SetActorLabel(skillName);
 		skill->SetActorHiddenInGame(true);
 		skill->SetActorEnableCollision(false);
 		skill->SetActorTickEnabled(false);
