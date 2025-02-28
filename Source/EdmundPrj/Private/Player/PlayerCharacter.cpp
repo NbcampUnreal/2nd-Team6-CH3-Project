@@ -23,7 +23,7 @@ APlayerCharacter::APlayerCharacter()
 	AttackMontage = nullptr;
 	MeleeAttackMontage = nullptr;
 
-	CurrentAmmo = MaxAmmo = 40;
+	CurrentAmmo = MaxAmmo = 20;
 
 	IsMeleeAttack = false;
 	IsAttack = false;
