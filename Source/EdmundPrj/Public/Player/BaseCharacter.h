@@ -68,6 +68,9 @@ protected:
 	void StartSprint(const FInputActionValue& value);
 	void StopSprint(const FInputActionValue& value);
 
+	// 공격
+	virtual void Attack(const FInputActionValue& value);
+
 	// 상호작용
 	void Interaction(const FInputActionValue& value);
 

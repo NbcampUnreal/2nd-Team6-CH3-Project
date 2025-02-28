@@ -44,7 +44,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// 공격
-	void Attack(const FInputActionValue& value);
+	virtual void Attack(const FInputActionValue& value) override;
 
 	// 피격
 	virtual float TakeDamage(

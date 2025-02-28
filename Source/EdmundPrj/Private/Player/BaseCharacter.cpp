@@ -173,6 +173,16 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 				);
 			}
 
+			if (PlayerController->AttackAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->AttackAction,
+					ETriggerEvent::Triggered,
+					this,
+					Attack
+				);
+			}
+
 			if (PlayerController->InteractionAction)
 			{
 				EnhancedInput->BindAction(
@@ -311,6 +321,10 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 		}
 	}
+}
+
+void ABaseCharacter::Attack(const FInputActionValue& value)
+{
 }
 
 void ABaseCharacter::Interaction(const FInputActionValue& value)

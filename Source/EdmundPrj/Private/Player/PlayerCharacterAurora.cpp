@@ -41,6 +41,8 @@ void APlayerCharacterAurora::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 {
+	Super::Attack(value);
+
 	if (!IsAttack)
 	{
 		IsAttack = true;
