@@ -30,14 +30,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float AttackDelay;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Sound")
-	TObjectPtr<USoundBase> FireSound;  // √—º“∏Æ
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Particle")
 	TObjectPtr<UParticleSystem> FireParticle;  // √— ¿Ã∆Â∆Æ
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Sound")
-	UAudioComponent* CurrentAudioComp;
 
 private:
 

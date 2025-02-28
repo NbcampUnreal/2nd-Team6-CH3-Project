@@ -31,6 +31,8 @@ ABullet::ABullet()
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetBulletHidden(true);
 }
 
 void ABullet::Tick(float DeltaTime)

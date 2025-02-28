@@ -136,6 +136,14 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 
 	if (ActiveWeapon())
 	{
+		// ÃÑ¼Ò¸® Àç»ý
+		if (FireSound)
+		{
+			//UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			CurrentAudioComp->SetSound(FireSound);
+			CurrentAudioComp->Play();
+		}
+
 		if (IsValid(AttackMontage))
 		{
 			PlayAnimMontage(AttackMontage);
@@ -356,7 +364,7 @@ void APlayerCharacter::ZoomIn(const FInputActionValue& value)
 	}
 
 	IsZoom = true;
-	SpringArmComp->TargetArmLength = -1000;
+	SpringArmComp->TargetArmLength = 100;
 }
 
 void APlayerCharacter::ZoomOut(const FInputActionValue& value)
@@ -372,7 +380,7 @@ void APlayerCharacter::ZoomOut(const FInputActionValue& value)
 	}
 
 	IsZoom = false;
-	SpringArmComp->TargetArmLength = 300;
+	SpringArmComp->TargetArmLength = 200;
 }
 
 void APlayerCharacter::SetAmmo(int32 NewAmmo)
