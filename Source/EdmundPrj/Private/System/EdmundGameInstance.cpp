@@ -59,6 +59,17 @@ void UEdmundGameInstance::StartMission(ESceneType SceneType)
 	OnUIByScene();
 	PlayBGMByScene();
 	EdmundGameMode->StartMission(SceneType);
+	EdmundGameState->SetEffectVolume(GetEffectVolume());
+	EdmundGameState->InitSkillData(GetPlayerSkillData());
+
+	checkf(IsValid(SoundHandle), TEXT("Sound Handle is invalid"));
+
+	EdmundGameState->InitSoundMap(
+		SoundHandle->GetSoundMapByType(ESoundCategory::Player, (int32)GetPlayerType()),
+		SoundHandle->GetMonsterSoundMap(),
+		SoundHandle->GetNpcSoundMap(),
+		SoundHandle->GetItemSoundMap()
+	);
 }
 
 void UEdmundGameInstance::BindGameStateObserver() const
@@ -121,7 +132,7 @@ void UEdmundGameInstance::ChangeInputMode(const FInputModeDataBase& InputMode) c
 void UEdmundGameInstance::EndMission(const bool bIsClear) const
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	UIHandle->AddToViewportByCoverType(EWidgetType::ResultWidget);
+	UIHandle->OpenResult();
 
 	if (bIsClear)
 	{
@@ -134,12 +145,6 @@ void UEdmundGameInstance::DestroyedGameState()
 {
 	EdmundGameMode = nullptr;
 	EdmundGameState = nullptr;
-}
-
-void UEdmundGameInstance::RequestSceneMove(const bool bIsNext, ESceneType SceneType) const
-{
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-	UIHandle->FadeOut(bIsNext, SceneType);
 }
 
 void UEdmundGameInstance::MoveScene(const ESceneType SceneType) const
@@ -272,6 +277,11 @@ void UEdmundGameInstance::SetEffectVolume(const float Volume) const
 {
 	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
 	SoundHandle->UpdateEffectVolume(Volume);
+
+	if (IsValid(EdmundGameState))
+	{
+		EdmundGameState->SetEffectVolume(Volume);
+	}
 }
 
 float UEdmundGameInstance::GetEffectVolume() const
@@ -282,15 +292,25 @@ float UEdmundGameInstance::GetEffectVolume() const
 
 void UEdmundGameInstance::PlayBGMByScene() const
 {
-
+	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+	SoundHandle->PlayBgmBySceneType(GetCurrentSceneName());
 }
 
-void UEdmundGameInstance::PlayUISound(const int32 Index) const
+void UEdmundGameInstance::PlayBGM(const EBGMSoundType Type) const
 {
-
+	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+	SoundHandle->PlayBgmByBgmType(Type);
 }
 
-void UEdmundGameInstance::PlayEffectSound(const UAudioComponent* AudioComp, const ESoundType SoundType, const int32 Index) const
+void UEdmundGameInstance::PlayUISound(const EUISoundType Type) const
 {
-
+	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+	SoundHandle->PlayUISound(Type);
 }
+
+const TMap<ESoundType, TObjectPtr<USoundBase>>& UEdmundGameInstance::GetSoundSetByCategory(const ESoundCategory Category, const int32 TypeIndex) const
+{
+	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+	return SoundHandle->GetSoundMapByType(Category, TypeIndex);
+}
+

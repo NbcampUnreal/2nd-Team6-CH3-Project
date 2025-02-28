@@ -48,6 +48,12 @@ void AEdmundGameMode::SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionP
 	SpawnerHandle->SpawnBossPatternSpawner(ActiveDimensionPosSet);
 }
 
+void AEdmundGameMode::SwapBgm(EBGMSoundType Type)
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->PlayBGM(Type);
+}
+
 void AEdmundGameMode::BeginPlay()
 {
 	Super::BeginPlay();

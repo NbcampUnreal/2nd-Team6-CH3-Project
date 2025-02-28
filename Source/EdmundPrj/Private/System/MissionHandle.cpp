@@ -88,6 +88,11 @@ void AMissionHandle::CompleteMission()
 	}
 }
 
+void AMissionHandle::RequestSwapBgm(EBGMSoundType Type)
+{
+	EdmundGameMode->SwapBgm(Type);
+}
+
 void AMissionHandle::SetPrison(ABaseMissionItem* NewPrison)
 {
 	Prison = NewPrison;

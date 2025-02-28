@@ -28,6 +28,8 @@ public:
 	void StartBossMission();
 	void SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionPosSet);
 
+	void SwapBgm(EBGMSoundType Type);
+
 private:
 	virtual void BeginPlay() override;
 	void InitDefaultPawnByCharacterType();
