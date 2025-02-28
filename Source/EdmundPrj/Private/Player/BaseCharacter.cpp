@@ -179,7 +179,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 					PlayerController->AttackAction,
 					ETriggerEvent::Triggered,
 					this,
-					Attack
+					&ABaseCharacter::Attack
 				);
 			}
 
