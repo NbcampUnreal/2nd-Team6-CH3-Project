@@ -11,6 +11,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/Actor.h"
 #include "Monster/RangedMonsterBullet.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -39,6 +40,8 @@ void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawn
 	InitializeMonsterSpawnPool(SpawnCount);
 
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
+
+	SetBossMode(false);
 }
 
 void AMonsterSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -59,6 +62,35 @@ void AMonsterSpawner::BossSpawn()
 	{
 		SpawnMonster();
 	}
+	SetBossMode(true);
+}
+
+void AMonsterSpawner::SetBossMode(bool NewMode)
+{
+	bBossMode = NewMode;
+}
+
+bool AMonsterSpawner::bCheckAllDead()
+{
+	return (SpawnCount <= DeadMonsterCount);
+}
+
+void AMonsterSpawner::AddDeadCount()
+{
+	if (!bBossMode) return;
+
+	DeadMonsterCount++;
+
+	if (bCheckAllDead())
+	{
+		//다 죽었을 때 호출 될 함수
+		UE_LOG(LogTemp, Warning, TEXT("모든 몬스터 사망"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("남은 몬스터 수: %d"), SpawnCount - DeadMonsterCount);
+	}
+
 }
 
 ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
@@ -181,6 +213,22 @@ void AMonsterSpawner::SpawnMonster()
 			Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			Monster->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 			Monster->SetActorLocation(GetSpawnVolume());
+
+			if (SpawnParticle)
+			{
+				UParticleSystemComponent* Particle = nullptr;
+
+				FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
+
+				Particle = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					SpawnParticle,
+					Monster->GetActorLocation(),
+					Monster->GetActorRotation(),
+					ParticleScale,
+					false
+				);
+			}
 
 		}
 	}

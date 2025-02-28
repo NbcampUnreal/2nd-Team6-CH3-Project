@@ -28,9 +28,9 @@ void ASuicideMonster::MonsterAttackCheck()
         CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
         // 콜리전 컴포넌트 초기화
-        CollisionComp->SetCapsuleSize(3000.0f, 3000.0f); // 필요에 따라 사이즈 조정
+        CollisionComp->SetCapsuleSize(5000.0f, 5000.0f); // 필요에 따라 사이즈 조정
         CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-        CollisionComp->SetRelativeLocation(FVector(0.0f, 10.0f, 0.0f)); // 액터의 앞에 콜리전 위치
+        CollisionComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f)); // 액터의 앞에 콜리전 위치
 
         CollisionComp->RegisterComponent();
 
@@ -38,7 +38,7 @@ void ASuicideMonster::MonsterAttackCheck()
 
 
         //  공격 Collision Visible 활성화
-         /*FVector CapsuleLocation = CollisionComp->GetComponentLocation();
+        /* FVector CapsuleLocation = CollisionComp->GetComponentLocation();
          DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);*/
 
 
@@ -85,7 +85,7 @@ void ASuicideMonster::PlayParticle()
 
     if (AttackParticle)
     {
-        FVector ParticleScale = FVector(8.0f, 8.0f, 8.0f);
+        FVector ParticleScale = FVector(2.0f, 2.0f, 2.0f);
 
         Particle = UGameplayStatics::SpawnEmitterAtLocation(
             GetWorld(),

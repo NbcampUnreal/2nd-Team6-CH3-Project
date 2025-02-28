@@ -21,7 +21,16 @@ void AGoldItem::SetGoldAmount(float NewGold)
 void AGoldItem::ActivateItem(AActor* Actor)
 {
 	AEdmundGameState* GameState = GetWorld()->GetGameState<AEdmundGameState>();
-	GameState->AddCurrentLevelMoney(GoldAmount);
-	UE_LOG(LogTemp, Warning, TEXT("%f 골드획득"), GoldAmount);
+
+	if (GameState)
+	{
+		GameState->AddCurrentLevelMoney(GoldAmount);
+		UE_LOG(LogTemp, Warning, TEXT("%f 골드획득"), GoldAmount);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GameState가 없습니다."));
+	}
+
 	PlaySound();
 }

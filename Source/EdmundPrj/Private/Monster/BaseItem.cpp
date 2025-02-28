@@ -33,9 +33,12 @@ void ABaseItem::BeginPlay()
 
 	float XPulse = FMath::RandRange(-300.0f, 300.0f);
 	float YPulse = FMath::RandRange(-300.0f, 300.0f);
+	float ZPulse = FMath::RandRange(300.0f, 700.0f);
 
 	StaticMeshComp->SetSimulatePhysics(true);  // 물리 활성화
-	StaticMeshComp->AddImpulse(FVector(XPulse, YPulse, 500.0f), NAME_None, true);
+	StaticMeshComp->AddImpulse(FVector(XPulse, YPulse, ZPulse), NAME_None, true);
+
+	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, this, &ABaseItem::ItemDestroy, 30.0f, false);
 }
 
 void ABaseItem::Tick(float DeltaTime)
@@ -76,6 +79,8 @@ void ABaseItem::PlaySound()
 
 	if (PickupSound)
 	{
+		GetWorld()->GetTimerManager().ClearTimer(DestroyTimerHandle);
+
 		float SoundDuration = PickupSoundComp->Sound->GetDuration();
 
 		PickupSoundComp->Play();
