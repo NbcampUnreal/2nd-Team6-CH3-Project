@@ -18,11 +18,11 @@ public:
 	virtual void BeginPlay() override;
 
 	// 공격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
 	UAnimMontage* AttackMontage;
 
 	// 근접 공격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
 	UAnimMontage* MeleeAttackMontage;
 
 	// 재장전 애니메이션
@@ -43,6 +43,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
 	TSubclassOf<AWeapon> Weapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
+	TObjectPtr<USoundBase> FireSound;			// 총소리
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	TObjectPtr<USoundBase> MeleeAttackSound;	// 근접공격 사운드

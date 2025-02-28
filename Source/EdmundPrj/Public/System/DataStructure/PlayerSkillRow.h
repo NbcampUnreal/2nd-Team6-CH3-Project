@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "System/EnumSet.h"
 #include "PlayerSkillRow.generated.h"
 
 
@@ -23,6 +24,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ESkillType SkillType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EActiveSkillType ActiveSkillType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EPassiveSkillType PassiveSkillType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ETimerSkillType TimerSkillType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString SkillInfo;

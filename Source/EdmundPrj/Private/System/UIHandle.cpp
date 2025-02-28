@@ -262,7 +262,7 @@ void UUIHandle::OpenOption()
 void UUIHandle::CloseOption()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->OnUnpause();
+	EdmundGameInstance->RequestUnpause();
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
@@ -290,6 +290,8 @@ void UUIHandle::CloseShop()
 
 void UUIHandle::OpenResult()
 {
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->RequestPause();
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
