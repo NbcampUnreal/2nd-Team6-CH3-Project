@@ -10,6 +10,10 @@ class USpringArmComponent;
 class UCameraComponent;
 struct FInputActionValue;
 class AEdmundGameState;
+class USkillManager;
+class UTimerSkillSpawnManagerComponent;
+class UActiveSkillSpawnManager;
+class UElectricEffectPool;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseCharacter : public ACharacter
@@ -24,6 +28,18 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera");
 	UCameraComponent* CameraComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	USkillManager* SkillManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	UTimerSkillSpawnManagerComponent* TimerSkillSpawnManagerComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	UActiveSkillSpawnManager* ActiveSkillSpawnManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<UElectricEffectPool> ElectricEffectPool;
 
 	// 공격력 Getter
 	float GetAttackDamage() const;
@@ -67,6 +83,9 @@ protected:
 	// 달리기
 	void StartSprint(const FInputActionValue& value);
 	void StopSprint(const FInputActionValue& value);
+
+	// 공격
+	virtual void Attack(const FInputActionValue& value);
 
 	// 상호작용
 	void Interaction(const FInputActionValue& value);
@@ -219,6 +238,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	TObjectPtr<USoundBase> DeathSound;
+
+
 
 private:
 	// 캡슐 높이 <- 앉기에서 사용

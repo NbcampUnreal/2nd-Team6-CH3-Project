@@ -6,10 +6,6 @@
 #include "Monster\BaseMonster.h"
 #include "Player\ElectricEffectPool.h"
 #include "Kismet\GameplayStatics.h"
-AMjolnir::AMjolnir()
-{
-
-}
 
 void AMjolnir::HitToMonster(TObjectPtr<ABaseMonster> monster)
 {
@@ -19,6 +15,7 @@ void AMjolnir::HitToMonster(TObjectPtr<ABaseMonster> monster)
 
 void AMjolnir::BeginPlay()
 {
+	Super::BeginPlay();
 	if (!IsValid(GetWorld())) return;
 	if (TObjectPtr<ACharacter> character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
 	{

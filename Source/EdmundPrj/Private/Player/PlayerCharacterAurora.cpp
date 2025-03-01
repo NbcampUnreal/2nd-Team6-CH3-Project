@@ -18,33 +18,14 @@ void APlayerCharacterAurora::BeginPlay()
 	Super::BeginPlay();
 }
 
-void APlayerCharacterAurora::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		if (AEdmundPlayerController* PlayerController = Cast<AEdmundPlayerController>(GetController()))
-		{
-			if (PlayerController->AttackAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->AttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacterAurora::Attack
-				);
-			}
-		}
-	}
-}
-
 void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 {
+
 	if (!IsAttack)
 	{
 		IsAttack = true;
 
+		Super::Attack(value);
 		switch (ComboCount)
 		{
 			case 0:
@@ -267,7 +248,7 @@ void APlayerCharacterAurora::AttackTrace()
 			{
 				UGameplayStatics::ApplyDamage(
 					HitActor,
-					30.0f,	// 수정필요
+					30.0f,
 					nullptr,
 					this,
 					UDamageType::StaticClass()
