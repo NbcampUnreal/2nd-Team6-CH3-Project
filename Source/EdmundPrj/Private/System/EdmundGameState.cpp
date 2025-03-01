@@ -418,6 +418,14 @@ APlayerController* AEdmundGameState::GetPlayerController()
 	return PlayerController;
 }
 
+void AEdmundGameState::SetPlayerPawn(AActor* NewPawn)
+{
+	if (IsValid(NewPawn))
+	{
+		PlayerPawn = NewPawn;
+	}
+}
+
 AActor* AEdmundGameState::GetPlayerPawn()
 {
 	return PlayerPawn;

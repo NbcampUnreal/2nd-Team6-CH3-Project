@@ -64,6 +64,8 @@ void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
 	
 	PlayerController->Possess(PlayerCharacter);
 	PlayerCharacter->PossessedBy(PlayerController);
+
+	EdmundGameState->SetPlayerPawn(PlayerCharacter);
 }
 
 void AEdmundGameMode::ClearMission()

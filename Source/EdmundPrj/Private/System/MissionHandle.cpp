@@ -116,6 +116,11 @@ void AMissionHandle::TeleportPlayerToTargetPoint()
 {
 	AActor* PlayerPawn = EdmundGameState->GetPlayerPawn();
 
+	if (!IsValid(PlayerPawn))
+	{
+		return;
+	}
+
 	FVector TargetVector = TargetPointLocation - FVector(-200, -200, 0);
 	PlayerPawn->SetActorLocation(TargetVector);
 }
