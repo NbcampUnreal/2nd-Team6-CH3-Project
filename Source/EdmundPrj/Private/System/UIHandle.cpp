@@ -257,6 +257,12 @@ const TArray<FPlayerSkillRow*>& UUIHandle::GetCurrentRandomSkill() const
 	return EdmundGameInstance->GetRandomSkillSet();
 }
 
+const TArray<FCharacterDataRow*>& UUIHandle::GetCharacterData() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->GetCharacterData();
+}
+
 const int32 UUIHandle::GetCurrentMoney() const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));

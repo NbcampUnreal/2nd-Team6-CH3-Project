@@ -31,6 +31,12 @@ void UShopWidget::InitWidget(UUIHandle* NewUIHandle)
 	ShopCloseButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedShopClose);
 }
 
+void UShopWidget::StartAddAnim()
+{
+	Super::StartAddAnim();
+	MoneyText->SetText(FText::FromString(FString::FromInt(UIHandle->GetCurrentMoney())));
+}
+
 void UShopWidget::EndRemoveAnim()
 {
 	Super::EndRemoveAnim();
