@@ -41,6 +41,8 @@ public:
 
 	AGameModeBase* CurrentGameMode;
 
+	void InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount, int32 NewLevelIndex);
+
 	void InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
@@ -72,6 +74,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Value")
 	int32 SpawnCount = 10;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Value")
+	int32 LevelIndex;
 
 	ABaseMonster* GetMonsterFromPool();
 

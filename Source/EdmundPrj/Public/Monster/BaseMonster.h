@@ -22,6 +22,8 @@ public:
 	// Sets default values for this character's properties
 	ABaseMonster();
 
+	void BeginPlay() override;
+
 float GetMonsterAttackDamage();
 
 virtual void MonsterAttackCheck();
@@ -31,6 +33,8 @@ virtual void MonsterDead();
 void SetIsDead(bool bNewIsDead);
 
 void SetCanDropReward(bool NewState);
+
+void SetMonsterLevel(int32 NewLevel);
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
@@ -50,7 +54,7 @@ TSubclassOf<ABaseItem> ItemClass;
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	int32 MonsterLevel;
+	int32 MonsterLevel = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float MonsterHP;

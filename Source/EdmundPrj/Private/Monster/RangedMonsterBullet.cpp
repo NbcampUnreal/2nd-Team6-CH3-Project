@@ -27,6 +27,7 @@ ARangedMonsterBullet::ARangedMonsterBullet()
 
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ARangedMonsterBullet::OnMonsterBulletOverlap);
 
+	this->Tags.Add(FName("Bullet"));
 }
 
 void ARangedMonsterBullet::SetMonsterBulletHidden(bool isHidden)
@@ -58,6 +59,8 @@ void ARangedMonsterBullet::SetDamage(float Damage)
 
 void ARangedMonsterBullet::OnMonsterBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (OtherActor && OtherActor->ActorHasTag("Skill")) return;
+
 	if (OtherActor && OtherActor->ActorHasTag("Player"))
 	{
 		UGameplayStatics::ApplyDamage(
