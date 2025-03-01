@@ -41,6 +41,11 @@ FVector UTimerSkillSpawnManagerComponent::GetRandomMonsterLocation()
 	return FVector::ZeroVector;
 }
 
+FVector UTimerSkillSpawnManagerComponent::SummonSkillLocation(FVector randomPos)
+{
+	return FVector();
+}
+
 void UTimerSkillSpawnManagerComponent::SetSkillTimer(ETimerSkillType skillType)
 {
 	if (!TimerSkillClassMap.Contains(skillType) || !IsValid(TimerSkillClassMap[skillType]))
@@ -80,7 +85,7 @@ void UTimerSkillSpawnManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	EnemySearchCollision->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
-	SetSkillTimer(ETimerSkillType::HealPlants);
+	SetSkillTimer(ETimerSkillType::AttackPlants);
 }
 
 void UTimerSkillSpawnManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -115,7 +120,6 @@ void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillT
 	{
 		skill->TimerSkillSpanwManager = this;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Spawn HealingPlant!!!"));
 	skill->SetActorLocation(skillLocation);
 	skill->SetActorEnableCollision(true);
 	skill->SetActorHiddenInGame(false);

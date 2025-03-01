@@ -80,8 +80,19 @@ void AHealingPlant::SpawnTimerSkill()
 			{
 				Super::SpawnTimerSkill();
 				GetWorldTimerManager().ClearTimer(SpawnShakeHandle);
+				GetWorldTimerManager().SetTimer(HealCycleHandle,
+					this,
+					&AHealingPlant::HealingCharacter,
+					HealCycleTime,
+					true);
 			}
 		},
 		0.1f,
 		true);
+}
+
+void AHealingPlant::Deactivate()
+{
+	GetWorldTimerManager().ClearTimer(HealCycleHandle);
+	Super::Deactivate();
 }

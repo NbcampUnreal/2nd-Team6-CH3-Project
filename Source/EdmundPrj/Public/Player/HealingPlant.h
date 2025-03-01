@@ -16,6 +16,7 @@ public:
 	AHealingPlant();
 	void HealingCharacter();
 	virtual void SpawnTimerSkill() override;
+	virtual void Deactivate() override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	TObjectPtr<USphereComponent> CheckCharacterCollision = nullptr;
@@ -23,4 +24,6 @@ public:
 	FTimerHandle SpawnShakeHandle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float HealAmount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	float HealCycleTime = 0;
 };

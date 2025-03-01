@@ -36,10 +36,17 @@ void ATimerSkill::BeginOverlaped(
 			HitToMonster(Monster);
 		}
 	}
-	
+	if (otherActor)
+	{
+		HitToGround();
+	}
 }
 
 void ATimerSkill::HitToMonster(TObjectPtr<ABaseMonster> Monster)
+{
+}
+
+void ATimerSkill::HitToGround()
 {
 }
 

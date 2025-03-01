@@ -28,6 +28,7 @@ public:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster);
+	virtual void HitToGround();
 	virtual void Deactivate();
 	virtual void SpawnTimerSkill();
 protected:

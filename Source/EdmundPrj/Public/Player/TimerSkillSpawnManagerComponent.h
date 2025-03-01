@@ -21,6 +21,7 @@ class EDMUNDPRJ_API UTimerSkillSpawnManagerComponent : public USceneComponent
 		UTimerSkillSpawnManagerComponent();
 
 		FVector GetRandomMonsterLocation();
+		FVector SummonSkillLocation(FVector randomPos);
 
 		void SetSkillTimer(ETimerSkillType skillType);
 		void ClearSkillTimer();

@@ -6,16 +6,11 @@
 #include "Kismet\KismetMathLibrary.h"
 #include "Components\SplineComponent.h"
 #include "Kismet\GameplayStatics.h"
+#include "Components\SphereComponent.h"
 void AAttackPlant::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorldTimerManager().SetTimer(
-		AttackCycleHandle,
-		this,
-		&AAttackPlant::Attack,
-		AttackSpeed,
-		true
-	);
+
 }
 
 void AAttackPlant::Attack()
@@ -70,17 +65,24 @@ TObjectPtr<ABaseMonster> AAttackPlant::FindCloseMonster()
 	if (Monsters.IsEmpty()) return nullptr;
 	TObjectPtr<ABaseMonster> CloseMonster = nullptr;
 	float MinDistance = 500;
+	TArray<AActor*> activators;
+	EnemySearchCollision->GetOverlappingActors(activators);
 	FVector MyLocation = GetActorLocation();
-	for (TObjectPtr<ABaseMonster>& monster : Monsters)
+	for (AActor* monster : activators)
 	{
 		if (!IsValid(monster)) continue;
-
-		float Distance = FVector::Dist(MyLocation, monster->GetActorLocation());
-
-		if (Distance < MinDistance)
+		if (monster->ActorHasTag("Monster"))
 		{
-			MinDistance = Distance;
-			CloseMonster = monster;
+			if (TObjectPtr<ABaseMonster> Monster = Cast<ABaseMonster>(monster))
+			{
+				float Distance = FVector::Dist(MyLocation, Monster->GetActorLocation());
+
+				if (Distance < MinDistance)
+				{
+					MinDistance = Distance;
+					CloseMonster = Monster;
+				}
+			}
 		}
 	}
 	return CloseMonster;
@@ -107,4 +109,17 @@ void AAttackPlant::RotationToTarget()
 void AAttackPlant::SpawnTimerSkill()
 {
 	Super::SpawnTimerSkill();
+	GetWorldTimerManager().SetTimer(
+		AttackCycleHandle,
+		this,
+		&AAttackPlant::Attack,
+		AttackSpeed,
+		true
+	);
+}
+
+void AAttackPlant::Deactivate()
+{
+	GetWorldTimerManager().ClearTimer(AttackCycleHandle);
+	Super::Deactivate();
 }
