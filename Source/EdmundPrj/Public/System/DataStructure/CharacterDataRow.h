@@ -21,7 +21,7 @@ public:
 	FName CharacterName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString CharacterInfo;
+	FText CharacterInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector SpawnLocation;
