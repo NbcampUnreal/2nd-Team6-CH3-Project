@@ -6,7 +6,7 @@
 #include "System/EdmundGameState.h"
 #include "System/MissionHandle.h"
 #include "System/SpawnerHandle.h"
-
+#include "Player/BaseCharacter.h"
 
 void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet)
 {
@@ -22,20 +22,69 @@ void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const T
 	SpawnerHandle = GetWorld()->SpawnActor<ASpawnerHandle>(SpawnerHandleClass);
 	SpawnerHandle->InitSpawnerHandle(this, EdmundGameState, SpawnerDataSet);
 	EdmundGameState->SetSpawnerHandle(SpawnerHandle);
+
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	UEnum* CharacterEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ECharacterType"));
+	ECharacterType CharacterType = EdmundGameInstance->GetPlayerType();
+	FString TypeName = CharacterEnum->GetNameStringByValue((int64)CharacterType);
+
+	if (OptionsString.Contains(TypeName))
+	{
+		SpawnPlayerByCharacterType(CharacterType);
+	}
+	
+}
+
+void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
+{
+	UClass* TargetClass = nullptr;
+
+	switch (Type)
+	{
+	case ECharacterType::Gunner:
+		TargetClass = GunnerClass;
+		break;
+
+	case ECharacterType::Aurora:
+		TargetClass = AuroraClass;
+		break;
+
+	default:
+		checkNoEntry();
+		break;
+	}
+	
+	checkf(IsValid(TargetClass), TEXT("Target Class is invalid"));
+	
+	APlayerController* PlayerController = EdmundGameState->GetPlayerController();
+	FActorSpawnParameters SpawnParam;
+	FVector StartPos = FindPlayerStart(PlayerController)->GetActorLocation();
+
+	ABaseCharacter* PlayerCharacter = GetWorld()->SpawnActor<ABaseCharacter>(TargetClass, StartPos, FRotator::ZeroRotator, SpawnParam);
+	
+	PlayerController->Possess(PlayerCharacter);
+	PlayerCharacter->PossessedBy(PlayerController);
+
+	EdmundGameState->SetPlayerPawn(PlayerCharacter);
 }
 
 void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameInstance->EndMission(true);
 	EdmundGameState->EndCurrentLevel();
+	EdmundGameInstance->EndMission(true);
 }
 
 void AEdmundGameMode::FailMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameInstance->EndMission(false);
 	EdmundGameState->EndCurrentLevel();
+	EdmundGameInstance->EndMission(false);
+}
+
+void AEdmundGameMode::StartDefenceMode()
+{
+	SpawnerHandle->ApplyDefenceMode();
 }
 
 void AEdmundGameMode::StartBossMission()
@@ -48,19 +97,15 @@ void AEdmundGameMode::SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionP
 	SpawnerHandle->SpawnBossPatternSpawner(ActiveDimensionPosSet);
 }
 
+void AEdmundGameMode::SwapBgm(EBGMSoundType Type)
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->PlayBGM(Type);
+}
+
 void AEdmundGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void AEdmundGameMode::InitDefaultPawnByCharacterType()
-{
-	if (EdmundGameInstance->GetPlayerType() == ECharacterType::Gunner)
-	{
-		DefaultPawnClass = GunnerClass;
-		PlayerControllerClass = TestPlayerController;
-	}
-	// 찾아보고 해야할듯
 }
 
 void AEdmundGameMode::StartMission(ESceneType CurrentScene)
@@ -71,6 +116,7 @@ void AEdmundGameMode::StartMission(ESceneType CurrentScene)
 		return;
 
 	case ESceneType::Main:
+		EdmundGameState->InitMainLevelPlayerController();
 		return;
 
 	case ESceneType::Ending:

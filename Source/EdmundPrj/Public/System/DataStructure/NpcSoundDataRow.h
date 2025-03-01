@@ -3,15 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "System/EnumSet.h"
 #include "NpcSoundDataRow.generated.h"
 
-/**
- * 
- */
-UCLASS()
-class EDMUNDPRJ_API UNpcSoundDataRow : public UObject
+USTRUCT(BlueprintType)
+struct EDMUNDPRJ_API FNpcSoundDataRow : public FTableRowBase
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName RowName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ENpcType NpcType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ESoundType SoundType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<USoundBase> SoundSource;
 };

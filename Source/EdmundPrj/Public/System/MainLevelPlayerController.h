@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "System/EnumSet.h"
 #include "MainLevelPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 class ABaseCharacter;
+class AEdmundGameState;
 struct FCharacterDataRow;
 
 UCLASS()
@@ -26,7 +28,8 @@ public:
 	AMainLevelPlayerController();
 	void SetTargetToNull();
 	void SetSelectMode(bool Value);
-	void InitMainLevelCharacters(const TArray<FCharacterDataRow*>& CharacterData);
+	void InitMainLevelCharacters(const TArray<FCharacterDataRow*>& CharacterData, ECharacterType Type, AEdmundGameState* NewGameState);
+	void CompareType(ECharacterType Type);
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,7 +44,10 @@ private:
 	
 private:
 	TObjectPtr<ABaseCharacter> TargetCharacter;
+	TObjectPtr<AEdmundGameState> EdmundGameState;
 	TArray <TObjectPtr<ABaseCharacter>> CharacterSet;
+
+	TMap<TObjectPtr<ABaseCharacter>, FVector> DistanceByTarget;
 	TMap<TObjectPtr<ABaseCharacter>, FVector> StartPosByCharacter;
 	TMap<TObjectPtr<ABaseCharacter>, bool> bIsReturnByCharacter;
 	FVector MoveTargetPos;

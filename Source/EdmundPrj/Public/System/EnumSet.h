@@ -17,19 +17,22 @@ enum class ESkillType : uint8
 UENUM(BlueprintType)
 enum class EActiveSkillType : uint8
 {
-	Freezing = 0
+	Null = 0,
+	Freezing
 };
 
 UENUM(BlueprintType)
 enum class EPassiveSkillType : uint8
 {
-	Berserker = 0
+	Null = 0,
+	Berserker
 };
 
 UENUM(BlueprintType)
 enum class ETimerSkillType : uint8
 {
-	Thunder = 0,
+	Null = 0,
+	Thunder,
 	Meteor,
 	AttackPlants,
 	HealPlants,
@@ -68,9 +71,7 @@ enum class EWidgetType : uint8
 UENUM(BlueprintType)
 enum class ESoundCategory : uint8
 {
-	BGM = 0,
-	UI,
-	Player,
+	Player = 0,
 	Monster,
 	Npc,
 	Item
@@ -81,7 +82,11 @@ enum class ESoundType : uint8
 {
 	Attack = 0,
 	Hit,
-	Die
+	Die,
+	MeleeAttack,
+	Reload,
+	Respawn,
+	Avoid
 };
 
 UENUM(BlueprintType)
@@ -93,7 +98,10 @@ enum class EBGMSoundType : uint8
 	Mission2,
 	Mission3,
 	Infinity,
-	Ending
+	Ending,
+	Defence,
+	Boss,
+	Intro
 };
 
 UENUM(BlueprintType)

@@ -88,6 +88,11 @@ void AMissionHandle::CompleteMission()
 	}
 }
 
+void AMissionHandle::RequestSwapBgm(EBGMSoundType Type)
+{
+	EdmundGameMode->SwapBgm(Type);
+}
+
 void AMissionHandle::SetPrison(ABaseMissionItem* NewPrison)
 {
 	Prison = NewPrison;
@@ -111,8 +116,18 @@ void AMissionHandle::TeleportPlayerToTargetPoint()
 {
 	AActor* PlayerPawn = EdmundGameState->GetPlayerPawn();
 
+	if (!IsValid(PlayerPawn))
+	{
+		return;
+	}
+
 	FVector TargetVector = TargetPointLocation - FVector(-200, -200, 0);
 	PlayerPawn->SetActorLocation(TargetVector);
+}
+
+void AMissionHandle::NotifyStartDefenceMode()
+{
+	EdmundGameMode->StartDefenceMode();
 }
 
 void AMissionHandle::ApplyNpcEquip()

@@ -52,5 +52,6 @@ public:
 	bool bIsItemActived = false;
 
 	FTimerHandle SoundDurationTimerHandle;
+	FTimerHandle DestroyTimerHandle;
 
 };

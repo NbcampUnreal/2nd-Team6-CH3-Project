@@ -10,6 +10,7 @@
 class UBoxComponent;
 class AMonsterBulletPool;
 class ARangedMonsterBullet;
+class ASpawnerHandle;
 
 UCLASS()
 class EDMUNDPRJ_API AMonsterSpawner : public AActor
@@ -24,11 +25,33 @@ public:
 
 	void ClearTimer();
 
-	void BossSpawn();
+	void BossSpawn(ASpawnerHandle* NewSpawnerHandle, AMonsterBulletPool* BulletPool, int32 NewSpawnCount);
+
+	void SetBossMode(bool NewMode);
+
+	bool bCheckAllDead();
+
+	void AddDeadCount();
+
+	void DestroySpawner();
+
+	void ApplyChaseMode();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Spawn")
+	int32 DeadMonsterCount = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Spawn")
+	bool bBossMode = false;
+
 
 	AGameModeBase* CurrentGameMode;
 
+	void InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount, int32 NewLevelIndex);
+
 	void InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Effects")
+	UParticleSystem* SpawnParticle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Bullet")
 	AMonsterBulletPool* MonsterBulletPool;
@@ -57,6 +80,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Value")
 	int32 SpawnCount = 10;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Value")
+	int32 LevelIndex;
+
 	ABaseMonster* GetMonsterFromPool();
 
 	ARangedMonsterBullet* GetBulletFromSpawner();
@@ -73,4 +99,7 @@ protected:
 
 	FVector GetSpawnVolume();
 
+	TObjectPtr<ASpawnerHandle> SpawnerHandle;
+	int32 BossModeSpawnCount = 0;
+	bool bIsDefenceMode = false;
 };
