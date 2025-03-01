@@ -18,7 +18,7 @@ public:
 	ABaseSkill();
 	void SelecteSkill();
 	void SelectedSkillActivate();
-	void UpgradeSkill();
+	virtual void UpgradeSkill();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -35,4 +35,6 @@ public:
 	int SkillIndex = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bIsSkillActivate = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	float DamageMultiplierAmount = 0;
 };

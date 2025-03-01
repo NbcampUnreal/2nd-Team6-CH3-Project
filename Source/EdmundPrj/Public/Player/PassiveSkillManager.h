@@ -7,9 +7,8 @@
 #include "Components/ActorComponent.h"
 #include "PassiveSkillManager.generated.h"
 
-DECLARE_DELEGATE(FOnHPChangedDelegate);
-
 class ABaseCharacter;
+class UElectricEffectPool;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EDMUNDPRJ_API UPassiveSkillManager : public UActorComponent
@@ -19,20 +18,22 @@ class EDMUNDPRJ_API UPassiveSkillManager : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UPassiveSkillManager();
+	virtual void BeginPlay() override;
 	void ActivatePassiveSkill(EPassiveSkillType passiveSkillType);
 	void BerserkerSkill();
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
+	void BloodAbsorbingSkill();
+	void ElectricChainSkill(FVector MonsterLocation);
+	void AmountMaxHpSkill();
+	void AmountMaxStaminaSkill();
+	void AmountStaminaRecoverySkill();
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	TObjectPtr<ABaseCharacter> Character;
 	TMap<EPassiveSkillType, int> PassiveSkillMap;
+	TObjectPtr<UElectricEffectPool> ElectricEffectPool = nullptr;
 
-	FOnHPChangedDelegate OnHPChanged;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BloodAbsorbing")
+	int BloodAbsorbingAmount = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Berserker")
 	float MinHealthMultiplier = 0;

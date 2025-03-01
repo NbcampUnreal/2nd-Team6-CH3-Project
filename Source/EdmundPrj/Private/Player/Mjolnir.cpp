@@ -10,7 +10,7 @@
 void AMjolnir::HitToMonster(TObjectPtr<ABaseMonster> monster)
 {
 
-	ElectricEffectPool->ActivateElectricEffect(monster->GetActorLocation());
+	ElectricEffectPool->ActivateElectricEffect(monster->GetActorLocation(), ElectricCount);
 }
 
 void AMjolnir::BeginPlay()
@@ -23,6 +23,12 @@ void AMjolnir::BeginPlay()
 		if (!IsValid(electricEffectPool)) return;
 		ElectricEffectPool = electricEffectPool;
 	}
+}
+
+void AMjolnir::UpgradeSkill()
+{
+	ElectricCount++;
+	DamageMultiplier += DamageMultiplierAmount;
 }
 
 

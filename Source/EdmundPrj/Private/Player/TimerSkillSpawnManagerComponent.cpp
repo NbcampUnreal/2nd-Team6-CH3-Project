@@ -4,6 +4,7 @@
 #include "Player/TimerSkillSpawnManagerComponent.h"
 #include "Components\SphereComponent.h"
 #include "Monster\BaseMonster.h"
+#include "Player\BaseCharacter.h"
 #include "Player\TimerSkill.h"
 #include "System\EnumSet.h"
 // Sets default values for this component's properties
@@ -59,7 +60,7 @@ void UTimerSkillSpawnManagerComponent::SetSkillTimer(ETimerSkillType skillType)
 	FTimerHandle& SkillTimer = SkillTimerMap.FindOrAdd(skillType);
 	if (!IsValid(TimerSkillClassMap[skillType])) return;
 	CreateTimerSkill(TimerSkillClassMap[skillType], skillType, 10);
-
+	
 	TObjectPtr<ATimerSkill> skill = FindDeactivateTimerSkill(skillType);
 	if (skill == nullptr) return;
 	GetWorld()->GetTimerManager().SetTimer(
@@ -142,12 +143,15 @@ void UTimerSkillSpawnManagerComponent::DeactivateTimerSkill(TObjectPtr<ATimerSki
 void UTimerSkillSpawnManagerComponent::CreateTimerSkill(TSubclassOf<ATimerSkill> timerSkill, ETimerSkillType skillType, int createCount)
 {
 	if (!timerSkill) return;
+	TObjectPtr<ABaseCharacter> Character = Cast<ABaseCharacter>(GetOwner());
+	if (Character == nullptr) return;
 	for (int i = 0; i < createCount; i++)
 	{
 		if (!IsValid(GetWorld())) return;
 		TObjectPtr<ATimerSkill> skill = GetWorld()->SpawnActor<ATimerSkill>(timerSkill);
 
 		if (!skill) continue;
+		skill->DamageMultiplier = Character->AttackDamage;
 		skill->SetActorHiddenInGame(true);
 		skill->SetActorEnableCollision(false);
 		skill->SetActorTickEnabled(false);

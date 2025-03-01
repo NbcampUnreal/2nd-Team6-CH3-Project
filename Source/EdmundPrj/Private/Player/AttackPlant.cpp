@@ -106,6 +106,11 @@ void AAttackPlant::RotationToTarget()
 	}
 }
 
+void AAttackPlant::UpgradeSkill()
+{
+	DamageMultiplier += DamageMultiplierAmount;
+}
+
 void AAttackPlant::SpawnTimerSkill()
 {
 	Super::SpawnTimerSkill();

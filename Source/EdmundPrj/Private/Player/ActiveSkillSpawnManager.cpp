@@ -3,6 +3,7 @@
 
 #include "Player/ActiveSkillSpawnManager.h"
 #include "Player\AttackSkill.h"
+#include "Player\BaseCharacter.h"
 
 // Sets default values for this component's properties
 UActiveSkillSpawnManager::UActiveSkillSpawnManager()
@@ -31,23 +32,24 @@ void UActiveSkillSpawnManager::ActivateProbCalculate()
 	for (EActiveSkillType skillType : ActivateSkillList)
 	{
 		int RandomInt = FMath::RandRange(1, 100);
-		if (RandomInt > ActivateProb)
+		if (RandomInt > 100 - ActivateProb)
 		{
 			ActivateActiveSkill(skillType, GetOwner()->GetActorForwardVector());
 		}
-
 	}
 }
 
 void UActiveSkillSpawnManager::CreateActiveSkill(TSubclassOf<AAttackSkill> attackSkill, EActiveSkillType skillType, int createCount)
 {
 	if (!attackSkill) return;
+	TObjectPtr<ABaseCharacter> Character = Cast<ABaseCharacter>(GetOwner());
 	for (int i = 0; i < createCount; i++)
 	{
 		if (!IsValid(GetWorld())) return;
 		TObjectPtr<AAttackSkill> skill = GetWorld()->SpawnActor<AAttackSkill>(attackSkill);
 
 		if (!skill) continue;
+		skill->DamageMultiplier = Character->AttackDamage;
 		skill->SetActorHiddenInGame(true);
 		skill->SetActorEnableCollision(false);
 		skill->SetActorTickEnabled(false);
