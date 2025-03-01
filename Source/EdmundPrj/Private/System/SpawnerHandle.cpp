@@ -100,7 +100,7 @@ void ASpawnerHandle::SpawnMonsterSpawner(UClass* SpawnClass, const FVector& Spaw
 		break;
 	}
 
-	NewMonsterSpawner->InitSpawner(MonsterBulletPool, SpawnTime, SpawnCount); // index 추가 전달
+	NewMonsterSpawner->InitSpawner(MonsterBulletPool, SpawnTime, SpawnCount, MissionIndex); // index 추가 전달
 	MonsterSpawnerSet.Add(NewMonsterSpawner);
 }
 

@@ -77,6 +77,7 @@ public:
 	void NotifyPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo);
 
 	APlayerController* GetPlayerController();
+	void SetPlayerPawn(AActor* NewPawn);
 	AActor* GetPlayerPawn();
 
 private:
