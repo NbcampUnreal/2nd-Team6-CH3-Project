@@ -31,6 +31,7 @@ protected:
 	UBehaviorTreeComponent* CachedOwnerComp;
 	FTimerHandle TimerHandle_Phase;
 	FVector TargetHorizontalLocation;
+	FTimerHandle TimerHandle_DisableCollision;
 
 	void StartAscend();
 	void OnAscendComplete();

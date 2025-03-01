@@ -31,9 +31,6 @@ public:
     UPROPERTY(VisibleAnywhere, Category = "Collision")
     class USphereComponent* Attack2Collision;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
-    UParticleSystem* LandImpactParticle;
-
 
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
@@ -67,6 +64,10 @@ public:
     void ActivateAttack2Collision();   
     void DeactivateAttack2Collision();
 
+    UFUNCTION(BlueprintCallable)
+    void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
+
+
     UFUNCTION()
     void OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
@@ -88,7 +89,7 @@ private:
     bool bChaseComplete = false;
 
 public:
-    float Chase_AcceptanceRadius = 99999.0f; // Chase 반경
+    float Chase_AcceptanceRadius = 60.0f; // Chase 반경
 
     // ***********************Attack 1*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
@@ -127,11 +128,17 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_GroundZ = 0.0f;  // 하강 완료 기준 지면 높이
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+    UParticleSystem* LandImpactParticle; // 착지 파티클
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+    float KnockbackStrength = 25000.0f;  // 밀치는 힘
+
     // ***********************Attack 3*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_CooldownEnd = 0.0f;
 
-    UPROPERTY()
+    UPROPERTY(BlueprintReadWrite)
     class UBTTask_BossAttack3* CurrentAttackTask;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")

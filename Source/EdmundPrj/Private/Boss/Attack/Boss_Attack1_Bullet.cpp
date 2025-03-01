@@ -137,7 +137,7 @@ void ABoss_Attack1_Bullet::Explode()
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 
-	// 현재 위치에서 폭발 파티클 스폰 (ExplosionEffectTemplate이 에디터에서 할당되어 있어야 함)
+	// 현재 위치에서 폭발 파티클 스폰
 	if (ExplosionEffect->Template)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect->Template, GetActorLocation());

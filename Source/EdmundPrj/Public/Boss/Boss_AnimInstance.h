@@ -16,9 +16,6 @@ public:
     virtual void NativeUpdateAnimation(float DeltaSeconds) override;
     
     UFUNCTION()
-    void AnimNotify_Attack1();
-
-    UFUNCTION()
     void AnimNotify_AttackCheck();
 
 
@@ -33,6 +30,12 @@ public:
 
     UPROPERTY(BlueprintReadOnly)
     int32 Attack1Count;
+
+    UPROPERTY(BlueprintReadOnly)
+    bool bIsFalling;
+
+    UPROPERTY(BlueprintReadOnly)
+    float Fly;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Attack1Montage;
@@ -55,4 +58,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Skill3Montage;
 
+
+    UFUNCTION(BlueprintCallable)
+    bool GetbIsFalling() const { return bIsFalling; }
 };

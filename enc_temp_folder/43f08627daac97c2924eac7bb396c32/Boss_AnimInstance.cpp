@@ -16,6 +16,7 @@ void UBoss_AnimInstance::NativeInitializeAnimation()
 
     UE_LOG(LogTemp, Log, TEXT("[UBoss_AnimInstance] TryGetPawnOwner() succeeded: %s"), *OwningPawn->GetName());
 
+    // Boss 캐릭터로 캐스팅
     BossRef = Cast<ABoss>(OwningPawn);
     if (!BossRef)
     {
@@ -23,6 +24,7 @@ void UBoss_AnimInstance::NativeInitializeAnimation()
         return;
     }
 
+    // MovementComponent 설정
     MovementComponent = BossRef->GetCharacterMovement();
     if (!MovementComponent)
     {
@@ -30,6 +32,7 @@ void UBoss_AnimInstance::NativeInitializeAnimation()
         return;
     }
 
+    // 점프 상태 체크
     bIsFalling = MovementComponent->IsFalling();
 
     UE_LOG(LogTemp, Log, TEXT("[UBoss_AnimInstance] Initialization Complete! BossRef: %s"), *BossRef->GetName());

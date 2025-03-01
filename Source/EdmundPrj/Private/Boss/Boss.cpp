@@ -333,3 +333,39 @@ void ABoss::DeactivateAttack2Collision()
     }
 }
 
+void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+    bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+    {
+        ACharacter* PlayerCharacter = Cast<ACharacter>(OtherActor);
+        if (PlayerCharacter)
+        {
+            FVector KnockbackDirection = PlayerCharacter->GetActorLocation() - GetActorLocation();
+            KnockbackDirection.Z = 0;
+            KnockbackDirection.Normalize();
+
+            PlayerCharacter->LaunchCharacter(KnockbackDirection * KnockbackStrength, true, false);
+
+            if (LandImpactParticle && GetWorld())
+            {
+                UGameplayStatics::SpawnEmitterAtLocation(
+                    GetWorld(),
+                    LandImpactParticle,
+                    PlayerCharacter->GetActorLocation(),
+                    FRotator::ZeroRotator,
+                    FVector(1.0f)
+                );
+            }
+            float DamageValue = 10.0f;
+            UGameplayStatics::ApplyDamage(
+                OtherActor,
+                DamageValue,
+                nullptr,
+                this,
+                UDamageType::StaticClass()
+            );
+        }
+    }
+}

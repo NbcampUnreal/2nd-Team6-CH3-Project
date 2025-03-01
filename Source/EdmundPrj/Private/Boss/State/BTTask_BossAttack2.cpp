@@ -34,7 +34,7 @@ EBTNodeResult::Type UBTTask_BossAttack2::ExecuteTask(UBehaviorTreeComponent& Own
 	CurrentPhase = 0;
 
 	BossRef->GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_Phase, this, &UBTTask_BossAttack2::StartAscend, 2.0f, false);
+		TimerHandle_Phase, this, &UBTTask_BossAttack2::StartAscend, 0.5f, false);
 
 	return EBTNodeResult::InProgress;
 }
@@ -80,7 +80,7 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		FVector NewLocation = CurrentLocation - FVector(0, 0, BossRef->Attack2_DescendSpeed * DeltaSeconds);
 		FHitResult HitResult;
 		FVector TraceStart = CurrentLocation;
-		FVector TraceEnd = CurrentLocation - FVector(0, 0, 20000.0f); 
+		FVector TraceEnd = CurrentLocation - FVector(0, 0, 20000.0f);
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(BossRef);
 
@@ -100,7 +100,10 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 					BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 				}
 
-				BossRef->DeactivateAttack2Collision();
+				BossRef->ActivateAttack2Collision();
+
+				BossRef->GetWorld()->GetTimerManager().SetTimer(
+					TimerHandle_DisableCollision, BossRef, &ABoss::DeactivateAttack2Collision, 0.5f, false);
 
 				BossRef->UpdateAttackCooldown(2);
 				BossRef->SetbChaseComplete(true);
@@ -189,26 +192,3 @@ void UBTTask_BossAttack2::StartDescend()
 	}
 }
 
-void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
-	{
-		AActor* LocalOwner = OverlappedComp->GetOwner();
-		ABoss* Boss = Cast<ABoss>(LocalOwner);
-
-		if (Boss)
-		{
-			float DamageValue = 10.0f;
-
-			UGameplayStatics::ApplyDamage(
-				OtherActor,
-				DamageValue,
-				nullptr,
-				Boss,
-				UDamageType::StaticClass()
-			);
-		}
-	}
-}

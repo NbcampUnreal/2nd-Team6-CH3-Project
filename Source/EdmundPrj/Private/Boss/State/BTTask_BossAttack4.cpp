@@ -169,25 +169,20 @@ void UBTTask_BossAttack4::UpdateDescend(float DeltaTime)
     FVector NewLocation = CurrentLocation - FVector(0, 0, BossRef->Attack4_DescendSpeed * DeltaTime);
     FHitResult HitResult;
     FVector TraceStart = CurrentLocation;
-    FVector TraceEnd = TraceStart - FVector(0, 0, 5000.0f); // 예: 5000 유닛 아래까지
+    FVector TraceEnd = TraceStart - FVector(0, 0, 5000.0f);
     FCollisionQueryParams QueryParams;
     QueryParams.AddIgnoredActor(BossRef);
 
-    // 라인트레이스를 통해 지면 감지
     if (BossRef->GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
     {
         float GroundZ = HitResult.Location.Z;
-        // 약간의 오프셋(예: 10 유닛)을 고려하여 착지 조건을 판단
-        if (NewLocation.Z <= GroundZ + 60.0f)
+        if (NewLocation.Z <= GroundZ + 10.0f)
         {
             NewLocation.Z = GroundZ;
             BossRef->SetActorLocation(NewLocation, false);
 
-            // 한 번만 회전 보정을 수행: 지면의 노멀을 이용해 자연스러운 착지 회전 계산
             FRotator LandingRotation = UKismetMathLibrary::MakeRotFromZX(HitResult.Normal, BossRef->GetActorForwardVector());
             BossRef->SetActorRotation(LandingRotation);
-
-            // 착지 후 필요한 상태 전환 및 쿨다운 업데이트
             if (BossRef->GetCharacterMovement())
             {
                 BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);

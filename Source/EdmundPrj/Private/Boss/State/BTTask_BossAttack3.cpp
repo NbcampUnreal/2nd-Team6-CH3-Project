@@ -9,99 +9,102 @@
 UBTTask_BossAttack3::UBTTask_BossAttack3()
 {
     NodeName = TEXT("Boss Attack3");
-    bNotifyTick = false; // 애니메이션 노티파이에 의존하므로 Tick은 사용하지 않습니다.
+    bNotifyTick = false; 
     BossRef = nullptr;
     CachedOwnerComp = nullptr;
     ComboPhase = 0;
 }
 
-// ExecuteTask에서 블랙보드 대신 클래스 멤버 변수 사용
 EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    // AIController와 Boss 확인
+    CachedOwnerComp = &OwnerComp;
+
     AAIController* AIController = OwnerComp.GetAIOwner();
     if (!AIController)
     {
+        UE_LOG(LogTemp, Error, TEXT("Boss AIController is NULL"));
         return EBTNodeResult::Failed;
     }
 
-    BossRef = Cast<ABoss>(AIController->GetPawn());
-    if (!BossRef)
+    this->BossRef = Cast<ABoss>(AIController->GetPawn());
+    if (!this->BossRef)
     {
+        UE_LOG(LogTemp, Error, TEXT("BossRef is NULL in ExecuteTask"));
         return EBTNodeResult::Failed;
     }
 
-    CachedOwnerComp = &OwnerComp;
-    ComboPhase = 0; // 콤보 초기화
-
-    UBlackboardComponent* BBComp = AIController->GetBlackboardComponent();
-    if (!BBComp)
+    BossRef->SetCurrentAttackTask(this);
+    if (!BossRef->CurrentAttackTask)
     {
+        UE_LOG(LogTemp, Error, TEXT("CurrentAttackTask is NULL after setting it!"));
         return EBTNodeResult::Failed;
     }
-    int32 NextAttackValue = BBComp->GetValueAsInt("NextAttack");
 
-    // 공격 타입에 맞게 공격 몽타주 재생
-    if (NextAttackValue == 3)
-    {
-        PlayAttack3Montage();
+    UE_LOG(LogTemp, Log, TEXT("CurrentAttackTask successfully set: %s"), *BossRef->CurrentAttackTask->GetName());
 
-        // 콤보 단계에 맞게 공격 진행
-        if (ComboPhase == 0)
-        {
-            OnAttack1Notify();
-        }
-        else if (ComboPhase == 1)
-        {
-            OnAttack2Notify();
-        }
-        else
-        {
-            FinishComboAttack();
-        }
-    }
-
+    PlayAttack3Montage();
     return EBTNodeResult::InProgress;
 }
 
 
-// OnAttack1Notify, OnAttack2Notify, FinishComboAttack에서 블랙보드 사용 없이 ComboPhase 직접 업데이트
+
 void UBTTask_BossAttack3::OnAttack1Notify()
 {
-    // 콤보 1단계로 변경
-    ComboPhase = 1;
-    ExecuteMeleeAttack(); // 돌진 처리
+    if (!BossRef)
+    {
+        UE_LOG(LogTemp, Error, TEXT("OnAttack1Notify: BossRef is NULL!"));
+        return;
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("combo %d"), BossRef->GetComboPhase());
+
+    if (ComboPhase != 1)
+        return;
+
+    BossRef->SetComboPhase(2);
+    ComboPhase = 2;
+    ExecuteMeleeAttack();
 }
 
 
 void UBTTask_BossAttack3::OnAttack2Notify()
 {
-    // 콤보 2단계로 변경
-    ComboPhase = 2;
-    ExecuteMeleeAttack(); // 돌진 처리
+    if (ComboPhase != 2)
+        return;
+
+    BossRef->SetComboPhase(3);
+    ComboPhase = 3;
+    FinishComboAttack();
+    UE_LOG(LogTemp, Log, TEXT("combo %d, %d"), BossRef->GetComboPhase(), ComboPhase);
+
 }
 
 void UBTTask_BossAttack3::FinishComboAttack()
 {
     if (!BossRef)
     {
+        UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: BossRef is NULL!"));
         return;
     }
 
-    // 공격 쿨타임 갱신
     BossRef->UpdateAttackCooldown(3);
     BossRef->CurrentAttackTask = nullptr;
 
-    // 콤보가 끝나면 ComboPhase 초기화
     ComboPhase = 0;
+    BossRef->SetComboPhase(0);
 
-    // Behavior Tree에서 현재 태스크를 성공적으로 종료
     if (CachedOwnerComp)
     {
         BossRef->SetbChaseComplete(true);
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
     }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: CachedOwnerComp is NULL! Behavior Tree Task could not finish properly."));
+    }
 }
+
+
 
 
 
@@ -135,28 +138,34 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
     float DashDistance = 0.0f;
     float DashSpeed = 0.0f;
 
-    // ComboPhase 0: 1타, ComboPhase 1: 2타
-    if (ComboPhase == 0)
+    // 공격 단계에 따른 이동 거리와 속도 설정
+    switch (BossRef->GetComboPhase())
     {
+    case 1:  // 1타
         DashDistance = BossRef->MeleeAttackDashDistance_Attack1;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack1;
-    }
-    else if (ComboPhase == 1)
-    {
+        break;
+    case 2:  // 2타
         DashDistance = BossRef->MeleeAttackDashDistance_Attack2;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack2;
+        break;
     }
 
-    // 돌진 방향은 보스의 정면 방향
+    // 돌진 방향 설정
     FVector DashDirection = BossRef->GetActorForwardVector();
-
-    // 돌진 효과: LaunchCharacter를 사용하여 지정된 속도로 돌진
     FVector LaunchVelocity = DashDirection * DashSpeed;
     BossRef->LaunchCharacter(LaunchVelocity, true, true);
 
-    // 추가: 이동 거리를 고려한 위치 변경 (필요 시)
-    // FVector NewLocation = BossRef->GetActorLocation() + DashDirection * DashDistance;
-    // BossRef->SetActorLocation(NewLocation, true);
-
+    // 공격 실행
     BossRef->MonsterAttackCheck();
+
+    // 콤보 진행
+    if (BossRef->GetComboPhase() < 3)
+    {
+        int32 NextPhase = BossRef->GetComboPhase() + 1;
+        BossRef->SetComboPhase(NextPhase);
+        ComboPhase = NextPhase; 
+    }
 }
+
+

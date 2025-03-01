@@ -1,6 +1,7 @@
 #include "Boss/BossAIController.h"
 #include "Boss/Boss.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 ABossAIController::ABossAIController()
@@ -22,15 +23,21 @@ void ABossAIController::BeginPlay()
 void ABossAIController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
+
+    if (!InPawn)
+    {
+        UE_LOG(LogTemp, Error, TEXT("BossAIController::OnPossess - InPawn is NULL!"));
+        return;
+    }
+
     BossCharacter = Cast<ABoss>(InPawn);
     if (!BossCharacter)
     {
-        UE_LOG(LogTemp, Error, TEXT("BossAIController::OnPossess - BossCharacter is null"));
+        UE_LOG(LogTemp, Error, TEXT("BossAIController::OnPossess - BossCharacter Cast Failed! InPawn Name: %s"), *InPawn->GetName());
+        return;
     }
-    else
-    {
 
-    }
+    UE_LOG(LogTemp, Log, TEXT("BossAIController::OnPossess - Successfully Possessed %s"), *BossCharacter->GetName());
 }
 
 void ABossAIController::Tick(float DeltaTime)
@@ -71,6 +78,19 @@ void ABossAIController::Tick(float DeltaTime)
             {
                 BBComp->SetValueAsInt("NextAttack", 0);
                 return;
+            }
+
+            bool bIsFalling = BossCharacter->GetCharacterMovement()->IsFalling();
+            float BossHeight = BossCharacter->GetActorLocation().Z;
+            const float FlyThreshold = 10.0f;
+
+            if (bIsFalling || BossHeight > FlyThreshold)
+            {
+                BossCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+            }
+            else
+            {
+                BossCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
             }
 
             if (BossCharacter->GetbChaseComplete())

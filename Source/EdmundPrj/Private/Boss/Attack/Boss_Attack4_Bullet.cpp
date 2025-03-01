@@ -201,17 +201,23 @@ void ABoss_Attack4_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* Othe
     UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
     if (!bIsActive) return;
+
     if (OtherActor && OtherActor != this && !OtherActor->IsA(ABoss_Attack4_Bullet::StaticClass()))
     {
-        AActor* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-        if (OtherActor->ActorHasTag(FName("Player")) || OtherActor == PlayerPawn)
-        {
-            float Damage = 50.0f;
-            UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
-        }
+        float Damage = 5.0f;
+
+        UGameplayStatics::ApplyDamage(
+            OtherActor,
+            Damage,
+            GetInstigatorController(),
+            this,
+            UDamageType::StaticClass()
+        );
+
         Explode();
     }
 }
+
 
 void ABoss_Attack4_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -220,6 +226,16 @@ void ABoss_Attack4_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 
     if (OtherActor && OtherActor != this && !OtherActor->IsA(ABoss_Attack4_Bullet::StaticClass()))
     {
+        float Damage = 5.0f;
+
+        UGameplayStatics::ApplyDamage(
+            OtherActor,
+            Damage,
+            GetInstigatorController(),
+            this,
+            UDamageType::StaticClass()
+        );
+
         Explode();
     }
 }

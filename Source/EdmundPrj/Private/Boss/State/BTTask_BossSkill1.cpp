@@ -125,7 +125,7 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
         Center.Z += 110.f; // 캐릭터 머리 높이
     }
 
-    FVector BoxExtent(50.f, 50.f, 10.f); // 콜리전 크기
+    FVector BoxExtent(1000.f, 1000.f, 10.f); // 콜리전 크기
 
     TArray<FOverlapResult> OverlapResults;
     FCollisionShape Shape = FCollisionShape::MakeBox(BoxExtent);
@@ -140,16 +140,6 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
 
     DrawDebugBox(World, Center, BoxExtent, (bFloorPattern ? FColor::Blue : FColor::Magenta), false, 0.5f);
 
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            1.0f,
-            (bFloorPattern ? FColor::Blue : FColor::Magenta),
-            bFloorPattern ? TEXT("Floor Overlap") : TEXT("Head Overlap")
-        );
-    }
-
     if (bOverlapped)
     {
         for (auto& Over : OverlapResults)
@@ -160,8 +150,14 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
                 {
                     if (OverChar != BossRef)
                     {
-                        UE_LOG(LogTemp, Log, TEXT("Overlap Found: %s"), *OverChar->GetName());
-                        // 데미지
+                        float DamageValue = 10.0f;
+                        UGameplayStatics::ApplyDamage(
+                            OverChar,
+                            DamageValue,
+                            nullptr,
+                            BossRef,
+                            UDamageType::StaticClass()
+                        );
                     }
                 }
             }
