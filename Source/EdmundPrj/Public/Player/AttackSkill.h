@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "BaseSkill.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "AttackSkill.generated.h"
@@ -10,14 +11,13 @@ class USphereComponent;
 class ABaseMonster;
 
 UCLASS()
-class EDMUNDPRJ_API AAttackSkill : public AActor
+class EDMUNDPRJ_API AAttackSkill : public ABaseSkill
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
 	AAttackSkill();
-	void ActivateProbCalculate();
 	virtual void ActivateSkill();
 	UFUNCTION()
 	void BeginOverlaped(
@@ -48,5 +48,6 @@ public:
 	int ActivateProb = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float SkillRange = 0;
+	FVector CharForwardVector = FVector::ZeroVector;
 	FVector FinishPos = FVector::ZeroVector;
 };

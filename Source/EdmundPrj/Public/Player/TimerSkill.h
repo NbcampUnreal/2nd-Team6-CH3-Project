@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "BaseSkill.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TimerSkill.generated.h"
@@ -11,7 +12,7 @@ class ABaseMonster;
 class UTimerSkillSpawnManagerComponent;
 
 UCLASS()
-class EDMUNDPRJ_API ATimerSkill : public AActor
+class EDMUNDPRJ_API ATimerSkill : public ABaseSkill
 {
 	GENERATED_BODY()
 	
@@ -27,7 +28,9 @@ public:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster);
+	virtual void HitToGround();
 	virtual void Deactivate();
+	virtual void SpawnTimerSkill();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -50,4 +53,8 @@ public:
 	float MoveSpeed = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float DeactivateTime = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	float SpawnPosZ = 0;
+
+	FTimerHandle DestroyHandler;
 };

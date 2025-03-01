@@ -10,6 +10,7 @@
 #include "Player/BaseCharacter.h"
 #include "System/MissionHandle.h"
 #include "System/SpawnerHandle.h"
+#include "Player/SkillManager.h"
 
 void AEdmundGameState::BeginPlay()
 {
@@ -131,11 +132,15 @@ void AEdmundGameState::ApplySelectedSkill(const int32 Index)
 	}
 
 	FPlayerSkillRow* SelectedSkill = RandomSkillSet[Index];
-	
+
 	++CurrentSkillMap[SelectedSkill];
 
 	UE_LOG(LogTemp, Warning, TEXT("Selected Skill Name is %s"), *SelectedSkill->SkillName.ToString());
-	// 플레이어에 전달 필요
+	USkillManager* SkillManager = PlayerPawn->FindComponentByClass<USkillManager>();
+	if (IsValid(SkillManager) && SelectedSkill != nullptr)
+	{
+		SkillManager->ActivateSkill(*SelectedSkill);
+	}
 }
 
 void AEdmundGameState::SetSelectedCharacter(AActor* Character)
