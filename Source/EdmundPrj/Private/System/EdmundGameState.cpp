@@ -418,6 +418,23 @@ void AEdmundGameState::NotifyPlayerAmmo(const int32 MaxAmmo, const int32 Current
 	}
 }
 
+void AEdmundGameState::NotifyPlayerExp(const int32 MaxExp, const int32 CurrentExp)
+{
+	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
+	{
+		return;
+	}
+
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedPlayerExp(MaxExp, CurrentExp);
+	}
+}
+
 APlayerController* AEdmundGameState::GetPlayerController()
 {
 	return PlayerController;

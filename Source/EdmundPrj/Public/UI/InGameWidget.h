@@ -20,7 +20,7 @@ public:
 	virtual void ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp) override;
 	virtual void ChangedPlayerOther(const int32 MaxValue, const int32 CurrentValue) override;
 	virtual void ChangedPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo) override;
-
+	virtual void ChangedPlayerExp(const int32 MaxExp, const int32 CurrentExp) override;
 
 private:
 	UPROPERTY(Meta = (BindWidget))
@@ -43,6 +43,9 @@ private:
 
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UProgressBar> OtherBar;
+
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UProgressBar> ExpBar;
 
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> NotifyAnimation;
