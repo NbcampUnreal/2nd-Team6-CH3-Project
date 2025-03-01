@@ -3,7 +3,11 @@
 
 #include "NPC/NPCMonster.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NPC/NPCAttack.h"
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Actor.h"
 
 ANPCMonster::ANPCMonster()
@@ -17,14 +21,15 @@ void ANPCMonster::BeginPlay()
     this->Tags.Empty();
     this->Tags.Add(FName("NPC"));
 
-    SetBondageMode(true);
-
+    //SetBondageMode(true);
+    SetBattleMode(true);
 }
 
 
 
 void ANPCMonster::MonsterAttackCheck()
 {
+
     USkeletalMeshComponent* MeshComp = GetMesh();
     ABaseMonster* Monster = Cast<ABaseMonster>(this);
 
@@ -61,21 +66,12 @@ void ANPCMonster::MonsterAttackCheck()
             }), 0.01f, false);
     }
 }
-void ANPCMonster::SetBattleMode(bool NewState)
-{
-	bIsFightMode = NewState;
-}
-void ANPCMonster::SetBondageMode(bool NewState)
-{
-    bIsBondageMode = NewState;
-}
 void ANPCMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor && OtherActor->ActorHasTag(FName("Monster")))
+    if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
     {
-        PlayParticle();
 
-        UE_LOG(LogTemp, Warning, TEXT("NPC 공격 성공")); // 공격 성공 Log
+        UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
         AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
         ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
         if (Monster)
@@ -93,29 +89,33 @@ void ANPCMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
     }
 }
 
-void ANPCMonster::PlayParticle()
+void ANPCMonster::SetBattleMode(bool NewState)
 {
-    //파티클 활성화, 헤더는 BaseMonster에 있음
-    UParticleSystemComponent* Particle = nullptr;
+    SetChaseMode(!NewState);
+    bIsFightMode = NewState;
 
-    if (AttackParticle)
+    if (NewState)
     {
-        FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
-        FVector ParticleLocation = GetActorLocation() + GetActorForwardVector() * 150.0f;
-
-        Particle = UGameplayStatics::SpawnEmitterAtLocation(
-            GetWorld(),
-            AttackParticle,
-            ParticleLocation,
-            GetActorRotation() + FRotator(0.f, 180.f, 0.f),
-            ParticleScale,
-            false
-        );
+        AAIController* AIController = Cast<AAIController>(GetController());
+        if (AIController)
+        {
+            AIController->GetBlackboardComponent()->SetValueAsBool(FName("IsBattleMode"), NewState);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("NPC BattleMode 실행중: AIController가 없습니다."));
+        }
     }
+
+}
+void ANPCMonster::SetBondageMode(bool NewState)
+{
+    SetChaseMode(!NewState);
+    bIsBondageMode = NewState;
 }
 
-void ANPCMonster::PlaySound()
-{
-    CurrentAudioComp->SetSound(AttackSound);
-    CurrentAudioComp->Play();
-}
+//void ANPCMonster::PlaySound()
+//{
+//    CurrentAudioComp->SetSound(AttackSound);
+//    CurrentAudioComp->Play();
+//}

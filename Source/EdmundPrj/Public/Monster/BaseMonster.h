@@ -55,6 +55,15 @@ TArray<TSubclassOf<ABaseItem>> AllItems;
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Spawn")
 TSubclassOf<ABaseItem> ItemClass;
 
+void FreezeMonster(float FreezeDuration);
+
+void UnfreezeMonster();
+
+UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|State")
+bool bIsFrozen = false;
+
+FTimerHandle FreezeTimerHandle;
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")

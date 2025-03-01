@@ -423,3 +423,34 @@ void ABaseMonster::UpdateState(EMonsterState NewMonsterState)
 	MonsterState = NewMonsterState;
 }
 
+void ABaseMonster::FreezeMonster(float FreezeDuration)
+{
+	if (bIsDead || bIsFrozen) return; // 이미 죽었거나 얼어 있으면 실행 X
+
+	bIsFrozen = true; // 상태 변경
+
+	// 이동 멈춤
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+	// 현재 애니메이션 상태 유지 후 정지
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->StopAllMontages(0.0f); // 즉시 중단 (필요 시)
+		GetMesh()->bPauseAnims = true; // 애니메이션 정지
+	}
+
+	// 일정 시간 후 해제
+	GetWorldTimerManager().SetTimer(FreezeTimerHandle, this, &ABaseMonster::UnfreezeMonster, FreezeDuration, false);
+}
+
+void ABaseMonster::UnfreezeMonster()
+{
+	bIsFrozen = false; // 상태 해제
+
+	// 이동 복구
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	// 애니메이션 재개
+	GetMesh()->bPauseAnims = false;
+}
