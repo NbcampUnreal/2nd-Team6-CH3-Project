@@ -10,12 +10,14 @@ UCLASS()
 class EDMUNDPRJ_API ABaseProjectile : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:
 	ABaseProjectile();
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet|Component")
 	USphereComponent* Collision;
@@ -50,4 +52,6 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComponent;
+
+	FVector PrevProjectileLocation;
 };
