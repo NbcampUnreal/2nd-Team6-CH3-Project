@@ -46,6 +46,8 @@ private:
 	TObjectPtr<ABaseCharacter> TargetCharacter;
 	TObjectPtr<AEdmundGameState> EdmundGameState;
 	TArray <TObjectPtr<ABaseCharacter>> CharacterSet;
+
+	TMap<TObjectPtr<ABaseCharacter>, FVector> DistanceByTarget;
 	TMap<TObjectPtr<ABaseCharacter>, FVector> StartPosByCharacter;
 	TMap<TObjectPtr<ABaseCharacter>, bool> bIsReturnByCharacter;
 	FVector MoveTargetPos;
