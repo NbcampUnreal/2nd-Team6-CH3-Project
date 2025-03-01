@@ -17,6 +17,7 @@ UBTTask_BossChase::UBTTask_BossChase()
 
 EBTNodeResult::Type UBTTask_BossChase::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	UE_LOG(LogTemp, Log, TEXT("체이스"));
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)
 	{

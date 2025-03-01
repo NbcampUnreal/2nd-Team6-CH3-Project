@@ -46,4 +46,7 @@ protected:
     void EndBulletFire();
 
     void UpdateDescend(float DeltaTime);
+    void OnDescendComplete();
+
+    void DelayedTransition();
 };

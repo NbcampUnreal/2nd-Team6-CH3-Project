@@ -40,11 +40,14 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
         return EBTNodeResult::Failed;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("CurrentAttackTask successfully set: %s"), *BossRef->CurrentAttackTask->GetName());
+    BossRef->SetComboPhase(1);
+    ComboPhase = 1;
+    UE_LOG(LogTemp, Log, TEXT("ExecuteTask: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
 
     PlayAttack3Montage();
     return EBTNodeResult::InProgress;
 }
+
 
 
 
@@ -56,28 +59,44 @@ void UBTTask_BossAttack3::OnAttack1Notify()
         return;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("combo %d"), BossRef->GetComboPhase());
+    UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify BEFORE: ComboPhase = %d"), BossRef->GetComboPhase());
 
-    if (ComboPhase != 1)
+    if (BossRef->GetComboPhase() != 1)
+    {
+        UE_LOG(LogTemp, Error, TEXT("OnAttack1Notify: ComboPhase is not 1, something went wrong!"));
         return;
+    }
 
     BossRef->SetComboPhase(2);
     ComboPhase = 2;
+
+    UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify AFTER: ComboPhase = %d"), BossRef->GetComboPhase());
+
     ExecuteMeleeAttack();
 }
 
 
 void UBTTask_BossAttack3::OnAttack2Notify()
 {
+    if (!BossRef)
+    {
+        UE_LOG(LogTemp, Error, TEXT("OnAttack2Notify: BossRef is NULL!"));
+        return;
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify BEFORE: ComboPhase = %d"), BossRef->GetComboPhase());
+
     if (ComboPhase != 2)
         return;
 
     BossRef->SetComboPhase(3);
     ComboPhase = 3;
-    FinishComboAttack();
-    UE_LOG(LogTemp, Log, TEXT("combo %d, %d"), BossRef->GetComboPhase(), ComboPhase);
 
+    UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify AFTER: ComboPhase = %d"), BossRef->GetComboPhase());
+
+    FinishComboAttack();
 }
+
 
 void UBTTask_BossAttack3::FinishComboAttack()
 {
@@ -87,15 +106,20 @@ void UBTTask_BossAttack3::FinishComboAttack()
         return;
     }
 
+    UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Executing, ComboPhase=%d"), BossRef->GetComboPhase());
+
     BossRef->UpdateAttackCooldown(3);
     BossRef->CurrentAttackTask = nullptr;
 
     ComboPhase = 0;
     BossRef->SetComboPhase(0);
 
+    UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
+
     if (CachedOwnerComp)
     {
         BossRef->SetbChaseComplete(true);
+        UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Behavior Tree Task Succeeded"));
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
     }
     else
@@ -103,6 +127,7 @@ void UBTTask_BossAttack3::FinishComboAttack()
         UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: CachedOwnerComp is NULL! Behavior Tree Task could not finish properly."));
     }
 }
+
 
 
 
@@ -133,39 +158,40 @@ void UBTTask_BossAttack3::PlayAttack3Montage()
 void UBTTask_BossAttack3::ExecuteMeleeAttack()
 {
     if (!BossRef)
+    {
+        UE_LOG(LogTemp, Error, TEXT("ExecuteMeleeAttack: BossRef is NULL!"));
         return;
+    }
 
     float DashDistance = 0.0f;
     float DashSpeed = 0.0f;
 
-    // 공격 단계에 따른 이동 거리와 속도 설정
-    switch (BossRef->GetComboPhase())
+    int32 CurrentPhase = BossRef->GetComboPhase();
+    UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: CurrentPhase = %d"), CurrentPhase);
+
+    switch (CurrentPhase)
     {
-    case 1:  // 1타
+    case 1:  // 1타 돌진
         DashDistance = BossRef->MeleeAttackDashDistance_Attack1;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack1;
         break;
-    case 2:  // 2타
+    case 2:  // 2타 돌진
         DashDistance = BossRef->MeleeAttackDashDistance_Attack2;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack2;
         break;
+    default:
+        UE_LOG(LogTemp, Warning, TEXT("ExecuteMeleeAttack: Unexpected ComboPhase = %d"), CurrentPhase);
+        return;
     }
 
-    // 돌진 방향 설정
+    UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: Using DashDistance = %f, DashSpeed = %f"), DashDistance, DashSpeed);
+
     FVector DashDirection = BossRef->GetActorForwardVector();
     FVector LaunchVelocity = DashDirection * DashSpeed;
     BossRef->LaunchCharacter(LaunchVelocity, true, true);
 
-    // 공격 실행
     BossRef->MonsterAttackCheck();
-
-    // 콤보 진행
-    if (BossRef->GetComboPhase() < 3)
-    {
-        int32 NextPhase = BossRef->GetComboPhase() + 1;
-        BossRef->SetComboPhase(NextPhase);
-        ComboPhase = NextPhase; 
-    }
 }
+
 
 

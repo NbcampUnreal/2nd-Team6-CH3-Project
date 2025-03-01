@@ -4,7 +4,6 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/CapsuleComponent.h"
 #include "Boss/Boss_AnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -88,31 +87,27 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		if (BossRef->GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 		{
 			float GroundZ = HitResult.Location.Z;
-			float CapsuleOffset = (BossRef->Front_Left_FootCapsuleComponent
-				? BossRef->Front_Left_FootCapsuleComponent->GetScaledCapsuleHalfHeight()
-				: 300.0f) + 100.0f;
-			if (NewLocation.Z <= GroundZ + CapsuleOffset)
+			if (NewLocation.Z <= GroundZ)
 			{
-				NewLocation.Z = GroundZ + CapsuleOffset;
+				NewLocation.Z = GroundZ;
 				BossRef->SetActorLocation(NewLocation, false);
-
-				FRotator CurrentRotation = BossRef->GetActorRotation();
-				BossRef->SetActorRotation(CurrentRotation);
+				FRotator LandingRotation = UKismetMathLibrary::MakeRotFromZX(HitResult.Normal, BossRef->GetActorForwardVector());
+				LandingRotation.Pitch = 0.0f;
+				BossRef->SetActorRotation(LandingRotation);
 
 				if (BossRef->GetCharacterMovement())
 				{
-					BossRef->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 					BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 				}
 
 				BossRef->ActivateAttack2Collision();
+
 				BossRef->GetWorld()->GetTimerManager().SetTimer(
 					TimerHandle_DisableCollision, BossRef, &ABoss::DeactivateAttack2Collision, 0.5f, false);
 
 				BossRef->UpdateAttackCooldown(2);
 				BossRef->SetbChaseComplete(true);
 				FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
-				return;
 			}
 			else
 			{
@@ -121,7 +116,6 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		}
 		break;
 	}
-
 
 	default:
 		break;
@@ -134,7 +128,6 @@ void UBTTask_BossAttack2::StartAscend()
 
 	if (BossRef->GetCharacterMovement())
 	{
-		BossRef->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	}
 	CurrentPhase = 1;

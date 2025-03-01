@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/BoxComponent.h"
 #include "Engine/World.h"
 
 ABoss::ABoss()
@@ -32,14 +33,59 @@ ABoss::ABoss()
 
 
     // 캡슐
-    CapsuleComponent1 = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent1"));
-    CapsuleComponent1->SetupAttachment(GetMesh(), TEXT("Cap"));
-    CapsuleComponent2 = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent2"));
-    CapsuleComponent2->SetupAttachment(GetMesh(), TEXT("Cap2"));
-    CapsuleComponent3 = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent3"));
-    CapsuleComponent3->SetupAttachment(GetMesh(), TEXT("iuhg"));
+#pragma region Capsule Components Creation
 
-    //
+    BossHeadCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("BossHeadCapsuleComponent"));
+    BossHeadCapsuleComponent->SetupAttachment(GetMesh(), TEXT("BossHead"));
+
+    NeckCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("NeckCapsuleComponent"));
+    NeckCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Neck"));
+
+    Front_Right_FootCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Front_Right_FootCapsuleComponent"));
+    Front_Right_FootCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Front_Right_Foot"));
+
+    Front_Left_FootCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Front_Left_FootCapsuleComponent"));
+    Front_Left_FootCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Front_Left_Foot"));
+
+    Back_Right_FootCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Back_Right_FootCapsuleComponent"));
+    Back_Right_FootCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Back_Right_Foot"));
+
+    Back_Left_FootCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Back_Left_FootCapsuleComponent"));
+    Back_Left_FootCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Back_Left_Foot"));
+
+    Front_Right_LegCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Front_Right_LegCapsuleComponent"));
+    Front_Right_LegCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Front_Right_Leg"));
+
+    Front_Left_LegCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Front_Left_LegCapsuleComponent"));
+    Front_Left_LegCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Front_Left_Leg"));
+
+    Back_Right_LegCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Back_Right_LegCapsuleComponent"));
+    Back_Right_LegCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Back_Right_Leg"));
+
+    Back_Left_LegCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Back_Left_LegCapsuleComponent"));
+    Back_Left_LegCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Back_Left_Leg"));
+
+    Body1_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Body1_CapsuleComponent"));
+    Body1_CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Body1"));
+
+    Body2_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Body2_CapsuleComponent"));
+    Body2_CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Body2"));
+
+    Body3_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Body3_CapsuleComponent"));
+    Body3_CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Body3"));
+
+    Tail1CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Tail1CapsuleComponent"));
+    Tail1CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Tail1"));
+
+    Tail2CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Tail2CapsuleComponent"));
+    Tail2CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Tail2"));
+
+    Tail3CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Tail3CapsuleComponent"));
+    Tail3CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Tail3"));
+
+#pragma endregion
+    
+
     Skill3Particle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Skill3Particle"));
     Skill3Particle->SetupAttachment(RootComponent);
     Skill3Particle->bAutoActivate = false;
@@ -84,25 +130,75 @@ void ABoss::Tick(float DeltaTime)
             FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
         );
     }
-
-    if (CapsuleComponent1 && GetMesh())
+#pragma region Soket
+    if (GetMesh())
     {
-
-        FTransform SocketTransform = GetMesh()->GetSocketTransform(TEXT("Cap"));
-        CapsuleComponent1->SetWorldTransform(SocketTransform);
+        if (BossHeadCapsuleComponent)
+        {
+            BossHeadCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("BossHead")));
+        }
+        if (NeckCapsuleComponent)
+        {
+            NeckCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Neck")));
+        }
+        if (Front_Right_FootCapsuleComponent)
+        {
+            Front_Right_FootCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Front_Right_Foot")));
+        }
+        if (Front_Left_FootCapsuleComponent)
+        {
+            Front_Left_FootCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Front_Left_Foot")));
+        }
+        if (Back_Right_FootCapsuleComponent)
+        {
+            Back_Right_FootCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Back_Right_Foot")));
+        }
+        if (Back_Left_FootCapsuleComponent)
+        {
+            Back_Left_FootCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Back_Left_Foot")));
+        }
+        if (Front_Right_LegCapsuleComponent)
+        {
+            Front_Right_LegCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Front_Right_Leg")));
+        }
+        if (Front_Left_LegCapsuleComponent)
+        {
+            Front_Left_LegCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Front_Left_Leg")));
+        }
+        if (Back_Right_LegCapsuleComponent)
+        {
+            Back_Right_LegCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Back_Right_Leg")));
+        }
+        if (Back_Left_LegCapsuleComponent)
+        {
+            Back_Left_LegCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Back_Left_Leg")));
+        }
+        if (Body1_CapsuleComponent)
+        {
+            Body1_CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Body1")));
+        }
+        if (Body2_CapsuleComponent)
+        {
+            Body2_CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Body2")));
+        }
+        if (Body3_CapsuleComponent)
+        {
+            Body3_CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Body3")));
+        }
+        if (Tail1CapsuleComponent)
+        {
+            Tail1CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Tail1")));
+        }
+        if (Tail2CapsuleComponent)
+        {
+            Tail2CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Tail2")));
+        }
+        if (Tail3CapsuleComponent)
+        {
+            Tail3CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Tail3")));
+        }
     }
-
-    if (CapsuleComponent2 && GetMesh())
-    {
-        FTransform SocketTransform = GetMesh()->GetSocketTransform(TEXT("Cap2"));
-        CapsuleComponent2->SetWorldTransform(SocketTransform);
-    }
-
-    if (CapsuleComponent3 && GetMesh())
-    {
-        FTransform SocketTransform = GetMesh()->GetSocketTransform(TEXT("Socket3"));
-        CapsuleComponent3->SetWorldTransform(SocketTransform);
-    }
+#pragma endregion
 }
 
 int32 ABoss::SetAttack1Count(int32 NewCount)

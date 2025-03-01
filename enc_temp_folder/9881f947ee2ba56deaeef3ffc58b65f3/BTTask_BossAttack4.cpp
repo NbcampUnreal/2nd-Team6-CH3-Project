@@ -76,7 +76,6 @@ void UBTTask_BossAttack4::StartRise()
 
     if (BossRef->GetCharacterMovement())
     {
-        BossRef->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
     }
 
@@ -178,17 +177,19 @@ void UBTTask_BossAttack4::UpdateDescend(float DeltaTime)
     if (BossRef->GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
     {
         float GroundZ = HitResult.Location.Z;
+        // Front_Left_FootCapsuleComponent의 반높이를 오프셋으로 사용, 없으면 300으로 고정
         float CapsuleOffset = BossRef->Front_Left_FootCapsuleComponent ? BossRef->Front_Left_FootCapsuleComponent->GetScaledCapsuleHalfHeight() : 300.0f;
         if (NewLocation.Z <= GroundZ + CapsuleOffset)
         {
             NewLocation.Z = GroundZ + CapsuleOffset;
             BossRef->SetActorLocation(NewLocation, false);
+
+            // 회전은 기존 값을 그대로 유지합니다.
             FRotator CurrentRotation = BossRef->GetActorRotation();
             BossRef->SetActorRotation(CurrentRotation);
 
             if (BossRef->GetCharacterMovement())
             {
-                BossRef->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
                 BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
             }
             BossRef->UpdateAttackCooldown(4);

@@ -19,14 +19,57 @@ class EDMUNDPRJ_API ABoss : public ABaseMonster {
 public:
     ABoss();
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    UCapsuleComponent* CapsuleComponent1;
+#pragma region Capsule Components
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    UCapsuleComponent* CapsuleComponent2;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* BossHeadCapsuleComponent;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    UCapsuleComponent* CapsuleComponent3;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* NeckCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Front_Right_FootCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Front_Left_FootCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Back_Right_FootCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Back_Left_FootCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Front_Right_LegCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Front_Left_LegCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Back_Right_LegCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Back_Left_LegCapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Body1_CapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Body2_CapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Body3_CapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Tail1CapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Tail2CapsuleComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    class UCapsuleComponent* Tail3CapsuleComponent;
+
+#pragma endregion
 
     UPROPERTY(VisibleAnywhere, Category = "Collision")
     class USphereComponent* Attack2Collision;
