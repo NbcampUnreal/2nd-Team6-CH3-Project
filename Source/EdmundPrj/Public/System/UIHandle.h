@@ -32,8 +32,12 @@ public:
 
 	//Fade In / Out : Play Animation from FadeWidget
 	void FadeIn();
-	void FadeOut(const bool bIsNext, const ESceneType SceneType);
+	void FadeOut(const bool bIsNext = false, const ESceneType SceneType = ESceneType::Title);
 	void RequestMoveSceneByFade(const bool bIsNext, const ESceneType SceneType);
+
+	// ResultWidget Close or Open
+	void OpenResult();
+	void CloseResult();
 
 	// Apply Sound Volume To Option Widget
 	float GetBGMVolumeByGameInstance() const;
@@ -47,11 +51,11 @@ public:
 
 	// UI Button Click Event
 	void ClickedCloseCoverWidget() const;
-	void ClickedMoveToTitle() const;
-	void ClickedMoveToMain() const;
-	void ClickedMoveToNext() const;
-	void ClickedMoveToMission(const ESceneType SceneType) const;
-	void ClickedRetry() const;
+	void ClickedMoveToTitle();
+	void ClickedMoveToMain();
+	void ClickedMoveToNext();
+	void ClickedMoveToMission(const ESceneType SceneType);
+	void ClickedRetry();
 	void ClickedQuitGame() const;
 	void ClickedBGMVolume(const float Volume) const;
 	void ClickedEffectVolume(const float Volume) const;
@@ -85,10 +89,6 @@ private:
 	// ShopWidget Close or Open
 	void OpenShop();
 	void CloseShop();
-
-	// ResultWidget Close or Open
-	void OpenResult();
-	void CloseResult();
 
 	// CharacterListWidget Close or Open
 	void OpenCharacterList();

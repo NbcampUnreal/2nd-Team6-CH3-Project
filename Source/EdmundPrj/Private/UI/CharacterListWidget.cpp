@@ -15,14 +15,12 @@ void UCharacterListWidget::InitWidget(UUIHandle* NewUIHandle)
 	SelectButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedSelect);
 	CancleButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedCancle);
 	CloseButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedClose);
-
-	SetEnableButton(false);
 }
 
 void UCharacterListWidget::PlayAddAnim()
 {
 	Super::PlayAddAnim();
-	
+	SetEnableButton(true);
 }
 
 void UCharacterListWidget::EndRemoveAnim()

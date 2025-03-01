@@ -25,6 +25,7 @@ void AMissionItemTargetPoint::ActionEventByPressedKey()
 
 	bIsActive = false;
 	SetVisible(false);
+	MissionHandle->RequestSwapBgm(EBGMSoundType::Defence);
 	MissionHandle->CompleteMission();
 }
 

@@ -34,6 +34,8 @@ void ASpawnerHandle::ApplySpawnerDataInLevel()
 	MonsterBulletPool = GetWorld()->SpawnActor<AMonsterBulletPool>(MonsterBulletPoolClass);
 	MonsterBulletPool->InitializeMonsterBulletPool(10);
 
+	CurrentMission = SpawnerDataSet[0]->InSceneType;
+
 	for (const FSpawnerDataRow* SpawnerDataRow : SpawnerDataSet)
 	{
 		UClass* SpawnClass = SpawnerDataRow->SpawnerClass.Get();
@@ -73,7 +75,32 @@ void ASpawnerHandle::SpawnMonsterSpawner(UClass* SpawnClass, const FVector& Spaw
 
 	AMonsterSpawner* NewMonsterSpawner = GetWorld()->SpawnActor<AMonsterSpawner>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
 
-	NewMonsterSpawner->InitSpawner(MonsterBulletPool, SpawnTime, SpawnCount);
+	int32 MissionIndex = 0;
+
+	switch (CurrentMission)
+	{
+	case ESceneType::Mission1:
+		MissionIndex = 0;
+		break;
+
+	case ESceneType::Mission2:
+		MissionIndex = 1;
+		break;
+
+	case ESceneType::Mission3:
+		MissionIndex = 2;
+		break;
+
+	case ESceneType::Infinity:
+		MissionIndex = 3;
+		break;
+
+	default:
+		MissionIndex = 0;
+		break;
+	}
+
+	NewMonsterSpawner->InitSpawner(MonsterBulletPool, SpawnTime, SpawnCount); // index 추가 전달
 	MonsterSpawnerSet.Add(NewMonsterSpawner);
 }
 
