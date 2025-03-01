@@ -120,6 +120,7 @@ void AAttackPlant::SpawnTimerSkill()
 
 void AAttackPlant::Deactivate()
 {
+	StartSplineMove(GetActorTransform().TransformPosition(DefaultPoint), 0);
 	GetWorldTimerManager().ClearTimer(AttackCycleHandle);
 	Super::Deactivate();
 }

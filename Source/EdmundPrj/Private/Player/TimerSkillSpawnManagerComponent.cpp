@@ -43,7 +43,9 @@ FVector UTimerSkillSpawnManagerComponent::GetRandomMonsterLocation()
 
 FVector UTimerSkillSpawnManagerComponent::SummonSkillLocation(FVector randomPos)
 {
-	return FVector();
+	randomPos.X = FMath::RandRange(randomPos.X - 100, randomPos.X + 100);
+	randomPos.Y = FMath::RandRange(randomPos.Y - 100, randomPos.Y + 100);
+	return randomPos;
 }
 
 void UTimerSkillSpawnManagerComponent::SetSkillTimer(ETimerSkillType skillType)
@@ -57,6 +59,7 @@ void UTimerSkillSpawnManagerComponent::SetSkillTimer(ETimerSkillType skillType)
 	FTimerHandle& SkillTimer = SkillTimerMap.FindOrAdd(skillType);
 	if (!IsValid(TimerSkillClassMap[skillType])) return;
 	CreateTimerSkill(TimerSkillClassMap[skillType], skillType, 10);
+
 	TObjectPtr<ATimerSkill> skill = FindDeactivateTimerSkill(skillType);
 	if (skill == nullptr) return;
 	GetWorld()->GetTimerManager().SetTimer(
@@ -85,7 +88,6 @@ void UTimerSkillSpawnManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	EnemySearchCollision->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
-	SetSkillTimer(ETimerSkillType::AttackPlants);
 }
 
 void UTimerSkillSpawnManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -113,6 +115,10 @@ void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillT
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Target is Null"));
 		return;
+	}
+	if (skillType == ETimerSkillType::AttackPlants || skillType == ETimerSkillType::HealPlants)
+	{
+		skillLocation = SummonSkillLocation(skillLocation);
 	}
 
 	skillLocation.Z = skill->SpawnPosZ;

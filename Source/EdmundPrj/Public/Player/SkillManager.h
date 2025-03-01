@@ -9,6 +9,7 @@
 
 class UActiveSkillSpawnManager;
 class UTimerSkillSpawnManagerComponent;
+class UPassiveSkillManager;
 class ABaseSkill;
 struct FPlayerSkillRow;
 
@@ -33,4 +34,6 @@ public:
 	TObjectPtr<UTimerSkillSpawnManagerComponent> TimerSkillManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<UActiveSkillSpawnManager> ActiveSkillManager;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<UPassiveSkillManager> PassiveSkillManager;
 };

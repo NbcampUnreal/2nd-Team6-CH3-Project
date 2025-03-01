@@ -25,7 +25,8 @@ UENUM(BlueprintType)
 enum class EPassiveSkillType : uint8
 {
 	Null = 0,
-	Berserker
+	Berserker,
+	BloodAbsorbing
 };
 
 UENUM(BlueprintType)
