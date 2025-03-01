@@ -1,249 +1,194 @@
 #include "Boss/Attack/Boss_Attack1_Bullet.h"
-#include "Components/SphereComponent.h"
-#include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SphereComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Boss/Boss.h"
+#include "Player/BaseCharacter.h"
+#include "TimerManager.h"
+#include "Engine/World.h"
 
-// 
 TArray<ABoss_Attack1_Bullet*> ABoss_Attack1_Bullet::BulletPool;
 
 ABoss_Attack1_Bullet::ABoss_Attack1_Bullet()
 {
-    PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 
-    ACollision = CreateDefaultSubobject<USphereComponent>(TEXT("ACollision"));
-    ACollision->InitSphereRadius(10.0f);
-    ACollision->SetCollisionProfileName(TEXT("BlockAll"));
-    ACollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-    ACollision->OnComponentHit.AddDynamic(this, &ABoss_Attack1_Bullet::OnHit);
-    RootComponent = ACollision;
+	// 충돌 컴포넌트 생성 및 설정
+	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
+	CollisionComp->InitSphereRadius(10.0f);
+	CollisionComp->SetCollisionProfileName(TEXT("BlockAll"));
+	// Pawn 채널은 Overlap 처리하여 물리 밀림 방지
+	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	// CCD 활성화 (빠른 이동에도 충돌 감지)
+	CollisionComp->BodyInstance.bUseCCD = true;
+	// Hit와 Overlap 이벤트 바인딩
+	CollisionComp->OnComponentHit.AddDynamic(this, &ABoss_Attack1_Bullet::OnHit);
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABoss_Attack1_Bullet::OnOverlapBegin);
+	RootComponent = CollisionComp;
 
-    BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
-    BulletMesh->SetupAttachment(RootComponent);
-    BulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// 총알 메쉬 컴포넌트 생성 및 설정 (충돌은 CollisionComp가 처리)
+	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
+	BulletMesh->SetupAttachment(RootComponent);
+	BulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-    BCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BCollision"));
-    BCollision->SetupAttachment(RootComponent);
-    BCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// 폭발 파티클 이펙트 컴포넌트 생성 및 설정 (자동 재생 비활성)
+	ExplosionEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplosionEffect"));
+	ExplosionEffect->SetupAttachment(RootComponent);
+	ExplosionEffect->bAutoActivate = false;
 
-    ExplosionEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplosionEffect"));
-    ExplosionEffect->SetupAttachment(RootComponent);
-    ExplosionEffect->bAutoActivate = false;
-
-    ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-    ProjectileMovement->InitialSpeed = 3000.f;
-    ProjectileMovement->MaxSpeed = 3000.f;
-    ProjectileMovement->bRotationFollowsVelocity = true;
-
-    bIsActive = false;
-    TraveledDistance = 0.0f;
-
-    Tags.Add(FName("Bullet"));
+	// 초기 상태: 탄환은 숨기고 충돌 비활성
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
 }
+
 
 void ABoss_Attack1_Bullet::BeginPlay()
 {
-    Super::BeginPlay();
-
-    BossRef = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
-
-    if (!BulletPool.Contains(this))
-    {
-        BulletPool.Add(this);
-    }
+	Super::BeginPlay();
+	// 생성 시 탄환 풀에 등록
+	BulletPool.Add(this);
 }
 
 void ABoss_Attack1_Bullet::Tick(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
-    if (!bIsActive) return;
+	Super::Tick(DeltaTime);
 
-    TraveledDistance += ProjectileMovement->Velocity.Size() * DeltaTime;
-    if (TraveledDistance >= MaxDistance)
-    {
-        ResetBullet();
-    }
+	if (bIsActive)
+	{
+		FVector NewLocation = GetActorLocation() + GetActorForwardVector() * BulletSpeed * DeltaTime;
+		FHitResult HitResult;
+		// Sweep 옵션을 활성화하여 이동 중 충돌 검사
+		SetActorLocation(NewLocation, true, &HitResult);
+
+		if (HitResult.bBlockingHit)
+		{
+			/*UE_LOG(LogTemp, Log, TEXT("Bullet sweep hit: %s at %s"),
+				HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("Unknown"),
+				*GetActorLocation().ToString());
+			Explode();*/
+			return;
+		}
+
+		TraveledDistance += BulletSpeed * DeltaTime;
+		if (TraveledDistance >= MaxDistance)
+		{
+			Explode();
+		}
+	}
 }
 
-void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-    UE_LOG(LogTemp, Log, TEXT("OnHit: Triggered"));
-
-    if (OtherActor)
-    {
-        FString TagList;
-        for (const FName& Tag : OtherActor->Tags)
-        {
-            TagList += Tag.ToString() + TEXT(", ");
-        }
-        //UE_LOG(LogTemp, Log, TEXT("OnHit: OtherActor = %s, Tags = %s"), *OtherActor->GetName(), *TagList);
-    }
-    else
-    {
-        //UE_LOG(LogTemp, Log, TEXT("OnHit: OtherActor is null"));
-    }
-
-    bool bIsIgnored = false;
-    //if (!OtherActor || OtherActor == this || OtherActor->ActorHasTag("Boss") || OtherActor->ActorHasTag("Bullet"))
-    if (!OtherActor || OtherActor == this)
-    {
-        bIsIgnored = true;
-    }
-    //UE_LOG(LogTemp, Log, TEXT("OnHit: bIsIgnored = %s"), bIsIgnored ? TEXT("true") : TEXT("false"));
-
-    if (bIsIgnored)
-    {
-        //UE_LOG(LogTemp, Log, TEXT("OnHit: Ignored collision; continuing flight without explosion"));
-        return;
-    }
-
-    ACollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    BulletMesh->SetVisibility(false);
-    BCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    ExplosionEffect->Activate(true);
-    //UE_LOG(LogTemp, Log, TEXT("OnHit: ExplosionEffect activated"));
-
-    GetWorld()->GetTimerManager().SetTimer(BCollisionDeactivateTimer, this, &ABoss_Attack1_Bullet::DeactivateBCollision, 0.5f, false);
-}
-
-
-void ABoss_Attack1_Bullet::ApplyBCollisionDamage()
-{
-    TArray<AActor*> OverlapActorsA;
-    ACollision->GetOverlappingActors(OverlapActorsA);
-    for (AActor* Actor : OverlapActorsA)
-    {
-        //UE_LOG(LogTemp, Log, TEXT("Collision A Overlap: %s"), *Actor->GetName());
-    }
-
-    TArray<AActor*> OverlapActorsB;
-    BCollision->GetOverlappingActors(OverlapActorsB);
-    for (AActor* Actor : OverlapActorsB)
-    {
-
-    }
-}
-
-
-void ABoss_Attack1_Bullet::DeactivateBCollision()
-{
-    ApplyBCollisionDamage();
-    BCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    ResetBullet();
-}
-
-void ABoss_Attack1_Bullet::ResetBullet()
-{
-    //UE_LOG(LogTemp, Log, TEXT("ResetBullet: Begin resetting bullet state"));
-
-    if (ProjectileMovement)
-    {
-        ProjectileMovement->StopMovementImmediately();
-        ProjectileMovement->Deactivate();
-        ProjectileMovement->Velocity = FVector::ZeroVector;
-        //UE_LOG(LogTemp, Log, TEXT("ResetBullet: ProjectileMovement stopped, deactivated, and velocity reset"));
-    }
-
-    bIsActive = false;
-    TraveledDistance = 0.0f;
-    SetActorHiddenInGame(true);
-    SetActorEnableCollision(false);
-    //UE_LOG(LogTemp, Log, TEXT("ResetBullet: Actor hidden and collision disabled"));
-
-    if (ACollision)
-    {
-        ACollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        //UE_LOG(LogTemp, Log, TEXT("ResetBullet: ACollision disabled"));
-    }
-    if (BCollision)
-    {
-        BCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        //UE_LOG(LogTemp, Log, TEXT("ResetBullet: BCollision disabled"));
-    }
-    if (BulletMesh)
-    {
-        BulletMesh->SetVisibility(false);
-        //UE_LOG(LogTemp, Log, TEXT("ResetBullet: BulletMesh hidden"));
-    }
-    if (ExplosionEffect)
-    {
-        ExplosionEffect->Deactivate();
-        //UE_LOG(LogTemp, Log, TEXT("ResetBullet: ExplosionEffect deactivated"));
-    }
-
-    if (!BulletPool.Contains(this))
-    {
-        BulletPool.Add(this);
-        //UE_LOG(LogTemp, Log, TEXT("ResetBullet: Bullet added to pool"));
-    }
-
-    //UE_LOG(LogTemp, Log, TEXT("ResetBullet: Bullet state reset complete"));
-}
-
-
-ABoss_Attack1_Bullet* ABoss_Attack1_Bullet::GetBulletFromPool(UWorld* World, TSubclassOf<ABoss_Attack1_Bullet> BulletClass)
-{
-    if (BulletPool.Num() > 0)
-    {
-        ABoss_Attack1_Bullet* Bullet = BulletPool.Pop();
-        if (Bullet)
-        {
-            Bullet->SetActorHiddenInGame(false);
-            Bullet->SetActorEnableCollision(true);
-            Bullet->bIsActive = true;
-            return Bullet;
-        }
-    }
-
-    ABoss_Attack1_Bullet* NewBullet = World->SpawnActor<ABoss_Attack1_Bullet>(BulletClass);
-    if (NewBullet)
-    {
-        NewBullet->bIsActive = true;
-    }
-    return NewBullet;
-}
 
 void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnRotation, FVector Direction)
 {
-    //UE_LOG(LogTemp, Log, TEXT("FireProjectile: Called with SpawnLocation: %s, SpawnRotation: %s"),
-        //*SpawnLocation.ToString(), *SpawnRotation.ToString());
+	// 발사 위치 및 회전 설정
+	SetActorLocation(SpawnLocation);
+	SetActorRotation(SpawnRotation);
 
-    SetActorLocation(SpawnLocation);
-    SetActorRotation(SpawnRotation);
-
-    if (ProjectileMovement)
-    {
-        ProjectileMovement->StopMovementImmediately();
-        ProjectileMovement->Activate(true);
-        ProjectileMovement->Velocity = Direction * ProjectileMovement->InitialSpeed;
-        //UE_LOG(LogTemp, Log, TEXT("FireProjectile: ProjectileMovement activated with velocity: %s"),
-            //*ProjectileMovement->Velocity.ToString());
-    }
-    else
-    {
-        //UE_LOG(LogTemp, Warning, TEXT("FireProjectile: ProjectileMovement is null"));
-    }
-
-    bIsActive = true;
-    TraveledDistance = 0.0f;
-    SetActorHiddenInGame(false);
-    SetActorEnableCollision(true);
-
-    if (ACollision)
-    {
-        ACollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-        //UE_LOG(LogTemp, Log, TEXT("FireProjectile: ACollision set to QueryOnly"));
-    }
-    if (BulletMesh)
-    {
-        BulletMesh->SetVisibility(true);
-        //UE_LOG(LogTemp, Log, TEXT("FireProjectile: BulletMesh set to visible"));
-    }
-
-    //UE_LOG(LogTemp, Log, TEXT("FireProjectile: Bullet is now active"));
+	// 탄환 활성화 및 초기화
+	bIsActive = true;
+	TraveledDistance = 0.0f;
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
 }
 
+void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		Explode();
+	}
+}
+
+void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+	{
+
+		AActor* LocalOwner = OverlappedComp->GetOwner(); 
+		ABoss_Attack1_Bullet* Bullet = Cast<ABoss_Attack1_Bullet>(LocalOwner);
+
+		if (Bullet)
+		{
+			float DamageValue = 10.0f;
+
+			UGameplayStatics::ApplyDamage(
+				OtherActor,
+				DamageValue,
+				nullptr,
+				Bullet,
+				UDamageType::StaticClass()
+			);
+		}
+
+		Explode();
+	}
+}
+
+
+void ABoss_Attack1_Bullet::Explode()
+{
+	if (!bIsActive)
+		return;
+
+	// 탄환은 즉시 숨기고 충돌 비활성화
+	bIsActive = false;
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+
+	// 현재 위치에서 폭발 파티클 스폰 (ExplosionEffectTemplate이 에디터에서 할당되어 있어야 함)
+	if (ExplosionEffect->Template)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect->Template, GetActorLocation());
+	}
+	else
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("ExplosionEffect Template is not assigned!"));
+	}
+
+	//UE_LOG(LogTemp, Log, TEXT("Bullet exploded at: %s"), *GetActorLocation().ToString());
+
+	// ExplosionDelay 후에 ResetBullet() 호출하여 탄환을 풀에 반환
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss_Attack1_Bullet::ResetBullet, ExplosionDelay, false);
+}
+
+
+void ABoss_Attack1_Bullet::ResetBullet()
+{
+	// 탄환 초기화
+	bIsActive = false;
+	TraveledDistance = 0.0f;
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+
+	// 탄환 풀이 누락되었으면 추가
+	if (!BulletPool.Contains(this))
+	{
+		BulletPool.Add(this);
+	}
+}
+
+ABoss_Attack1_Bullet* ABoss_Attack1_Bullet::GetBulletFromPool(UWorld* World, TSubclassOf<ABoss_Attack1_Bullet> BulletClass)
+{
+	// 사용 중이지 않은 탄환 반환
+	for (ABoss_Attack1_Bullet* Bullet : BulletPool)
+	{
+		if (Bullet && !Bullet->bIsActive)
+		{
+			return Bullet;
+		}
+	}
+	// 없으면 새로 생성 후 풀에 추가
+	if (World)
+	{
+		ABoss_Attack1_Bullet* NewBullet = World->SpawnActor<ABoss_Attack1_Bullet>(BulletClass);
+		if (NewBullet)
+		{
+			BulletPool.Add(NewBullet);
+			return NewBullet;
+		}
+	}
+	return nullptr;
+}

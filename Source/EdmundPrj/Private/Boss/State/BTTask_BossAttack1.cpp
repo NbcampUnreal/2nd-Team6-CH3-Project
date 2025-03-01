@@ -77,6 +77,7 @@ void UBTTask_BossAttack1::DelayedTransition()
 		return;
 	}
 	BossRef->UpdateAttackCooldown(1);
+	BossRef->SetbChaseComplete(true);
 	FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
 }
 

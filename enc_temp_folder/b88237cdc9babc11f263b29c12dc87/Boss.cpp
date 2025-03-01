@@ -21,7 +21,6 @@ ABoss::ABoss()
     MonsterMaxHP = 1000.0f;
     MonsterAttackDamage = 10.0f;
 
-    // 공격2 범위
     Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2_콜리전"));
     Attack2Collision->SetupAttachment(RootComponent);
     Attack2Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);

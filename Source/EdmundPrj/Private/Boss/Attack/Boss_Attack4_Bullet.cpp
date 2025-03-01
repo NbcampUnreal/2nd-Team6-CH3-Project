@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h" 
 #include "Engine/World.h"
+#include "Player/BaseCharacter.h"
 #include "TimerManager.h"
 
 TArray<ABoss_Attack4_Bullet*> ABoss_Attack4_Bullet::Bullet4Pool;
@@ -202,6 +203,12 @@ void ABoss_Attack4_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* Othe
     if (!bIsActive) return;
     if (OtherActor && OtherActor != this && !OtherActor->IsA(ABoss_Attack4_Bullet::StaticClass()))
     {
+        AActor* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+        if (OtherActor->ActorHasTag(FName("Player")) || OtherActor == PlayerPawn)
+        {
+            float Damage = 50.0f;
+            UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
+        }
         Explode();
     }
 }

@@ -67,7 +67,13 @@ void ABossAIController::Tick(float DeltaTime)
                 NextAttack = 101; // 스킬1
             }
 
-            if (NextAttack == 0)
+            if (!BossCharacter->GetbChaseComplete())
+            {
+                BBComp->SetValueAsInt("NextAttack", 0);
+                return;
+            }
+
+            if (BossCharacter->GetbChaseComplete())
             {
                 float CurrentTime = GetWorld()->GetTimeSeconds();
                 bool bAttack1Ready = (CurrentTime >= BossCharacter->Attack1_CooldownEnd);
@@ -121,6 +127,10 @@ void ABossAIController::Tick(float DeltaTime)
                 {
                     GEngine->AddOnScreenDebugMessage(1, DeltaTime, FColor::Green, DebugMsg);
                 }
+            }
+            else
+            {
+               NextAttack = 0;
             }
             BBComp->SetValueAsInt("NextAttack", NextAttack);
         }

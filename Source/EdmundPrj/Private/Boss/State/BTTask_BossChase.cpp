@@ -3,6 +3,7 @@
 #include "AIController.h"
 #include "Engine/World.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 UBTTask_BossChase::UBTTask_BossChase()
@@ -40,10 +41,11 @@ void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
-
+	BossRef->GetCharacterMovement()->MaxWalkSpeed = BossRef->GetMonsterMoveSpeed();
 	AccumulatedTime += DeltaSeconds;
 	if (AccumulatedTime >= FMath::RandRange(2.0f, 3.0f)) // 랜덤 2~3초 지속
 	{
+		BossRef->SetbChaseComplete(false);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		return;
 	}
@@ -59,10 +61,11 @@ void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
 	if (Distance >= 1500.0f)
 	{
-		BossRef->Chase_AcceptanceRadius += 100.0f; // 거리가 1500 이상이면 속도 증가
+		BossRef->Chase_AcceptanceRadius += 100.0f;
 	}
 
 	AICon->MoveToActor(Player, BossRef->Chase_AcceptanceRadius);
+	BossRef->SetbChaseComplete(false);
 
 	int32 NextAttack = 0;
 	if (UBlackboardComponent* BBComp = OwnerComp.GetBlackboardComponent())
@@ -70,8 +73,9 @@ void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		NextAttack = BBComp->GetValueAsInt("NextAttack");
 	}
 
-	if (NextAttack != 0 || Distance <= BossRef->Chase_AcceptanceRadius)
+	if (NextAttack != 0 || Distance <= BossRef->Chase_AcceptanceRadius + 500.0f)
 	{
+		BossRef->SetbChaseComplete(true);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

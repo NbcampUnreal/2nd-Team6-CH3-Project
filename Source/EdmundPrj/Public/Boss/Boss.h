@@ -28,6 +28,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UCapsuleComponent* CapsuleComponent3;
 
+    UPROPERTY(VisibleAnywhere, Category = "Collision")
+    class USphereComponent* Attack2Collision;
+
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -51,6 +54,12 @@ public:
     float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
     int32 SetAttack1Count(int32 NewCount);
     void SetbIsInvulnerable(bool NewIsInvulnerable) { bIsInvulnerable = NewIsInvulnerable; }
+    int32 GetComboPhase() { return ComboPhase; }
+    void SetComboPhase(int32 NewComboPhase) { ComboPhase = NewComboPhase; }
+    virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+    bool GetbChaseComplete() const { return bChaseComplete; }
+    void SetbChaseComplete(bool NewbChaseComplete) { bChaseComplete = NewbChaseComplete; }
+    float GetBossSkill1Damage() { return BossSkill1Damage; }
 
 private:
     UPROPERTY()
@@ -61,15 +70,20 @@ private:
 
 private:
     int32 PoolSize = 15;
+    int32 ComboPhase = 0;
     bool bSkill1Used = false;
     bool bSkill2Used = false;
     bool bSkill3Used = false;
     bool bIsInvulnerable = false;
+    bool bChaseComplete = false;
 
 public:
-    float Chase_AcceptanceRadius = 1000.0f; // Chase 반경
+    float Chase_AcceptanceRadius = 99999.0f; // Chase 반경
 
     // ***********************Attack 1*************************
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
+    float BossSkill1Damage = 1.0f;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
     float Attack1_CooldownEnd = 0.0f;
 
@@ -107,11 +121,20 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_CooldownEnd = 0.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Skill3")
-    float Skill3AttackRadius = 1000.0f;  // 광역 공격 반경
+    UPROPERTY()
+    class UBTTask_BossAttack3* CurrentAttackTask;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Skill3")
-    float Skill3AttackDamage = 50.0f;  // 광역 공격 데미지
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
+    float MeleeAttackDashDistance_Attack1 = 10000.0f; // 1타 돌진 거리
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
+    float MeleeAttackDashDistance_Attack2 = 10000.0f; // 2타 돌진 거리
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
+    float MeleeAttackDashSpeed_Attack1 = 1200.0f; // 1타 돌진 속도
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
+    float MeleeAttackDashSpeed_Attack2 = 1300.0f; // 2타 돌진 속도
 
     // ***********************Attack 4*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
@@ -198,6 +221,11 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill3")
     float Skill3StartDelay = 3.0f; // 벽 스폰 후 딜레이 시간
 
+    UPROPERTY(EditDefaultsOnly, Category = "Skill3")
+    float Skill3AttackRadius = 1000.0f;  // 광역 공격 반경
+
+    UPROPERTY(EditDefaultsOnly, Category = "Skill3")
+    float Skill3AttackDamage = 50.0f;  // 광역 공격 데미지
 
     // ***********************Skill 4*************************
 

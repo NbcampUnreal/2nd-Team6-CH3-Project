@@ -100,6 +100,7 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 					BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 				}
 				BossRef->UpdateAttackCooldown(2);
+				BossRef->SetbChaseComplete(true);
 				FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
 			}
 			else
