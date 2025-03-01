@@ -12,6 +12,7 @@
 #include "GameFramework/Actor.h"
 #include "Monster/RangedMonsterBullet.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/SpawnerHandle.h"
 
 
 // Sets default values
@@ -74,14 +75,24 @@ void AMonsterSpawner::ClearTimer()
 	GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 }
 
-void AMonsterSpawner::BossSpawn()
+void AMonsterSpawner::BossSpawn(ASpawnerHandle* NewSpawnerHandle, AMonsterBulletPool* BulletPool, int32 NewSpawnCount)
 {
-	ClearTimer();
-	for (int i = 0; i < SpawnCount; ++i)
+	SpawnerHandle = NewSpawnerHandle;
+	MonsterBulletPool = BulletPool;
+	InitializeMonsterSpawnPool(SpawnCount);
+	BossModeSpawnCount = NewSpawnCount;
+
+	for (int i = 0; i < BossModeSpawnCount; ++i)
 	{
 		SpawnMonster();
 	}
 	SetBossMode(true);
+
+	for (ABaseMonster* Monster : SpawnedMonstersPool)
+	{
+		Monster->SetCanDropReward(false);
+		Monster->SetChaseMode(true);
+	}
 }
 
 void AMonsterSpawner::SetBossMode(bool NewMode)
@@ -91,7 +102,7 @@ void AMonsterSpawner::SetBossMode(bool NewMode)
 
 bool AMonsterSpawner::bCheckAllDead()
 {
-	return (SpawnCount <= DeadMonsterCount);
+	return (BossModeSpawnCount <= DeadMonsterCount);
 }
 
 void AMonsterSpawner::AddDeadCount()
@@ -102,14 +113,40 @@ void AMonsterSpawner::AddDeadCount()
 
 	if (bCheckAllDead())
 	{
-		//다 죽었을 때 호출 될 함수
+		if (IsValid(SpawnerHandle))
+		{
+			SpawnerHandle->IncreaseSpawnerClearCount();
+		}
 		UE_LOG(LogTemp, Warning, TEXT("모든 몬스터 사망"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("남은 몬스터 수: %d"), SpawnCount - DeadMonsterCount);
+		UE_LOG(LogTemp, Warning, TEXT("남은 몬스터 수: %d"), BossModeSpawnCount - DeadMonsterCount);
 	}
 
+}
+
+void AMonsterSpawner::DestroySpawner()
+{
+	ClearTimer();
+
+	for (ABaseMonster* Monster : SpawnedMonstersPool)
+	{
+		Monster->SetCanDropReward(false);
+		Monster->MonsterDead();
+	}
+
+	Destroy();
+}
+
+void AMonsterSpawner::ApplyChaseMode()
+{
+	bIsDefenceMode = true;
+
+	for (ABaseMonster* Monster : SpawnedMonstersPool)
+	{
+		Monster->SetChaseMode(true);
+	}
 }
 
 ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
@@ -170,7 +207,6 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 
 		if (AllMonsters.Num() > 0)
 		{
-
 			for (const TSubclassOf<ABaseMonster>& Monster : AllMonsters)
 			{
 				if (Monster == nullptr)
@@ -250,6 +286,10 @@ void AMonsterSpawner::SpawnMonster()
 				);
 			}
 
+			if (bIsDefenceMode)
+			{
+				Monster->SetChaseMode(true);
+			}
 		}
 	}
 }

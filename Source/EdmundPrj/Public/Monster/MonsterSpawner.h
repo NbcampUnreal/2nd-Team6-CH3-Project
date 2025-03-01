@@ -10,6 +10,7 @@
 class UBoxComponent;
 class AMonsterBulletPool;
 class ARangedMonsterBullet;
+class ASpawnerHandle;
 
 UCLASS()
 class EDMUNDPRJ_API AMonsterSpawner : public AActor
@@ -24,13 +25,17 @@ public:
 
 	void ClearTimer();
 
-	void BossSpawn();
+	void BossSpawn(ASpawnerHandle* NewSpawnerHandle, AMonsterBulletPool* BulletPool, int32 NewSpawnCount);
 
 	void SetBossMode(bool NewMode);
 
 	bool bCheckAllDead();
 
 	void AddDeadCount();
+
+	void DestroySpawner();
+
+	void ApplyChaseMode();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|Spawn")
 	int32 DeadMonsterCount = 0;
@@ -94,4 +99,7 @@ protected:
 
 	FVector GetSpawnVolume();
 
+	TObjectPtr<ASpawnerHandle> SpawnerHandle;
+	int32 BossModeSpawnCount = 0;
+	bool bIsDefenceMode = false;
 };

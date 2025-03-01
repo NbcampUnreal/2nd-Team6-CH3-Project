@@ -125,6 +125,11 @@ void AMissionHandle::TeleportPlayerToTargetPoint()
 	PlayerPawn->SetActorLocation(TargetVector);
 }
 
+void AMissionHandle::NotifyStartDefenceMode()
+{
+	EdmundGameMode->StartDefenceMode();
+}
+
 void AMissionHandle::ApplyNpcEquip()
 {
 	bGetNpcEquip = true;

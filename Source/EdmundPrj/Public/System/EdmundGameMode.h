@@ -27,6 +27,7 @@ public:
 	void ClearMission();
 	void FailMission();
 
+	void StartDefenceMode();
 	void StartBossMission();
 	void SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionPosSet);
 

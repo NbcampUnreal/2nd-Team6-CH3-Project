@@ -22,8 +22,11 @@ public:
 	ASpawnerHandle();
 	void InitSpawnerHandle(AEdmundGameMode* NewGameMode, AEdmundGameState* NewGameState, const TArray<FSpawnerDataRow*>& CurrentSpawnerData);
 	void ApplySpawnerDataInLevel();
+	void ApplyDefenceMode();
 	void DestroyAllSpawner();
 	void SpawnBossPatternSpawner(const TArray<FVector>& PosSet);
+	void IncreaseSpawnerClearCount();
+	void ClearSpawnPattern();
 
 private:
 	virtual void BeginPlay() override;
@@ -32,6 +35,12 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ObjectPool")
 	TSubclassOf<AMonsterBulletPool> MonsterBulletPoolClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ObjectPool")
+	TSubclassOf<AMonsterSpawner> NormalSpawner;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ObjectPool")
+	TSubclassOf<AMonsterSpawner> SuperSpawner;
 
 private:
 	TObjectPtr<AEdmundGameMode> EdmundGameMode;
@@ -42,4 +51,7 @@ private:
 	TArray<AMonsterSpawner*> MonsterSpawnerSet;
 
 	ESceneType CurrentMission = ESceneType::Mission1;
+
+	int32 SpawnerClearCount = 0;
+	int32 BossPatternSpawnCount = 1;
 };
