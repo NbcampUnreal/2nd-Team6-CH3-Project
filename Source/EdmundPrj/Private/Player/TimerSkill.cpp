@@ -36,17 +36,35 @@ void ATimerSkill::BeginOverlaped(
 			HitToMonster(Monster);
 		}
 	}
-	
+	if (otherActor)
+	{
+		HitToGround();
+	}
 }
 
 void ATimerSkill::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 {
 }
 
+void ATimerSkill::HitToGround()
+{
+}
+
 void ATimerSkill::Deactivate()
 {
+	GetWorldTimerManager().ClearTimer(DestroyHandler);
 	if (!IsValid(TimerSkillSpanwManager)) return;
 	TimerSkillSpanwManager->DeactivateTimerSkill(this);
+
+}
+
+void ATimerSkill::SpawnTimerSkill()
+{
+	GetWorld()->GetTimerManager().SetTimer(DestroyHandler,
+		this,
+		&ATimerSkill::Deactivate,
+		DeactivateTime,
+		false);
 }
 
 // Called when the game starts or when spawned

@@ -3,7 +3,9 @@
 
 #include "UI/CharacterListWidget.h"
 #include "System/UIHandle.h"
+#include "System/DataStructure/CharacterDataRow.h"
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 
 void UCharacterListWidget::InitWidget(UUIHandle* NewUIHandle)
 {
@@ -16,13 +18,13 @@ void UCharacterListWidget::InitWidget(UUIHandle* NewUIHandle)
 	CancleButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedCancle);
 	CloseButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedClose);
 
-	SetEnableButton(false);
+	CharacterData = UIHandle->GetCharacterData();
 }
 
 void UCharacterListWidget::PlayAddAnim()
 {
 	Super::PlayAddAnim();
-	
+	SetEnableButton(true);
 }
 
 void UCharacterListWidget::EndRemoveAnim()
@@ -36,10 +38,10 @@ void UCharacterListWidget::ChangedCharacterType(const ECharacterType CharacterTy
 	Super::ChangedCharacterType(CharacterType);
 	TargetCharacterType = CharacterType;
 	SetEnableButton(true);
-
-	UEnum* CharacterEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ECharacterType"));
+	PrintCharacterInfo();
+	/*UEnum* CharacterEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ECharacterType"));
 	FString TypeName = CharacterEnum->GetNameStringByValue((int64)CharacterType);
-	UE_LOG(LogTemp, Warning, TEXT("Selected Character Type is %s"), *TypeName);
+	UE_LOG(LogTemp, Warning, TEXT("Selected Character Type is %s"), *TypeName);*/
 }
 
 void UCharacterListWidget::OnClickedSelect()
@@ -58,6 +60,9 @@ void UCharacterListWidget::OnClickedCancle()
 
 	UIHandle->ClickedCancleSelectCharacter();
 	TargetCharacterType = ECharacterType::Gunner;
+
+	CharacterNameText->SetText(FText::FromString(FString::Printf(TEXT(""))));
+	CharacterInfoText->SetText(FText::FromString(FString::Printf(TEXT(""))));
 }
 
 void UCharacterListWidget::OnClickedClose()
@@ -69,4 +74,26 @@ void UCharacterListWidget::SetEnableButton(bool bIsEnable)
 {
 	SelectButton->SetIsEnabled(bIsEnable);
 	CancleButton->SetIsEnabled(bIsEnable);
+}
+
+void UCharacterListWidget::PrintCharacterInfo()
+{
+	for (const FCharacterDataRow* CharacterDataRow : CharacterData)
+	{
+		if (CharacterDataRow->CharacterType == TargetCharacterType)
+		{
+			CharacterInfoText->SetText(FText::FromString(FString::Printf(TEXT(""))));
+			CharacterNameText->SetText(FText::FromString(CharacterDataRow->CharacterName.ToString()));
+
+			TArray<FString> ParsingString;
+			CharacterDataRow->CharacterInfo.ToString().ParseIntoArray(ParsingString, TEXT("_"));
+
+			for (const FString& TargetString : ParsingString)
+			{
+				FString Origin = CharacterInfoText->GetText().ToString();
+				CharacterInfoText->SetText(FText::FromString(FString::Printf(TEXT("%s \n %s"), *Origin, *TargetString)));
+			}
+			break;
+		}
+	}
 }

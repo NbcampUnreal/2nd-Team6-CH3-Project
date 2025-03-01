@@ -7,12 +7,10 @@ APlayerCharacterAurora::APlayerCharacterAurora()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	AttackSound = nullptr;
-
 	IsAttack = false;
 	ComboCount = 0;
 	ResetDelay = 1.0f;
-	AttackRangeRadius = 300.0f;
+	AttackRangeRadius = 150.0f;
 }
 
 void APlayerCharacterAurora::BeginPlay()
@@ -20,61 +18,95 @@ void APlayerCharacterAurora::BeginPlay()
 	Super::BeginPlay();
 }
 
-void APlayerCharacterAurora::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		if (AEdmundPlayerController* PlayerController = Cast<AEdmundPlayerController>(GetController()))
-		{
-			if (PlayerController->AttackAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->AttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacterAurora::Attack
-				);
-			}
-		}
-	}
-}
-
 void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 {
+
 	if (!IsAttack)
 	{
 		IsAttack = true;
 
+		Super::Attack(value);
 		switch (ComboCount)
 		{
 			case 0:
 				if (IsValid(AttackMontages[0]))
 				{
+					if (IsValid(AttackSounds[0]))
+					{
+						CurrentAudioComp->SetSound(AttackSounds[0]);
+						CurrentAudioComp->Play();
+					}
+
+					if (IsValid(WeaponSounds[0]))
+					{
+						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[0], GetActorLocation());
+						WeaponAudioComp->Play();
+					}
+
 					PlayAnimMontage(AttackMontages[0]);
 				}
+
 				break;
 
 			case 1:
 				if (IsValid(AttackMontages[1]))
 				{
+
+					if (IsValid(AttackSounds[1]))
+					{
+						CurrentAudioComp->SetSound(AttackSounds[1]);
+						CurrentAudioComp->Play();
+					}
+
+					if (IsValid(WeaponSounds[1]))
+					{
+						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[1], GetActorLocation());
+						WeaponAudioComp->Play();
+					}
+
 					PlayAnimMontage(AttackMontages[1]);
 				}
+
 				break;
 
 			case 2:
 				if (IsValid(AttackMontages[2]))
 				{
+					if (IsValid(AttackSounds[2]))
+					{
+						CurrentAudioComp->SetSound(AttackSounds[2]);
+						CurrentAudioComp->Play();
+					}
+
+					if (IsValid(WeaponSounds[2]))
+					{
+						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[2], GetActorLocation());
+						WeaponAudioComp->Play();
+					}
+
 					PlayAnimMontage(AttackMontages[2]);
 				}
+
 				break;
 
 			case 3:
 				if (IsValid(AttackMontages[3]))
 				{
+					if (IsValid(AttackSounds[3]))
+					{
+						CurrentAudioComp->SetSound(AttackSounds[3]);
+						CurrentAudioComp->Play();
+					}
+
+					if (IsValid(WeaponSounds[3]))
+					{
+						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[3], GetActorLocation());
+						WeaponAudioComp->Play();
+					}
+
 					PlayAnimMontage(AttackMontages[3]);
 				}
+
 				break;
 
 			default:
@@ -92,14 +124,83 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 	}
 }
 
+float APlayerCharacterAurora::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (IsDie)
+	{
+		return 0.0f;
+	}
+
+	int32 DamageProb = FMath::RandRange(1, 100);
+
+	// 회피 성공
+	if (DamageProb <= EvasionProb)
+	{
+		// 회피 성공 사운드
+		if (IsValid(EvasionSuccessSound))
+		{
+			CurrentAudioComp->SetSound(EvasionSuccessSound);
+			CurrentAudioComp->Play();
+		}
+
+		return 0.0f;
+	}
+
+	// 공격 중에 피격 애니메이션 실행하면 다음 공격 못함
+	if (IsValid(HitActionMontage) && !CheckAction() && !IsAttack)
+	{
+
+		PlayAnimMontage(HitActionMontage);
+	}
+
+	float ActualDamage = Super::Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// 방어력 적용
+	ActualDamage = (100 - Defense) * ActualDamage / 100;
+
+	// HP는 정수, 데미지는 소수?
+	// HP 음수 방지
+	HP = FMath::Max(0.0f, HP - ActualDamage);
+
+	if (HP == 0 && !IsDie)
+	{
+		// 부활 횟수가 있다면
+		if (RevivalCount >= 1)
+		{
+			RevivalCount--;
+			HP = MaxHP;
+
+			// 부활 사운드
+			if (IsValid(RevivalSuccessSound))
+			{
+				CurrentAudioComp->SetSound(RevivalSuccessSound);
+				CurrentAudioComp->Play();
+			}
+		}
+		// 부활 횟수가 없다면
+		else
+		{
+			IsDie = true;
+			ActiveDieAction();
+		}
+	}
+
+	/*if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	}*/
+
+	return ActualDamage;
+}
+
 void APlayerCharacterAurora::AttackTrace()
 {
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	FRotator ControlRotation = PlayerController->GetControlRotation();
 	FVector ForwardVector = ControlRotation.Vector();
 
-	FVector Start = GetActorLocation() + (ForwardVector * AttackRangeRadius); // 공격 시작 위치
-	FVector End = Start + (ForwardVector * AttackRangeRadius); // 공격 끝 위치
+	FVector Start = GetActorLocation() + (ForwardVector * (AttackRangeRadius + 10)); // 공격 시작 위치
+	FVector End = Start + (ForwardVector * (AttackRangeRadius + 10)); // 공격 끝 위치
 
 	TArray<FHitResult> HitResults;
 
@@ -147,7 +248,7 @@ void APlayerCharacterAurora::AttackTrace()
 			{
 				UGameplayStatics::ApplyDamage(
 					HitActor,
-					30.0f,	// 수정필요
+					30.0f,
 					nullptr,
 					this,
 					UDamageType::StaticClass()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "System/EnumSet.h"
 #include "SpawnerHandle.generated.h"
 
 class AEdmundGameMode;
@@ -21,8 +22,11 @@ public:
 	ASpawnerHandle();
 	void InitSpawnerHandle(AEdmundGameMode* NewGameMode, AEdmundGameState* NewGameState, const TArray<FSpawnerDataRow*>& CurrentSpawnerData);
 	void ApplySpawnerDataInLevel();
+	void ApplyDefenceMode();
 	void DestroyAllSpawner();
 	void SpawnBossPatternSpawner(const TArray<FVector>& PosSet);
+	void IncreaseSpawnerClearCount();
+	void ClearSpawnPattern();
 
 private:
 	virtual void BeginPlay() override;
@@ -32,6 +36,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ObjectPool")
 	TSubclassOf<AMonsterBulletPool> MonsterBulletPoolClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ObjectPool")
+	TSubclassOf<AMonsterSpawner> NormalSpawner;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ObjectPool")
+	TSubclassOf<AMonsterSpawner> SuperSpawner;
+
 private:
 	TObjectPtr<AEdmundGameMode> EdmundGameMode;
 	TObjectPtr<AEdmundGameState> EdmundGameState;
@@ -39,4 +49,9 @@ private:
 
 	TArray<FSpawnerDataRow*> SpawnerDataSet;
 	TArray<AMonsterSpawner*> MonsterSpawnerSet;
+
+	ESceneType CurrentMission = ESceneType::Mission1;
+
+	int32 SpawnerClearCount = 0;
+	int32 BossPatternSpawnCount = 1;
 };

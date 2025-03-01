@@ -23,7 +23,7 @@ APlayerCharacter::APlayerCharacter()
 	AttackMontage = nullptr;
 	MeleeAttackMontage = nullptr;
 
-	CurrentAmmo = MaxAmmo = 40;
+	CurrentAmmo = MaxAmmo = 20;
 
 	IsMeleeAttack = false;
 	IsAttack = false;
@@ -58,16 +58,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	{
 		if (AEdmundPlayerController* PlayerController = Cast<AEdmundPlayerController>(GetController()))
 		{
-			if (PlayerController->AttackAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->AttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacter::Attack
-				);
-			}
-
 			if (PlayerController->MeleeAttackAction)
 			{
 				EnhancedInput->BindAction(
@@ -129,6 +119,7 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 
 void APlayerCharacter::Attack(const FInputActionValue& value)
 {
+
 	if (CurrentAmmo <= 0 || CheckAction())
 	{
 		return;
@@ -149,6 +140,7 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 			PlayAnimMontage(AttackMontage);
 		}
 
+		Super::Attack(value);
 		CurrentAmmo--;
 	}
 

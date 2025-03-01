@@ -11,6 +11,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/Actor.h"
 #include "Monster/RangedMonsterBullet.h"
+#include "Kismet/GameplayStatics.h"
+#include "System/SpawnerHandle.h"
 
 
 // Sets default values
@@ -29,8 +31,27 @@ AMonsterSpawner::AMonsterSpawner()
 	SpawnerMeshComp->SetupAttachment(RootComp);
 }
 
+void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount, int32 NewLevelIndex)
+{
+	MonsterBulletPool = BulletPool;
+
+	LevelIndex = NewLevelIndex;
+
+	SpawnTime = NewSpawnTime;
+	SpawnCount = NewSpawnCount;
+
+	InitializeMonsterSpawnPool(SpawnCount);
+
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
+
+	SetBossMode(false);
+
+}
+
 void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount)
 {
+	UE_LOG(LogTemp, Warning, TEXT("InitSpawner에 NewLevelIndex가 없습니다. Monster의 레벨이 1이 됩니다."));
+
 	MonsterBulletPool = BulletPool;
 
 	SpawnTime = NewSpawnTime;
@@ -39,6 +60,8 @@ void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawn
 	InitializeMonsterSpawnPool(SpawnCount);
 
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
+
+	SetBossMode(false);
 }
 
 void AMonsterSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -52,12 +75,77 @@ void AMonsterSpawner::ClearTimer()
 	GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 }
 
-void AMonsterSpawner::BossSpawn()
+void AMonsterSpawner::BossSpawn(ASpawnerHandle* NewSpawnerHandle, AMonsterBulletPool* BulletPool, int32 NewSpawnCount)
 {
-	ClearTimer();
-	for (int i = 0; i < SpawnCount; ++i)
+	SpawnerHandle = NewSpawnerHandle;
+	MonsterBulletPool = BulletPool;
+	InitializeMonsterSpawnPool(SpawnCount);
+	BossModeSpawnCount = NewSpawnCount;
+
+	for (int i = 0; i < BossModeSpawnCount; ++i)
 	{
 		SpawnMonster();
+	}
+	SetBossMode(true);
+
+	for (ABaseMonster* Monster : SpawnedMonstersPool)
+	{
+		Monster->SetCanDropReward(false);
+		Monster->SetChaseMode(true);
+	}
+}
+
+void AMonsterSpawner::SetBossMode(bool NewMode)
+{
+	bBossMode = NewMode;
+}
+
+bool AMonsterSpawner::bCheckAllDead()
+{
+	return (BossModeSpawnCount <= DeadMonsterCount);
+}
+
+void AMonsterSpawner::AddDeadCount()
+{
+	if (!bBossMode) return;
+
+	DeadMonsterCount++;
+
+	if (bCheckAllDead())
+	{
+		if (IsValid(SpawnerHandle))
+		{
+			SpawnerHandle->IncreaseSpawnerClearCount();
+		}
+		UE_LOG(LogTemp, Warning, TEXT("모든 몬스터 사망"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("남은 몬스터 수: %d"), BossModeSpawnCount - DeadMonsterCount);
+	}
+
+}
+
+void AMonsterSpawner::DestroySpawner()
+{
+	ClearTimer();
+
+	for (ABaseMonster* Monster : SpawnedMonstersPool)
+	{
+		Monster->SetCanDropReward(false);
+		Monster->MonsterDead();
+	}
+
+	Destroy();
+}
+
+void AMonsterSpawner::ApplyChaseMode()
+{
+	bIsDefenceMode = true;
+
+	for (ABaseMonster* Monster : SpawnedMonstersPool)
+	{
+		Monster->SetChaseMode(true);
 	}
 }
 
@@ -119,7 +207,6 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 
 		if (AllMonsters.Num() > 0)
 		{
-
 			for (const TSubclassOf<ABaseMonster>& Monster : AllMonsters)
 			{
 				if (Monster == nullptr)
@@ -175,6 +262,7 @@ void AMonsterSpawner::SpawnMonster()
 				AIController->SetActorTickEnabled(true);
 			}
 
+			Monster->SetMonsterLevel(LevelIndex);
 			Monster->Tags.Add(FName("Monster"));
 			Monster->SetCanDropReward(true);
 			Monster->SetIsDead(false);
@@ -182,6 +270,26 @@ void AMonsterSpawner::SpawnMonster()
 			Monster->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 			Monster->SetActorLocation(GetSpawnVolume());
 
+			if (SpawnParticle)
+			{
+				UParticleSystemComponent* Particle = nullptr;
+
+				FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
+
+				Particle = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					SpawnParticle,
+					Monster->GetActorLocation(),
+					Monster->GetActorRotation(),
+					ParticleScale,
+					false
+				);
+			}
+
+			if (bIsDefenceMode)
+			{
+				Monster->SetChaseMode(true);
+			}
 		}
 	}
 }

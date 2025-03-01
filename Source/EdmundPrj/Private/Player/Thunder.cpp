@@ -23,8 +23,15 @@ void AThunder::BeginPlay()
 }
 void AThunder::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 {
-	if (Monster)
+	if (IsValid(Monster))
 	{
+		UGameplayStatics::ApplyDamage(
+			Monster,
+			30.0f,
+			nullptr,
+			this,
+			UDamageType::StaticClass());
+	
 		ElectricEffectPool->ActivateElectricEffect(Monster->GetActorLocation());
 	}
 }
@@ -32,6 +39,11 @@ void AThunder::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 void AThunder::Deactivate()
 {
 	Super::Deactivate();
+}
+
+void AThunder::SpawnTimerSkill()
+{
+	Super::SpawnTimerSkill();
 }
 
 

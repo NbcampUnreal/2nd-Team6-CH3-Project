@@ -32,6 +32,8 @@ public:
 	void StartMainMission();
 	void CompleteMission();
 
+	void RequestSwapBgm(EBGMSoundType Type);
+
 	// Mission1
 	void SetPrison(ABaseMissionItem* NewPrison);
 	ABaseMissionItem* GetPrison() const;
@@ -39,6 +41,7 @@ public:
 	// Mission2
 	void SetTargetPointLocation(const FVector& TargetPointPos);
 	void TeleportPlayerToTargetPoint();
+	void NotifyStartDefenceMode();
 	void ApplyNpcEquip();
 
 	// Mission3

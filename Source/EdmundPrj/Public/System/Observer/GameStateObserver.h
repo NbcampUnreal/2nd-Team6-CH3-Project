@@ -32,6 +32,9 @@ public:
 	virtual void ChangedPlayerMoney(const int32 Money) = 0;
 
 	UFUNCTION()
+	virtual void ChangedPlayerExp(const int32 MaxExp, const int32 CurrentExp) = 0;
+
+	UFUNCTION()
 	virtual void ChangedSkillList() = 0;
 
 	UFUNCTION()

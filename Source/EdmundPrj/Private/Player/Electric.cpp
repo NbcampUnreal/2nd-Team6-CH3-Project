@@ -93,6 +93,13 @@ void AElectric::Move()
 
 void AElectric::Attack(ABaseMonster* monster)
 {
+	UGameplayStatics::ApplyDamage(
+		monster,
+		30.0f,
+		nullptr,
+		this,
+		UDamageType::StaticClass()
+	);
 	if (CurrentElectricCount >= ElectricCount)
 	{
 		GetWorldTimerManager().ClearTimer(MoveTimer);

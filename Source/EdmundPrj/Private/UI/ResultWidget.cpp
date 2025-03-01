@@ -14,8 +14,6 @@ void UResultWidget::InitWidget(UUIHandle* NewUIHandle)
 
 	MoveNextButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedMoveNext);
 	MoveMainButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedMoveMain);
-
-	//UpdateResult(false);
 }
 
 void UResultWidget::ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp)
@@ -32,7 +30,7 @@ void UResultWidget::ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp)
 	}
 }
 
-void UResultWidget::UpdateResult(bool bIsClear) // notify를 통해 클리어 or 사망 값 전달 받고 그에 따라 변경
+void UResultWidget::UpdateResult(bool bIsClear)
 {
 	// 게임 결과 텍스트들 출력하도록 구현 필요
 	MoveNextButton->OnClicked.Clear();

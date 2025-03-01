@@ -9,6 +9,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
 #include "System/EdmundGameState.h"
+#include "System/DataStructure/ShopCatalogRow.h"
+#include "Player/SkillManager.h"
+#include "Player/TimerSkillSpawnManagerComponent.h"
+#include "Player/ActiveSkillSpawnManager.h"
+#include "Player\ElectricEffectPool.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -26,6 +31,16 @@ ABaseCharacter::ABaseCharacter()
 	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
 	CurrentAudioComp->SetupAttachment(RootComponent);
 
+	SkillManager = CreateDefaultSubobject<USkillManager>(TEXT("SkillManager"));
+
+	TimerSkillSpawnManagerComponent = CreateDefaultSubobject<UTimerSkillSpawnManagerComponent>(TEXT("TimerSkillManager"));
+	TimerSkillSpawnManagerComponent->SetupAttachment(RootComponent);
+
+	ActiveSkillSpawnManager = CreateDefaultSubobject<UActiveSkillSpawnManager>(TEXT("ActiveSkillManager"));
+	ActiveSkillSpawnManager->SetupAttachment(RootComponent);
+
+	ElectricEffectPool = CreateDefaultSubobject<UElectricEffectPool>(TEXT("ElectricEffectPool"));
+
 	WalkSpeed = 600.0f;
 	SprintSpeed = 1000.0f;
 	CrouchMoveSpeed = 300.0f;
@@ -33,9 +48,23 @@ ABaseCharacter::ABaseCharacter()
 	HP = MaxHP = 300;
 	Stamina = MaxStamina = 100;
 	StaminaRecoveryAmount = StaminaConsumAmount = 0.0f;
+
 	StaminaRecoveryAndConsumDelay = 1.0f;
 
+	AttackDamage = 20;
+	Defense = 10;
+	AttackDelay = 0.5;
+	CriticalProb = 5;
 	CriticalMultiplier = 2.0f;
+	EvasionProb = 5;
+	MaxExp = 100;
+	CurrentLevel = 1;
+	MaxLevel = 30;
+
+	ExpMultipler = 100.0f;
+	GoldMultipler = 100.0f;
+	ItemDropProb = 20;
+	RevivalCount = 0;
 
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
@@ -58,9 +87,6 @@ void ABaseCharacter::BeginPlay()
 	
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
-	HP = MaxHP;
-	Stamina = MaxStamina;
-
 	// 캡슐 콜리전 크기 저장하기
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
@@ -72,6 +98,11 @@ void ABaseCharacter::BeginPlay()
 	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
 
 	CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
+
+	GetUpgradeStatus();
+
+	HP = MaxHP;
+	Stamina = MaxStamina;
 
 	if (IsValid(CurrentGameState))
 	{
@@ -153,6 +184,16 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 					ETriggerEvent::Completed,
 					this,
 					&ABaseCharacter::StopSprint
+				);
+			}
+
+			if (PlayerController->AttackAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->AttackAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABaseCharacter::Attack
 				);
 			}
 
@@ -296,9 +337,13 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 	}
 }
 
+void ABaseCharacter::Attack(const FInputActionValue& value)
+{
+	ActiveSkillSpawnManager->ActivateProbCalculate();
+}
+
 void ABaseCharacter::Interaction(const FInputActionValue& value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Interaction Start!!")));
 	CurrentGameState->RequestInteraction();
 }
 
@@ -554,6 +599,54 @@ void ABaseCharacter::AmountHP(int32 AmountHP)
 
 void ABaseCharacter::GetUpgradeStatus()
 {
+	if (!IsValid(CurrentGameState))
+	{
+		return;
+	}
+
+	TArray<FShopCatalogRow*> ShopStatusList = CurrentGameState->GetPlayerAdvancedData();
+
+	// MaxHP
+	MaxHP = MaxHP + ShopStatusList[0]->CurrentLevel * ShopStatusList[0]->AdvanceValue;
+
+	// Damage
+	AttackDamage = AttackDamage + ShopStatusList[1]->CurrentLevel * ShopStatusList[1]->AdvanceValue;
+
+	// CriticalRate
+	CriticalProb = CriticalProb + ShopStatusList[2]->CurrentLevel * ShopStatusList[2]->AdvanceValue;
+
+	// AttackSpeed
+	// 자식 클래스에서
+
+	// MoveSpeed
+	float SpeedMultipler = 1.0f + ShopStatusList[4]->CurrentLevel * ShopStatusList[4]->AdvanceValue;
+
+	WalkSpeed *= SpeedMultipler;
+	SprintSpeed *= SpeedMultipler;
+	CrouchMoveSpeed *= SpeedMultipler;
+
+	// AvoidRate
+	EvasionProb = EvasionProb + ShopStatusList[5]->CurrentLevel * ShopStatusList[5]->AdvanceValue;
+
+	// Defence
+	Defense = Defense * (1.0f + ShopStatusList[6]->CurrentLevel * ShopStatusList[6]->AdvanceValue);
+
+	// ExpAmount
+	ExpMultipler = ExpMultipler + ShopStatusList[7]->CurrentLevel * ShopStatusList[7]->AdvanceValue;
+
+	// GoldAmount
+	GoldMultipler = GoldMultipler + ShopStatusList[8]->CurrentLevel * ShopStatusList[8]->AdvanceValue;
+
+	// DropRate
+	ItemDropProb = ItemDropProb + ShopStatusList[9]->CurrentLevel * ShopStatusList[9]->AdvanceValue;
+
+	// MaxAmmo
+	// 자식 클래스에서
+
+	// ReloadTime
+	// 자식 클래스에서
+
+	RevivalCount = ShopStatusList[12]->CurrentLevel * ShopStatusList[0]->AdvanceValue;
 }
 
 void ABaseCharacter::ActiveDieAction()

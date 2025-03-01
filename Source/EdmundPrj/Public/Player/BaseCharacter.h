@@ -10,6 +10,10 @@ class USpringArmComponent;
 class UCameraComponent;
 struct FInputActionValue;
 class AEdmundGameState;
+class USkillManager;
+class UTimerSkillSpawnManagerComponent;
+class UActiveSkillSpawnManager;
+class UElectricEffectPool;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseCharacter : public ACharacter
@@ -24,6 +28,18 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera");
 	UCameraComponent* CameraComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	USkillManager* SkillManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	UTimerSkillSpawnManagerComponent* TimerSkillSpawnManagerComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	UActiveSkillSpawnManager* ActiveSkillSpawnManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<UElectricEffectPool> ElectricEffectPool;
 
 	// 공격력 Getter
 	float GetAttackDamage() const;
@@ -67,6 +83,9 @@ protected:
 	// 달리기
 	void StartSprint(const FInputActionValue& value);
 	void StopSprint(const FInputActionValue& value);
+
+	// 공격
+	virtual void Attack(const FInputActionValue& value);
 
 	// 상호작용
 	void Interaction(const FInputActionValue& value);
@@ -157,14 +176,13 @@ public:
 
 	// 치명타 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	int32 CriticalMultiplier;
+	float CriticalMultiplier;
 
 	// 회피 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 EvasionProb;
 
 	// 현재 경험치
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 CurrentExp;
 
 	// 최대 경험치
@@ -172,15 +190,26 @@ public:
 	int32 MaxExp;
 
 	// 현재 레벨
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 CurrentLevel;
 
 	// 최대 레벨
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 MaxLevel;
 
-	// 부활 횟수
+	// 경험치 배율
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Shop")
+	float ExpMultipler;
+
+	// 골드 배율
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Shop")
+	float GoldMultipler;
+
+	// 아이템 드랍률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	int32 ItemDropProb;
+
+	// 부활 횟수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Shop")
 	int32 RevivalCount;
 
 	// 달리는 중
@@ -209,6 +238,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	TObjectPtr<USoundBase> DeathSound;
+
+
 
 private:
 	// 캡슐 높이 <- 앉기에서 사용
