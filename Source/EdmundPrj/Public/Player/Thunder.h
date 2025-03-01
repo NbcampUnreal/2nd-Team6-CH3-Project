@@ -19,6 +19,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster) override;
 	virtual void Deactivate() override;
+	virtual void SpawnTimerSkill() override;
 public:
 	TObjectPtr<UElectricEffectPool> ElectricEffectPool = nullptr;
 };

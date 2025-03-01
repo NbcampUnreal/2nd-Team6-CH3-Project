@@ -14,6 +14,7 @@ class UFadeWidget;
 class IGameStateObserver;
 struct FShopCatalogRow;
 struct FPlayerSkillRow;
+struct FCharacterDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UUIHandle : public UGameInstanceSubsystem
@@ -32,8 +33,12 @@ public:
 
 	//Fade In / Out : Play Animation from FadeWidget
 	void FadeIn();
-	void FadeOut(const bool bIsNext, const ESceneType SceneType);
+	void FadeOut(const bool bIsNext = false, const ESceneType SceneType = ESceneType::Title);
 	void RequestMoveSceneByFade(const bool bIsNext, const ESceneType SceneType);
+
+	// ResultWidget Close or Open
+	void OpenResult();
+	void CloseResult();
 
 	// Apply Sound Volume To Option Widget
 	float GetBGMVolumeByGameInstance() const;
@@ -42,16 +47,17 @@ public:
 	// Apply Current Data
 	const TArray<FShopCatalogRow*>& GetCurrentAdvance() const;
 	const TArray<FPlayerSkillRow*>& GetCurrentRandomSkill() const;
+	const TArray<FCharacterDataRow*>& GetCharacterData() const;
 	const int32 GetCurrentMoney() const;
 	bool CheckClearedMission(int32 Index) const;
 
 	// UI Button Click Event
 	void ClickedCloseCoverWidget() const;
-	void ClickedMoveToTitle() const;
-	void ClickedMoveToMain() const;
-	void ClickedMoveToNext() const;
-	void ClickedMoveToMission(const ESceneType SceneType) const;
-	void ClickedRetry() const;
+	void ClickedMoveToTitle();
+	void ClickedMoveToMain();
+	void ClickedMoveToNext();
+	void ClickedMoveToMission(const ESceneType SceneType);
+	void ClickedRetry();
 	void ClickedQuitGame() const;
 	void ClickedBGMVolume(const float Volume) const;
 	void ClickedEffectVolume(const float Volume) const;
@@ -85,10 +91,6 @@ private:
 	// ShopWidget Close or Open
 	void OpenShop();
 	void CloseShop();
-
-	// ResultWidget Close or Open
-	void OpenResult();
-	void CloseResult();
 
 	// CharacterListWidget Close or Open
 	void OpenCharacterList();

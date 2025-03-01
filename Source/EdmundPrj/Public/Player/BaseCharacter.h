@@ -10,6 +10,10 @@ class USpringArmComponent;
 class UCameraComponent;
 struct FInputActionValue;
 class AEdmundGameState;
+class USkillManager;
+class UTimerSkillSpawnManagerComponent;
+class UActiveSkillSpawnManager;
+class UElectricEffectPool;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseCharacter : public ACharacter
@@ -24,6 +28,18 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera");
 	UCameraComponent* CameraComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	USkillManager* SkillManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	UTimerSkillSpawnManagerComponent* TimerSkillSpawnManagerComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	UActiveSkillSpawnManager* ActiveSkillSpawnManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<UElectricEffectPool> ElectricEffectPool;
 
 	// °ø°Ý·Â Getter
 	float GetAttackDamage() const;

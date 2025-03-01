@@ -10,6 +10,10 @@
 #include "Sound/SoundBase.h"
 #include "System/EdmundGameState.h"
 #include "System/DataStructure/ShopCatalogRow.h"
+#include "Player/SkillManager.h"
+#include "Player/TimerSkillSpawnManagerComponent.h"
+#include "Player/ActiveSkillSpawnManager.h"
+#include "Player\ElectricEffectPool.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -26,6 +30,16 @@ ABaseCharacter::ABaseCharacter()
 
 	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
 	CurrentAudioComp->SetupAttachment(RootComponent);
+
+	SkillManager = CreateDefaultSubobject<USkillManager>(TEXT("SkillManager"));
+
+	TimerSkillSpawnManagerComponent = CreateDefaultSubobject<UTimerSkillSpawnManagerComponent>(TEXT("TimerSkillManager"));
+	TimerSkillSpawnManagerComponent->SetupAttachment(RootComponent);
+
+	ActiveSkillSpawnManager = CreateDefaultSubobject<UActiveSkillSpawnManager>(TEXT("ActiveSkillManager"));
+	ActiveSkillSpawnManager->SetupAttachment(RootComponent);
+
+	ElectricEffectPool = CreateDefaultSubobject<UElectricEffectPool>(TEXT("ElectricEffectPool"));
 
 	WalkSpeed = 600.0f;
 	SprintSpeed = 1000.0f;
@@ -328,6 +342,7 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 
 void ABaseCharacter::Attack(const FInputActionValue& value)
 {
+	ActiveSkillSpawnManager->ActivateProbCalculate();
 }
 
 void ABaseCharacter::Interaction(const FInputActionValue& value)

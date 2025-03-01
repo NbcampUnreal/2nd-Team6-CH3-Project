@@ -3,15 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "System/EnumSet.h"
 #include "BgmDataRow.generated.h"
 
-/**
- * 
- */
-UCLASS()
-class EDMUNDPRJ_API UBgmDataRow : public UObject
+USTRUCT(BlueprintType)
+struct EDMUNDPRJ_API FBgmDataRow : public FTableRowBase
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName RowName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EBGMSoundType Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<USoundBase> SoundSource;
 };

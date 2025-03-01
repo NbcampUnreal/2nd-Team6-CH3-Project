@@ -15,8 +15,13 @@ class EDMUNDPRJ_API AMeteor : public ATimerSkill
 	GENERATED_BODY()
 	AMeteor();
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster) override;
+	virtual void HitToGround() override;
 	void Deactivate();
+	virtual void SpawnTimerSkill() override;
 	virtual void Tick(float deltaTime);
 public:
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	float MetoerHitPushStrength = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	TObjectPtr<USphereComponent> MonsterLaunchCollision = nullptr;
 };

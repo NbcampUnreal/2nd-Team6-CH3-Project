@@ -119,7 +119,6 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 
 void APlayerCharacter::Attack(const FInputActionValue& value)
 {
-	Super::Attack(value);
 
 	if (CurrentAmmo <= 0 || CheckAction())
 	{
@@ -141,6 +140,7 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 			PlayAnimMontage(AttackMontage);
 		}
 
+		Super::Attack(value);
 		CurrentAmmo--;
 	}
 

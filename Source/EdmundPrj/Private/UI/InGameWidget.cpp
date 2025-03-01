@@ -38,5 +38,7 @@ void UInGameWidget::ChangedPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAm
 	AmmoText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo)));
 }
 
-
-
+void UInGameWidget::ChangedPlayerExp(const int32 MaxExp, const int32 CurrentExp)
+{
+	ExpBar->SetPercent((float)CurrentExp / (float)MaxExp);
+}

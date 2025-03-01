@@ -23,6 +23,7 @@ class EDMUNDPRJ_API UShopWidget : public UBaseWidget
 	
 public:
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
+	virtual void StartAddAnim() override;
 	virtual void EndRemoveAnim() override;
 	void OnClickedBuyButton(UAdvanceWidget* AdvanceWidget);
 

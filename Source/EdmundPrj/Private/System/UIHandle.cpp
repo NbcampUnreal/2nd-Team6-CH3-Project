@@ -98,11 +98,6 @@ void UUIHandle::AddToViewportByCoverType(const EWidgetType WidgetType)
 		OpenShop();
 		break;
 
-	case EWidgetType::ResultWidget:
-		CurrentCoverWidget = ResultWidget;
-		OpenResult();
-		break;
-
 	case EWidgetType::TextWidget:
 		CurrentCoverWidget = TextWidget;
 		OpenText();
@@ -148,10 +143,6 @@ void UUIHandle::RequestRemoveCoverFromViewport(const EWidgetType WidgetType)
 		CloseOption();
 		break;
 
-	case EWidgetType::ResultWidget:
-		CloseResult();
-		break;
-
 	case EWidgetType::TextWidget:
 		CloseText();
 		break;
@@ -182,6 +173,12 @@ void UUIHandle::RemoveCoverFromViewport(const EWidgetType WidgetType)
 		return;
 	}
 
+	if (WidgetType == EWidgetType::ResultWidget)
+	{
+		RemoveWidgetFromViewport(ResultWidget);
+		return;
+	}
+
 	if (IsValid(CurrentCoverWidget))
 	{
 		RemoveWidgetFromViewport(CurrentCoverWidget);
@@ -204,6 +201,24 @@ void UUIHandle::FadeOut(const bool bIsNext, const ESceneType SceneType)
 	FadeWidget->AddToViewport(20);
 	FadeWidget->PlayRemoveAnim(bIsNext, SceneType);
 	RequestChangeCursorMode(true, FInputModeUIOnly());
+}
+
+void UUIHandle::OpenResult()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->RequestPause();
+
+	checkf(IsValid(ResultWidget), TEXT("ResultWidget is invalid"));
+	ResultWidget->AddToViewport(10);
+	ResultWidget->PlayAddAnim();
+	RequestChangeCursorMode(true, FInputModeUIOnly());
+}
+
+void UUIHandle::CloseResult()
+{
+	checkf(IsValid(ResultWidget), TEXT("ResultWidget is invalid"));
+	ResultWidget->PlayRemoveAnim();
+	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
 void UUIHandle::RequestMoveSceneByFade(const bool bIsNext, const ESceneType SceneType)
@@ -240,6 +255,12 @@ const TArray<FPlayerSkillRow*>& UUIHandle::GetCurrentRandomSkill() const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	return EdmundGameInstance->GetRandomSkillSet();
+}
+
+const TArray<FCharacterDataRow*>& UUIHandle::GetCharacterData() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	return EdmundGameInstance->GetCharacterData();
 }
 
 const int32 UUIHandle::GetCurrentMoney() const
@@ -288,18 +309,6 @@ void UUIHandle::CloseShop()
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 
-void UUIHandle::OpenResult()
-{
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->RequestPause();
-	RequestChangeCursorMode(true, FInputModeUIOnly());
-}
-
-void UUIHandle::CloseResult()
-{
-	RequestChangeCursorMode(false, FInputModeGameOnly());
-}
-
 void UUIHandle::OpenCharacterList()
 {
 	CurrentBaseWidget->PlayRemoveAnim();
@@ -316,6 +325,7 @@ void UUIHandle::CloseCharacterList()
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->CheckClosedPlayerType();
 	EdmundGameInstance->ChangeCursorMode(true);
 	EdmundGameInstance->ChangeInputMode(FInputModeUIOnly());
 }
@@ -346,28 +356,30 @@ void UUIHandle::ClickedCloseCoverWidget() const
 	CurrentCoverWidget->PlayRemoveAnim();
 }
 
-void UUIHandle::ClickedMoveToTitle() const
+void UUIHandle::ClickedMoveToTitle()
 {
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->RequestSceneMove(false, ESceneType::Title);
+	FadeOut(false, ESceneType::Title);
 }
 
-void UUIHandle::ClickedMoveToMain() const
+void UUIHandle::ClickedMoveToMain()
 {
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->RequestSceneMove(false, ESceneType::Main);
+	FadeOut(false, ESceneType::Main);
 }
 
-void UUIHandle::ClickedMoveToNext() const
+void UUIHandle::ClickedMoveToNext()
 {
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->RequestSceneMove(true);
+	FadeOut(true);
 }
 
-void UUIHandle::ClickedMoveToMission(const ESceneType SceneType) const
+void UUIHandle::ClickedMoveToMission(const ESceneType SceneType)
 {
-	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
-	EdmundGameInstance->RequestSceneMove(false, SceneType);
+	FadeOut(false, SceneType);
+}
+
+void UUIHandle::ClickedRetry()
+{
+	ESceneType CurrentScene = EdmundGameInstance->GetCurrentSceneName();
+	FadeOut(false, CurrentScene);
 }
 
 void UUIHandle::ClickedQuitGame() const
@@ -422,13 +434,6 @@ const FShopCatalogRow* UUIHandle::ClickedBuyAgree(const FName& TargetRow, const 
 const TArray<TScriptInterface<IGameStateObserver>>& UUIHandle::GetUIObservers() const
 {
 	return UIObservers;
-}
-
-void UUIHandle::ClickedRetry() const
-{
-	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	ESceneType CurrentScene = EdmundGameInstance->GetCurrentSceneName();
-	EdmundGameInstance->RequestSceneMove(false, CurrentScene);
 }
 
 void UUIHandle::RequestChangeCursorMode(const bool bIsVisible, const FInputModeDataBase& InputMode)

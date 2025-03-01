@@ -19,25 +19,12 @@ class EDMUNDPRJ_API UTimerSkillSpawnManagerComponent : public USceneComponent
 	public:
 		// Sets default values for this component's properties
 		UTimerSkillSpawnManagerComponent();
-		UFUNCTION()
-		void BeginOverlaped(
-			UPrimitiveComponent * overlappedComp,
-			AActor * otherActor,
-			UPrimitiveComponent * otherComp,
-			int32 otherBodyIndex,
-			bool bFromSweep,
-			const FHitResult & SweepResult);
-		UFUNCTION()
-		void EndOverlaped(
-			UPrimitiveComponent * overlappedComponent,
-			AActor * otherActor,
-			UPrimitiveComponent * otherComp,
-			int32 otherBodyIndex);
+
 		FVector GetRandomMonsterLocation();
+		FVector SummonSkillLocation(FVector randomPos);
 
 		void SetSkillTimer(ETimerSkillType skillType);
 		void ClearSkillTimer();
-		virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction) override;
 		void CreateTimerSkill(TSubclassOf<ATimerSkill> timerSkill, ETimerSkillType skillType, int createCount);
 		void ActivateTimerSkill(ETimerSkillType skillType);
 		void DeactivateTimerSkill(TObjectPtr<ATimerSkill> timerSkill);
@@ -47,7 +34,6 @@ class EDMUNDPRJ_API UTimerSkillSpawnManagerComponent : public USceneComponent
 		virtual void BeginPlay() override;
 		virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 	public:
-		// Called every frame
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
 		TObjectPtr<USphereComponent> EnemySearchCollision = nullptr;
 
