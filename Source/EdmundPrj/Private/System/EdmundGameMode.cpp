@@ -82,6 +82,11 @@ void AEdmundGameMode::FailMission()
 	EdmundGameInstance->EndMission(false);
 }
 
+void AEdmundGameMode::StartDefenceMode()
+{
+	SpawnerHandle->ApplyDefenceMode();
+}
+
 void AEdmundGameMode::StartBossMission()
 {
 	SpawnerHandle->DestroyAllSpawner();

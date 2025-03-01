@@ -22,6 +22,9 @@ public:
 	// Sets default values for this character's properties
 	ABaseMonster();
 
+	UFUNCTION(BlueprintCallable)
+	void SetChaseMode(bool Mode);
+
 	void BeginPlay() override;
 
 float GetMonsterAttackDamage();
@@ -35,6 +38,7 @@ void SetIsDead(bool bNewIsDead);
 void SetCanDropReward(bool NewState);
 
 void SetMonsterLevel(int32 NewLevel);
+
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
@@ -166,9 +170,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void MonsterAttack();
-
-	UFUNCTION(BlueprintCallable)
-	void SetChaseMode(bool Mode);
 
 	void MonsterAttackEnd();
 

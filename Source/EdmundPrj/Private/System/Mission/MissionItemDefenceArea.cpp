@@ -17,6 +17,7 @@ void AMissionItemDefenceArea::SetIsActive(bool Value)
 	Super::SetIsActive(Value);
 
 	SetVisible(Value);
+	MissionHandle->NotifyStartDefenceMode();
 }
 
 AMissionItemDefenceArea::AMissionItemDefenceArea() : Super()

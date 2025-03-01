@@ -51,14 +51,73 @@ void ASpawnerHandle::ApplySpawnerDataInLevel()
 	}
 }
 
+void ASpawnerHandle::ApplyDefenceMode()
+{
+	for (AMonsterSpawner* Spawner : MonsterSpawnerSet)
+	{
+		Spawner->ApplyChaseMode();
+	}
+}
+
 void ASpawnerHandle::DestroyAllSpawner()
 {
+	for (AMonsterSpawner* Spawner : MonsterSpawnerSet)
+	{
+		Spawner->DestroySpawner();
+	}
 
+	MonsterSpawnerSet.Empty();
 }
 
 void ASpawnerHandle::SpawnBossPatternSpawner(const TArray<FVector>& PosSet)
 {
+	SpawnerClearCount = PosSet.Num();
 
+	int32 SpawnCount = 0;
+
+	for (const FVector& SpawnPos : PosSet)
+	{
+		UClass* SpawnClass = nullptr;
+
+		if (SpawnCount <= SpawnerClearCount / 2)
+		{
+			SpawnClass = NormalSpawner;
+		}
+		else
+		{
+			SpawnClass = SuperSpawner;
+		}
+
+		if (!IsValid(SpawnClass))
+		{
+			continue;
+		}
+
+		FActorSpawnParameters SpawnParam;
+
+		AMonsterSpawner* NewSpawner = GetWorld()->SpawnActor<AMonsterSpawner>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
+
+		NewSpawner->BossSpawn(this, MonsterBulletPool, BossPatternSpawnCount);
+
+		MonsterSpawnerSet.Add(NewSpawner);
+		++SpawnCount;
+	}
+}
+
+void ASpawnerHandle::IncreaseSpawnerClearCount()
+{
+	--SpawnerClearCount;
+
+	if (SpawnerClearCount <= 0)
+	{
+		ClearSpawnPattern();
+	}
+}
+
+void ASpawnerHandle::ClearSpawnPattern()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Pattern Clear!"));
+	// 보스 호출
 }
 
 void ASpawnerHandle::BeginPlay()
