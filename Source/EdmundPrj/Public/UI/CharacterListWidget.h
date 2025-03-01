@@ -8,6 +8,8 @@
 
 class UUIHandle;
 class UButton;
+class UTextBlock;
+struct FCharacterDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UCharacterListWidget : public UBaseWidget
@@ -31,6 +33,7 @@ private:
 	void OnClickedClose();
 
 	void SetEnableButton(bool bIsEnable);
+	void PrintCharacterInfo();
 
 private:
 	UPROPERTY(Meta = (BindWidget))
@@ -42,6 +45,12 @@ private:
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UButton> CloseButton;
 
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UTextBlock> CharacterNameText;
+
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UTextBlock> CharacterInfoText;
+
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> OpenAnim;
 
@@ -49,4 +58,5 @@ private:
 	TObjectPtr<UWidgetAnimation> CloseAnim;
 
 	ECharacterType TargetCharacterType = ECharacterType::Gunner;
+	TArray<FCharacterDataRow*> CharacterData;
 };

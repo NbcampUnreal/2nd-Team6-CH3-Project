@@ -14,6 +14,7 @@ class UFadeWidget;
 class IGameStateObserver;
 struct FShopCatalogRow;
 struct FPlayerSkillRow;
+struct FCharacterDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UUIHandle : public UGameInstanceSubsystem
@@ -46,6 +47,7 @@ public:
 	// Apply Current Data
 	const TArray<FShopCatalogRow*>& GetCurrentAdvance() const;
 	const TArray<FPlayerSkillRow*>& GetCurrentRandomSkill() const;
+	const TArray<FCharacterDataRow*>& GetCharacterData() const;
 	const int32 GetCurrentMoney() const;
 	bool CheckClearedMission(int32 Index) const;
 
