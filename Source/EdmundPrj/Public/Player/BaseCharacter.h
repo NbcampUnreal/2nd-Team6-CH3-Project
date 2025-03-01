@@ -61,8 +61,8 @@ protected:
 	virtual void Look(const FInputActionValue& value);
 
 	// 점프
-	void StartJump(const FInputActionValue& value);
-	void StopJump(const FInputActionValue& value);
+	virtual void StartJump(const FInputActionValue& value);
+	virtual void StopJump(const FInputActionValue& value);
 	
 	// 달리기
 	void StartSprint(const FInputActionValue& value);
@@ -222,6 +222,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	TObjectPtr<USoundBase> DeathSound;
+
+	// 앉을 수 없는 캐릭 - Fey
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Crouch")
+	bool CanCrouchCharacter;
 
 private:
 	// 캡슐 높이 <- 앉기에서 사용

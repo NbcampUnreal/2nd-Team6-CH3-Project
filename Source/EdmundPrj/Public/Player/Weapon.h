@@ -5,7 +5,7 @@
 #include "Components/AudioComponent.h"
 #include "Weapon.generated.h"
 
-class ABullet;
+class ABaseProjectile;
 
 UCLASS()
 class EDMUNDPRJ_API AWeapon : public AActor
@@ -36,16 +36,16 @@ public:
 private:
 
 	void InitializeBulletPool(int32 PoolSize);  // BulletPool을 초기화하는 함수
-	ABullet* GetBulletFromPool();
-	void ReturnBulletToPool(ABullet* Bullet);
+	ABaseProjectile* GetBulletFromPool();
+	void ReturnBulletToPool(ABaseProjectile* Bullet);
 
 	FTimerHandle AttackDelayHandle;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<ABullet> BulletClass;
+	TSubclassOf<ABaseProjectile> BulletClass;
 
 	UPROPERTY()
-	TArray<ABullet*> BulletPool;  // 총알 풀 배열
+	TArray<ABaseProjectile*> BulletPool;  // 총알 풀 배열
 
 	void ActivateAttack();
 
