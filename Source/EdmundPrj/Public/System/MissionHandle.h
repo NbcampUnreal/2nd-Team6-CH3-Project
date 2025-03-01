@@ -41,6 +41,7 @@ public:
 	// Mission2
 	void SetTargetPointLocation(const FVector& TargetPointPos);
 	void TeleportPlayerToTargetPoint();
+	void NotifyStartDefenceMode();
 	void ApplyNpcEquip();
 
 	// Mission3

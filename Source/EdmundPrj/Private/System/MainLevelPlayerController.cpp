@@ -91,59 +91,57 @@ void AMainLevelPlayerController::CheckCollideCharacter()
 
 void AMainLevelPlayerController::MoveToTargetPoint()
 {
-	if (IsValid(TargetCharacter))
+	if (!IsValid(TargetCharacter))
 	{
-		if (bIsReturnByCharacter[TargetCharacter])
-		{
-			bIsReturnByCharacter[TargetCharacter] = false;
-		}
-
-		if (150 >= FVector::Distance(MoveTargetPos, TargetCharacter->GetActorLocation()))
-		{
-			FVector CurrentTarget = TargetCharacter->GetActorLocation();
-			CurrentTarget = FVector(CurrentTarget.X, CurrentTarget.Y, 0);
-			FVector LookForwardDirection = LookAtTargetPos - CurrentTarget;
-			LookForwardDirection = LookForwardDirection / LookForwardDirection.Size();
-			FRotator LookRotator(0, LookForwardDirection.Rotation().Yaw, 0);
-			TargetCharacter->SetActorRotation(LookRotator);
-			return;
-		}
-
-		FVector Direction = MoveTargetPos - StartPosByCharacter[TargetCharacter];
-		Direction = Direction / Direction.Size();
-		FRotator NewLookRotator(0, Direction.Rotation().Yaw, 0);
-
-		TargetCharacter->SetActorRotation(NewLookRotator);
-		TargetCharacter->AddMovementInput(Direction, 0.3f);
+		return;
 	}
+
+	if (bIsReturnByCharacter[TargetCharacter])
+	{
+		bIsReturnByCharacter[TargetCharacter] = false;
+	}
+
+	float MoveDistance = DistanceByTarget[TargetCharacter].Size();
+	FVector CurrentPos(TargetCharacter->GetActorLocation().X, TargetCharacter->GetActorLocation().Y, 0);
+	FRotator MoveLookAt(0, DistanceByTarget[TargetCharacter].Rotation().Yaw, 0);
+	
+	if (FVector::Dist(CurrentPos, StartPosByCharacter[TargetCharacter]) >= MoveDistance)
+	{
+		FVector LookVector = LookAtTargetPos - CurrentPos;
+		FRotator CameraLookAt(0, LookVector.Rotation().Yaw, 0);
+		TargetCharacter->SetActorRotation(CameraLookAt);
+		return;
+	}
+
+	TargetCharacter->AddMovementInput(DistanceByTarget[TargetCharacter], 0.3f);
+	TargetCharacter->SetActorRotation(MoveLookAt);
 }
 
 void AMainLevelPlayerController::MoveToStartPoint()
 {
-	for (TPair<TObjectPtr<ABaseCharacter>, FVector>& BaseCharacter : StartPosByCharacter)
+	for (TPair<TObjectPtr<ABaseCharacter>, FVector>& Pair : DistanceByTarget)
 	{
-		if (!bIsReturnByCharacter[BaseCharacter.Key])
+		if (!bIsReturnByCharacter[Pair.Key])
 		{
 			continue;
 		}
 
-		FVector Direction = BaseCharacter.Value - BaseCharacter.Key->GetActorLocation();
-		Direction = Direction / Direction.Size();
-		FRotator NewLookAt(0, Direction.Rotation().Yaw, 0);
+		float Distance = Pair.Value.Size();
+		FRotator MoveLookAt(0, Pair.Value.Rotation().Yaw + 180, 0);
+		FVector CurrentPos(Pair.Key->GetActorLocation().X, Pair.Key->GetActorLocation().Y, 0);
 
-		BaseCharacter.Key->SetActorRotation(NewLookAt);
-		BaseCharacter.Key->AddMovementInput(Direction, 0.3f);
-
-		if (FVector::Distance(BaseCharacter.Value, BaseCharacter.Key->GetActorLocation()) <= 150)
+		if (FVector::Dist(CurrentPos, MoveTargetPos) >= Distance)
 		{
-			bIsReturnByCharacter[BaseCharacter.Key] = false;
-			BaseCharacter.Key->SetActorLocation(BaseCharacter.Value);
+			bIsReturnByCharacter[Pair.Key] = false;
 
-			FVector LookAtDirection = LookAtTargetPos - BaseCharacter.Value;
-			LookAtDirection = LookAtDirection / LookAtDirection.Size();
-			FRotator LookAtRotator(0, LookAtDirection.Rotation().Yaw, 0);
-			BaseCharacter.Key->SetActorRotation(LookAtRotator);
+			FVector LookVector = LookAtTargetPos - CurrentPos;
+			FRotator CameraLookAt(0, LookVector.Rotation().Yaw, 0);
+			Pair.Key->SetActorRotation(CameraLookAt);
+			continue;
 		}
+
+		Pair.Key->SetActorRotation(MoveLookAt);
+		Pair.Key->AddMovementInput(-Pair.Value, 0.3f);
 	}
 }
 
@@ -172,18 +170,21 @@ void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacter
 		UClass* SpawnClass = CharacterDataRow->CharacterClass.Get();
 		checkf(IsValid(SpawnClass), TEXT("Spawn Class is invalid"));
 
-		FVector SpawnPos = CharacterDataRow->SpawnLocation;
 		FActorSpawnParameters SpawnParam;
+
+		FVector SpawnPos = CharacterDataRow->SpawnLocation;
 
 		ABaseCharacter* NewCharacter = GetWorld()->SpawnActor<ABaseCharacter>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
 
 		SpawnPos = FVector(SpawnPos.X, SpawnPos.Y, 0);
+		FVector MoveDirection = MoveTargetPos - SpawnPos;
+		FVector LookAtDirection = LookAtTargetPos - SpawnPos;
+
 		StartPosByCharacter.Add(NewCharacter, SpawnPos);
+		DistanceByTarget.Add(NewCharacter, MoveDirection);
 		bIsReturnByCharacter.Add(NewCharacter, false);
 		CharacterSet.Add(NewCharacter);
 
-		FVector LookAtDirection = LookAtTargetPos - SpawnPos;
-		LookAtDirection = LookAtDirection / LookAtDirection.Size();
 		FRotator LookAtRotator(0, LookAtDirection.Rotation().Yaw, 0);
 		NewCharacter->SetActorRotation(LookAtRotator);
 		NewCharacter->AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -194,6 +195,7 @@ void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacter
 			{
 				TargetCharacter = NewCharacter;
 				EdmundGameState->SetSelectedCharacter(TargetCharacter);
+				bIsSelectMode = false;
 			}
 		}
 	}
@@ -201,16 +203,15 @@ void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacter
 
 void AMainLevelPlayerController::CompareType(ECharacterType Type)
 {
-	if (TargetCharacter != nullptr)
-	{
-		return;
-	}
+	SetTargetToNull();
 
 	for (ABaseCharacter* BaseCharacter : CharacterSet)
 	{
 		if (BaseCharacter->GetCharacterType() == Type)
 		{
 			TargetCharacter = BaseCharacter;
+			EdmundGameState->SetSelectedCharacter(TargetCharacter);
+			bIsSelectMode = false;
 			return;
 		}
 	}

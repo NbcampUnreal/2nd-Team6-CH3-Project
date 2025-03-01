@@ -64,6 +64,8 @@ void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
 	
 	PlayerController->Possess(PlayerCharacter);
 	PlayerCharacter->PossessedBy(PlayerController);
+
+	EdmundGameState->SetPlayerPawn(PlayerCharacter);
 }
 
 void AEdmundGameMode::ClearMission()
@@ -78,6 +80,11 @@ void AEdmundGameMode::FailMission()
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameState->EndCurrentLevel();
 	EdmundGameInstance->EndMission(false);
+}
+
+void AEdmundGameMode::StartDefenceMode()
+{
+	SpawnerHandle->ApplyDefenceMode();
 }
 
 void AEdmundGameMode::StartBossMission()
