@@ -99,6 +99,9 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 				{
 					BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 				}
+
+				BossRef->DeactivateAttack2Collision();
+
 				BossRef->UpdateAttackCooldown(2);
 				BossRef->SetbChaseComplete(true);
 				FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
@@ -179,4 +182,33 @@ void UBTTask_BossAttack2::DelayedTransition()
 void UBTTask_BossAttack2::StartDescend()
 {
 	CurrentPhase = 5;
+
+	if (BossRef)
+	{
+		BossRef->ActivateAttack2Collision();
+	}
+}
+
+void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+	{
+		AActor* LocalOwner = OverlappedComp->GetOwner();
+		ABoss* Boss = Cast<ABoss>(LocalOwner);
+
+		if (Boss)
+		{
+			float DamageValue = 10.0f;
+
+			UGameplayStatics::ApplyDamage(
+				OtherActor,
+				DamageValue,
+				nullptr,
+				Boss,
+				UDamageType::StaticClass()
+			);
+		}
+	}
 }

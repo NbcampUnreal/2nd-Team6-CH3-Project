@@ -21,11 +21,13 @@ ABoss::ABoss()
     MonsterMaxHP = 1000.0f;
     MonsterAttackDamage = 10.0f;
 
-    Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2_콜리전"));
+    // 공격2 범위
+    Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2Collision"));
     Attack2Collision->SetupAttachment(RootComponent);
-    Attack2Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    Attack2Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     Attack2Collision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
     Attack2Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+    Attack2Collision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnAttack2CollisionOverlap);
 
 
     // 캡슐
@@ -301,4 +303,20 @@ void ABoss::NotifyActorBeginOverlap(AActor* OtherActor)
     }
 
     Super::NotifyActorBeginOverlap(OtherActor);
+}
+
+void ABoss::ActivateAttack2Collision()
+{
+    if (Attack2Collision)
+    {
+        Attack2Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    }
+}
+
+void ABoss::DeactivateAttack2Collision()
+{
+    if (Attack2Collision)
+    {
+        Attack2Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    }
 }

@@ -31,10 +31,6 @@ public:
     UPROPERTY(VisibleAnywhere, Category = "Collision")
     class USphereComponent* Attack2Collision;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
-    UParticleSystem* LandImpactParticle;
-
-
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

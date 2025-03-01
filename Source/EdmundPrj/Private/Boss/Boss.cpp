@@ -6,6 +6,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
 
@@ -22,11 +23,12 @@ ABoss::ABoss()
     MonsterAttackDamage = 10.0f;
 
     // 공격2 범위
-    Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2_콜리전"));
+    Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2Collision"));
     Attack2Collision->SetupAttachment(RootComponent);
-    Attack2Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    Attack2Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     Attack2Collision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
     Attack2Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+    Attack2Collision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnAttack2CollisionOverlap);
 
 
     // 캡슐
@@ -303,3 +305,31 @@ void ABoss::NotifyActorBeginOverlap(AActor* OtherActor)
 
     Super::NotifyActorBeginOverlap(OtherActor);
 }
+
+void ABoss::ActivateAttack2Collision()
+{
+    if (Attack2Collision)
+    {
+        Attack2Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    }
+}
+
+void ABoss::DeactivateAttack2Collision()
+{
+    if (Attack2Collision)
+    {
+        Attack2Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    }
+
+    if (LandImpactParticle)
+    {
+        UGameplayStatics::SpawnEmitterAtLocation(
+            GetWorld(),
+            LandImpactParticle,
+            GetActorLocation(),
+            FRotator::ZeroRotator,
+            FVector(20.0f)
+        );
+    }
+}
+
