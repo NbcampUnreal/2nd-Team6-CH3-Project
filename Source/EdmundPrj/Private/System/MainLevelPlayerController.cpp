@@ -203,7 +203,10 @@ void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacter
 
 void AMainLevelPlayerController::CompareType(ECharacterType Type)
 {
-	SetTargetToNull();
+	if (IsValid(TargetCharacter))
+	{
+		SetTargetToNull();
+	}
 
 	for (ABaseCharacter* BaseCharacter : CharacterSet)
 	{
