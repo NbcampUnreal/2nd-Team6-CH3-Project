@@ -21,6 +21,7 @@ public:
 	virtual void ChangedPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo) override {};
 	virtual void ChangedPlayerOther(const int32 MaxValue, const int32 CurrentValue) override {};
 	virtual void ChangedPlayerMoney(const int32 Money) override {};
+	virtual void ChangedPlayerExp(const int32 MaxExp, const int32 CurrentExp) override {};
 	virtual void ChangedSkillList() override {};
 	virtual void ChangedCharacterType(const ECharacterType CharacterType) override {};
 	virtual void ChangedNotifyText(const FString& NotifyText) override {};
