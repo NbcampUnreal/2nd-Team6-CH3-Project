@@ -22,7 +22,12 @@ class EDMUNDPRJ_API AEdmundGameMode : public AGameMode
 
 public:
 	//virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
-	void InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet);
+	void InitGameMode(
+		UEdmundGameInstance* NewGameInstance,
+		const TArray<FMissionDataRow*>& MissionDataSet,
+		const TArray<FSpawnerDataRow*>& SpawnerDataSet,
+		UClass* CharacterClass
+	);
 	void StartMission(ESceneType CurrentScene);
 	void ClearMission();
 	void FailMission();
@@ -35,7 +40,7 @@ public:
 
 private:
 	virtual void BeginPlay() override;
-	void SpawnPlayerByCharacterType(ECharacterType Type);
+	void SpawnPlayerByCharacterType(UClass* SpawnClass);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")

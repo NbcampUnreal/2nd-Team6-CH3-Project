@@ -8,7 +8,12 @@
 #include "System/SpawnerHandle.h"
 #include "Player/BaseCharacter.h"
 
-void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet)
+void AEdmundGameMode::InitGameMode(
+	UEdmundGameInstance* NewGameInstance, 
+	const TArray<FMissionDataRow*>& MissionDataSet, 
+	const TArray<FSpawnerDataRow*>& SpawnerDataSet,
+	UClass* CharacterClass
+)
 {
 	EdmundGameInstance = NewGameInstance;
 	EdmundGameState = Cast<AEdmundGameState>(GameState);
@@ -30,45 +35,45 @@ void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const T
 
 	if (OptionsString.Contains(TypeName))
 	{
-		SpawnPlayerByCharacterType(CharacterType);
+		SpawnPlayerByCharacterType(CharacterClass);
 	}
 	
 }
 
-void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
+void AEdmundGameMode::SpawnPlayerByCharacterType(UClass* SpawnClass)
 {
-	UClass* TargetClass = nullptr;
+	//UClass* TargetClass = nullptr;
 
-	switch (Type)
-	{
-	case ECharacterType::Gunner:
-		TargetClass = GunnerClass;
-		break;
+	//switch (Type)
+	//{
+	//case ECharacterType::Gunner:
+	//	TargetClass = GunnerClass;
+	//	break;
 
-	case ECharacterType::Aurora:
-		TargetClass = AuroraClass;
-		break;
+	//case ECharacterType::Aurora:
+	//	TargetClass = AuroraClass;
+	//	break;
 
-	case ECharacterType::Fey:
-		TargetClass = GunnerClass;
-		break;
+	//case ECharacterType::Fey:
+	//	TargetClass = GunnerClass;
+	//	break;
 
-	case ECharacterType::Sparrow:
-		TargetClass = GunnerClass; // 수정 필요
-		break;
+	//case ECharacterType::Sparrow:
+	//	TargetClass = GunnerClass; // 수정 필요
+	//	break;
 
-	default:
-		checkNoEntry();
-		break;
-	}
-	
-	checkf(IsValid(TargetClass), TEXT("Target Class is invalid"));
+	//default:
+	//	checkNoEntry();
+	//	break;
+	//}
+
+	checkf(IsValid(SpawnClass), TEXT("Target Class is invalid"));
 	
 	APlayerController* PlayerController = EdmundGameState->GetPlayerController();
 	FActorSpawnParameters SpawnParam;
 	FVector StartPos = FindPlayerStart(PlayerController)->GetActorLocation();
 
-	ABaseCharacter* PlayerCharacter = GetWorld()->SpawnActor<ABaseCharacter>(TargetClass, StartPos, FRotator::ZeroRotator, SpawnParam);
+	ABaseCharacter* PlayerCharacter = GetWorld()->SpawnActor<ABaseCharacter>(SpawnClass, StartPos, FRotator::ZeroRotator, SpawnParam);
 	
 	PlayerController->Possess(PlayerCharacter);
 	PlayerCharacter->PossessedBy(PlayerController);
