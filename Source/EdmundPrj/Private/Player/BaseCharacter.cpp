@@ -453,10 +453,10 @@ float ABaseCharacter::GetAttackDamage() const
 	}
 
 	// 랜덤 데미지 적용
-	int32 RandomRange = 20;
+	float RandomRange = 0.2f;
 
-	float MinDamage = (100 - RandomRange) * Damage;
-	float MaxDamage = (100 + RandomRange) * Damage;
+	float MinDamage = (1.0f - RandomRange) * Damage;
+	float MaxDamage = (1.0f + RandomRange) * Damage;
 
 	Damage = FMath::RandRange(MinDamage, MaxDamage);
 
