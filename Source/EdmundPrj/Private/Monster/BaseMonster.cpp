@@ -41,6 +41,10 @@ ABaseMonster::ABaseMonster()
 
 	Tags.Add(FName("Monster"));
 
+	MonsterType = EMonsterType::Melee;
+
+	GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
+
 }
 
 void ABaseMonster::BeginPlay()
@@ -54,9 +58,24 @@ void ABaseMonster::BeginPlay()
 
 	MonsterOverHeadWidget->SetVisibility(true, true);
 
-	MonsterOverHeadWidgetObject = Cast<UAIInteractionWidget>(MonsterOverHeadWidget->GetUserWidgetObject());
-	MonsterOverHeadWidgetObject->SetIsVisible(true);
-	MonsterOverHeadWidgetObject->InitWidget();
+	if (MonsterOverHeadWidget)
+	{
+		MonsterOverHeadWidgetObject = Cast<UAIInteractionWidget>(MonsterOverHeadWidget->GetUserWidgetObject());
+
+		if (IsValid(MonsterOverHeadWidgetObject))
+		{
+			MonsterOverHeadWidgetObject->SetIsVisible(true);
+			MonsterOverHeadWidgetObject->InitWidget();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MonsterOverHeadWidgetObject 없음"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MonsterOverHeadWidget 없음"));
+	}
 }
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -66,8 +85,9 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	if (TakeDamageSound)
 	{
-		CurrentAudioComp->SetSound(TakeDamageSound);
-		CurrentAudioComp->Play();
+		GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Hit);
+		//CurrentAudioComp->SetSound(TakeDamageSound);
+		//CurrentAudioComp->Play();
 	}
 	else
 	{
@@ -157,7 +177,10 @@ void ABaseMonster::MonsterDead()
 
 				MonsterHP = 0;
 
-				MonsterOverHeadWidgetObject->SetIsVisible(false);
+				if (IsValid(MonsterOverHeadWidgetObject))
+				{
+					MonsterOverHeadWidgetObject->SetIsVisible(false);
+				}
 
 				GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
 				GetWorld()->GetTimerManager().ClearTimer(AttackAnimTimerHandle);
@@ -188,7 +211,11 @@ void ABaseMonster::SetCanDropReward(bool NewState)
 void ABaseMonster::SetMonsterLevel(int32 NewLevel)
 {
 	MonsterLevel = NewLevel;
-	MonsterOverHeadWidgetObject->SetIsVisible(true);
+
+	if (IsValid(MonsterOverHeadWidgetObject))
+	{
+		MonsterOverHeadWidgetObject->SetIsVisible(true);
+	}
 }
 
 // DropReward 호출 후 Destroy
@@ -196,8 +223,10 @@ void ABaseMonster::MonsterDestroy()
 {
 	bIsDead = false;
 	bIsHit = false;
-
-	MonsterOverHeadWidgetObject->SetIsVisible(false);
+	if (IsValid(MonsterOverHeadWidgetObject))
+	{
+		MonsterOverHeadWidgetObject->SetIsVisible(false);
+	}
 
 	if (bCanDropReward)
 	{
@@ -386,8 +415,10 @@ void ABaseMonster::UpdateMonsterOverHeadWidget(float Damage)
 		UE_LOG(LogTemp, Warning, TEXT("위젯 X"));
 		return;
 	}
-
-	MonsterOverHeadWidgetObject->SetIsVisible(true);
+	if (IsValid(MonsterOverHeadWidgetObject))
+	{
+		MonsterOverHeadWidgetObject->SetIsVisible(true);
+	}
 
 	//UUserWidget* MonsterOverHeadWidgetInstance = MonsterOverHeadWidget->GetUserWidgetObject();
 
@@ -405,8 +436,10 @@ void ABaseMonster::UpdateMonsterOverHeadWidget(float Damage)
 	//GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::UpdateMonsterOverHeadWidgetEnd, 1.0f, false);
 
 
-
-	MonsterOverHeadWidgetObject->ApplyHitEvent(MonsterMaxHP, MonsterHP, Damage);
+	if (IsValid(MonsterOverHeadWidgetObject))
+	{
+		MonsterOverHeadWidgetObject->ApplyHitEvent(MonsterMaxHP, MonsterHP, Damage);
+	}
 }
 
 void ABaseMonster::UpdateMonsterOverHeadWidgetEnd()

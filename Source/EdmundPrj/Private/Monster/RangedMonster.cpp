@@ -12,6 +12,7 @@
 
 ARangedMonster::ARangedMonster()
 {
+    MonsterType = EMonsterType::Ranger;
 }
 
 void ARangedMonster::BeginPlay()
@@ -86,8 +87,9 @@ void ARangedMonster::PlayParticle()
 
 void ARangedMonster::PlaySound()
 {
-    CurrentAudioComp->SetSound(AttackSound);
-    CurrentAudioComp->Play();
+    GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
+    //CurrentAudioComp->SetSound(AttackSound);
+    //CurrentAudioComp->Play();
 }
 
 
