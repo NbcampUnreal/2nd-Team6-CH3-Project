@@ -42,11 +42,6 @@ void AMissionItemBossSpawnPoint::RequestMoveToNextPattern()
 	}
 }
 
-void AMissionItemBossSpawnPoint::ClearBoss()
-{
-	MissionHandle->CompleteMission();
-}
-
 void AMissionItemBossSpawnPoint::SpawnBoss()
 {
 	if (!IsValid(BossClass))

@@ -4,14 +4,18 @@
 #include "System/Mission/MissionItemTargetPoint.h"
 #include "System/MissionHandle.h"
 #include "UI/3DWidget/InteractionWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 void AMissionItemTargetPoint::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
 	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(false);
-
+	
+	FVector SpawnPos = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation() + FVector(0, 500, 0);
 	MissionHandle->SetTargetPointLocation(GetActorLocation());
+	MissionHandle->SpawnNpc(SpawnPos);
+	MissionHandle->SetNpcMoveMode(true);
 }
 
 void AMissionItemTargetPoint::ActionEventByPressedKey()
@@ -26,6 +30,7 @@ void AMissionItemTargetPoint::ActionEventByPressedKey()
 	bIsActive = false;
 	SetVisible(false);
 	MissionHandle->RequestSwapBgm(EBGMSoundType::Defence);
+	MissionHandle->SetNpcBattleMode(true);
 	MissionHandle->CompleteMission();
 }
 
