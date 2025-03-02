@@ -8,6 +8,7 @@
 
 ASuicideMonster::ASuicideMonster()
 {
+    MonsterType = EMonsterType::Suicide;
 }
 
 void ASuicideMonster::MonsterAttackCheck()
@@ -106,6 +107,7 @@ void ASuicideMonster::PlayParticle()
 
 void ASuicideMonster::PlaySound()
 {
-    CurrentAudioComp->SetSound(AttackSound);
-    CurrentAudioComp->Play();
+    GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
+    //CurrentAudioComp->SetSound(AttackSound);
+    //CurrentAudioComp->Play();
 }

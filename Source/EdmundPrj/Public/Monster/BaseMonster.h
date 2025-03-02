@@ -7,6 +7,7 @@
 #include "System/EnumSet.h"
 #include "Components/AudioComponent.h"
 #include "UI/3DWidget/AIInteractionWidget.h"
+#include "System/EdmundGameState.h"
 #include "BaseMonster.generated.h"
 
 class AMonsterSpawner;
@@ -40,6 +41,7 @@ void SetCanDropReward(bool NewState);
 
 void SetMonsterLevel(int32 NewLevel);
 
+AEdmundGameState* GameState;
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
@@ -114,7 +116,7 @@ protected:
 	bool bCanDropReward = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	FName MonsterType;	
+	EMonsterType MonsterType;	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
 	EMonsterState MonsterState;

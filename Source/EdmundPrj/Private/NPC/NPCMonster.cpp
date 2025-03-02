@@ -12,6 +12,8 @@
 
 ANPCMonster::ANPCMonster()
 {
+    NpcType = ENpcType::Baldor;
+    //MonsterType = EMonsterType::Melee;
 }
 
 void ANPCMonster::BeginPlay()
@@ -29,6 +31,8 @@ void ANPCMonster::BeginPlay()
     MonsterChaseSpeed = 500.0f;
 
     UpdatePatrolSpeed();
+
+    GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
 }
 
 
@@ -177,8 +181,6 @@ void ANPCMonster::SetBondageMode(bool NewState)
 
 void ANPCMonster::SetMoveMode(bool NewState)
 {
-    if (NewState)
-    {
         AAIController* AIController = Cast<AAIController>(GetController());
         if (AIController)
         {
@@ -188,7 +190,6 @@ void ANPCMonster::SetMoveMode(bool NewState)
         {
             UE_LOG(LogTemp, Warning, TEXT("NPC BattleMode 실행중: AIController가 없습니다."));
         }
-    }
 }
 
 void ANPCMonster::InitSpawnParticlePlay()
@@ -218,8 +219,18 @@ void ANPCMonster::PlayBondageMontage()
     LoopAnimInstance->Montage_Play(BondageAnimation);
 }
 
-//void ANPCMonster::PlaySound()
-//{
-//    CurrentAudioComp->SetSound(AttackSound);
-//    CurrentAudioComp->Play();
-//}
+void ANPCMonster::PlaySound()
+{
+    //CurrentAudioComp->SetSound(AttackSound);
+    //CurrentAudioComp->Play();
+
+    if (GameState)
+    {
+        GameState->PlayNpcSound(CurrentAudioComp, NpcType, ESoundType::Attack);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("NPC게임스테이트없음"));
+    }
+    //GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Avoid);
+}

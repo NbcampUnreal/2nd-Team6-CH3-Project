@@ -8,6 +8,7 @@
 
 AMeleeMonster::AMeleeMonster()
 {
+    MonsterType = EMonsterType::Melee;
 }
 
 void AMeleeMonster::MonsterAttackCheck()
@@ -95,6 +96,7 @@ void AMeleeMonster::PlayParticle()
 
 void AMeleeMonster::PlaySound()
 {
-    CurrentAudioComp->SetSound(AttackSound);
-    CurrentAudioComp->Play();
+    GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
+    //CurrentAudioComp->SetSound(AttackSound);
+    //CurrentAudioComp->Play();
 }
