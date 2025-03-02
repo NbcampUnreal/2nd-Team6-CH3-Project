@@ -20,7 +20,6 @@ UActiveSkillSpawnManager::UActiveSkillSpawnManager()
 void UActiveSkillSpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
-	ActivateSkillList.Add(EActiveSkillType::Slow);
 	// ...
 	
 }

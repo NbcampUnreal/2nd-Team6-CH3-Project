@@ -18,7 +18,9 @@ UENUM(BlueprintType)
 enum class EActiveSkillType : uint8
 {
 	Null = 0,
-	Freezing
+	Freezing,
+	Slow,
+	Mjolnir
 };
 
 UENUM(BlueprintType)
