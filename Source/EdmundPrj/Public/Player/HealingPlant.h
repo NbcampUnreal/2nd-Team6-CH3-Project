@@ -17,6 +17,7 @@ public:
 	void HealingCharacter();
 	virtual void SpawnTimerSkill() override;
 	virtual void Deactivate() override;
+	virtual void UpgradeSkill() override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	TObjectPtr<USphereComponent> CheckCharacterCollision = nullptr;

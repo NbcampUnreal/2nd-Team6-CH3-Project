@@ -20,7 +20,7 @@ void AMeteor::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 	if (!IsValid(Monster)) return;
 	UGameplayStatics::ApplyDamage(
 		Monster,
-		30.0f,
+		DamageMultiplier,
 		nullptr,
 		this,
 		UDamageType::StaticClass()
@@ -41,7 +41,7 @@ void AMeteor::HitToGround()
 			{
 				UGameplayStatics::ApplyDamage(
 					Monster,
-					30.0f,
+					DamageMultiplier,
 					nullptr,
 					this,
 					UDamageType::StaticClass()
@@ -84,4 +84,9 @@ void AMeteor::Tick(float deltaTime)
 {
 	FVector NewLocation = GetActorLocation() - FVector(0, 0, MoveSpeed);
 	SetActorLocation(NewLocation);
+}
+
+void AMeteor::UpgradeSkill()
+{
+	DamageMultiplier += DamageMultiplierAmount;
 }

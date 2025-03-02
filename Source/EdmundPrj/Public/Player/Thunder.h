@@ -20,6 +20,9 @@ public:
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> Monster) override;
 	virtual void Deactivate() override;
 	virtual void SpawnTimerSkill() override;
+	virtual void UpgradeSkill() override;
 public:
 	TObjectPtr<UElectricEffectPool> ElectricEffectPool = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Electric Setting")
+	int ElectricCount = 3;
 };

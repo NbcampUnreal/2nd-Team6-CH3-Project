@@ -4,6 +4,7 @@
 #include "Player\BaseSkill.h"
 #include "Player\TimerSkillSpawnManagerComponent.h"
 #include "Player\ActiveSkillSpawnManager.h"
+#include "Player\PassiveSkillManager.h"
 
 USkillManager::USkillManager()
 {
@@ -48,13 +49,12 @@ void USkillManager::ActivateActiveSkill(EActiveSkillType SkillType)
 
 void USkillManager::ActivatePassiveSkill(EPassiveSkillType SkillType)
 {
-	switch (SkillType)
+	if (PassiveSkillManager == nullptr)
 	{
-	case EPassiveSkillType::Berserker:
-		break;
-	default:
-		break;
+		PassiveSkillManager = GetOwner()->FindComponentByClass<UPassiveSkillManager>();
 	}
+	PassiveSkillManager->ActivatePassiveSkill(SkillType);
+
 }
 
 // Called when the game starts
