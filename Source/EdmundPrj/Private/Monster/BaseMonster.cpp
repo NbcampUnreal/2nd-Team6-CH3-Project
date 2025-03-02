@@ -102,14 +102,13 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	float TakeDamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	float ActualDamage = TakeDamageAmount * (1.0f - MonsterArmor / 100.0f);
 
-
-	UpdateMonsterOverHeadWidget(ActualDamage);
-
 	//UE_LOG(LogTemp, Warning, TEXT("원래 피해량: %f"), TakeDamageAmount);
 
 	//UE_LOG(LogTemp, Warning, TEXT("감소된 피해량: %f"), ActualDamage);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
+
+	UpdateMonsterOverHeadWidget(ActualDamage);
 
 	if (MonsterHP <= 0)
 	{
@@ -142,7 +141,7 @@ void ABaseMonster::MonsterDead()
 					ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
 					if (PlayerCharacter)
 					{
-						UE_LOG(LogTemp, Warning, TEXT("%f EXP얻음"), MonsterExpReward);
+						//UE_LOG(LogTemp, Warning, TEXT("%f EXP얻음"), MonsterExpReward);
 						PlayerCharacter->AddExp(MonsterExpReward);
 					}
 				}
@@ -197,6 +196,8 @@ void ABaseMonster::MonsterDestroy()
 {
 	bIsDead = false;
 	bIsHit = false;
+
+	MonsterOverHeadWidgetObject->SetIsVisible(false);
 
 	if (bCanDropReward)
 	{
@@ -386,7 +387,6 @@ void ABaseMonster::UpdateMonsterOverHeadWidget(float Damage)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("위젯 O"));
 	MonsterOverHeadWidgetObject->SetIsVisible(true);
 
 	//UUserWidget* MonsterOverHeadWidgetInstance = MonsterOverHeadWidget->GetUserWidgetObject();
