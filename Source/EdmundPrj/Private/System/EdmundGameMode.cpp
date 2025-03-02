@@ -42,31 +42,6 @@ void AEdmundGameMode::InitGameMode(
 
 void AEdmundGameMode::SpawnPlayerByCharacterType(UClass* SpawnClass)
 {
-	//UClass* TargetClass = nullptr;
-
-	//switch (Type)
-	//{
-	//case ECharacterType::Gunner:
-	//	TargetClass = GunnerClass;
-	//	break;
-
-	//case ECharacterType::Aurora:
-	//	TargetClass = AuroraClass;
-	//	break;
-
-	//case ECharacterType::Fey:
-	//	TargetClass = GunnerClass;
-	//	break;
-
-	//case ECharacterType::Sparrow:
-	//	TargetClass = GunnerClass; // 수정 필요
-	//	break;
-
-	//default:
-	//	checkNoEntry();
-	//	break;
-	//}
-
 	checkf(IsValid(SpawnClass), TEXT("Target Class is invalid"));
 	
 	APlayerController* PlayerController = EdmundGameState->GetPlayerController();
