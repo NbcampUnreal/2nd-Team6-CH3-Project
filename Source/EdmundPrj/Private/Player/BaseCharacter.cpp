@@ -14,6 +14,7 @@
 #include "Player/TimerSkillSpawnManagerComponent.h"
 #include "Player/ActiveSkillSpawnManager.h"
 #include "Player/ElectricEffectPool.h"
+#include "System/EnumSet.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -487,10 +488,12 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	if (DamageProb <= EvasionProb)
 	{
 		// 회피 성공 사운드
-		if (IsValid(EvasionSuccessSound))
+		if (/*IsValid(EvasionSuccessSound) &&*/ IsValid(CurrentGameState))
 		{
-			CurrentAudioComp->SetSound(EvasionSuccessSound);
-			CurrentAudioComp->Play();
+			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Avoid);
+			
+			/*CurrentAudioComp->SetSound(EvasionSuccessSound);
+			CurrentAudioComp->Play();*/
 		}
 
 		return 0.0f;
@@ -520,10 +523,12 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 			HP = MaxHP;
 
 			// 부활 사운드
-			if (IsValid(RevivalSuccessSound))
+			if (/*IsValid(RevivalSuccessSound) &&*/ IsValid(CurrentGameState))
 			{
-				CurrentAudioComp->SetSound(RevivalSuccessSound);
-				CurrentAudioComp->Play();
+				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Respawn);
+
+				/*CurrentAudioComp->SetSound(RevivalSuccessSound);
+				CurrentAudioComp->Play();*/
 			}
 		}
 		// 부활 횟수가 없다면
@@ -665,10 +670,12 @@ void ABaseCharacter::GetUpgradeStatus()
 void ABaseCharacter::ActiveDieAction()
 {
 	// 죽음 사운드
-	if (IsValid(DeathSound))
+	if (/*IsValid(RevivalSuccessSound) &&*/ IsValid(CurrentGameState))
 	{
-		CurrentAudioComp->SetSound(DeathSound);
-		CurrentAudioComp->Play();
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Die);
+
+		/*CurrentAudioComp->SetSound(DeathSound);
+		CurrentAudioComp->Play();*/
 	}
 
 	if (IsValid(DieActionMontage))
