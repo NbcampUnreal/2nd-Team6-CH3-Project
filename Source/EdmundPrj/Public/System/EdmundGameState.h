@@ -76,6 +76,9 @@ public:
 	void NotifyPlayerOther(const int32 MaxValue, const int32 CurrentValue);
 	void NotifyPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo);
 	void NotifyPlayerExp(const int32 MaxExp, const int32 CurrentExp);
+	void NotifyPlayerLevel(const int32 LevelValue);
+	void NotifySpawnedBoss();
+	void NotifyBossHp(const int32 MaxHp, const int32 CurrentHp);
 
 	APlayerController* GetPlayerController();
 	void SetPlayerPawn(AActor* NewPawn);
