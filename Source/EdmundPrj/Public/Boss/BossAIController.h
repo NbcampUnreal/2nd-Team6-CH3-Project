@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Boss/State/BTTask_BossAttack3.h"  
 #include "BossAIController.generated.h"
 
 class ABoss;
@@ -18,6 +19,9 @@ public:
     virtual void OnPossess(APawn* InPawn) override;
     virtual void Tick(float DeltaTime) override;
     //void OnAttackTaskComplete(int32 AttackID);
+
+    UPROPERTY(BlueprintReadWrite, Category = "Attack")
+    UBTTask_BossAttack3* CurrentAttackTask;
     
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Boss")

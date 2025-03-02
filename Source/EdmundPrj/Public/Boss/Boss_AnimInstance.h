@@ -16,10 +16,9 @@ public:
     virtual void NativeUpdateAnimation(float DeltaSeconds) override;
     
     UFUNCTION()
-    void AnimNotify_Attack1();
-
-    UFUNCTION()
     void AnimNotify_AttackCheck();
+
+    void InitializeBossRef();
 
 
     UPROPERTY(BlueprintReadOnly)
@@ -34,6 +33,12 @@ public:
     UPROPERTY(BlueprintReadOnly)
     int32 Attack1Count;
 
+    UPROPERTY(BlueprintReadOnly)
+    bool bIsFalling;
+
+    UPROPERTY(BlueprintReadOnly)
+    float Fly;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Attack1Montage;
 
@@ -47,8 +52,14 @@ public:
     UAnimMontage* Attack4Montage;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+    UAnimMontage* Skill1Montage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Skill2Montage;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Skill3Montage;
+
+    UFUNCTION(BlueprintCallable)
+    bool GetbIsFalling() const { return bIsFalling; }
 };

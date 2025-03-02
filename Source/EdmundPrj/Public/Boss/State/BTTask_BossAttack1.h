@@ -36,4 +36,5 @@ protected:
 
 	// 태스크 종료를 위해 보관하는 Behavior Tree 컴포넌트
 	UBehaviorTreeComponent* CachedOwnerComp;
+
 };
