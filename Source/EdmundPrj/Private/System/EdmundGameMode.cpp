@@ -78,6 +78,7 @@ void AEdmundGameMode::StartDefenceMode()
 void AEdmundGameMode::StartBossMission()
 {
 	SpawnerHandle->DestroyAllSpawner();
+	EdmundGameState->NotifySpawnedBoss();
 }
 
 void AEdmundGameMode::SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionPosSet)

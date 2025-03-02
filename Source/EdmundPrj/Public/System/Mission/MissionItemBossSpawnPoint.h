@@ -21,7 +21,6 @@ public:
 
 	void SpawnMonster() const;
 	void RequestMoveToNextPattern();
-	void ClearBoss();
 
 private:
 	void SpawnBoss();

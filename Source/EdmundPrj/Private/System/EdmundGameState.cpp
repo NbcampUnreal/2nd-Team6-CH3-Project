@@ -448,6 +448,47 @@ void AEdmundGameState::NotifyPlayerExp(const int32 MaxExp, const int32 CurrentEx
 	}
 }
 
+void AEdmundGameState::NotifyPlayerLevel(const int32 LevelValue)
+{
+	if (EdmundGameInstance->GetCurrentSceneName() == ESceneType::Main)
+	{
+		return;
+	}
+
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedPlayerLevel(LevelValue);
+	}
+}
+
+void AEdmundGameState::NotifySpawnedBoss()
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedStageToBoss();
+	}
+}
+
+void AEdmundGameState::NotifyBossHp(const int32 MaxHp, const int32 CurrentHp)
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedBossHp(MaxHp, CurrentHp);
+	}
+}
+
 APlayerController* AEdmundGameState::GetPlayerController()
 {
 	return PlayerController;

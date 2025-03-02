@@ -68,6 +68,7 @@ void UUIHandle::AddToViewportBySceneType(ESceneType SceneType)
 		CurrentBaseWidget = EndingWidget;
 		RequestChangeCursorMode(true, FInputModeUIOnly());
 		bBaseCursorMode = true;
+		CurrentBaseWidget->PlayAddAnim();
 		break;
 
 	default:
