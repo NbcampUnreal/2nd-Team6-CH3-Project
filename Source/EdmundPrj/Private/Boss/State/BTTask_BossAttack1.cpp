@@ -104,6 +104,8 @@ void UBTTask_BossAttack1::FireBullet()
 	FVector PlayerLocation = Player->GetActorLocation();
 	FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
 	FRotator TargetRotation = Direction.Rotation();
+	TargetRotation.Pitch = 0.0f;
+	TargetRotation.Roll = 0.0f;
 	FRotator NewRotation = FMath::RInterpTo(BossRef->GetActorRotation(), TargetRotation, BossRef->GetWorld()->GetDeltaSeconds(), 5.0f);
 	BossRef->SetActorRotation(NewRotation);
 	ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);

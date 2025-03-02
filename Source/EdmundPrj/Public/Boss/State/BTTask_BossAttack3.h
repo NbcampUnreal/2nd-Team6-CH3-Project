@@ -46,10 +46,16 @@ public:
 	void OnAttack1Notify();
 	UFUNCTION(BlueprintCallable)
 	void OnAttack2Notify();
+
+	UFUNCTION(BlueprintCallable)
+	void OnAttack3Notify();
+
 	UFUNCTION(BlueprintCallable)
 	void FinishComboAttack();
+
 	void ExecuteMeleeAttack();
 	void PlayAttack3Montage();
+	
 
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	int32 GetComboPhase() { return ComboPhase; }

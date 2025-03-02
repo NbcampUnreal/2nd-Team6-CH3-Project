@@ -4,6 +4,8 @@
 #include "Engine/World.h"
 #include "Behaviortree/BlackboardComponent.h"
 #include "Components/SphereComponent.h"
+#include "Boss/BossAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Boss/Boss_AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -23,56 +25,53 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
     AAIController* AIController = OwnerComp.GetAIOwner();
     if (!AIController)
     {
-        UE_LOG(LogTemp, Error, TEXT("Boss AIController is NULL"));
+        //UE_LOG(LogTemp, Error, TEXT("Boss AIController is NULL"));
         return EBTNodeResult::Failed;
     }
+
+    ABossAIController* BossController = Cast<ABossAIController>(AIController);
+    if (!BossController)
+    {
+        //UE_LOG(LogTemp, Error, TEXT("Boss AIController cast failed"));
+        return EBTNodeResult::Failed;
+    }
+    BossController->CurrentAttackTask = this;
 
     BossRef = Cast<ABoss>(AIController->GetPawn());
     if (!BossRef)
     {
-        return EBTNodeResult::Failed;
-    }
-
-    BossRef->CurrentAttackTask = this;
-
-    BossRef->SetCurrentAttackTask(this);
-    if (!BossRef->CurrentAttackTask)
-    {
-        UE_LOG(LogTemp, Error, TEXT("CurrentAttackTask is NULL after setting it!"));
+        //UE_LOG(LogTemp, Error, TEXT("Boss Pawn is NULL"));
         return EBTNodeResult::Failed;
     }
 
     BossRef->SetComboPhase(1);
     ComboPhase = 1;
-    UE_LOG(LogTemp, Log, TEXT("ExecuteTask: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
+    //UE_LOG(LogTemp, Log, TEXT("ExecuteTask: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
 
     PlayAttack3Montage();
     return EBTNodeResult::InProgress;
 }
 
-
-
-
 void UBTTask_BossAttack3::OnAttack1Notify()
 {
     if (!BossRef)
     {
-        UE_LOG(LogTemp, Error, TEXT("OnAttack1Notify: BossRef is NULL!"));
+        //UE_LOG(LogTemp, Error, TEXT("OnAttack1Notify: BossRef is NULL!"));
         return;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify BEFORE: ComboPhase = %d"), BossRef->GetComboPhase());
+    //UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify BEFORE: ComboPhase = %d"), BossRef->GetComboPhase());
 
     if (BossRef->GetComboPhase() != 1)
     {
-        UE_LOG(LogTemp, Error, TEXT("OnAttack1Notify: ComboPhase is not 1, something went wrong!"));
+        //UE_LOG(LogTemp, Error, TEXT("OnAttack1Notify: ComboPhase is not 1, something went wrong!"));
         return;
     }
 
     BossRef->SetComboPhase(2);
     ComboPhase = 2;
 
-    UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify AFTER: ComboPhase = %d"), BossRef->GetComboPhase());
+    //UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify AFTER: ComboPhase = %d"), BossRef->GetComboPhase());
 
     ExecuteMeleeAttack();
 }
@@ -82,11 +81,11 @@ void UBTTask_BossAttack3::OnAttack2Notify()
 {
     if (!BossRef)
     {
-        UE_LOG(LogTemp, Error, TEXT("OnAttack2Notify: BossRef is NULL!"));
+        //UE_LOG(LogTemp, Error, TEXT("OnAttack2Notify: BossRef is NULL!"));
         return;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify BEFORE: ComboPhase = %d"), BossRef->GetComboPhase());
+    //UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify BEFORE: ComboPhase = %d"), BossRef->GetComboPhase());
 
     if (ComboPhase != 2)
         return;
@@ -94,7 +93,14 @@ void UBTTask_BossAttack3::OnAttack2Notify()
     BossRef->SetComboPhase(3);
     ComboPhase = 3;
 
-    UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify AFTER: ComboPhase = %d"), BossRef->GetComboPhase());
+    //UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify AFTER: ComboPhase = %d"), BossRef->GetComboPhase());
+}
+
+void UBTTask_BossAttack3::OnAttack3Notify()
+{
+    if (!BossRef) return;
+
+    Attack3_RangedAttackNotify();
 
     FinishComboAttack();
 }
@@ -104,11 +110,11 @@ void UBTTask_BossAttack3::FinishComboAttack()
 {
     if (!BossRef)
     {
-        UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: BossRef is NULL!"));
+        //UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: BossRef is NULL!"));
         return;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Executing, ComboPhase=%d"), BossRef->GetComboPhase());
+    //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Executing, ComboPhase=%d"), BossRef->GetComboPhase());
 
     BossRef->UpdateAttackCooldown(3);
     BossRef->CurrentAttackTask = nullptr;
@@ -116,17 +122,17 @@ void UBTTask_BossAttack3::FinishComboAttack()
     ComboPhase = 0;
     BossRef->SetComboPhase(0);
 
-    UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
+    //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
 
     if (CachedOwnerComp)
     {
         BossRef->SetbChaseComplete(true);
-        UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Behavior Tree Task Succeeded"));
+        //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Behavior Tree Task Succeeded"));
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: CachedOwnerComp is NULL! Behavior Tree Task could not finish properly."));
+        //UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: CachedOwnerComp is NULL! Behavior Tree Task could not finish properly."));
     }
 }
 
@@ -154,7 +160,7 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
 {
     if (!BossRef)
     {
-        UE_LOG(LogTemp, Error, TEXT("ExecuteMeleeAttack: BossRef is NULL!"));
+        //UE_LOG(LogTemp, Error, TEXT("ExecuteMeleeAttack: BossRef is NULL!"));
         return;
     }
 
@@ -162,7 +168,7 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
     float DashSpeed = 0.0f;
 
     int32 CurrentPhase = BossRef->GetComboPhase();
-    UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: CurrentPhase = %d"), CurrentPhase);
+    //UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: CurrentPhase = %d"), CurrentPhase);
 
     switch (CurrentPhase)
     {
@@ -175,11 +181,11 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack2;
         break;
     default:
-        UE_LOG(LogTemp, Warning, TEXT("ExecuteMeleeAttack: Unexpected ComboPhase = %d"), CurrentPhase);
+        //UE_LOG(LogTemp, Warning, TEXT("ExecuteMeleeAttack: Unexpected ComboPhase = %d"), CurrentPhase);
         return;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: Using DashDistance = %f, DashSpeed = %f"), DashDistance, DashSpeed);
+    //UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: Using DashDistance = %f, DashSpeed = %f"), DashDistance, DashSpeed);
 
     FVector DashDirection = BossRef->GetActorForwardVector();
     FVector LaunchVelocity = DashDirection * DashSpeed;
@@ -295,4 +301,32 @@ void UBTTask_BossAttack3::OnMeleeCollisionOverlap_Check2(UPrimitiveComponent* Ov
 
 void UBTTask_BossAttack3::Attack3_RangedAttackNotify()
 {
+    if (!BossRef)
+        return;
+
+    if (BossRef->GetCharacterMovement())
+    {
+        BossRef->GetCharacterMovement()->StopMovementImmediately();
+    }
+
+    FRotator CurrentRotation = BossRef->GetActorRotation();
+
+    if (!BossRef->GetWorld() || !BossRef->MuzzleLocation || !BossRef->Attack1BulletClass)
+        return;
+
+    FVector SpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
+
+    for (int32 i = 0; i < 10; i++)
+    {
+        float RandomYawOffset = FMath::RandRange(-30.0f, 30.0f);
+        FRotator BulletRotation = CurrentRotation;
+        BulletRotation.Yaw += RandomYawOffset;
+        FVector BulletDirection = BulletRotation.Vector();
+
+        ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
+        if (Bullet)
+        {
+            Bullet->FireProjectile(SpawnLocation, BulletRotation, BulletDirection);
+        }
+    }
 }

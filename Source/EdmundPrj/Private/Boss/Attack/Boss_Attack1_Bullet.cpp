@@ -16,7 +16,7 @@ ABoss_Attack1_Bullet::ABoss_Attack1_Bullet()
 	// 충돌 컴포넌트 생성 및 설정
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	CollisionComp->InitSphereRadius(10.0f);
-	CollisionComp->SetCollisionProfileName(TEXT("BlockAll"));
+	CollisionComp->SetCollisionProfileName(TEXT("IgnoreAll"));
 	// Pawn 채널은 Overlap 처리하여 물리 밀림 방지
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	// CCD 활성화 (빠른 이동에도 충돌 감지)
@@ -94,37 +94,49 @@ void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnR
 void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor && OtherActor != this)
+	if (!OtherActor || OtherActor == this || OtherActor->IsA(ABoss_Attack1_Bullet::StaticClass()))
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Bullet hit: %s"), *OtherActor->GetName());
+
+	if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
 	{
 		Explode();
 	}
 }
+
+
 
 void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+	if (!OtherActor || OtherActor == this || OtherActor->IsA(ABoss_Attack1_Bullet::StaticClass()))
 	{
+		return;
+	}
 
-		AActor* LocalOwner = OverlappedComp->GetOwner(); 
-		ABoss_Attack1_Bullet* Bullet = Cast<ABoss_Attack1_Bullet>(LocalOwner);
+	UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
 
-		if (Bullet)
+	if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
+	{
+		if (OtherActor->ActorHasTag("Player"))
 		{
-			float DamageValue = 10.0f;
+			AActor* LocalOwner = OverlappedComp->GetOwner();
+			ABoss_Attack1_Bullet* Bullet = Cast<ABoss_Attack1_Bullet>(LocalOwner);
 
-			UGameplayStatics::ApplyDamage(
-				OtherActor,
-				DamageValue,
-				nullptr,
-				Bullet,
-				UDamageType::StaticClass()
-			);
+			if (Bullet)
+			{
+				float DamageValue = 10.0f;
+				UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
+			}
 		}
-
 		Explode();
 	}
 }
+
+
 
 
 void ABoss_Attack1_Bullet::Explode()

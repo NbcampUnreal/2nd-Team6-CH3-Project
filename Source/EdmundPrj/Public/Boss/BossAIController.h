@@ -20,8 +20,8 @@ public:
     virtual void Tick(float DeltaTime) override;
     //void OnAttackTaskComplete(int32 AttackID);
 
-    UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Boss|Attack3")
-    UBTTask_BossAttack3* CurrentAttackTask = nullptr;
+    UPROPERTY(BlueprintReadWrite, Category = "Attack")
+    UBTTask_BossAttack3* CurrentAttackTask;
     
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Boss")

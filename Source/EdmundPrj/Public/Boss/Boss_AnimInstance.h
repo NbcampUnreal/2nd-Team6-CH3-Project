@@ -18,6 +18,8 @@ public:
     UFUNCTION()
     void AnimNotify_AttackCheck();
 
+    void InitializeBossRef();
+
 
     UPROPERTY(BlueprintReadOnly)
     TObjectPtr<ABoss> BossRef;
@@ -57,7 +59,6 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Skill3Montage;
-
 
     UFUNCTION(BlueprintCallable)
     bool GetbIsFalling() const { return bIsFalling; }
