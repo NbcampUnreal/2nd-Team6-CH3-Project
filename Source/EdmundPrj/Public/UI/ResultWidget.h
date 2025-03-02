@@ -18,12 +18,17 @@ class EDMUNDPRJ_API UResultWidget : public UBaseWidget
 public: // add notify
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
 	virtual void ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp) override;
+	virtual void ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney) override;
 
 private: 
 	UFUNCTION()
 	void OnClickedRetry();
 
+	virtual void EndAddAnim() override;
+
 	void UpdateResult(bool bIsClear);
+	void DecreaseCurrentMoneyCount();
+	void DecreaseMissionMoneyCount();
 
 private:
 	UPROPERTY(Meta = (BindWidget))
@@ -38,6 +43,23 @@ private:
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UTextBlock> TitleText;
 
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UTextBlock> ValueText1;
+
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UTextBlock> ValueText2;
+
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UTextBlock> ValueText3;
+
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> OpenAnim;
+
+	int32 TempCurrentMoney = 0;
+	int32 TempTotalMoney = 0;
+	int32 TempMissionMoney = 0;
+
+	float DecreaseTime = 100;
+
+	FTimerHandle Timer;
 };

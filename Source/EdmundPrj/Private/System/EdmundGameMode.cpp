@@ -49,6 +49,14 @@ void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
 		TargetClass = AuroraClass;
 		break;
 
+	case ECharacterType::Fey:
+		TargetClass = GunnerClass;
+		break;
+
+	case ECharacterType::Sparrow:
+		TargetClass = GunnerClass; // 수정 필요
+		break;
+
 	default:
 		checkNoEntry();
 		break;
@@ -71,14 +79,14 @@ void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
 void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameState->EndCurrentLevel();
+	EdmundGameState->EndCurrentLevel(true);
 	EdmundGameInstance->EndMission(true);
 }
 
 void AEdmundGameMode::FailMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameState->EndCurrentLevel();
+	EdmundGameState->EndCurrentLevel(false);
 	EdmundGameInstance->EndMission(false);
 }
 

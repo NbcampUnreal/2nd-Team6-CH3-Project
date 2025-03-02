@@ -126,8 +126,8 @@ enum class ECharacterType : uint8
 {
 	Gunner = 0,
 	Aurora,
-	Other2,
-	Other3
+	Fey,
+	Sparrow
 };
 
 UENUM(BlueprintType)

@@ -65,7 +65,7 @@ public:
 	void RequestEndPause();
 	void RequestInteraction();
 
-	void EndCurrentLevel();
+	void EndCurrentLevel(bool bIsClear);
 
 	void RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
 	void UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer);
@@ -86,6 +86,7 @@ private:
 
 	void NotifyCreateRandomSkill() const;
 	void NotifySelectCharacterType(ECharacterType CharacterType) const;
+	void NotifyResultValue(int32 CurrnetMoney, int32 TotalMoney, int32 MissionMoney) const;
 
 private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
@@ -110,6 +111,7 @@ private:
 	FTimerHandle TimerHandle;
 
 	int32 CurrentLevelMoney = 0;
+	int32 MissionClearMoney = 500;
 	float EffectVolume = 0;
 	ECharacterType CurrentCharacterType = ECharacterType::Gunner;
 };

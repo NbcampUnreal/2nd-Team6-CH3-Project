@@ -30,9 +30,23 @@ void UResultWidget::ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp)
 	}
 }
 
+void UResultWidget::ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney)
+{
+	GetWorld()->GetTimerManager().ClearTimer(Timer);
+
+	TempCurrentMoney = StateMoney;
+	TempTotalMoney = InstanceMoney;
+	TempMissionMoney = MissionMoney;
+
+	ValueText1->SetText(FText::FromString(FString::FromInt(TempCurrentMoney)));
+	ValueText2->SetText(FText::FromString(FString::FromInt(TempMissionMoney)));
+	ValueText3->SetText(FText::FromString(FString::FromInt(TempTotalMoney)));
+
+	TempTotalMoney += TempCurrentMoney + TempMissionMoney;
+}
+
 void UResultWidget::UpdateResult(bool bIsClear)
 {
-	// 게임 결과 텍스트들 출력하도록 구현 필요
 	MoveNextButton->OnClicked.Clear();
 
 	if (bIsClear)
@@ -53,5 +67,41 @@ void UResultWidget::OnClickedRetry()
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 	UIHandle->ClickedRetry();
+}
+
+void UResultWidget::EndAddAnim()
+{
+	Super::EndAddAnim();
+	ValueText3->SetText(FText::FromString(FString::FromInt(TempTotalMoney)));
+	//GetWorld()->GetTimerManager().SetTimer(Timer, this, &ThisClass::DecreaseCurrentMoneyCount, DecreaseTime, true);
+}
+
+void UResultWidget::DecreaseCurrentMoneyCount()
+{
+	if (TempCurrentMoney <= 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(Timer);
+		GetWorld()->GetTimerManager().SetTimer(Timer, this, &ThisClass::DecreaseMissionMoneyCount, DecreaseTime, true);
+	}
+
+	--TempCurrentMoney;
+	++TempTotalMoney;
+
+	ValueText1->SetText(FText::FromString(FString::FromInt(TempCurrentMoney)));
+	ValueText3->SetText(FText::FromString(FString::FromInt(TempTotalMoney)));
+}
+
+void UResultWidget::DecreaseMissionMoneyCount()
+{
+	if (TempMissionMoney <= 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(Timer);
+	}
+
+	--TempMissionMoney;
+	++TempTotalMoney;
+
+	ValueText2->SetText(FText::FromString(FString::FromInt(TempMissionMoney)));
+	ValueText3->SetText(FText::FromString(FString::FromInt(TempTotalMoney)));
 }
 
