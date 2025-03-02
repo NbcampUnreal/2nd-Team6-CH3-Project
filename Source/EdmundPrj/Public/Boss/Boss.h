@@ -115,6 +115,7 @@ public:
     void DisableRotation();
     void EnableMovement();
     void EnableRotation();
+    float GetTurnSpeed() { return TurnSpeed; }
 
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
@@ -145,6 +146,12 @@ private:
     bool bChaseComplete = false;
 
 public:
+    // ***********************Stat*************************
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float TurnSpeed = 5.0f; // 회전 속도
+
+
+
     float Chase_AcceptanceRadius = 60.0f; // Chase 반경
 
     // ***********************Attack 1*************************

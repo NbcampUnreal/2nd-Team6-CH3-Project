@@ -559,35 +559,22 @@ void ABoss::FireBullet()
     FVector PlayerLocation = Player->GetActorLocation();
     FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
     FRotator TargetRotation = Direction.Rotation();
-
-    // 🔹 현재 보스의 회전값 가져오기
     FRotator CurrentRotation = GetActorRotation();
-
-    // 🔹 서서히 회전하도록 보간 적용 (즉시 회전 방지)
     FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 2.0f);
 
-    // 🔹 적용할 회전값 조정 (Pitch, Roll 유지)
     SmoothRotation.Pitch = 0.0f;
     SmoothRotation.Roll = 0.0f;
 
-    // 🔹 보스의 회전 적용
     SetActorRotation(SmoothRotation);
-
-    // 🔹 AI 컨트롤러 회전 방지 (즉시 회전하는 문제 해결)
     DisableRotation();
+    TargetRotation = (PlayerLocation - SpawnLocation).Rotation();
 
-    // 🔹 총알 발사 방향 ±30도 범위 내에서 조정
-    float RandomYawOffset = FMath::RandRange(-30.0f, 30.0f); // -30도 ~ +30도 랜덤 값
-    TargetRotation.Yaw += RandomYawOffset;
-
-    // 🔹 총알 발사
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(GetWorld(), Attack1BulletClass);
     if (Bullet)
     {
         Bullet->FireProjectile(SpawnLocation, TargetRotation, Direction);
     }
 
-    // 🔹 일정 시간 후 AI 컨트롤러 회전 다시 활성화 (자연스럽게 복귀)
     FTimerHandle ResetRotationTimer;
     GetWorldTimerManager().SetTimer(ResetRotationTimer, this, &ABoss::EnableRotation, 1.0f, false); // 1초 후 회전 다시 활성화
 }
