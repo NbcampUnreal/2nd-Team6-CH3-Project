@@ -47,7 +47,8 @@ ABaseCharacter::ABaseCharacter()
 
 	HP = MaxHP = 200;
 	Stamina = MaxStamina = 100;
-	StaminaRecoveryAmount = StaminaConsumAmount = 0.0f;
+	StaminaRecoveryAmount = 1.0f;
+	StaminaConsumAmount = 4.0f;
 
 	StaminaRecoveryAndConsumDelay = 1.0f;
 
