@@ -9,10 +9,12 @@
 #include "Boss/Attack/Boss_Attack4_Bullet.h"
 #include "Boss/Attack/Boss_Skill3_Wall.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Boss/State/BTTask_BossAttack2.h"
 #include "Boss.generated.h"
 
 class ABossAIController;
 class AMissionHandle;
+
 
 UCLASS()
 class EDMUNDPRJ_API ABoss : public ABaseMonster {
@@ -108,7 +110,7 @@ public:
     virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
     bool GetbChaseComplete() const { return bChaseComplete; }
     void SetbChaseComplete(bool NewbChaseComplete) { bChaseComplete = NewbChaseComplete; }
-    float GetBossSkill1Damage() { return BossSkill1Damage; }
+    float GetBossSkill1Damage() const { return BossSkill1Damage; }
     void ActivateAttack2Collision();   
     void DeactivateAttack2Collision();
     void DisableMovement();
@@ -116,6 +118,7 @@ public:
     void EnableMovement();
     void EnableRotation();
     float GetTurnSpeed() { return TurnSpeed; }
+
 
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
@@ -128,6 +131,16 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void FireBullet();
+
+    UFUNCTION(BlueprintCallable)
+    void HandleAttack2State(int32 State);
+
+    UFUNCTION(BlueprintCallable)
+    void OnAttack2Finished();
+
+    UPROPERTY()
+    class UBTTask_BossAttack2* BTTask_BossAttack2Instance;
+
 
 
 private:
@@ -149,8 +162,6 @@ public:
     // ***********************Stat*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float TurnSpeed = 5.0f; // 회전 속도
-
-
 
     float Chase_AcceptanceRadius = 60.0f; // Chase 반경
 
@@ -177,13 +188,13 @@ public:
     float Attack2_CooldownEnd = 0.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
-    float Attack2_AscendSpeed = 300.0f;   // 상승 속도
+    float Attack2_AscendSpeed = 30000.0f;   // 상승 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_DescendSpeed = 600.0f;   // 하강 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
-    float Attack2_TargetHeight = 1000.0f;  // 목표 높이 (Z)
+    float Attack2_TargetHeight = 10000.0f;  // 목표 높이 (Z)
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_HorizontalMoveSpeed = 500.0f; // 수평 이동 속도 (X, Y)
@@ -330,6 +341,6 @@ public:
 
     TObjectPtr<ABossAIController> BossController = nullptr;
     TObjectPtr<AMissionHandle> MissionHandle = nullptr;
-    bool bIsStart = false;
+    
 };
 

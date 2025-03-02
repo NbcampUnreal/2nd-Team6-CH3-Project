@@ -15,6 +15,7 @@ public:
 	UBTTask_BossAttack2();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+	void OnAttack2Completed();
 
 protected:
 	// Phase 정의:

@@ -112,23 +112,29 @@ void ABoss::BeginPlay()
         AnimInstance = Cast<UBoss_AnimInstance>(GetMesh()->GetAnimInstance());
     }
 
-    InitiallizeBullerPool();
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+    }
 
+    InitiallizeBullerPool();
     BossController = Cast<ABossAIController>(GetOwner());
     MonsterMoveSpeed = 5000.0f;
     //MonsterHP = 500.0f;
     MonsterHP = MonsterMaxHP = 2000.0f;
     MonsterAttackDamage = 10.0f;
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+        UE_LOG(LogTemp, Warning, TEXT("Boss 초기 이동 모드 설정: MOVE_Walking"));
+    }
+
+    
 }
 
 void ABoss::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-    if (!bIsStart)
-    {
-        return;
-    }
 
     if (BossState)
     {
@@ -324,8 +330,7 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
     // Attack1 풀 정리
     ABoss_Attack1_Bullet::BulletPool.Empty();
     ABoss_Attack4_Bullet::Bullet4Pool.Empty();
-    ABoss_Skill3_Wall::WallPool.Empty();
-    
+    ABoss_Skill3_Wall::WallPool.Empty();    
 }
 
 void ABoss::UpdateAttackCooldown(int32 AttackID)
@@ -503,10 +508,8 @@ void ABoss::DisableRotation()
         GetCharacterMovement()->bUseControllerDesiredRotation = false;
     }
 
-    // 🔹 보스 자체의 모든 회전 방지
     bUseControllerRotationYaw = false;
 
-    // 🔹 AI 컨트롤러 회전 고정 (현재 회전값 유지)
     AAIController* AIController = Cast<AAIController>(GetController());
     if (AIController)
     {
@@ -530,14 +533,11 @@ void ABoss::EnableRotation()
         GetCharacterMovement()->bUseControllerDesiredRotation = true;
     }
 
-    // 🔹 현재 회전값 가져오기
     FRotator CurrentRotation = GetActorRotation();
 
-    // 🔹 Yaw(좌우 회전)만 활성화, Pitch(X)와 Roll(Z)는 유지
     FRotator NewRotation = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, 0.0f);
     SetActorRotation(NewRotation);
 
-    // 🔹 보스의 Yaw(좌우) 회전만 허용
     bUseControllerRotationYaw = true;
 }
 
@@ -579,6 +579,35 @@ void ABoss::FireBullet()
     GetWorldTimerManager().SetTimer(ResetRotationTimer, this, &ABoss::EnableRotation, 1.0f, false); // 1초 후 회전 다시 활성화
 }
 
+void ABoss::HandleAttack2State(int32 State)
+{
+
+    switch (State)
+    {
+    case 1:
+        GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+        LaunchCharacter(FVector(0, 0, 1000), false, false);
+        break;
+
+    case 2:
+        GetCharacterMovement()->StopMovementImmediately();
+        GetCharacterMovement()->GravityScale = 0.0f;
+        break;
+
+    case 3:
+        GetCharacterMovement()->GravityScale = 1.0f;
+        GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+        break;
+    }
+}
+
+void ABoss::OnAttack2Finished()
+{
+    if (BTTask_BossAttack2Instance)
+    {
+        BTTask_BossAttack2Instance->OnAttack2Completed();
+    }
+}
 
 
 
@@ -587,8 +616,6 @@ void ABoss::InitBoss(AMissionHandle* NewMissionHandle)
     BossController->InitBlackboard(NewMissionHandle);
     MissionHandle = NewMissionHandle;
     CheckWeaken();
-
-    bIsStart = true;
 }
 
 void ABoss::CheckWeaken()
