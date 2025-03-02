@@ -72,6 +72,7 @@ ABaseCharacter::ABaseCharacter()
 	IsSprint = false;
 	IsCrouch = false;
 	IsDie = false;
+	IsAttack = false;
 
 	HitActionMontage = nullptr;
 	DieActionMontage = nullptr;
@@ -495,7 +496,8 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
-	if (IsValid(HitActionMontage) && !CheckAction())
+	// 공격 중에 피격 애니메이션 실행하면 다음 공격 못함
+	if (IsValid(HitActionMontage) && !CheckAction() && !IsAttack)
 	{
 		PlayAnimMontage(HitActionMontage);
 	}

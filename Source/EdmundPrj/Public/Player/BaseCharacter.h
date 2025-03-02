@@ -258,6 +258,7 @@ private:
 
 protected:
 	bool IsDie;
+	bool IsAttack;
 
 	AEdmundGameState* CurrentGameState;
 

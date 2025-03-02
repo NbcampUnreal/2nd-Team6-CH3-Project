@@ -211,7 +211,7 @@ void APlayerCharacterFey::Attack(const FInputActionValue& value)
 
 	IsAttack = true;
 	Stamina -= 10;
-	
+
 	if (IsValid(CurrentGameState))
 	{
 		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
@@ -238,7 +238,7 @@ void APlayerCharacterFey::ActiveWeapon()
 			}
 
 			GetWorld()->GetTimerManager().SetTimer(
-				HoveringDelayHandle,
+				AttackDelayHandle,
 				this,
 				&APlayerCharacterFey::SetIsAttack,
 				AttackDelay,

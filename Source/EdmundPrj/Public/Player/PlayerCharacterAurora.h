@@ -44,15 +44,7 @@ protected:
 	// 공격
 	virtual void Attack(const FInputActionValue& value) override;
 
-	// 피격
-	virtual float TakeDamage(
-		float DamageAmount,
-		struct FDamageEvent const& DamageEvent,
-		AController* EventInstigator,
-		AActor* DamageCauser) override;
-
 private:
-	bool IsAttack;
 	int32 ComboCount;
 	float ComboTimeDuration;
 
