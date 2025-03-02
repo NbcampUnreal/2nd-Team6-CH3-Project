@@ -8,7 +8,12 @@
 #include "System/SpawnerHandle.h"
 #include "Player/BaseCharacter.h"
 
-void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const TArray<FMissionDataRow*>& MissionDataSet, const TArray<FSpawnerDataRow*>& SpawnerDataSet)
+void AEdmundGameMode::InitGameMode(
+	UEdmundGameInstance* NewGameInstance, 
+	const TArray<FMissionDataRow*>& MissionDataSet, 
+	const TArray<FSpawnerDataRow*>& SpawnerDataSet,
+	UClass* CharacterClass
+)
 {
 	EdmundGameInstance = NewGameInstance;
 	EdmundGameState = Cast<AEdmundGameState>(GameState);
@@ -30,37 +35,20 @@ void AEdmundGameMode::InitGameMode(UEdmundGameInstance* NewGameInstance, const T
 
 	if (OptionsString.Contains(TypeName))
 	{
-		SpawnPlayerByCharacterType(CharacterType);
+		SpawnPlayerByCharacterType(CharacterClass);
 	}
 	
 }
 
-void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
+void AEdmundGameMode::SpawnPlayerByCharacterType(UClass* SpawnClass)
 {
-	UClass* TargetClass = nullptr;
-
-	switch (Type)
-	{
-	case ECharacterType::Gunner:
-		TargetClass = GunnerClass;
-		break;
-
-	case ECharacterType::Aurora:
-		TargetClass = AuroraClass;
-		break;
-
-	default:
-		checkNoEntry();
-		break;
-	}
-	
-	checkf(IsValid(TargetClass), TEXT("Target Class is invalid"));
+	checkf(IsValid(SpawnClass), TEXT("Target Class is invalid"));
 	
 	APlayerController* PlayerController = EdmundGameState->GetPlayerController();
 	FActorSpawnParameters SpawnParam;
 	FVector StartPos = FindPlayerStart(PlayerController)->GetActorLocation();
 
-	ABaseCharacter* PlayerCharacter = GetWorld()->SpawnActor<ABaseCharacter>(TargetClass, StartPos, FRotator::ZeroRotator, SpawnParam);
+	ABaseCharacter* PlayerCharacter = GetWorld()->SpawnActor<ABaseCharacter>(SpawnClass, StartPos, FRotator::ZeroRotator, SpawnParam);
 	
 	PlayerController->Possess(PlayerCharacter);
 	PlayerCharacter->PossessedBy(PlayerController);
@@ -71,14 +59,14 @@ void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
 void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameState->EndCurrentLevel();
+	EdmundGameState->EndCurrentLevel(true);
 	EdmundGameInstance->EndMission(true);
 }
 
 void AEdmundGameMode::FailMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameState->EndCurrentLevel();
+	EdmundGameState->EndCurrentLevel(false);
 	EdmundGameInstance->EndMission(false);
 }
 

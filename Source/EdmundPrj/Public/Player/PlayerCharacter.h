@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float MeleeAttackPushStrength;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	float ZoomMouseMoveMultipler;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
 	TSubclassOf<AWeapon> Weapon;
 

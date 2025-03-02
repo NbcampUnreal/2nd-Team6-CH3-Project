@@ -332,11 +332,13 @@ void UUIHandle::CloseCharacterList()
 
 void UUIHandle::OpenSkillList()
 {
+	EdmundGameInstance->RequestPause();
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseSkillList()
 {
+	EdmundGameInstance->RequestUnpause();
 	RequestChangeCursorMode(false, FInputModeGameOnly());
 }
 

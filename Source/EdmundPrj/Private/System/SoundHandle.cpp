@@ -234,7 +234,7 @@ void USoundHandle::InitUISound()
 
 void USoundHandle::InitPlayerSoundMap()
 {
-	for (int32 TypeNum = (int32)ECharacterType::Gunner; TypeNum <= (int32)ECharacterType::Other3; TypeNum++)
+	for (int32 TypeNum = (int32)ECharacterType::Gunner; TypeNum <= (int32)ECharacterType::Sparrow; TypeNum++)
 	{
 		ECharacterType CharacterType = (ECharacterType)TypeNum;
 		TMap<ESoundType, TObjectPtr<USoundBase>> SoundSource;
