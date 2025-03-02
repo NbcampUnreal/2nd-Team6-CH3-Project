@@ -6,6 +6,7 @@
 #include "System/DataStructure/MissionDataRow.h"
 #include "System/EdmundGameMode.h"
 #include "System/EdmundGameState.h"
+#include "System/Mission/MissionItemBossSpawnPoint.h"
 
 // Sets default values
 AMissionHandle::AMissionHandle()
@@ -210,8 +211,9 @@ void AMissionHandle::RemoveDimensionPortalSet(ABaseMissionItem* DimentionPortal)
 	DimensionPortalSet.Remove(DimentionPortal);
 }
 
-void AMissionHandle::NotifyStartedBossStage()
+void AMissionHandle::NotifyStartedBossStage(AMissionItemBossSpawnPoint* NewBossHandle)
 {
+	BossHandle = NewBossHandle;
 	EdmundGameMode->StartBossMission();
 }
 
@@ -236,6 +238,11 @@ void AMissionHandle::RequestSpawnToSpawnerHandle()
 	}
 
 	EdmundGameMode->SpawnMonsterByBoss(DimensionPosSet);
+}
+
+void AMissionHandle::ApplyNextPatternFromHalf()
+{
+	BossHandle->RequestMoveToNextPattern();
 }
 
 void AMissionHandle::BeginPlay()

@@ -116,8 +116,7 @@ void ASpawnerHandle::IncreaseSpawnerClearCount()
 
 void ASpawnerHandle::ClearSpawnPattern()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Pattern Clear!"));
-	// 보스 호출
+	EdmundGameMode->NotifyClearedHalfPatternByBoss();
 }
 
 void ASpawnerHandle::BeginPlay()

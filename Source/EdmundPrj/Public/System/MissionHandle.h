@@ -10,6 +10,7 @@
 class AEdmundGameMode;
 class AEdmundGameState;
 class ABaseMissionItem;
+class AMissionItemBossSpawnPoint;
 struct FMissionDataRow;
 
 UCLASS()
@@ -52,10 +53,11 @@ public:
 	void RemoveDimensionPortalSet(ABaseMissionItem* DimentionPortal);
 
 	// Boss
-	void NotifyStartedBossStage();
+	void NotifyStartedBossStage(AMissionItemBossSpawnPoint* NewBossHandle);
 	bool GetWeakenBoss() const;
 	EBossState GetLockedSkill() const;
 	void RequestSpawnToSpawnerHandle();
+	void ApplyNextPatternFromHalf();
 
 protected:
 	virtual void BeginPlay() override;
@@ -75,6 +77,7 @@ private:
 
 	TObjectPtr<ABaseMissionItem> TargetMissionItem = nullptr;
 	TObjectPtr<ABaseMissionItem> Prison = nullptr;
+	TObjectPtr<AMissionItemBossSpawnPoint> BossHandle = nullptr;
 
 	FVector TargetPointLocation = FVector::ZeroVector;
 

@@ -35,6 +35,7 @@ public:
 	void StartDefenceMode();
 	void StartBossMission();
 	void SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionPosSet);
+	void NotifyClearedHalfPatternByBoss();
 
 	void SwapBgm(EBGMSoundType Type);
 

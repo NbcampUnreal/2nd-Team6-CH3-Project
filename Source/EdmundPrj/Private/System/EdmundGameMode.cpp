@@ -85,6 +85,11 @@ void AEdmundGameMode::SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionP
 	SpawnerHandle->SpawnBossPatternSpawner(ActiveDimensionPosSet);
 }
 
+void AEdmundGameMode::NotifyClearedHalfPatternByBoss()
+{
+	MissionHandle->ApplyNextPatternFromHalf();
+}
+
 void AEdmundGameMode::SwapBgm(EBGMSoundType Type)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
