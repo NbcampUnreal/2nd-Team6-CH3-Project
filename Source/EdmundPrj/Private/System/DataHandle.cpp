@@ -10,6 +10,7 @@
 #include "System/DataStructure/CharacterDataRow.h"
 #include "System/DataStructure/MissionDataRow.h"
 #include "System/DataStructure/SpawnerDataRow.h"
+#include "Player/BaseCharacter.h"
 
 
 void UDataHandle::InitDataHandle(UEdmundGameInstance* NewGameInstance)
@@ -87,6 +88,21 @@ const TArray<FPlayerSkillRow*>& UDataHandle::GetPlayerSkillData() const
 const TArray<FCharacterDataRow*>& UDataHandle::GetCharacterData() const
 {
 	return CharacterData;
+}
+
+UClass* UDataHandle::GetCharacterClass() const
+{
+	UClass* CurrentClass = nullptr;
+
+	for (const FCharacterDataRow* CharacterDataRow : CharacterData)
+	{
+		if (CharacterDataRow->CharacterType == PlayData[0]->CharacterType)
+		{
+			CurrentClass = CharacterDataRow->CharacterClass.Get();
+		}
+	}
+	
+	return CurrentClass;
 }
 
 const TArray<FMissionDataRow*>& UDataHandle::GetMissionDataBySceneType(const ESceneType SceneType)

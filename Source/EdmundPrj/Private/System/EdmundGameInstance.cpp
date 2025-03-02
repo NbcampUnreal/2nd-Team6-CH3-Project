@@ -12,6 +12,7 @@
 #include "System/DataStructure/MissionDataRow.h"
 #include "System/DataStructure/SpawnerDataRow.h"
 
+
 void UEdmundGameInstance::Init()
 {
 	Super::Init();
@@ -43,13 +44,15 @@ void UEdmundGameInstance::RequestGameStart(AEdmundGameMode* NewGameMode, AEdmund
 void UEdmundGameInstance::ApplyCurrentDataToGameMode()
 {
 	checkf(IsValid(EdmundGameMode), TEXT("EdmundGameMode is invalid"));
+	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
 	BindGameStateObserver();
 
 	ESceneType CurrentScene = GetCurrentSceneName();
 	const TArray<FMissionDataRow*> CurrentMissionData = GetCurrentMissionData(CurrentScene);
 	const TArray<FSpawnerDataRow*> CurrentSpawnerData = GetCurrentSpawnerData(CurrentScene);
+	UClass* CurrentPlayerClass = DataHandle->GetCharacterClass();
 
-	EdmundGameMode->InitGameMode(this, CurrentMissionData, CurrentSpawnerData);
+	EdmundGameMode->InitGameMode(this, CurrentMissionData, CurrentSpawnerData, CurrentPlayerClass);
 
 	StartMission(CurrentScene);
 }
