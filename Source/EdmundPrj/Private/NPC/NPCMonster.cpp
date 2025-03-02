@@ -51,8 +51,8 @@ void ANPCMonster::MonsterAttackCheck()
 
 
         //  공격 Collision Visible 활성화
-         //FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-         //DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
+         FVector CapsuleLocation = CollisionComp->GetComponentLocation();
+         DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
 
 
          // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
@@ -68,7 +68,7 @@ void ANPCMonster::MonsterAttackCheck()
 }
 void ANPCMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+    if (OtherActor && OtherActor->ActorHasTag(FName("Monster")))
     {
 
         UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log

@@ -410,12 +410,18 @@ void ABaseMonster::SetInitialSpawn()
 
 void ABaseMonster::UpdateChaseSpeed()
 {
-	GetCharacterMovement()->MaxWalkSpeed = MonsterChaseSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MonsterCurrentSpeed * MonsterChaseSpeedMultifly;
 }
 
 void ABaseMonster::UpdatePatrolSpeed()
 {
+	//이 함수는 쓰이지 않음
 	GetCharacterMovement()->MaxWalkSpeed = MonsterMoveSpeed;
+}
+
+void ABaseMonster::ChangeCurrentSpeed(float ChangeSpeed)
+{
+	MonsterCurrentSpeed = ChangeSpeed;
 }
 
 void ABaseMonster::UpdateState(EMonsterState NewMonsterState)

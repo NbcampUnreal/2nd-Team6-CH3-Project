@@ -88,6 +88,13 @@ protected:
 	float MonsterChaseSpeed = 43.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
+	float MonsterChaseSpeedMultifly = 2.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
+	float MonsterCurrentSpeed = 200.0f;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float MonsterAttackSpeed = 1.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Monster")
@@ -173,6 +180,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdatePatrolSpeed();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeCurrentSpeed(float ChangeSpeed);
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateState(EMonsterState NewMonsterState);
