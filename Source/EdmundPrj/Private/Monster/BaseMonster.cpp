@@ -51,6 +51,12 @@ void ABaseMonster::BeginPlay()
 	MonsterMaxHP = 100 + (MonsterLevel * 50);
 	MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
 	MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+
+	MonsterOverHeadWidget->SetVisibility(true, true);
+
+	MonsterOverHeadWidgetObject = Cast<UAIInteractionWidget>(MonsterOverHeadWidget->GetUserWidgetObject());
+	MonsterOverHeadWidgetObject->SetIsVisible(true);
+	MonsterOverHeadWidgetObject->InitWidget();
 }
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -71,8 +77,7 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	if (TakeDamageParticle)
 	{
 		SetChaseMode(true);
-
-		UpdateMonsterOverHeadWidget();
+	
 
 		UParticleSystemComponent* Particle = nullptr;
 
@@ -102,6 +107,8 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	//UE_LOG(LogTemp, Warning, TEXT("감소된 피해량: %f"), ActualDamage);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
+
+	UpdateMonsterOverHeadWidget(ActualDamage);
 
 	if (MonsterHP <= 0)
 	{
@@ -134,7 +141,7 @@ void ABaseMonster::MonsterDead()
 					ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
 					if (PlayerCharacter)
 					{
-						UE_LOG(LogTemp, Warning, TEXT("%f EXP얻음"), MonsterExpReward);
+						//UE_LOG(LogTemp, Warning, TEXT("%f EXP얻음"), MonsterExpReward);
 						PlayerCharacter->AddExp(MonsterExpReward);
 					}
 				}
@@ -150,7 +157,7 @@ void ABaseMonster::MonsterDead()
 
 				MonsterHP = 0;
 
-				UpdateMonsterOverHeadWidget();
+				MonsterOverHeadWidgetObject->SetIsVisible(false);
 
 				GetWorld()->GetTimerManager().ClearTimer(HitAnimTimerHandle);
 				GetWorld()->GetTimerManager().ClearTimer(AttackAnimTimerHandle);
@@ -181,6 +188,7 @@ void ABaseMonster::SetCanDropReward(bool NewState)
 void ABaseMonster::SetMonsterLevel(int32 NewLevel)
 {
 	MonsterLevel = NewLevel;
+	MonsterOverHeadWidgetObject->SetIsVisible(true);
 }
 
 // DropReward 호출 후 Destroy
@@ -188,6 +196,8 @@ void ABaseMonster::MonsterDestroy()
 {
 	bIsDead = false;
 	bIsHit = false;
+
+	MonsterOverHeadWidgetObject->SetIsVisible(false);
 
 	if (bCanDropReward)
 	{
@@ -369,25 +379,34 @@ float ABaseMonster::GetMonsterAttackDamage()
 	return MonsterAttackDamage;
 }
 
-void ABaseMonster::UpdateMonsterOverHeadWidget()
+void ABaseMonster::UpdateMonsterOverHeadWidget(float Damage)
 {
-	if (!MonsterOverHeadWidget) return;
-
-	UUserWidget* MonsterOverHeadWidgetInstance = MonsterOverHeadWidget->GetUserWidgetObject();
-
-	if (!MonsterOverHeadWidgetInstance) return;
-
-	MonsterOverHeadWidget->SetVisibility(true, true);
-	GetWorld()->GetTimerManager().ClearTimer(OverHeadUITimerHandle);
-
-	if (UProgressBar* HPBar = Cast<UProgressBar>(MonsterOverHeadWidgetInstance->GetWidgetFromName(TEXT("HealthBar"))))
+	if (!MonsterOverHeadWidget)
 	{
-		float HealthPercent = MonsterHP / MonsterMaxHP;
-		HPBar->SetPercent(HealthPercent);
+		UE_LOG(LogTemp, Warning, TEXT("위젯 X"));
+		return;
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::UpdateMonsterOverHeadWidgetEnd, 1.0f, false);
+	MonsterOverHeadWidgetObject->SetIsVisible(true);
 
+	//UUserWidget* MonsterOverHeadWidgetInstance = MonsterOverHeadWidget->GetUserWidgetObject();
+
+	//if (!MonsterOverHeadWidgetInstance) return;
+
+	//MonsterOverHeadWidget->SetVisibility(true, true);
+	//GetWorld()->GetTimerManager().ClearTimer(OverHeadUITimerHandle);
+
+	//if (UProgressBar* HPBar = Cast<UProgressBar>(MonsterOverHeadWidgetInstance->GetWidgetFromName(TEXT("HealthBar"))))
+	//{
+	//	float HealthPercent = MonsterHP / MonsterMaxHP;
+	//	HPBar->SetPercent(HealthPercent);
+	//}
+
+	//GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::UpdateMonsterOverHeadWidgetEnd, 1.0f, false);
+
+
+
+	MonsterOverHeadWidgetObject->ApplyHitEvent(MonsterMaxHP, MonsterHP, Damage);
 }
 
 void ABaseMonster::UpdateMonsterOverHeadWidgetEnd()

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "System/EnumSet.h"
 #include "Components/AudioComponent.h"
+#include "UI/3DWidget/AIInteractionWidget.h"
 #include "BaseMonster.generated.h"
 
 class AMonsterSpawner;
@@ -154,6 +155,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|UI")
 	UWidgetComponent* MonsterOverHeadWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|UI")
+	TObjectPtr<UAIInteractionWidget> MonsterOverHeadWidgetObject;
+
 	virtual float TakeDamage(
 		float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
@@ -166,7 +170,7 @@ protected:
 	void MonsterHit();
 	void MonsterHitEnd();
 
-	void UpdateMonsterOverHeadWidget();
+	void UpdateMonsterOverHeadWidget(float Damage);
 	void UpdateMonsterOverHeadWidgetEnd();
 
 	virtual void PlayParticle();
