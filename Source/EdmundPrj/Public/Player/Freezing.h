@@ -18,6 +18,7 @@ public:
 	TObjectPtr<AActor> ActivateFrozenEffect(TObjectPtr<ABaseMonster> monster);
 	TObjectPtr<AActor> FindDeactivateFrozenEffect();
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> monster) override;
+	virtual void UpgradeSkill() override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float FrozenTime = 0;

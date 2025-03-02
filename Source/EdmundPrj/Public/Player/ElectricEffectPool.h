@@ -18,7 +18,7 @@ public:
 	UElectricEffectPool();
 	void CreateElectricEffect(int createCount);
 	TObjectPtr<AElectric> FindDeactivateElectricEffect();
-	void ActivateElectricEffect(FVector monsterLocation);
+	void ActivateElectricEffect(FVector monsterLocation, int ElectricCount);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -28,5 +28,4 @@ public:
 	TSubclassOf<AElectric> ElectricEffectClass = nullptr;
 	TArray<TObjectPtr<AElectric>> ElectricEffects = TArray<TObjectPtr<AElectric>>();
 	FTimerHandle DeactivateCycleHandler;
-		
 };

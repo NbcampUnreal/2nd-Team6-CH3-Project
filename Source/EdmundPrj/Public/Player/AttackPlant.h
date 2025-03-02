@@ -24,7 +24,7 @@ public:
 	// È¸Àü
 	void RotationToTarget();
 
-
+	virtual void UpgradeSkill() override;
 	virtual void SpawnTimerSkill() override;
 	virtual void Deactivate() override;
 public:

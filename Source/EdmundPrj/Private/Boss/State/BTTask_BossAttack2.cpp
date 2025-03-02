@@ -4,7 +4,9 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 #include "Boss/Boss_AnimInstance.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 UBTTask_BossAttack2::UBTTask_BossAttack2()
@@ -33,7 +35,7 @@ EBTNodeResult::Type UBTTask_BossAttack2::ExecuteTask(UBehaviorTreeComponent& Own
 	CurrentPhase = 0;
 
 	BossRef->GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_Phase, this, &UBTTask_BossAttack2::StartAscend, 2.0f, false);
+		TimerHandle_Phase, this, &UBTTask_BossAttack2::StartAscend, 0.5f, false);
 
 	return EBTNodeResult::InProgress;
 }
@@ -79,34 +81,48 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		FVector NewLocation = CurrentLocation - FVector(0, 0, BossRef->Attack2_DescendSpeed * DeltaSeconds);
 		FHitResult HitResult;
 		FVector TraceStart = CurrentLocation;
-		FVector TraceEnd = CurrentLocation - FVector(0, 0, 5000.0f); // 예: 5000 유닛 아래까지
+		FVector TraceEnd = CurrentLocation - FVector(0, 0, 20000.0f);
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(BossRef);
+
 		if (BossRef->GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 		{
 			float GroundZ = HitResult.Location.Z;
-			if (NewLocation.Z <= GroundZ)
+			float CapsuleOffset = (BossRef->Front_Left_FootCapsuleComponent
+				? BossRef->Front_Left_FootCapsuleComponent->GetScaledCapsuleHalfHeight()
+				: 300.0f) + 100.0f;
+			if (NewLocation.Z <= GroundZ + CapsuleOffset)
 			{
-				NewLocation.Z = GroundZ;
+				NewLocation.Z = GroundZ + CapsuleOffset;
 				BossRef->SetActorLocation(NewLocation, false);
+
+				FRotator CurrentRotation = BossRef->GetActorRotation();
+				BossRef->SetActorRotation(CurrentRotation);
+
 				if (BossRef->GetCharacterMovement())
 				{
+					BossRef->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 					BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 				}
+
+				BossRef->ActivateAttack2Collision();
+				BossRef->GetWorld()->GetTimerManager().SetTimer(
+					TimerHandle_DisableCollision, BossRef, &ABoss::DeactivateAttack2Collision, 0.5f, false);
+
 				BossRef->UpdateAttackCooldown(2);
+				BossRef->SetbChaseComplete(true);
 				FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
+				return;
 			}
 			else
 			{
 				BossRef->SetActorLocation(NewLocation, false);
 			}
 		}
-		else
-		{
-			BossRef->SetActorLocation(NewLocation, false);
-		}
 		break;
 	}
+
+
 	default:
 		break;
 	}
@@ -118,6 +134,7 @@ void UBTTask_BossAttack2::StartAscend()
 
 	if (BossRef->GetCharacterMovement())
 	{
+		BossRef->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	}
 	CurrentPhase = 1;
@@ -175,4 +192,10 @@ void UBTTask_BossAttack2::DelayedTransition()
 void UBTTask_BossAttack2::StartDescend()
 {
 	CurrentPhase = 5;
+
+	if (BossRef)
+	{
+		BossRef->ActivateAttack2Collision();
+	}
 }
+

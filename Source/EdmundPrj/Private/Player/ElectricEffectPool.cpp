@@ -7,9 +7,7 @@
 // Sets default values for this component's properties
 UElectricEffectPool::UElectricEffectPool()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 	
 	// ...
 }
@@ -45,7 +43,7 @@ TObjectPtr<AElectric> UElectricEffectPool::FindDeactivateElectricEffect()
     return nullptr;
 }
 
-void UElectricEffectPool::ActivateElectricEffect(FVector monsterLocation)
+void UElectricEffectPool::ActivateElectricEffect(FVector monsterLocation, int ElectricCount)
 {
     TObjectPtr<AElectric> electric = FindDeactivateElectricEffect();
 
@@ -55,7 +53,7 @@ void UElectricEffectPool::ActivateElectricEffect(FVector monsterLocation)
         electric = FindDeactivateElectricEffect();
     }
     if (!electric) return;
-
+    electric->ElectricCount = ElectricCount;
     electric->SetActorLocation(monsterLocation);
     electric->Activate();
 }

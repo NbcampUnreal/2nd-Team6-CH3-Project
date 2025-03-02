@@ -3,6 +3,7 @@
 #include "AIController.h"
 #include "Engine/World.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 UBTTask_BossChase::UBTTask_BossChase()
@@ -12,11 +13,11 @@ UBTTask_BossChase::UBTTask_BossChase()
 	BossRef = nullptr;
 	CachedOwnerComp = nullptr;
 	AccumulatedTime = 0.0f;
-	
 }
 
 EBTNodeResult::Type UBTTask_BossChase::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	UE_LOG(LogTemp, Log, TEXT("체이스"));
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)
 	{
@@ -36,44 +37,46 @@ EBTNodeResult::Type UBTTask_BossChase::ExecuteTask(UBehaviorTreeComponent& Owner
 
 void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-    if (!BossRef)
-    {
-        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-        return;
-    }
+	if (!BossRef)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return;
+	}
+	BossRef->GetCharacterMovement()->MaxWalkSpeed = BossRef->GetMonsterMoveSpeed();
+	AccumulatedTime += DeltaSeconds;
+	if (AccumulatedTime >= FMath::RandRange(2.0f, 3.0f)) // 랜덤 2~3초 지속
+	{
+		BossRef->SetbChaseComplete(false);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		return;
+	}
 
-    AccumulatedTime += DeltaSeconds;
-    if (AccumulatedTime >= 0.5f)
-    {
-        AccumulatedTime = 0.0f;
-        AAIController* AICon = Cast<AAIController>(BossRef->GetController());
-        AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
-        if (!AICon || !Player)
-        {
-            FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-            return;
-        }
-        AICon->MoveToActor(Player, BossRef->Chase_AcceptanceRadius);
+	AAIController* AICon = Cast<AAIController>(BossRef->GetController());
+	AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
+	if (!AICon || !Player)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return;
+	}
 
-        int32 NextAttack = 0;
-        if (UBlackboardComponent* BBComp = OwnerComp.GetBlackboardComponent())
-        {
-            NextAttack = BBComp->GetValueAsInt("NextAttack");
-        }
+	float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
+	if (Distance >= 1500.0f)
+	{
+		BossRef->Chase_AcceptanceRadius += 100.0f;
+	}
 
-        if (NextAttack != 0)
-        {
-            FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-        }
-        /*
-        else
-        {
-            float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
-            if (Distance <= BossRef->Chase_AcceptanceRadius)
-            {
-                FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-            }
-        }
-        */
-    }
+	AICon->MoveToActor(Player, BossRef->Chase_AcceptanceRadius);
+	BossRef->SetbChaseComplete(false);
+
+	int32 NextAttack = 0;
+	if (UBlackboardComponent* BBComp = OwnerComp.GetBlackboardComponent())
+	{
+		NextAttack = BBComp->GetValueAsInt("NextAttack");
+	}
+
+	if (NextAttack != 0 || Distance <= BossRef->Chase_AcceptanceRadius + 500.0f)
+	{
+		BossRef->SetbChaseComplete(true);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 }

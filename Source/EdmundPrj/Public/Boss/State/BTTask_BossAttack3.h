@@ -5,7 +5,6 @@
 #include "BTTask_BossAttack3.generated.h"
 
 class ABoss;
-class UBehaviorTreeComponent;
 
 UCLASS()
 class EDMUNDPRJ_API UBTTask_BossAttack3 : public UBTTaskNode
@@ -16,22 +15,57 @@ public:
 	UBTTask_BossAttack3();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
-protected:
-	int32 ComboPhase;
-	int32 RangedComboBulletCount;
-	float CurrentPhaseTimer;
+	UFUNCTION(BlueprintCallable)
+	void Attack3_ActivateMeleeCollision_Check1();
 
-	static constexpr float InitialDelay = 1.0f;          // Phase 0 대기
-	static constexpr float MeleeAttackInterval = 2.5f;     // Phase 1,2: 근접 공격 후 대기
-	static constexpr float RangedAttackInterval = 0.2f;    // Phase 3: 0.2초마다 탄환 발사
+	UFUNCTION(BlueprintCallable)
+	void Attack3_DeactivateCollision_Check1();
+
+	UFUNCTION()
+	void OnMeleeCollisionOverlap_Check1(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void Attack3_ActivateMeleeCollision_Check2();
+
+	UFUNCTION(BlueprintCallable)
+	void Attack3_DeactivateCollision_Check2();
+
+	UFUNCTION()
+	void OnMeleeCollisionOverlap_Check2(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void Attack3_RangedAttackNotify();
+
+	UPROPERTY(BlueprintReadOnly)
+	class ABoss* BossRef;
+
+	UFUNCTION(BlueprintCallable)
+	void OnAttack1Notify();
+	UFUNCTION(BlueprintCallable)
+	void OnAttack2Notify();
+
+	UFUNCTION(BlueprintCallable)
+	void OnAttack3Notify();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishComboAttack();
 
 	void ExecuteMeleeAttack();
-	void ExecuteRangedComboAttack();
-	void FinishComboAttack();
 	void PlayAttack3Montage();
+	
 
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+	int32 GetComboPhase() { return ComboPhase; }
+	
+	UPROPERTY()
 	UBehaviorTreeComponent* CachedOwnerComp;
-	ABoss* BossRef;
+
+	int32 ComboPhase;
+
+	FTimerHandle CollisionDisableTimerHandle_Check1;
+	FTimerHandle CollisionDisableTimerHandle_Check2;
+
 };

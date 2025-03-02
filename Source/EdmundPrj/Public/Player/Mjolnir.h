@@ -17,6 +17,9 @@ class EDMUNDPRJ_API AMjolnir : public AAttackSkill
 public:
 	virtual void HitToMonster(TObjectPtr<ABaseMonster> monster) override;
 	virtual void BeginPlay() override;
+	virtual void UpgradeSkill() override;
 public:
 	TObjectPtr<UElectricEffectPool> ElectricEffectPool = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Electric Setting")
+	int ElectricCount = 3;
 };

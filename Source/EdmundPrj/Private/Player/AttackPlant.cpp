@@ -106,6 +106,11 @@ void AAttackPlant::RotationToTarget()
 	}
 }
 
+void AAttackPlant::UpgradeSkill()
+{
+	DamageMultiplier += DamageMultiplierAmount;
+}
+
 void AAttackPlant::SpawnTimerSkill()
 {
 	Super::SpawnTimerSkill();
@@ -120,6 +125,7 @@ void AAttackPlant::SpawnTimerSkill()
 
 void AAttackPlant::Deactivate()
 {
+	StartSplineMove(GetActorTransform().TransformPosition(DefaultPoint), 0);
 	GetWorldTimerManager().ClearTimer(AttackCycleHandle);
 	Super::Deactivate();
 }

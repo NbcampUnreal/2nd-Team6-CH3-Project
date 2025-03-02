@@ -3,6 +3,7 @@
 #include "Components/SphereComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/BaseCharacter.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 
@@ -15,7 +16,7 @@ ABoss_Attack1_Bullet::ABoss_Attack1_Bullet()
 	// 충돌 컴포넌트 생성 및 설정
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	CollisionComp->InitSphereRadius(10.0f);
-	CollisionComp->SetCollisionProfileName(TEXT("BlockAll"));
+	CollisionComp->SetCollisionProfileName(TEXT("IgnoreAll"));
 	// Pawn 채널은 Overlap 처리하여 물리 밀림 방지
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	// CCD 활성화 (빠른 이동에도 충돌 감지)
@@ -93,24 +94,50 @@ void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnR
 void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// 만약 OtherActor가 유효하고 자기 자신이 아니면 폭발 처리
-	if (OtherActor && OtherActor != this)
+	if (!OtherActor || OtherActor == this || OtherActor->IsA(ABoss_Attack1_Bullet::StaticClass()))
 	{
-		//UE_LOG(LogTemp, Log, TEXT("Bullet OnHit: %s at %s"), *OtherActor->GetName(), *GetActorLocation().ToString());
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Bullet hit: %s"), *OtherActor->GetName());
+
+	if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
+	{
 		Explode();
 	}
 }
 
+
+
 void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// Pawn(캐릭터 등)과의 Overlap 시 바로 폭발 처리
-	if (OtherActor && OtherActor != this)
+	if (!OtherActor || OtherActor == this || OtherActor->IsA(ABoss_Attack1_Bullet::StaticClass()))
 	{
-		//UE_LOG(LogTemp, Log, TEXT("Bullet OnOverlapBegin: %s at %s"), *OtherActor->GetName(), *GetActorLocation().ToString());
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
+
+	if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
+	{
+		if (OtherActor->ActorHasTag("Player"))
+		{
+			AActor* LocalOwner = OverlappedComp->GetOwner();
+			ABoss_Attack1_Bullet* Bullet = Cast<ABoss_Attack1_Bullet>(LocalOwner);
+
+			if (Bullet)
+			{
+				float DamageValue = 10.0f;
+				UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
+			}
+		}
 		Explode();
 	}
 }
+
+
+
 
 void ABoss_Attack1_Bullet::Explode()
 {
@@ -122,7 +149,7 @@ void ABoss_Attack1_Bullet::Explode()
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 
-	// 현재 위치에서 폭발 파티클 스폰 (ExplosionEffectTemplate이 에디터에서 할당되어 있어야 함)
+	// 현재 위치에서 폭발 파티클 스폰
 	if (ExplosionEffect->Template)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect->Template, GetActorLocation());

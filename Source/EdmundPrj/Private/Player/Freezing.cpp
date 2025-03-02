@@ -20,7 +20,6 @@ void AFreezing::CreateFrozenEffect(int createCount)
 		frozenEffect->SetActorTickEnabled(false);
 		FrozenEffects.Add(frozenEffect);
 	}
-
 }
 
 TObjectPtr<AActor> AFreezing::ActivateFrozenEffect(TObjectPtr<ABaseMonster> monster)
@@ -76,3 +75,9 @@ void AFreezing::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 		false
 	);
 }
+
+void AFreezing::UpgradeSkill()
+{
+	DamageMultiplier += DamageMultiplierAmount;
+}
+
