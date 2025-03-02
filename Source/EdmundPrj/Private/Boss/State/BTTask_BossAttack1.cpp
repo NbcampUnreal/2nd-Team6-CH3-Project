@@ -37,7 +37,12 @@ EBTNodeResult::Type UBTTask_BossAttack1::ExecuteTask(UBehaviorTreeComponent& Own
 void UBTTask_BossAttack1::DelayedFire()
 {
 	if (!BossRef) return;
+
 	UBoss_AnimInstance* AnimInst = Cast<UBoss_AnimInstance>(BossRef->GetMesh()->GetAnimInstance());
+	if (AnimInst && AnimInst->Attack3Montage)
+	{
+		BossRef->GetMesh()->GetAnimInstance()->Montage_Play(AnimInst->Attack3Montage);
+	}
 	float TransitionDelay = 1.0f;
 	if (AnimInst && AnimInst->Attack1Montage)
 	{
@@ -49,17 +54,21 @@ void UBTTask_BossAttack1::DelayedFire()
 		TransitionDelay = 1.0f;
 	}
 	BossRef->GetWorld()->GetTimerManager().SetTimer(TimerHandle_Transition, this, &UBTTask_BossAttack1::DelayedTransition, TransitionDelay, false);
-	AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
-	if (Player)
+
+	AAIController* AIController = Cast<AAIController>(BossRef->GetController());
+	if (AIController)
 	{
-		FVector PlayerLocation = Player->GetActorLocation();
-		FVector BossLocation = BossRef->GetActorLocation();
-		FVector Direction = (PlayerLocation - BossLocation).GetSafeNormal();
-		FRotator TargetRotation = Direction.Rotation();
-		BossRef->SetActorRotation(TargetRotation);
+		AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
+		if (Player)
+		{
+			AIController->SetFocus(Player);
+		}
 	}
+
 	FireBullet();
 }
+
+
 
 void UBTTask_BossAttack1::DelayedTransition()
 {
@@ -68,6 +77,7 @@ void UBTTask_BossAttack1::DelayedTransition()
 		return;
 	}
 	BossRef->UpdateAttackCooldown(1);
+	BossRef->SetbChaseComplete(true);
 	FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
 }
 
@@ -94,6 +104,8 @@ void UBTTask_BossAttack1::FireBullet()
 	FVector PlayerLocation = Player->GetActorLocation();
 	FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
 	FRotator TargetRotation = Direction.Rotation();
+	TargetRotation.Pitch = 0.0f;
+	TargetRotation.Roll = 0.0f;
 	FRotator NewRotation = FMath::RInterpTo(BossRef->GetActorRotation(), TargetRotation, BossRef->GetWorld()->GetDeltaSeconds(), 5.0f);
 	BossRef->SetActorRotation(NewRotation);
 	ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);

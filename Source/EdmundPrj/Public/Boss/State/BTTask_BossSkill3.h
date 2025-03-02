@@ -5,6 +5,7 @@
 #include "BTTask_BossSkill3.generated.h"
 
 class ABoss;
+class ABoss_Skill3_Wall; // 추가: 전방 선언
 
 UCLASS()
 class EDMUNDPRJ_API UBTTask_BossSkill3 : public UBTTaskNode
@@ -13,7 +14,7 @@ class EDMUNDPRJ_API UBTTask_BossSkill3 : public UBTTaskNode
 
 public:
     UBTTask_BossSkill3();
-
+    bool bHasAttacked;
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 protected:
@@ -21,6 +22,13 @@ protected:
     void SpawnWall();
     void OnSpawnComplete();
     FRotator CalculateRandomRotation();
+
+    void StartDetection();
+    void PerformDetection();
+    void StopDetection();
+    FTimerHandle DetectionTimer;
+    FTimerHandle EndTimer;
+    FTimerHandle DelayedStartTimer;
 
 private:
     ABoss* BossRef;

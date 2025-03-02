@@ -3,34 +3,113 @@
 #include "Boss/BossAIController.h"
 #include "Boss/State/Boss_Idle.h"
 #include "GameFramework/Actor.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/BoxComponent.h"
 #include "Engine/World.h"
 
 ABoss::ABoss()
 {
     PrimaryActorTick.bCanEverTick = true;
-
     AIControllerClass = ABossAIController::StaticClass();
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     BossState = nullptr;
-    MonsterMoveSpeed = 500.0f;
-    MonsterHP = 50.0f;
-    MonsterMaxHP = 50.0f;
+    MonsterMoveSpeed = 5000.0f;
+    MonsterHP = 500.0f;
+    MonsterMaxHP = 1000.0f;
+    MonsterAttackDamage = 10.0f;
 
-    // 탄환 발사 위치
+    // 공격2 범위
+    Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2Collision"));
+    Attack2Collision->SetupAttachment(RootComponent);
+    Attack2Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    Attack2Collision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+    Attack2Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+    Attack2Collision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnAttack2CollisionOverlap);
+
+    // 공격 3 근접
+    Attack2_MeleeCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2_Melee_Range"));
+    Attack2_MeleeCollision->SetupAttachment(GetMesh());
+    Attack2_MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+
+    // 캡슐
+#pragma region Capsule Components Creation
+
+    BossHeadCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("BossHeadCapsuleComponent"));
+    BossHeadCapsuleComponent->SetupAttachment(GetMesh(), TEXT("BossHead"));
+
+    NeckCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("NeckCapsuleComponent"));
+    NeckCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Neck"));
+
+    Front_Right_FootCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Front_Right_FootCapsuleComponent"));
+    Front_Right_FootCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Front_Right_Foot"));
+
+    Front_Left_FootCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Front_Left_FootCapsuleComponent"));
+    Front_Left_FootCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Front_Left_Foot"));
+
+    Back_Right_FootCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Back_Right_FootCapsuleComponent"));
+    Back_Right_FootCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Back_Right_Foot"));
+
+    Back_Left_FootCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Back_Left_FootCapsuleComponent"));
+    Back_Left_FootCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Back_Left_Foot"));
+
+    Front_Right_LegCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Front_Right_LegCapsuleComponent"));
+    Front_Right_LegCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Front_Right_Leg"));
+
+    Front_Left_LegCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Front_Left_LegCapsuleComponent"));
+    Front_Left_LegCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Front_Left_Leg"));
+
+    Back_Right_LegCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Back_Right_LegCapsuleComponent"));
+    Back_Right_LegCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Back_Right_Leg"));
+
+    Back_Left_LegCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Back_Left_LegCapsuleComponent"));
+    Back_Left_LegCapsuleComponent->SetupAttachment(GetMesh(), TEXT("Back_Left_Leg"));
+
+    Body1_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Body1_CapsuleComponent"));
+    Body1_CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Body1"));
+
+    Body2_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Body2_CapsuleComponent"));
+    Body2_CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Body2"));
+
+    Body3_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Body3_CapsuleComponent"));
+    Body3_CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Body3"));
+
+    Tail1CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Tail1CapsuleComponent"));
+    Tail1CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Tail1"));
+
+    Tail2CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Tail2CapsuleComponent"));
+    Tail2CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Tail2"));
+
+    Tail3CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Tail3CapsuleComponent"));
+    Tail3CapsuleComponent->SetupAttachment(GetMesh(), TEXT("Tail3"));
+
+#pragma endregion
+    
+
+    Skill3Particle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Skill3Particle"));
+    Skill3Particle->SetupAttachment(RootComponent);
+    Skill3Particle->bAutoActivate = false;
+
+    // 공격 스폰 위치
     MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
     MuzzleLocation->SetupAttachment(GetMesh(), TEXT("MuzzleSocket"));
+
 }
 
 void ABoss::BeginPlay()
 {
     Super::BeginPlay();
-
+    Tags.Add(TEXT("Boss"));
     if (GetMesh() && GetMesh()->GetAnimInstance())
     {
         AnimInstance = Cast<UBoss_AnimInstance>(GetMesh()->GetAnimInstance());
     }
+
     InitiallizeBullerPool();
 }
 
@@ -56,6 +135,75 @@ void ABoss::Tick(float DeltaTime)
             FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
         );
     }
+#pragma region Soket
+    if (GetMesh())
+    {
+        if (BossHeadCapsuleComponent)
+        {
+            BossHeadCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("BossHead")));
+        }
+        if (NeckCapsuleComponent)
+        {
+            NeckCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Neck")));
+        }
+        if (Front_Right_FootCapsuleComponent)
+        {
+            Front_Right_FootCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Front_Right_Foot")));
+        }
+        if (Front_Left_FootCapsuleComponent)
+        {
+            Front_Left_FootCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Front_Left_Foot")));
+        }
+        if (Back_Right_FootCapsuleComponent)
+        {
+            Back_Right_FootCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Back_Right_Foot")));
+        }
+        if (Back_Left_FootCapsuleComponent)
+        {
+            Back_Left_FootCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Back_Left_Foot")));
+        }
+        if (Front_Right_LegCapsuleComponent)
+        {
+            Front_Right_LegCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Front_Right_Leg")));
+        }
+        if (Front_Left_LegCapsuleComponent)
+        {
+            Front_Left_LegCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Front_Left_Leg")));
+        }
+        if (Back_Right_LegCapsuleComponent)
+        {
+            Back_Right_LegCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Back_Right_Leg")));
+        }
+        if (Back_Left_LegCapsuleComponent)
+        {
+            Back_Left_LegCapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Back_Left_Leg")));
+        }
+        if (Body1_CapsuleComponent)
+        {
+            Body1_CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Body1")));
+        }
+        if (Body2_CapsuleComponent)
+        {
+            Body2_CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Body2")));
+        }
+        if (Body3_CapsuleComponent)
+        {
+            Body3_CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Body3")));
+        }
+        if (Tail1CapsuleComponent)
+        {
+            Tail1CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Tail1")));
+        }
+        if (Tail2CapsuleComponent)
+        {
+            Tail2CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Tail2")));
+        }
+        if (Tail3CapsuleComponent)
+        {
+            Tail3CapsuleComponent->SetWorldTransform(GetMesh()->GetSocketTransform(TEXT("Tail3")));
+        }
+    }
+#pragma endregion
 }
 
 int32 ABoss::SetAttack1Count(int32 NewCount)
@@ -87,7 +235,7 @@ void ABoss::SetState(EBossState NewState)
 
     case EBossState::Chase:
         //BossState = NewObject<UBoss_Chase>();
-        GetCharacterMovement()->MaxWalkSpeed = MonsterMoveSpeed;
+        GetCharacterMovement()->MaxWalkSpeed = GetMonsterMoveSpeed();
         //if (AnimInstance) AnimInstance->bIsMoving = true;
         break;
 
@@ -192,4 +340,133 @@ void ABoss::UpdateAttackCooldown(int32 AttackID)
 void ABoss::MonsterAttackCheck()
 {
 
+}
+
+void ABoss::OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+    if (Montage == nullptr || bInterrupted)
+    {
+        return;
+    }
+    GetMesh()->bPauseAnims = true;
+}
+
+void ABoss::MonsterDead()
+{
+    if (bIsDead)
+    {
+        return;
+    }
+
+    SetIsDead(true);
+
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+    }
+
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->StopMovementImmediately();
+        GetCharacterMovement()->DisableMovement();
+    }
+
+    if (AAIController* AICon = Cast<AAIController>(GetController()))
+    {
+        if (AICon->BrainComponent)
+        {
+            AICon->BrainComponent->StopLogic(TEXT("Boss is dead"));
+        }
+        AICon->UnPossess();
+    }
+
+    if (USkeletalMeshComponent* MeshComp = GetMesh())
+    {
+        MeshComp->SetSimulatePhysics(true);
+        MeshComp->WakeAllRigidBodies();
+        MeshComp->bBlendPhysics = true;
+    }
+}
+
+float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+    if (bIsInvulnerable)
+    {
+        return 0.f;
+    }
+    return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ABoss::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+    if (OtherActor && OtherActor->ActorHasTag("Bullet"))
+    {
+        return;
+    }
+
+    Super::NotifyActorBeginOverlap(OtherActor);
+}
+
+void ABoss::ActivateAttack2Collision()
+{
+    if (Attack2Collision)
+    {
+        Attack2Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    }
+}
+
+void ABoss::DeactivateAttack2Collision()
+{
+    if (Attack2Collision)
+    {
+        Attack2Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    }
+
+    if (LandImpactParticle)
+    {
+        UGameplayStatics::SpawnEmitterAtLocation(
+            GetWorld(),
+            LandImpactParticle,
+            GetActorLocation(),
+            FRotator::ZeroRotator,
+            FVector(20.0f)
+        );
+    }
+}
+
+void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+    bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+    {
+        ACharacter* PlayerCharacter = Cast<ACharacter>(OtherActor);
+        if (PlayerCharacter)
+        {
+            FVector KnockbackDirection = PlayerCharacter->GetActorLocation() - GetActorLocation();
+            KnockbackDirection.Z = 0;
+            KnockbackDirection.Normalize();
+
+            PlayerCharacter->LaunchCharacter(KnockbackDirection * KnockbackStrength, true, false);
+
+            if (LandImpactParticle && GetWorld())
+            {
+                UGameplayStatics::SpawnEmitterAtLocation(
+                    GetWorld(),
+                    LandImpactParticle,
+                    PlayerCharacter->GetActorLocation(),
+                    FRotator::ZeroRotator,
+                    FVector(1.0f)
+                );
+            }
+            float DamageValue = 10.0f;
+            UGameplayStatics::ApplyDamage(
+                OtherActor,
+                DamageValue,
+                nullptr,
+                this,
+                UDamageType::StaticClass()
+            );
+        }
+    }
 }
