@@ -18,7 +18,7 @@ ABoss_Attack4_Bullet::ABoss_Attack4_Bullet()
 
     CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
     CollisionComp->InitSphereRadius(10.0f);
-    CollisionComp->SetCollisionProfileName(TEXT("IgnoreAll"));
+    CollisionComp->SetCollisionProfileName(TEXT("BlockAll"));
     CollisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
     CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
     CollisionComp->BodyInstance.bUseCCD = true;
@@ -204,10 +204,17 @@ void ABoss_Attack4_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* Othe
 
     if (OtherActor && OtherActor != this && !OtherActor->IsA(ABoss_Attack4_Bullet::StaticClass()))
     {
-        if (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Ground"))
-        {
-            Explode();
-        }
+        float Damage = 5.0f;
+
+        UGameplayStatics::ApplyDamage(
+            OtherActor,
+            Damage,
+            GetInstigatorController(),
+            this,
+            UDamageType::StaticClass()
+        );
+
+        Explode();
     }
 }
 
@@ -219,9 +226,16 @@ void ABoss_Attack4_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 
     if (OtherActor && OtherActor != this && !OtherActor->IsA(ABoss_Attack4_Bullet::StaticClass()))
     {
-        if (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Ground"))
-        {
-            Explode();
-        }
+        float Damage = 5.0f;
+
+        UGameplayStatics::ApplyDamage(
+            OtherActor,
+            Damage,
+            GetInstigatorController(),
+            this,
+            UDamageType::StaticClass()
+        );
+
+        Explode();
     }
 }
