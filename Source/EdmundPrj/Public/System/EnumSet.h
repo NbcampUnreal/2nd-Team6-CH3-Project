@@ -18,14 +18,21 @@ UENUM(BlueprintType)
 enum class EActiveSkillType : uint8
 {
 	Null = 0,
-	Freezing
+	Freezing,
+	Slow,
+	Mjolnir
 };
 
 UENUM(BlueprintType)
 enum class EPassiveSkillType : uint8
 {
 	Null = 0,
-	Berserker
+	Berserker,
+	BloodAbsorbing,
+	ElectricChain,
+	AmountMaxHp,
+	AmountMaxStamina,
+	AmountStaminaRecovery
 };
 
 UENUM(BlueprintType)
@@ -126,8 +133,8 @@ enum class ECharacterType : uint8
 {
 	Gunner = 0,
 	Aurora,
-	Other2,
-	Other3
+	Fey,
+	Sparrow
 };
 
 UENUM(BlueprintType)

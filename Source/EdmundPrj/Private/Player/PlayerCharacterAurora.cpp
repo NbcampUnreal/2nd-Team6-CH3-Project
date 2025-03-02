@@ -2,6 +2,7 @@
 #include "Player/EdmundPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/EdmundGameState.h"
 
 APlayerCharacterAurora::APlayerCharacterAurora()
 {
@@ -162,6 +163,8 @@ float APlayerCharacterAurora::TakeDamage(float DamageAmount, FDamageEvent const&
 	// HP 음수 방지
 	HP = FMath::Max(0.0f, HP - ActualDamage);
 
+	UE_LOG(LogTemp, Error, TEXT("CurrentHP: %d"), HP);
+
 	if (HP == 0 && !IsDie)
 	{
 		// 부활 횟수가 있다면
@@ -185,10 +188,10 @@ float APlayerCharacterAurora::TakeDamage(float DamageAmount, FDamageEvent const&
 		}
 	}
 
-	/*if (IsValid(CurrentGameState))
+	if (IsValid(CurrentGameState))
 	{
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
-	}*/
+	}
 
 	return ActualDamage;
 }

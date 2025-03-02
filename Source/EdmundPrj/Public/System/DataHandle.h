@@ -44,6 +44,7 @@ public:
 
 	// Controll Character Data
 	const TArray<FCharacterDataRow*>& GetCharacterData() const;
+	UClass* GetCharacterClass() const;
 
 	// Controll Mission Data
 	const TArray<FMissionDataRow*>& GetMissionDataBySceneType(const ESceneType SceneType);

@@ -55,6 +55,15 @@ TArray<TSubclassOf<ABaseItem>> AllItems;
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Spawn")
 TSubclassOf<ABaseItem> ItemClass;
 
+void FreezeMonster(float FreezeDuration);
+
+void UnfreezeMonster();
+
+UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster|State")
+bool bIsFrozen = false;
+
+FTimerHandle FreezeTimerHandle;
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
@@ -77,6 +86,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float MonsterChaseSpeed = 43.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
+	float MonsterChaseSpeedMultifly = 2.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
+	float MonsterCurrentSpeed = 200.0f;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
 	float MonsterAttackSpeed = 1.0f;
@@ -164,6 +180,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdatePatrolSpeed();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeCurrentSpeed(float ChangeSpeed);
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateState(EMonsterState NewMonsterState);

@@ -19,6 +19,7 @@ class EDMUNDPRJ_API AMeteor : public ATimerSkill
 	void Deactivate();
 	virtual void SpawnTimerSkill() override;
 	virtual void Tick(float deltaTime);
+	virtual void UpgradeSkill() override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float MetoerHitPushStrength = 0;
