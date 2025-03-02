@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/PrimitiveComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "System/DataStructure/ShopCatalogRow.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -29,6 +30,8 @@ APlayerCharacter::APlayerCharacter()
 	IsMeleeAttack = false;
 	IsAttack = false;
 	IsReload = false;
+
+	ReloadTimeMultipler = 1.0f;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -160,7 +163,7 @@ bool APlayerCharacter::ActiveWeapon()
 {
 	if (IsValid(WeaponActor))
 	{
-		return WeaponActor->Fire();
+		return WeaponActor->Fire(AttackDelay);
 	}
 
 	return false;
@@ -319,7 +322,7 @@ void APlayerCharacter::Reload()
 	{
 		if (IsValid(ReloadMontage))
 		{
-			PlayAnimMontage(ReloadMontage);
+			PlayAnimMontage(ReloadMontage, ReloadTimeMultipler);
 		}
 
 		IsReload = true;
@@ -411,4 +414,23 @@ void APlayerCharacter::ActiveDieAction()
 	{
 		PlayAnimMontage(DieActionMontage);
 	}
+}
+
+void APlayerCharacter::GetUpgradeStatus()
+{
+	Super::GetUpgradeStatus();
+	
+	if (!IsValid(CurrentGameState))
+	{
+		return;
+	}
+
+	TArray<FShopCatalogRow*> ShopStatusList = CurrentGameState->GetPlayerAdvancedData();
+
+	// MaxAmmo
+	MaxAmmo = MaxAmmo + ShopStatusList[10]->CurrentLevel * ShopStatusList[10]->AdvanceValue;
+
+	// ReloadTime
+	ReloadTimeMultipler = ReloadTimeMultipler * (1.0f + ShopStatusList[11]->CurrentLevel * ShopStatusList[11]->AdvanceValue);
+	ReloadDelay *= (1.0f - ShopStatusList[11]->CurrentLevel * ShopStatusList[11]->AdvanceValue / 2);
 }

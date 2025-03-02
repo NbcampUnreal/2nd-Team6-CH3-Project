@@ -107,8 +107,14 @@ protected:
 	// 죽음
 	void ActiveDieAction();
 
+	// 강화해놓은 스테이터스값 받기
+	virtual void GetUpgradeStatus() override;
+
 	bool IsAttack;
 	bool IsMeleeAttack;
 	bool IsReload;
 	bool IsZoom;
+
+private:
+	float ReloadTimeMultipler;
 };

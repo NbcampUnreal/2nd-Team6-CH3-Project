@@ -33,6 +33,8 @@ void APlayerCharacterFey::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AttackDelay *= 2;
+
 	WeaponActor = GetWorld()->SpawnActor<AWeapon>(Weapon);
 
 	if (Weapon)
@@ -225,7 +227,7 @@ void APlayerCharacterFey::ActiveWeapon()
 {
 	if (IsValid(WeaponActor))
 	{
-		if (WeaponActor->Fire())
+		if (WeaponActor->Fire(AttackDelay))
 		{
 			// ÃÑ¼Ò¸® Àç»ý
 			if (FireSound)
