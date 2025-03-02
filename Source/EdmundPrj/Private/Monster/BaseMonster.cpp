@@ -61,8 +61,16 @@ void ABaseMonster::BeginPlay()
 	if (MonsterOverHeadWidget)
 	{
 		MonsterOverHeadWidgetObject = Cast<UAIInteractionWidget>(MonsterOverHeadWidget->GetUserWidgetObject());
-		MonsterOverHeadWidgetObject->SetIsVisible(true);
-		MonsterOverHeadWidgetObject->InitWidget();
+
+		if (IsValid(MonsterOverHeadWidgetObject))
+		{
+			MonsterOverHeadWidgetObject->SetIsVisible(true);
+			MonsterOverHeadWidgetObject->InitWidget();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MonsterOverHeadWidgetObject 없음"));
+		}
 	}
 	else
 	{
