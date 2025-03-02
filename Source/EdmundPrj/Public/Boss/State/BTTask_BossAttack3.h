@@ -16,6 +16,29 @@ public:
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
+	UFUNCTION(BlueprintCallable)
+	void Attack3_ActivateMeleeCollision_Check1();
+
+	UFUNCTION(BlueprintCallable)
+	void Attack3_DeactivateCollision_Check1();
+
+	UFUNCTION()
+	void OnMeleeCollisionOverlap_Check1(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void Attack3_ActivateMeleeCollision_Check2();
+
+	UFUNCTION(BlueprintCallable)
+	void Attack3_DeactivateCollision_Check2();
+
+	UFUNCTION()
+	void OnMeleeCollisionOverlap_Check2(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void Attack3_RangedAttackNotify();
+
 	UPROPERTY(BlueprintReadOnly)
 	class ABoss* BossRef;
 
@@ -26,7 +49,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FinishComboAttack();
 	void ExecuteMeleeAttack();
-	// 몽타주 재생 함수
 	void PlayAttack3Montage();
 
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
@@ -36,4 +58,8 @@ public:
 	UBehaviorTreeComponent* CachedOwnerComp;
 
 	int32 ComboPhase;
+
+	FTimerHandle CollisionDisableTimerHandle_Check1;
+	FTimerHandle CollisionDisableTimerHandle_Check2;
+
 };

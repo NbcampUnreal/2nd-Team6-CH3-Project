@@ -21,6 +21,9 @@ public:
 
 #pragma region Capsule Components
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack3")
+    USphereComponent* Attack2_MeleeCollision;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
     class UCapsuleComponent* BossHeadCapsuleComponent;
 

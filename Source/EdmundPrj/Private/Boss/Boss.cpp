@@ -31,6 +31,11 @@ ABoss::ABoss()
     Attack2Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
     Attack2Collision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnAttack2CollisionOverlap);
 
+    // 공격 3 근접
+    Attack2_MeleeCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2_Melee_Range"));
+    Attack2_MeleeCollision->SetupAttachment(GetMesh());
+    Attack2_MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 
     // 캡슐
 #pragma region Capsule Components Creation
