@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
+#include "System/MissionHandle.h"
 
 ABoss::ABoss()
 {
@@ -111,11 +112,22 @@ void ABoss::BeginPlay()
     }
 
     InitiallizeBullerPool();
+
+    BossController = Cast<ABossAIController>(GetOwner());
+    MonsterMoveSpeed = 5000.0f;
+    //MonsterHP = 500.0f;
+    MonsterHP = MonsterMaxHP = 2000.0f;
+    MonsterAttackDamage = 10.0f;
 }
 
 void ABoss::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    if (!bIsStart)
+    {
+        return;
+    }
 
     if (BossState)
     {
@@ -386,6 +398,8 @@ void ABoss::MonsterDead()
         MeshComp->WakeAllRigidBodies();
         MeshComp->bBlendPhysics = true;
     }
+
+    MissionHandle->CompleteMission();
 }
 
 float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -470,3 +484,31 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
         }
     }
 }
+
+void ABoss::InitBoss(AMissionHandle* NewMissionHandle)
+{
+    BossController->InitBlackboard(NewMissionHandle);
+    MissionHandle = NewMissionHandle;
+    CheckWeaken();
+
+    bIsStart = true;
+}
+
+void ABoss::CheckWeaken()
+{
+    if (!IsValid(MissionHandle))
+    {
+        return;
+    }
+
+    if (MissionHandle->GetWeakenBoss())
+    {
+        ApplyWeaken();
+    }
+}
+
+void ABoss::ApplyWeaken()
+{
+    // TODO : 보스 약화 구현 필요
+}
+
