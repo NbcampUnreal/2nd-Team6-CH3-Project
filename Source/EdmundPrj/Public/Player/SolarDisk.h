@@ -19,6 +19,7 @@ public:
 	virtual void SpawnTimerSkill() override;
 	virtual void Deactivate() override;
 	virtual void UpgradeSkill() override;
+	virtual void Tick(float DeltaTime) override;
 public:
 	FTimerHandle AttackCycleHandle;
 	FTimerHandle SpawnAnimHandle;
@@ -34,7 +35,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float DamageCycleTime = 0;
 
-	float RotationElapsedTime = 0.0f;
-	float RotationDuration = 2.0f; // 2초 동안 회전
-	float InitialSpeed = 300.0f; // 처음 회전 속도 (도/초)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tracking")
+	float RotationSpeed = 5.0f;
 };

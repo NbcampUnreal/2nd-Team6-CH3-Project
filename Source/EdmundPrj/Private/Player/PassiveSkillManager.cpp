@@ -60,12 +60,10 @@ void UPassiveSkillManager::ActivatePassiveSkill(EPassiveSkillType passiveSkillTy
 //델리게이트
 void UPassiveSkillManager::BerserkerSkill()
 {
-
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::Berserker];
 	float HpRatio = Character->GetHP() / Character->MaxHP;
 	float AttackMultiplier = 1.0f + (1.0f - HpRatio) * (MinHealthMultiplier - (1.0f - SkillLevel / 10));
 	Character->AttackDamage *= AttackMultiplier;
-	
 }
 //델리게이트
 void UPassiveSkillManager::BloodAbsorbingSkill()

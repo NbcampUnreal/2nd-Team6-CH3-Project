@@ -10,7 +10,7 @@ UActiveSkillSpawnManager::UActiveSkillSpawnManager()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 	ActiveSkillClassMap.Empty();
 	// ...
 }
@@ -20,7 +20,7 @@ UActiveSkillSpawnManager::UActiveSkillSpawnManager()
 void UActiveSkillSpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
-
+	ActivateSkillList.Add(EActiveSkillType::Slow);
 	// ...
 	
 }
@@ -31,9 +31,13 @@ void UActiveSkillSpawnManager::ActivateProbCalculate()
 	if (ActivateSkillList.IsEmpty()) return;
 	for (EActiveSkillType skillType : ActivateSkillList)
 	{
+
+		UE_LOG(LogTemp, Warning, TEXT("I'm Here_1!!"));
 		int RandomInt = FMath::RandRange(1, 100);
-		if (RandomInt > 100 - ActivateProb)
+		if (RandomInt > ActivateProb)
 		{
+
+			UE_LOG(LogTemp, Warning, TEXT("I'm Here_2!!"));
 			ActivateActiveSkill(skillType, GetOwner()->GetActorForwardVector());
 		}
 	}
