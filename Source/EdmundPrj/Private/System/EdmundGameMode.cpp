@@ -49,6 +49,14 @@ void AEdmundGameMode::SpawnPlayerByCharacterType(ECharacterType Type)
 		TargetClass = AuroraClass;
 		break;
 
+	case ECharacterType::Fey:
+		TargetClass = GunnerClass;
+		break;
+
+	case ECharacterType::Sparrow:
+		TargetClass = GunnerClass; // 수정 필요
+		break;
+
 	default:
 		checkNoEntry();
 		break;
