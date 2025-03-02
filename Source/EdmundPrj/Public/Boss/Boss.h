@@ -11,6 +11,8 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Boss.generated.h"
 
+class ABossAIController;
+class AMissionHandle;
 
 UCLASS()
 class EDMUNDPRJ_API ABoss : public ABaseMonster {
@@ -306,5 +308,13 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
     float Attack4_CooldownDuration = 20.0f;
 
+    ////
+    void InitBoss(AMissionHandle* NewMissionHandle);
+    void CheckWeaken();
+    void ApplyWeaken();
+
+    TObjectPtr<ABossAIController> BossController = nullptr;
+    TObjectPtr<AMissionHandle> MissionHandle = nullptr;
+    bool bIsStart = false;
 };
 

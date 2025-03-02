@@ -19,9 +19,8 @@ public:
 	virtual void InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type) override;
 	virtual void SetIsActive(bool Value) override;
 
-	bool GetWeakend() const;
-	EBossState GetLockSkill() const;
 	void SpawnMonster() const;
+	void RequestMoveToNextPattern();
 	void ClearBoss();
 
 private:
@@ -29,8 +28,10 @@ private:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
-	TSubclassOf<ABoss> BossActor;
+	TSubclassOf<ABoss> BossClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TObjectPtr<UBehaviorTree> BossBt;
+
+	TObjectPtr<ABoss> BossPawn;
 };

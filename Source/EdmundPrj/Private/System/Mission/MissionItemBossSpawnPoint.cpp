@@ -6,6 +6,7 @@
 #include "Boss/Boss.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Boss/BossAIController.h"
 
 void AMissionItemBossSpawnPoint::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
@@ -22,25 +23,23 @@ void AMissionItemBossSpawnPoint::SetIsActive(bool Value)
 	{
 		SpawnBoss();
 		PrintMissionActiveText();
-		MissionHandle->NotifyStartedBossStage();
-		//Test
-		SpawnMonster();
+		MissionHandle->NotifyStartedBossStage(this);
 	}
-}
-
-bool AMissionItemBossSpawnPoint::GetWeakend() const
-{
-	return MissionHandle->GetWeakenBoss();
-}
-
-EBossState AMissionItemBossSpawnPoint::GetLockSkill() const
-{
-	return MissionHandle->GetLockedSkill();
 }
 
 void AMissionItemBossSpawnPoint::SpawnMonster() const
 {
 	MissionHandle->RequestSpawnToSpawnerHandle();
+}
+
+void AMissionItemBossSpawnPoint::RequestMoveToNextPattern()
+{
+	ABossAIController* BossController = BossPawn->GetController<ABossAIController>();
+
+	if (IsValid(BossController))
+	{
+		BossController->NotifyClearHalfPattern();
+	}
 }
 
 void AMissionItemBossSpawnPoint::ClearBoss()
@@ -50,6 +49,19 @@ void AMissionItemBossSpawnPoint::ClearBoss()
 
 void AMissionItemBossSpawnPoint::SpawnBoss()
 {
-	//AActor* Enemy_Instance = UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), EnemyPawnExplosion, EnemyBehaviorTree, GetActorLocation(), GetActorRotation(), true);
-	UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), BossActor, BossBt, GetActorLocation(), GetActorRotation(), true);
+	if (!IsValid(BossClass))
+	{
+		return;
+	}
+
+	if (!IsValid(BossBt))
+	{
+		return;
+	}
+
+	APawn* NewBoss = UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), BossClass, BossBt, GetActorLocation(), GetActorRotation(), true);
+	
+	BossPawn = Cast<ABoss>(NewBoss);
+
+	BossPawn->InitBoss(MissionHandle);
 }
