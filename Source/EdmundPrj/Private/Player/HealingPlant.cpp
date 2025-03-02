@@ -96,3 +96,8 @@ void AHealingPlant::Deactivate()
 	GetWorldTimerManager().ClearTimer(HealCycleHandle);
 	Super::Deactivate();
 }
+
+void AHealingPlant::UpgradeSkill()
+{
+	HealAmount += DamageMultiplierAmount;
+}

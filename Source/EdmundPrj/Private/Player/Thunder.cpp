@@ -32,7 +32,7 @@ void AThunder::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 			this,
 			UDamageType::StaticClass());
 	
-		ElectricEffectPool->ActivateElectricEffect(Monster->GetActorLocation());
+		ElectricEffectPool->ActivateElectricEffect(Monster->GetActorLocation(), ElectricCount);
 	}
 }
 
@@ -44,6 +44,12 @@ void AThunder::Deactivate()
 void AThunder::SpawnTimerSkill()
 {
 	Super::SpawnTimerSkill();
+}
+
+void AThunder::UpgradeSkill()
+{
+	ElectricCount++;
+	DamageMultiplier += DamageMultiplierAmount;
 }
 
 

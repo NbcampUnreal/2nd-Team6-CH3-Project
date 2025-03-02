@@ -12,6 +12,7 @@ struct FInputActionValue;
 class AEdmundGameState;
 class USkillManager;
 class UTimerSkillSpawnManagerComponent;
+class UPassiveSkillManager;
 class UActiveSkillSpawnManager;
 class UElectricEffectPool;
 
@@ -37,6 +38,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
 	UActiveSkillSpawnManager* ActiveSkillSpawnManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill");
+	UPassiveSkillManager* PassiveSkillManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<UElectricEffectPool> ElectricEffectPool;
