@@ -24,6 +24,7 @@ APlayerCharacter::APlayerCharacter()
 	MeleeAttackMontage = nullptr;
 
 	CurrentAmmo = MaxAmmo = 20;
+	ZoomMouseMoveMultipler = 0.5f;
 
 	IsMeleeAttack = false;
 	IsAttack = false;
@@ -110,7 +111,7 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 	// 줌상태에서 마우스 감도 낮추기
 	if (IsZoom)
 	{
-		LookInput /= 4;
+		LookInput *= ZoomMouseMoveMultipler;
 	}
 
 	AddControllerYawInput(LookInput.X);
@@ -130,7 +131,7 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 		// 총소리 재생
 		if (FireSound)
 		{
-			//UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 			CurrentAudioComp->SetSound(FireSound);
 			CurrentAudioComp->Play();
 		}
