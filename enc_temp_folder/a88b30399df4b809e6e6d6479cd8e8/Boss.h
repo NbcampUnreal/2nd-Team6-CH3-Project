@@ -150,7 +150,7 @@ private:
     UPROPERTY()
     UBoss_AnimInstance* AnimInstance;
 
-    int32 PoolSize = 70;
+    int32 PoolSize = 15;
     int32 ComboPhase = 0;
     bool bSkill1Used = false;
     bool bSkill2Used = false;
@@ -215,26 +215,17 @@ public:
     UPROPERTY(BlueprintReadWrite)
     class UBTTask_BossAttack3* CurrentAttackTask;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
     float MeleeAttackDashDistance_Attack1 = 10000.0f; // 1타 돌진 거리
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
     float MeleeAttackDashDistance_Attack2 = 10000.0f; // 2타 돌진 거리
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
     float MeleeAttackDashSpeed_Attack1 = 1200.0f; // 1타 돌진 속도
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
     float MeleeAttackDashSpeed_Attack2 = 1300.0f; // 2타 돌진 속도
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float Attack3_3FiringDuration = 3.0f; // 3타 지속시간
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float Attack3_3FireInterval = 0.03f; // 3타 발사 간격
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    int32 Attack3_3BulletNum = 40; // 탄 발사 수
 
     // ***********************Attack 4*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")

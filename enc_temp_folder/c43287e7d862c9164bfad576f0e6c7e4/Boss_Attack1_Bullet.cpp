@@ -99,7 +99,7 @@ void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* Othe
 		return;
 	}
 
-	//UE_LOG(LogTemp, Log, TEXT("Bullet hit: %s"), *OtherActor->GetName());
+	UE_LOG(LogTemp, Log, TEXT("Bullet hit: %s"), *OtherActor->GetName());
 
 	if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
 	{
@@ -117,7 +117,7 @@ void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 		return;
 	}
 
-	//UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
+	UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
 
 	if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
 	{

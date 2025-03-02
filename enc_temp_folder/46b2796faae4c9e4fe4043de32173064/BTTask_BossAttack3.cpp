@@ -309,18 +309,16 @@ void UBTTask_BossAttack3::Attack3_RangedAttackNotify()
         BossRef->GetCharacterMovement()->StopMovementImmediately();
     }
 
-    CurrentRotation = BossRef->MuzzleLocation->GetComponentRotation();
+    CurrentRotation = BossRef->GetActorRotation();
+
+    if (!BossRef->GetWorld() || !BossRef->MuzzleLocation || !BossRef->Attack1BulletClass)
+        return;
+
     SpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
 
-    AccumulatedDeltaTime = 0.0f;
-    FiredBulletCount = 0;
+    BulletFireCount = 0;
 
-    BossRef->GetWorld()->GetTimerManager().SetTimer(BulletFireTimerHandle, this, &UBTTask_BossAttack3::FireSingleBullet, BossRef->Attack3_3FireInterval, true);
-}
-
-FVector UBTTask_BossAttack3::GetAdjustedSpawnLocation(const FVector& Offset) const
-{
-    return SpawnLocation + Offset;
+    BossRef->GetWorld()->GetTimerManager().SetTimer(BulletFireTimerHandle, this, &UBTTask_BossAttack3::FireSingleBullet, 1.0f, true);
 }
 
 void UBTTask_BossAttack3::FireSingleBullet()
@@ -330,20 +328,23 @@ void UBTTask_BossAttack3::FireSingleBullet()
         BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
         return;
     }
-    if (FiredBulletCount >= BossRef->Attack3_3BulletNum)
+
+    if (BulletFireCount >= 10)
     {
         BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
         return;
     }
-    FVector BulletDirection = CurrentRotation.Vector();
-    FVector Offset(0.0f, 0.0f, -15.0f);
-    FVector AdjustedSpawnLocation = GetAdjustedSpawnLocation(Offset);
+
+    float RandomYawOffset = FMath::RandRange(-30.0f, 30.0f);
+    FRotator BulletRotation = CurrentRotation;
+    BulletRotation.Yaw += RandomYawOffset;
+    FVector BulletDirection = BulletRotation.Vector();
 
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
     if (Bullet)
     {
-        Bullet->FireProjectile(AdjustedSpawnLocation, CurrentRotation, BulletDirection);
+        Bullet->FireProjectile(SpawnLocation, BulletRotation, BulletDirection);
     }
 
-    FiredBulletCount++;
+    BulletFireCount++;
 }

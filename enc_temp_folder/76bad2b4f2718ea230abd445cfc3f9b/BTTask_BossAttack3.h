@@ -68,14 +68,10 @@ public:
 
 	FTimerHandle CollisionDisableTimerHandle_Check1;
 	FTimerHandle CollisionDisableTimerHandle_Check2;
+	FTimerHandle BulletFireTimerHandle;
 
-private:
+	int32 BulletFireCount = 30;
 	FRotator CurrentRotation;
 	FVector SpawnLocation;
-	FTimerHandle BulletFireTimerHandle;
-	float AccumulatedDeltaTime;
-	int32 FiredBulletCount;
-
-	FVector GetAdjustedSpawnLocation(const FVector& Offset) const;
 
 };
