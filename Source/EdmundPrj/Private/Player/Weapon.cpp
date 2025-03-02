@@ -90,13 +90,14 @@ void AWeapon::ReturnBulletToPool(ABaseProjectile* Bullet)
 	}
 }
 
-bool AWeapon::Fire()
+bool AWeapon::Fire(float NewAttackDelay)
 {
 	if (IsAttack)
 	{
 		return false;
 	}
 
+	AttackDelay = NewAttackDelay;
 	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 
 	// BulletPool에서 총알을 가져옴

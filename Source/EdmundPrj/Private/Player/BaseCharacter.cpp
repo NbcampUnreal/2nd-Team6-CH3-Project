@@ -13,7 +13,7 @@
 #include "Player/SkillManager.h"
 #include "Player/TimerSkillSpawnManagerComponent.h"
 #include "Player/ActiveSkillSpawnManager.h"
-#include "Player\ElectricEffectPool.h"
+#include "Player/ElectricEffectPool.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -497,7 +497,6 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 	if (IsValid(HitActionMontage) && !CheckAction())
 	{
-		UE_LOG(LogTemp, Error, TEXT("active"));
 		PlayAnimMontage(HitActionMontage);
 	}
 
@@ -509,8 +508,6 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	// HP는 정수, 데미지는 소수?
 	// HP 음수 방지
 	HP = FMath::Max(0.0f, HP - ActualDamage);
-
-	UE_LOG(LogTemp, Error, TEXT("CurrentHP: %d"), HP);
 
 	if (HP == 0 && !IsDie)
 	{
@@ -630,7 +627,7 @@ void ABaseCharacter::GetUpgradeStatus()
 	CriticalProb = CriticalProb + ShopStatusList[2]->CurrentLevel * ShopStatusList[2]->AdvanceValue;
 
 	// AttackSpeed
-	// 자식 클래스에서
+	AttackDelay = AttackDelay * (1.0f - ShopStatusList[3]->CurrentLevel * ShopStatusList[3]->AdvanceValue * 0.1);
 
 	// MoveSpeed
 	float SpeedMultipler = 1.0f + ShopStatusList[4]->CurrentLevel * ShopStatusList[4]->AdvanceValue;
@@ -643,7 +640,7 @@ void ABaseCharacter::GetUpgradeStatus()
 	EvasionProb = EvasionProb + ShopStatusList[5]->CurrentLevel * ShopStatusList[5]->AdvanceValue;
 
 	// Defence
-	Defense = Defense * (1.0f + ShopStatusList[6]->CurrentLevel * ShopStatusList[6]->AdvanceValue);
+	Defense = Defense + ShopStatusList[6]->CurrentLevel * ShopStatusList[6]->AdvanceValue;
 
 	// ExpAmount
 	ExpMultipler = ExpMultipler + ShopStatusList[7]->CurrentLevel * ShopStatusList[7]->AdvanceValue;
@@ -655,12 +652,12 @@ void ABaseCharacter::GetUpgradeStatus()
 	ItemDropProb = ItemDropProb + ShopStatusList[9]->CurrentLevel * ShopStatusList[9]->AdvanceValue;
 
 	// MaxAmmo
-	// 자식 클래스에서
+	MaxStamina = MaxStamina * (100.0f + ShopStatusList[10]->CurrentLevel * ShopStatusList[10]->AdvanceValue) / 100;
 
 	// ReloadTime
-	// 자식 클래스에서
+	// 거너만 적용
 
-	RevivalCount = ShopStatusList[12]->CurrentLevel * ShopStatusList[0]->AdvanceValue;
+	RevivalCount = ShopStatusList[12]->CurrentLevel * ShopStatusList[12]->AdvanceValue;
 }
 
 void ABaseCharacter::ActiveDieAction()

@@ -54,6 +54,7 @@ protected:
 private:
 	bool IsAttack;
 	int32 ComboCount;
+	float ComboTimeDuration;
 
 	FTimerHandle ComboResetTimerHandle;
 
