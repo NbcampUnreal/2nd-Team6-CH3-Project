@@ -322,9 +322,22 @@ void AEdmundGameState::RequestInteraction()
 	MissionHandle->OnPressedKeyFromPlayer();
 }
 
-void AEdmundGameState::EndCurrentLevel()
+void AEdmundGameState::EndCurrentLevel(bool bIsClear)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+
+	int32 TotalMoney = EdmundGameInstance->GetPossessMoney();
+
+	if (bIsClear)
+	{
+		EdmundGameInstance->AddPossessMoney(MissionClearMoney);
+		NotifyResultValue(CurrentLevelMoney, TotalMoney, MissionClearMoney);
+	}
+	else
+	{
+		NotifyResultValue(CurrentLevelMoney, TotalMoney, 0);
+	}
+	
 	EdmundGameInstance->AddPossessMoney(CurrentLevelMoney);
 }
 
@@ -474,5 +487,17 @@ void AEdmundGameState::NotifySelectCharacterType(ECharacterType CharacterType) c
 			continue;
 		}
 		Observer->ChangedCharacterType(CharacterType);
+	}
+}
+
+void AEdmundGameState::NotifyResultValue(int32 CurrnetMoney, int32 TotalMoney, int32 MissionMoney) const
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedMissionStateToEnd(CurrnetMoney, TotalMoney, MissionMoney);
 	}
 }

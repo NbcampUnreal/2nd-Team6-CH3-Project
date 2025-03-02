@@ -29,9 +29,6 @@ public:
 	virtual void ChangedPlayerOther(const int32 MaxValue, const int32 CurrentValue) = 0;
 
 	UFUNCTION()
-	virtual void ChangedPlayerMoney(const int32 Money) = 0;
-
-	UFUNCTION()
 	virtual void ChangedPlayerExp(const int32 MaxExp, const int32 CurrentExp) = 0;
 
 	UFUNCTION()
@@ -45,4 +42,7 @@ public:
 
 	UFUNCTION()
 	virtual void ChangedMissionText(const FString& MissionText) = 0;
+
+	UFUNCTION()
+	virtual void ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney) = 0;
 };

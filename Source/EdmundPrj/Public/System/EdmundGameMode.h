@@ -45,6 +45,12 @@ public:
 	TSubclassOf<ABaseCharacter> AuroraClass = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")
+	TSubclassOf<ABaseCharacter> FeyClass = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")
+	TSubclassOf<ABaseCharacter> SparrowClass = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")
 	TSubclassOf<AActor> MissionHandleClass = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Setting")

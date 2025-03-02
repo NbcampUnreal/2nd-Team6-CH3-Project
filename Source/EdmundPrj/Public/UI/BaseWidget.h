@@ -20,12 +20,12 @@ public:
 	virtual void ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp) override {};
 	virtual void ChangedPlayerAmmo(const int32 MaxAmmo, const int32 CurrentAmmo) override {};
 	virtual void ChangedPlayerOther(const int32 MaxValue, const int32 CurrentValue) override {};
-	virtual void ChangedPlayerMoney(const int32 Money) override {};
 	virtual void ChangedPlayerExp(const int32 MaxExp, const int32 CurrentExp) override {};
 	virtual void ChangedSkillList() override {};
 	virtual void ChangedCharacterType(const ECharacterType CharacterType) override {};
 	virtual void ChangedNotifyText(const FString& NotifyText) override {};
 	virtual void ChangedMissionText(const FString& MissionText) override {};
+	virtual void ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney) override {};
 
 	virtual void InitWidget(UUIHandle* uiHandle);
 	virtual void Action();
