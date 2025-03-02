@@ -24,6 +24,7 @@ APlayerCharacter::APlayerCharacter()
 	MeleeAttackMontage = nullptr;
 
 	CurrentAmmo = MaxAmmo = 20;
+	ZoomMouseMoveMultipler = 0.5f;
 
 	IsMeleeAttack = false;
 	IsAttack = false;
@@ -110,7 +111,7 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 	// 줌상태에서 마우스 감도 낮추기
 	if (IsZoom)
 	{
-		LookInput /= 4;
+		LookInput *= ZoomMouseMoveMultipler;
 	}
 
 	AddControllerYawInput(LookInput.X);
