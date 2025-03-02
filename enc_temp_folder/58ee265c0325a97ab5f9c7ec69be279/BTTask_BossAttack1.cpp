@@ -28,11 +28,12 @@ EBTNodeResult::Type UBTTask_BossAttack1::ExecuteTask(UBehaviorTreeComponent& Own
 	{
 		return EBTNodeResult::Failed;
 	}
+	if (BossRef)
+	{
+		BossRef->FireBullet();
+	}
 
 	CachedOwnerComp = &OwnerComp;
-
-	BossRef->DisableMovement();
-	BossRef->DisableRotation();
 
 	UBoss_AnimInstance* AnimInst = Cast<UBoss_AnimInstance>(BossRef->GetMesh()->GetAnimInstance());
 	if (AnimInst && AnimInst->Attack1Montage)
@@ -54,9 +55,6 @@ void UBTTask_BossAttack1::OnAnimationCompleted()
 	{
 		return;
 	}
-
-	BossRef->EnableMovement();
-	BossRef->EnableRotation();
 
 	BossRef->UpdateAttackCooldown(1);
 	BossRef->SetbChaseComplete(true);

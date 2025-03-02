@@ -111,6 +111,10 @@ public:
     float GetBossSkill1Damage() { return BossSkill1Damage; }
     void ActivateAttack2Collision();   
     void DeactivateAttack2Collision();
+    void DisableMovement();
+    void DisableRotation();
+    void EnableMovement();
+    void EnableRotation();
 
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
@@ -120,6 +124,10 @@ public:
     void OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
         bool bFromSweep, const FHitResult& SweepResult);
+
+    UFUNCTION(BlueprintCallable)
+    void FireBullet();
+
 
 private:
     UPROPERTY()

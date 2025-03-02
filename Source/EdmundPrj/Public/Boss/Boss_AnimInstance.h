@@ -37,6 +37,9 @@ public:
     bool bIsFalling;
 
     UPROPERTY(BlueprintReadOnly)
+    bool bIsMoving;
+
+    UPROPERTY(BlueprintReadOnly)
     float Fly;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")

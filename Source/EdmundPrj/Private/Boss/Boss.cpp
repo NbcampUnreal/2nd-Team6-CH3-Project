@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Boss/Attack/Boss_Attack1_Bullet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
@@ -484,6 +485,73 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
         }
     }
 }
+
+void ABoss::DisableMovement()
+{
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->StopMovementImmediately();
+        GetCharacterMovement()->DisableMovement();
+    }
+}
+
+void ABoss::DisableRotation()
+{
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->bOrientRotationToMovement = false;
+        GetCharacterMovement()->bUseControllerDesiredRotation = false;
+    }
+}
+
+
+void ABoss::EnableMovement()
+{
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+    }
+}
+
+void ABoss::EnableRotation()
+{
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->bOrientRotationToMovement = true;
+        GetCharacterMovement()->bUseControllerDesiredRotation = true;
+    }
+}
+
+
+void ABoss::FireBullet()
+{
+    if (!GetWorld() || !MuzzleLocation || !Attack1BulletClass)
+    {
+        return;
+    }
+
+    FVector SpawnLocation = MuzzleLocation->GetComponentLocation();
+    AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    if (!Player)
+    {
+        return;
+    }
+
+    FVector PlayerLocation = Player->GetActorLocation();
+    FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
+    FRotator TargetRotation = Direction.Rotation();
+    TargetRotation.Pitch = 0.0f;
+    TargetRotation.Roll = 0.0f;
+    FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.0f);
+    SetActorRotation(NewRotation);
+    ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(GetWorld(), Attack1BulletClass);
+    if (Bullet)
+    {
+        Bullet->FireProjectile(SpawnLocation, TargetRotation, Direction);
+    }
+}
+
+
 
 void ABoss::InitBoss(AMissionHandle* NewMissionHandle)
 {

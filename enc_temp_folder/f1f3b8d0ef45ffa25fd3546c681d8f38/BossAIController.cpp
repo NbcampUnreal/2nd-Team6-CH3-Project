@@ -99,7 +99,7 @@ void ABossAIController::Tick(float DeltaTime)
         );
 
         if (maxWeight == finalWeight4)      NextAttack = 4;
-        else if (maxWeight == finalWeight3) NextAttack = 1;
+        else if (maxWeight == finalWeight3) NextAttack = 3;
         else if (maxWeight == finalWeight2) NextAttack = 2;
         else if (maxWeight == finalWeight1) NextAttack = 1;
         else                                NextAttack = 0;
