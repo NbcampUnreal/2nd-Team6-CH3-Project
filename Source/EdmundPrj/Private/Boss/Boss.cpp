@@ -610,6 +610,36 @@ void ABoss::OnAttack2Finished()
 }
 
 
+//void ABoss::SetSkill2Invulnerable(bool NewIsInvulnerable)
+//{
+//    if (bIsInvulnerable)
+//    {
+//        Skill2InvulnerableStartHP = MonsterHP;
+//        GetWorldTimerManager().SetTimer(Skill2HealingTimerHandle, this, &ABoss::Skill2HealOverTime, Skill2HealingInterval, true);
+//    }
+//    else
+//    {
+//        GetWorldTimerManager().ClearTimer(Skill2HealingTimerHandle);
+//        Skill2InvulnerableStartHP = 0.0f;
+//    }
+//}
+//
+//void ABoss::Skill2HealOverTime()
+//{
+//    if (!bIsInvulnerable)
+//    {
+//        GetWorldTimerManager().ClearTimer(Skill2HealingTimerHandle);
+//        return;
+//    }
+//    float MaxHealAmount = MonsterMaxHP * (Skill2MaxHealingPercent / 100.0f);
+//    float AlreadyHealed = MonsterHP - Skill2InvulnerableStartHP;
+//    if (AlreadyHealed < MaxHealAmount)
+//    {
+//        float HealAmount = MonsterMaxHP * (Skill2HealingPercentPerInterval / 100.0f);
+//        MonsterHP = FMath::Min(MonsterHP + HealAmount, Skill2InvulnerableStartHP + MaxHealAmount);
+//    }
+//}
+
 
 void ABoss::InitBoss(AMissionHandle* NewMissionHandle)
 {

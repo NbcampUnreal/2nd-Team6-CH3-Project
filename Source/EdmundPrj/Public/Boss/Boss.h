@@ -120,6 +120,7 @@ public:
     float GetTurnSpeed() { return TurnSpeed; }
 
 
+
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
 
@@ -157,6 +158,11 @@ private:
     bool bSkill3Used = false;
     bool bIsInvulnerable = false;
     bool bChaseComplete = false;
+    float Skill2InvulnerableStartHP;
+    //void Skill2HealOverTime();
+    //void SetSkill2Invulnerable(bool NewIsInvulnerable);
+
+    FTimerHandle Skill2HealingTimerHandle;
 
 public:
     // ***********************Stat*************************
@@ -294,6 +300,14 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UMaterialInterface* Skill2NewMaterial;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    float Skill2HealingInterval = 10.0f; // 회복 간격
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    float Skill2HealingPercentPerInterval = 1.0f; // 회복 비율
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    float Skill2MaxHealingPercent = 10.0f; // 최대 회복 가능 비율
 
 
     // ***********************Skill 3*************************

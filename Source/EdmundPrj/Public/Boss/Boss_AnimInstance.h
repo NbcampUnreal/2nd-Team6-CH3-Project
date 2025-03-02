@@ -42,6 +42,12 @@ public:
     UPROPERTY(BlueprintReadOnly)
     float Fly;
 
+    UPROPERTY(BlueprintReadOnly)
+    int32 Situation = 0;
+
+    UPROPERTY(BlueprintReadOnly)
+    int32 UpDown = 1;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Attack1Montage;
 
