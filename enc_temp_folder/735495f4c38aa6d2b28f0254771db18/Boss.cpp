@@ -502,17 +502,8 @@ void ABoss::DisableRotation()
         GetCharacterMovement()->bOrientRotationToMovement = false;
         GetCharacterMovement()->bUseControllerDesiredRotation = false;
     }
-
-    // 🔹 보스 자체의 모든 회전 방지
-    bUseControllerRotationYaw = false;
-
-    // 🔹 AI 컨트롤러 회전 고정 (현재 회전값 유지)
-    AAIController* AIController = Cast<AAIController>(GetController());
-    if (AIController)
-    {
-        AIController->SetControlRotation(GetActorRotation());
-    }
 }
+
 
 void ABoss::EnableMovement()
 {
@@ -529,16 +520,6 @@ void ABoss::EnableRotation()
         GetCharacterMovement()->bOrientRotationToMovement = true;
         GetCharacterMovement()->bUseControllerDesiredRotation = true;
     }
-
-    // 🔹 현재 회전값 가져오기
-    FRotator CurrentRotation = GetActorRotation();
-
-    // 🔹 Yaw(좌우 회전)만 활성화, Pitch(X)와 Roll(Z)는 유지
-    FRotator NewRotation = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, 0.0f);
-    SetActorRotation(NewRotation);
-
-    // 🔹 보스의 Yaw(좌우) 회전만 허용
-    bUseControllerRotationYaw = true;
 }
 
 
@@ -559,39 +540,16 @@ void ABoss::FireBullet()
     FVector PlayerLocation = Player->GetActorLocation();
     FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
     FRotator TargetRotation = Direction.Rotation();
-
-    // 🔹 현재 보스의 회전값 가져오기
-    FRotator CurrentRotation = GetActorRotation();
-
-    // 🔹 서서히 회전하도록 보간 적용 (즉시 회전 방지)
-    FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 2.0f);
-
-    // 🔹 적용할 회전값 조정 (Pitch, Roll 유지)
-    SmoothRotation.Pitch = 0.0f;
-    SmoothRotation.Roll = 0.0f;
-
-    // 🔹 보스의 회전 적용
-    SetActorRotation(SmoothRotation);
-
-    // 🔹 AI 컨트롤러 회전 방지 (즉시 회전하는 문제 해결)
-    DisableRotation();
-
-    // 🔹 총알 발사 방향 ±30도 범위 내에서 조정
-    float RandomYawOffset = FMath::RandRange(-30.0f, 30.0f); // -30도 ~ +30도 랜덤 값
-    TargetRotation.Yaw += RandomYawOffset;
-
-    // 🔹 총알 발사
+    TargetRotation.Pitch = 0.0f;
+    TargetRotation.Roll = 0.0f;
+    FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.0f);
+    SetActorRotation(NewRotation);
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(GetWorld(), Attack1BulletClass);
     if (Bullet)
     {
         Bullet->FireProjectile(SpawnLocation, TargetRotation, Direction);
     }
-
-    // 🔹 일정 시간 후 AI 컨트롤러 회전 다시 활성화 (자연스럽게 복귀)
-    FTimerHandle ResetRotationTimer;
-    GetWorldTimerManager().SetTimer(ResetRotationTimer, this, &ABoss::EnableRotation, 1.0f, false); // 1초 후 회전 다시 활성화
 }
-
 
 
 
