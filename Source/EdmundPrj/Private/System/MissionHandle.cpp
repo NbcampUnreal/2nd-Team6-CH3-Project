@@ -215,6 +215,11 @@ void AMissionHandle::NotifyStartedBossStage(AMissionItemBossSpawnPoint* NewBossH
 {
 	BossHandle = NewBossHandle;
 	EdmundGameMode->StartBossMission();
+
+	for (ABaseMissionItem* TargetAlter : AlterSet)
+	{
+		TargetAlter->SetIsActive(false);
+	}
 }
 
 bool AMissionHandle::GetWeakenBoss() const
@@ -235,6 +240,12 @@ void AMissionHandle::RequestSpawnToSpawnerHandle()
 	{
 		DimensionPosSet.Add(Dimension->GetActorLocation());
 		Dimension->SetIsActive(false);
+	}
+
+	if (DimensionPosSet.Num() == 0)
+	{
+		ApplyNextPatternFromHalf();
+		return;
 	}
 
 	EdmundGameMode->SpawnMonsterByBoss(DimensionPosSet);
