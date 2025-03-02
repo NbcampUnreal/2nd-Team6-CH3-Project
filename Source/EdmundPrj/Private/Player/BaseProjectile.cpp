@@ -41,6 +41,8 @@ void ABaseProjectile::BeginPlay()
 
 void ABaseProjectile::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
 	FVector CurrentProjectileLocation = GetActorLocation();
 
 	// Sweep 충돌 검사
@@ -57,6 +59,8 @@ void ABaseProjectile::Tick(float DeltaTime)
 		ECC_Visibility,   // 충돌 채널
 		FCollisionShape::MakeSphere(32.0f)  // 범위 설정 (구체 형태)
 	);
+
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Activate")));
 
 	if (bHit)
 	{

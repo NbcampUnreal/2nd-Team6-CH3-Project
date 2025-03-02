@@ -110,6 +110,7 @@ void ABaseCharacter::BeginPlay()
 	{
 		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+		CurrentGameState->NotifyPlayerExp(MaxExp, CurrentExp);
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -554,6 +555,11 @@ void ABaseCharacter::AddExp(int32 Exp)
 	{
 		LevelUp();
 	}
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerExp(MaxExp, CurrentExp);
+	}
 }
 
 void ABaseCharacter::LevelUp()
@@ -572,8 +578,9 @@ void ABaseCharacter::LevelUp()
 
 	if (IsValid(CurrentGameState))
 	{
-		CurrentGameState->CreateRandomSkillSet();
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
+		CurrentGameState->CreateRandomSkillSet();
 	}
 }
 
@@ -694,7 +701,10 @@ void ABaseCharacter::UpdateStamina()
 
 	Stamina = FMath::Clamp(Stamina, 0, MaxStamina);
 
-	CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
+	}
 }
 
 bool ABaseCharacter::CheckAction()
