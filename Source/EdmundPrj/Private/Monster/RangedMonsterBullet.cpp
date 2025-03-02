@@ -73,7 +73,7 @@ void ARangedMonsterBullet::OnMonsterBulletOverlap(UPrimitiveComponent* Overlappe
 
 		GetWorld()->GetTimerManager().ClearTimer(MonsterBulletLifeTimerHandle);
 
-		UE_LOG(LogTemp, Warning, TEXT("%f"), DamageValue);
+		//UE_LOG(LogTemp, Warning, TEXT("%f"), DamageValue);
 
 		EndMonsterBulletLife();
 	}
