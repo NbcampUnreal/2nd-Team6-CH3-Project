@@ -60,8 +60,6 @@ void ABaseProjectile::Tick(float DeltaTime)
 		FCollisionShape::MakeSphere(32.0f)  // 범위 설정 (구체 형태)
 	);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Activate")));
-
 	if (bHit)
 	{
 		// 충돌한 객체가 있다면

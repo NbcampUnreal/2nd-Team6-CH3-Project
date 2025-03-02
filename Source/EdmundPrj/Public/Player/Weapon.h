@@ -19,7 +19,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	bool Fire();
+	bool Fire(float NewAttackDelay);
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class USkeletalMeshComponent> Mesh;
