@@ -130,7 +130,7 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 		// ÃÑ¼Ò¸® Àç»ý
 		if (FireSound)
 		{
-			//UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 			CurrentAudioComp->SetSound(FireSound);
 			CurrentAudioComp->Play();
 		}

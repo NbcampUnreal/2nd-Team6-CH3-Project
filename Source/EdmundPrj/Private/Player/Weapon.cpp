@@ -1,5 +1,5 @@
 #include "Player/Weapon.h"
-#include "Player/Bullet.h"
+#include "Player/BaseProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Player/BaseCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -48,7 +48,7 @@ void AWeapon::BeginPlay()
 void AWeapon::InitializeBulletPool(int32 PoolSize)
 {
 	FRotator SpawnRotation(0, 0, 0);
-	FVector SpawnLocation(0, 0, 0);
+	FVector SpawnLocation(0, 0, -1000);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 
@@ -57,7 +57,7 @@ void AWeapon::InitializeBulletPool(int32 PoolSize)
 	{
 		SpawnLocation.X += 2000;
 
-		ABullet* NewBullet = GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
+		ABaseProjectile* NewBullet = GetWorld()->SpawnActor<ABaseProjectile>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
 		if (NewBullet)
 		{
 			NewBullet->SetActorHiddenInGame(true);  // 초기에는 총알을 숨김
@@ -66,22 +66,22 @@ void AWeapon::InitializeBulletPool(int32 PoolSize)
 	}
 }
 
-ABullet* AWeapon::GetBulletFromPool()
+ABaseProjectile* AWeapon::GetBulletFromPool()
 {
 	// 사용 가능한 총알을 풀에서 가져옴
-	for (ABullet* Bullet : BulletPool)
+	for (ABaseProjectile* ABaseProjectile : BulletPool)
 	{
-		if (Bullet && Bullet->IsHidden())
+		if (ABaseProjectile && ABaseProjectile->IsHidden())
 		{
-			Bullet->SetBulletHidden(false);  // 숨겨둔 총알을 보이게 설정
-			return Bullet;
+			ABaseProjectile->SetBulletHidden(false);  // 숨겨둔 총알을 보이게 설정
+			return ABaseProjectile;
 		}
 	}
 
 	return nullptr;
 }
 
-void AWeapon::ReturnBulletToPool(ABullet* Bullet)
+void AWeapon::ReturnBulletToPool(ABaseProjectile* Bullet)
 {
 	// 총알을 풀로 반환하고 숨김
 	if (Bullet)
@@ -100,7 +100,7 @@ bool AWeapon::Fire()
 	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 
 	// BulletPool에서 총알을 가져옴
-	ABullet* BulletToFire = GetBulletFromPool();
+	ABaseProjectile* BulletToFire = GetBulletFromPool();
 	if (BulletToFire)
 	{
 		FRotator SpawnRotation = MuzzleOffset->GetComponentRotation();
@@ -121,7 +121,7 @@ bool AWeapon::Fire()
 		FVector TargetLocation = WorldCenter + WorldDirection * 3500;
 		SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, TargetLocation);
 
-		BulletToFire->SetActorLocation(SpawnLocation + WorldDirection * 100);
+		BulletToFire->SetActorLocation(SpawnLocation);
 		BulletToFire->SetActorRotation(SpawnRotation);
 
 		// 총알의 이동 방향 설정

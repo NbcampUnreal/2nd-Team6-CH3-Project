@@ -45,7 +45,7 @@ ABaseCharacter::ABaseCharacter()
 	SprintSpeed = 1000.0f;
 	CrouchMoveSpeed = 300.0f;
 
-	HP = MaxHP = 300;
+	HP = MaxHP = 200;
 	Stamina = MaxStamina = 100;
 	StaminaRecoveryAmount = StaminaConsumAmount = 0.0f;
 
@@ -79,6 +79,8 @@ ABaseCharacter::ABaseCharacter()
 	EvasionSuccessSound = nullptr;
 	RevivalSuccessSound = nullptr;
 	DeathSound = nullptr;
+
+	CanCrouchCharacter = true;
 }
 
 void ABaseCharacter::BeginPlay()
@@ -106,6 +108,7 @@ void ABaseCharacter::BeginPlay()
 
 	if (IsValid(CurrentGameState))
 	{
+		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
 
@@ -147,7 +150,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 			{
 				EnhancedInput->BindAction(
 					PlayerController->JumpAction,
-					ETriggerEvent::Triggered,
+					ETriggerEvent::Started,
 					this,
 					&ABaseCharacter::StartJump
 				);
@@ -262,9 +265,9 @@ void ABaseCharacter::Look(const FInputActionValue& value)
 	}
 
 	FVector2D LookInput = value.Get<FVector2D>();
-
-	AddControllerYawInput(LookInput.X);
+	
 	AddControllerPitchInput(LookInput.Y);
+	AddControllerYawInput(LookInput.X);
 }
 
 void ABaseCharacter::StartJump(const FInputActionValue& value)
@@ -349,7 +352,7 @@ void ABaseCharacter::Interaction(const FInputActionValue& value)
 
 void ABaseCharacter::StartCrouch(const FInputActionValue& value)
 {
-	if (IsDie)
+	if (IsDie || !CanCrouchCharacter)
 	{
 		return;
 	}
@@ -390,7 +393,7 @@ void ABaseCharacter::StartCrouch(const FInputActionValue& value)
 
 void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 {
-	if (IsDie)
+	if (IsDie || !CanCrouchCharacter)
 	{
 		return;
 	}
@@ -492,6 +495,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 	if (IsValid(HitActionMontage) && !CheckAction())
 	{
+		UE_LOG(LogTemp, Error, TEXT("active"));
 		PlayAnimMontage(HitActionMontage);
 	}
 
@@ -503,6 +507,8 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	// HP는 정수, 데미지는 소수?
 	// HP 음수 방지
 	HP = FMath::Max(0.0f, HP - ActualDamage);
+
+	UE_LOG(LogTemp, Error, TEXT("CurrentHP: %d"), HP);
 
 	if (HP == 0 && !IsDie)
 	{
@@ -651,7 +657,7 @@ void ABaseCharacter::GetUpgradeStatus()
 
 void ABaseCharacter::ActiveDieAction()
 {
-	// 회피 성공 사운드
+	// 죽음 사운드
 	if (IsValid(DeathSound))
 	{
 		CurrentAudioComp->SetSound(DeathSound);
