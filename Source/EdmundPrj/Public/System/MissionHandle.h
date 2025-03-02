@@ -11,6 +11,8 @@ class AEdmundGameMode;
 class AEdmundGameState;
 class ABaseMissionItem;
 class AMissionItemBossSpawnPoint;
+class ANPCMonster;
+class UBehaviorTree;
 struct FMissionDataRow;
 
 UCLASS()
@@ -34,6 +36,12 @@ public:
 	void CompleteMission();
 
 	void RequestSwapBgm(EBGMSoundType Type);
+
+	// Npc Controll
+	void SpawnNpc(const FVector& SpawnPos);
+	void SetNpcBondageMode(bool bIsBondage);
+	void SetNpcBattleMode(bool bIsBattle);
+	void SetNpcMoveMode(bool bIsMove);
 
 	// Mission1
 	void SetPrison(ABaseMissionItem* NewPrison);
@@ -65,6 +73,13 @@ protected:
 private:
 	void SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPos, const FMissionDataRow* MissionData);
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Npc")
+	TSubclassOf<ANPCMonster> NpcClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Npc")
+	TObjectPtr<UBehaviorTree> NpcBT;
+
 private:
 	TArray<FMissionDataRow*> MissionDataSet;
 	TArray<ABaseMissionItem*> MissionItemSet;
@@ -78,6 +93,8 @@ private:
 	TObjectPtr<ABaseMissionItem> TargetMissionItem = nullptr;
 	TObjectPtr<ABaseMissionItem> Prison = nullptr;
 	TObjectPtr<AMissionItemBossSpawnPoint> BossHandle = nullptr;
+
+	TObjectPtr<ANPCMonster> NpcPawn;
 
 	FVector TargetPointLocation = FVector::ZeroVector;
 

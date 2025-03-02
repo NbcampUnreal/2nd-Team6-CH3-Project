@@ -13,6 +13,8 @@ void AMissionItemPrison::InitMissionItem(AMissionHandle* NewMissionHandle, const
 	SetActorTickEnabled(false);
 
 	MissionHandle->SetPrison(this);
+	MissionHandle->SpawnNpc(GetActorLocation());
+	MissionHandle->SetNpcBondageMode(true);
 }
 
 void AMissionItemPrison::ActionEventByPressedKey()
@@ -90,7 +92,8 @@ void AMissionItemPrison::CompleteProgress()
 	Super::CompleteProgress();
 
 	SetVisible(false);
-	//UpdateNotifyTextToUI();
+	MissionHandle->SetNpcBondageMode(false);
+	MissionHandle->SetNpcMoveMode(true);
 	MissionHandle->CompleteMission();
 }
 
