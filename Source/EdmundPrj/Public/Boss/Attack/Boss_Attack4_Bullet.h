@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NiagaraComponent.h"
 #include "Boss_Attack4_Bullet.generated.h"
 
 class USphereComponent;
@@ -74,6 +75,9 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4|Homing")
     AActor* HomingTarget;
+
+    UPROPERTY(VisibleAnywhere)
+    UNiagaraComponent* Attack4Niagara;
 
     bool bIsHoming;
 

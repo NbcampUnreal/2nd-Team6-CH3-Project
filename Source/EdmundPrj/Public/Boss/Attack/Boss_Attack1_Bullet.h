@@ -7,6 +7,7 @@
 class USphereComponent;
 class UStaticMeshComponent;
 class UParticleSystemComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class EDMUNDPRJ_API ABoss_Attack1_Bullet : public AActor
@@ -70,6 +71,9 @@ public:
 	// 탄환 메쉬 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* BulletMesh;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* Attack1Niagara;
 
 	// 탄환 풀
 	static TArray<ABoss_Attack1_Bullet*> BulletPool;

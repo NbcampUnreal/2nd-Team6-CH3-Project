@@ -39,4 +39,7 @@ protected:
 	void StartDescend();
 	void DelayedFire_Attack2();
 	void DelayedTransition();
+
+	UFUNCTION()
+	void OnMontageNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 };
