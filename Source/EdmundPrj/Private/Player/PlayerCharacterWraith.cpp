@@ -26,6 +26,7 @@ APlayerCharacterWraith::APlayerCharacterWraith()
 
 	ReloadMontage = nullptr;
 
+	ChargeMontage = nullptr;
 	AttackMontage = nullptr;
 	MeleeAttackMontage = nullptr;
 
@@ -172,6 +173,11 @@ void APlayerCharacterWraith::StartAttack(const FInputActionValue& value)
 	if (CurrentAmmo <= 0 || CheckAction())
 	{
 		return;
+	}
+
+	if (IsValid(MeleeAttackMontage))
+	{
+		PlayAnimMontage(ChargeMontage);
 	}
 
 	IsAttack = true;

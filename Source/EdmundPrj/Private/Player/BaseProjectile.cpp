@@ -22,6 +22,8 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMovementComponent->InitialSpeed = BulletSpeed;
 	ProjectileMovementComponent->MaxSpeed = BulletSpeed;
 
+	BulletDuraion = 3.0f;
+
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnProjectileOverlap);
 
 	BulletLandParticle = nullptr;
@@ -80,7 +82,7 @@ void ABaseProjectile::SetBulletHidden(bool IsHidden)
 			BulletLifeTimerHandle,
 			this,
 			&ABaseProjectile::EndBulletLife,
-			3.0f,
+			BulletDuraion,
 			false
 		);
 	}

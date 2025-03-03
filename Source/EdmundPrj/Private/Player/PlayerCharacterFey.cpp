@@ -201,12 +201,12 @@ void APlayerCharacterFey::EndMeleeAttack()
 
 void APlayerCharacterFey::Attack(const FInputActionValue& value)
 {
-	Super::Attack(value);
-
 	if (Stamina < 10 || IsAttack)
 	{
 		return;
 	}
+
+	Super::Attack(value);
 
 	IsAttack = true;
 	Stamina -= 10;
