@@ -237,10 +237,10 @@ public:
     float Attack3_3FiringDuration = 3.0f; // 3타 지속시간
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float Attack3_3FireInterval = 0.03f; // 3타 발사 간격
+    float Attack3_3FireInterval = 0.1f; // 3타 발사 간격
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    int32 Attack3_3BulletNum = 40; // 탄 발사 수
+    int32 Attack3_3BulletNum = 20; // 탄 발사 수
 
     // ***********************Attack 4*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")

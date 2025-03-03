@@ -44,14 +44,9 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
         return EBTNodeResult::Failed;
     }
 
-    if (BossRef->GetWorld()->GetTimerManager().IsTimerActive(BulletFireTimerHandle))
-    {
-        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
-    }
-    FiredBulletCount = 0;
-
     BossRef->SetComboPhase(1);
     ComboPhase = 1;
+    //UE_LOG(LogTemp, Log, TEXT("ExecuteTask: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
 
     PlayAttack3Montage();
     return EBTNodeResult::InProgress;
@@ -314,13 +309,6 @@ void UBTTask_BossAttack3::Attack3_RangedAttackNotify()
         BossRef->GetCharacterMovement()->StopMovementImmediately();
     }
 
-    BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
-
-    if (BossRef->GetCharacterMovement())
-    {
-        BossRef->GetCharacterMovement()->StopMovementImmediately();
-    }
-
     CurrentRotation = BossRef->MuzzleLocation->GetComponentRotation();
     SpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
 
@@ -342,27 +330,33 @@ void UBTTask_BossAttack3::FireSingleBullet()
         BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
         return;
     }
+    if (FiredBulletCount >= BossRef->Attack3_3BulletNum)
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+        return;
+    }
 
+    // 매 발사마다 최신 노즐 위치와 회전값을 가져옴
     FRotator NewRotation = BossRef->MuzzleLocation->GetComponentRotation();
     FVector NewSpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
 
+    // 플레이어 태그가 붙은 액터의 Head 소켓 위치로 높이 조정 시도
     TArray<AActor*> PlayerActors;
     UGameplayStatics::GetAllActorsWithTag(BossRef->GetWorld(), FName("Player"), PlayerActors);
     if (PlayerActors.Num() > 0)
     {
+        // 첫 번째 플레이어 액터 선택
         AActor* PlayerActor = PlayerActors[0];
+        // 플레이어의 스켈레탈 메시 컴포넌트 찾기
         USkeletalMeshComponent* SkeletalMesh = PlayerActor->FindComponentByClass<USkeletalMeshComponent>();
         if (SkeletalMesh && SkeletalMesh->DoesSocketExist(FName("Head")))
         {
             FVector HeadLocation = SkeletalMesh->GetSocketLocation(FName("Head"));
-            //UE_LOG(LogTemp, Error, TEXT("머리 감지O"));
+            // 기존 NewSpawnLocation의 Z값을 Head 소켓의 Z값으로 교체하여 높이 조정
             NewSpawnLocation.Z = HeadLocation.Z;
         }
-        //else
-        //{
-        //    UE_LOG(LogTemp, Error, TEXT("머리 감지X"));
-        //}
     }
+    // 플레이어 액터나 Head 소켓이 없으면 기존 NewSpawnLocation 사용
 
     FVector BulletDirection = NewRotation.Vector();
 
