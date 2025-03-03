@@ -130,7 +130,10 @@ void AMissionHandle::SetNpcBattleMode(bool bIsBattle)
 		return;
 	}
 
-	NpcPawn->SetBattleMode(bIsBattle);
+	if (bGetNpcEquip)
+	{
+		NpcPawn->SetBattleMode(bIsBattle);
+	}
 }
 
 void AMissionHandle::SetNpcMoveMode(bool bIsMove)
@@ -190,7 +193,6 @@ void AMissionHandle::NotifyStartDefenceMode()
 void AMissionHandle::ApplyNpcEquip()
 {
 	bGetNpcEquip = true;
-	// npc가 도움 주게 변경 필요
 }
 
 void AMissionHandle::UpdateDefenceState(bool bIsOn)

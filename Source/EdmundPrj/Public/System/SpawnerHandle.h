@@ -42,6 +42,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ObjectPool")
 	TSubclassOf<AMonsterSpawner> SuperSpawner;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
+	int32 BossPatternSpawnCount = 1;
+
 private:
 	TObjectPtr<AEdmundGameMode> EdmundGameMode;
 	TObjectPtr<AEdmundGameState> EdmundGameState;
@@ -53,5 +56,4 @@ private:
 	ESceneType CurrentMission = ESceneType::Mission1;
 
 	int32 SpawnerClearCount = 0;
-	int32 BossPatternSpawnCount = 1;
 };

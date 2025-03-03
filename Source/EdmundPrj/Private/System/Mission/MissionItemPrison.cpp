@@ -15,6 +15,8 @@ void AMissionItemPrison::InitMissionItem(AMissionHandle* NewMissionHandle, const
 	MissionHandle->SetPrison(this);
 	MissionHandle->SpawnNpc(GetActorLocation());
 	MissionHandle->SetNpcBondageMode(true);
+
+	DeltaTargetTime = 1.0f / TargetTime;
 }
 
 void AMissionItemPrison::ActionEventByPressedKey()
@@ -74,10 +76,10 @@ void AMissionItemPrison::Tick(float DeltaTime)
 
 	CurrentTime += DeltaTime;
 
-	if (CurrentTime >= TargetTime)
+	if (CurrentTime >= UpdateTime)
 	{
 		CurrentTime = 0.0f;
-		ProgressValue -= TargetTime;
+		ProgressValue -= DeltaTargetTime * UpdateTime;
 		InteractionWidget->UpdateProgressBar(ProgressValue);
 
 		if (ProgressValue <= 0.0f)
