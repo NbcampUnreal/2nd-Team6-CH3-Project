@@ -6,6 +6,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABaseItem::ABaseItem()
@@ -24,7 +25,9 @@ ABaseItem::ABaseItem()
 	PickupSoundComp = CreateDefaultSubobject<UAudioComponent>(TEXT("PickupSound"));
 	PickupSoundComp->SetupAttachment(StaticMeshComp);
 
+	GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
 
+	ItemType = EItemType::Gold;
 }
 
 void ABaseItem::BeginPlay()
@@ -48,6 +51,13 @@ void ABaseItem::Tick(float DeltaTime)
 	FRotator NewRotator = GetActorRotation();
 	NewRotator.Yaw += 100.0f * DeltaTime;
 	SetActorRotation(NewRotator);
+}
+
+void ABaseItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorldTimerManager().ClearAllTimersForObject(this);
 }
 
 
@@ -75,22 +85,24 @@ void ABaseItem::ActivateItem(AActor* Actor)
 
 void ABaseItem::PlaySound()
 {
-	PickupSoundComp->SetSound(PickupSound);
+	GameState->PlayItemSound(PickupSoundComp, ItemType, ESoundType::Hit);
 
-	if (PickupSound)
-	{
+	//PickupSoundComp->SetSound(PickupSound);
+
+	//if (PickupSound)
+	//{
 		GetWorld()->GetTimerManager().ClearTimer(DestroyTimerHandle);
 
-		float SoundDuration = PickupSoundComp->Sound->GetDuration();
+		//float SoundDuration = PickupSoundComp->Sound->GetDuration();
 
-		PickupSoundComp->Play();
+		/*PickupSoundComp->Play();*/
 
-		GetWorld()->GetTimerManager().SetTimer(SoundDurationTimerHandle, this, &ABaseItem::ItemDestroy, SoundDuration, false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PickupSound가 없습니다."));
-	}
+		GetWorld()->GetTimerManager().SetTimer(SoundDurationTimerHandle, this, &ABaseItem::ItemDestroy, 1.0f, false);
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("PickupSound가 없습니다."));
+	//}
 }
 
 void ABaseItem::ItemDestroy()

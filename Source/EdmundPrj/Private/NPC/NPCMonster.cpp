@@ -10,6 +10,16 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Actor.h"
 
+// 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 여긴 NPC라 적용안됨
+void ANPCMonster::SetMonsterStatsByLevel()
+{
+    MonsterHP = 100 + (MonsterLevel * 50);
+    MonsterMaxHP = 100 + (MonsterLevel * 50);
+    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+}
+
+
 ANPCMonster::ANPCMonster()
 {
     NpcType = ENpcType::Baldor;
@@ -33,6 +43,11 @@ void ANPCMonster::BeginPlay()
     UpdatePatrolSpeed();
 
     GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
+
+    MonsterHP = 100 + (MonsterLevel * 50);
+    MonsterMaxHP = 100 + (MonsterLevel * 50);
+    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
 }
 
 
@@ -45,8 +60,6 @@ void ANPCMonster::MonsterAttackCheck()
 
     if (Monster)
     {
-
-        PlaySound();
 
         UCapsuleComponent* CollisionComp = NewObject<UCapsuleComponent>(this);
         CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
@@ -119,6 +132,8 @@ void ANPCMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 
 void ANPCMonster::NPCMonsterAttack()
 {
+    
+    PlaySound();
 
     UParticleSystemComponent* Particle = nullptr;
 

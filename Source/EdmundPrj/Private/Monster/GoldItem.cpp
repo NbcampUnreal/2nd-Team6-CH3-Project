@@ -20,8 +20,6 @@ void AGoldItem::SetGoldAmount(float NewGold)
 
 void AGoldItem::ActivateItem(AActor* Actor)
 {
-	AEdmundGameState* GameState = GetWorld()->GetGameState<AEdmundGameState>();
-
 	if (GameState)
 	{
 		GameState->AddCurrentLevelMoney(GoldAmount);

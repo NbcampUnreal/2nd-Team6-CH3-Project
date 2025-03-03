@@ -15,6 +15,8 @@ class EDMUNDPRJ_API ANPCMonster : public ABaseMonster
 	GENERATED_BODY()
 
 public:
+	void SetMonsterStatsByLevel() override;
+
 	ANPCMonster();
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Components")

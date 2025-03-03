@@ -15,6 +15,8 @@ class EDMUNDPRJ_API AMeleeMonster : public ABaseMonster
 	GENERATED_BODY()
 	
 public:
+	void SetMonsterStatsByLevel() override;
+
 	AMeleeMonster();
 
 	void MonsterAttackCheck() override;

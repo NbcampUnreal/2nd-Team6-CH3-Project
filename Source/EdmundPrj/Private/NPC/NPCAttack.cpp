@@ -10,7 +10,7 @@
 // Sets default values
 ANPCAttack::ANPCAttack()
 {
-    UE_LOG(LogTemp, Warning, TEXT("공격 스폰"));
+    //UE_LOG(LogTemp, Warning, TEXT("공격 스폰"));
 
     // Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = false;
@@ -43,7 +43,7 @@ ANPCAttack::ANPCAttack()
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("GetWorld()가 없습니다."));
+        //UE_LOG(LogTemp, Warning, TEXT("GetWorld()가 없습니다."));
     }
 }
 
