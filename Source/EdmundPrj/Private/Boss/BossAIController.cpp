@@ -45,11 +45,6 @@ void ABossAIController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (!bIsStart)
-    {
-        return;
-    }
-
     if (!IsValid(BossCharacter))
     {
         return;
@@ -65,7 +60,7 @@ void ABossAIController::Tick(float DeltaTime)
         return;
     }
 
-    CheckBossHeight();
+    //CheckBossHeight();
 
     int32 NextAttack = 0;
 
@@ -100,10 +95,10 @@ void ABossAIController::Tick(float DeltaTime)
 
         if (maxWeight == finalWeight4)      NextAttack = 4;
         else if (maxWeight == finalWeight3) NextAttack = 3;
-        else if (maxWeight == finalWeight2) NextAttack = 2;
+        else if (maxWeight == finalWeight2) NextAttack = 1;
         else if (maxWeight == finalWeight1) NextAttack = 1;
         else                                NextAttack = 0;
-
+        //NextAttack = 3;
         float Attack1Remaining = FMath::Max(0.0f, BossCharacter->Attack1_CooldownEnd - CurrentTime);
         float Attack2Remaining = FMath::Max(0.0f, BossCharacter->Attack2_CooldownEnd - CurrentTime);
         float Attack3Remaining = FMath::Max(0.0f, BossCharacter->Attack3_CooldownEnd - CurrentTime);
@@ -134,7 +129,6 @@ void ABossAIController::InitBlackboard(AMissionHandle* NewMissionHandle)
 {
     BBComp = GetBlackboardComponent();
     MissionHandle = NewMissionHandle;
-    bIsStart = true;
 }
 
 bool ABossAIController::CheckHpPattern() // 체력 퍼센트
@@ -169,21 +163,21 @@ bool ABossAIController::CheckHpPattern() // 체력 퍼센트
     return false;
 }
 
-void ABossAIController::CheckBossHeight()
-{
-    bool bIsFalling = BossCharacter->GetCharacterMovement()->IsFalling();
-    float BossHeight = BossCharacter->GetActorLocation().Z;
-    const float FlyThreshold = 10.0f;
-
-    if (bIsFalling || BossHeight > FlyThreshold)
-    {
-        BossCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-    }
-    else
-    {
-        BossCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-    }
-}
+//void ABossAIController::CheckBossHeight()
+//{
+//    bool bIsFalling = BossCharacter->GetCharacterMovement()->IsFalling();
+//    float BossHeight = BossCharacter->GetActorLocation().Z;
+//    const float FlyThreshold = 10.0f;
+//
+//    if (bIsFalling || BossHeight > FlyThreshold)
+//    {
+//        BossCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+//    }
+//    else
+//    {
+//        BossCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+//    }
+//}
 
 void ABossAIController::CheckLockedSkill(float CurrentTime)
 {

@@ -18,7 +18,7 @@ public:
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 private:
-    ABoss* BossRef;
+    ABoss* BossRef = nullptr;
     UBehaviorTreeComponent* CachedOwnerComp;
     int32 CurrentOverlapCount;
 

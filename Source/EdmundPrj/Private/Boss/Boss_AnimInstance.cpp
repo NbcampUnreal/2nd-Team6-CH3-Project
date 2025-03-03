@@ -46,6 +46,7 @@ void UBoss_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
         float CurrentSpeed = MovementComponent->Velocity.Size();
 
         MonsterMoveSpeed = CurrentSpeed;
+        bIsMoving = CurrentSpeed > 0.0f;
     }
 
     if (BossRef)
