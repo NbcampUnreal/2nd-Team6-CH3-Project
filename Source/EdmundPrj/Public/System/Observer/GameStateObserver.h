@@ -45,4 +45,16 @@ public:
 
 	UFUNCTION()
 	virtual void ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney) = 0;
+
+	UFUNCTION()
+	virtual void ChangedPlayerLevel(const int32 LevelValue) = 0;
+
+	UFUNCTION()
+	virtual void ChangedStageToProgress(const FString& ProgressText, const bool bIsOn) = 0;
+
+	UFUNCTION()
+	virtual void ChangedBossHp(const int32 MaxHp, const int32 CurrentHp) = 0;
+
+	UFUNCTION()
+	virtual void ChangedMissionInfoOnOff() = 0;
 };

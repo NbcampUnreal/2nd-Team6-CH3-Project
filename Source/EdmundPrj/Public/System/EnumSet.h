@@ -93,7 +93,11 @@ enum class ESoundType : uint8
 	MeleeAttack,
 	Reload,
 	Respawn,
-	Avoid
+	Avoid,
+	Attack2,
+	Attack3,
+	Attack4,
+	Weapon
 };
 
 UENUM(BlueprintType)

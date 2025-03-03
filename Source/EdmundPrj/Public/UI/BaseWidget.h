@@ -26,6 +26,10 @@ public:
 	virtual void ChangedNotifyText(const FString& NotifyText) override {};
 	virtual void ChangedMissionText(const FString& MissionText) override {};
 	virtual void ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney) override {};
+	virtual void ChangedPlayerLevel(const int32 LevelValue) override {};
+	virtual void ChangedStageToProgress(const FString& ProgressText, const bool bIsOn) override {};
+	virtual void ChangedBossHp(const int32 MaxHp, const int32 CurrentHp) override {};
+	virtual void ChangedMissionInfoOnOff() override {};
 
 	virtual void InitWidget(UUIHandle* uiHandle);
 	virtual void Action();

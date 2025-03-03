@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "System/EnumSet.h"
 #include "Components/AudioComponent.h"
+#include "UI/3DWidget/AIInteractionWidget.h"
+#include "System/EdmundGameState.h"
 #include "BaseMonster.generated.h"
 
 class AMonsterSpawner;
@@ -39,6 +41,7 @@ void SetCanDropReward(bool NewState);
 
 void SetMonsterLevel(int32 NewLevel);
 
+AEdmundGameState* GameState;
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
 UAudioComponent* CurrentAudioComp;
@@ -113,7 +116,7 @@ protected:
 	bool bCanDropReward = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
-	FName MonsterType;	
+	EMonsterType MonsterType;	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
 	EMonsterState MonsterState;
@@ -154,6 +157,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|UI")
 	UWidgetComponent* MonsterOverHeadWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|UI")
+	TObjectPtr<UAIInteractionWidget> MonsterOverHeadWidgetObject;
+
 	virtual float TakeDamage(
 		float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
@@ -166,7 +172,7 @@ protected:
 	void MonsterHit();
 	void MonsterHitEnd();
 
-	void UpdateMonsterOverHeadWidget();
+	void UpdateMonsterOverHeadWidget(float Damage);
 	void UpdateMonsterOverHeadWidgetEnd();
 
 	virtual void PlayParticle();

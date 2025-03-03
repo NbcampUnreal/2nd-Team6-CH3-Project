@@ -12,11 +12,14 @@ APlayerCharacterAurora::APlayerCharacterAurora()
 	ComboCount = 0;
 	ResetDelay = 1.0f;
 	AttackRangeRadius = 150.0f;
+	ComboTimeDuration = 1.2f;
 }
 
 void APlayerCharacterAurora::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ComboTimeDuration = ComboTimeDuration - AttackDelay;
 }
 
 void APlayerCharacterAurora::Attack(const FInputActionValue& value)
@@ -44,7 +47,7 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 						WeaponAudioComp->Play();
 					}
 
-					PlayAnimMontage(AttackMontages[0]);
+					PlayAnimMontage(AttackMontages[0], ComboTimeDuration);
 				}
 
 				break;
@@ -65,7 +68,7 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 						WeaponAudioComp->Play();
 					}
 
-					PlayAnimMontage(AttackMontages[1]);
+					PlayAnimMontage(AttackMontages[1], ComboTimeDuration);
 				}
 
 				break;
@@ -85,7 +88,7 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 						WeaponAudioComp->Play();
 					}
 
-					PlayAnimMontage(AttackMontages[2]);
+					PlayAnimMontage(AttackMontages[2], ComboTimeDuration);
 				}
 
 				break;
@@ -105,7 +108,7 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 						WeaponAudioComp->Play();
 					}
 
-					PlayAnimMontage(AttackMontages[3]);
+					PlayAnimMontage(AttackMontages[3], ComboTimeDuration);
 				}
 
 				break;
@@ -162,8 +165,6 @@ float APlayerCharacterAurora::TakeDamage(float DamageAmount, FDamageEvent const&
 	// HP는 정수, 데미지는 소수?
 	// HP 음수 방지
 	HP = FMath::Max(0.0f, HP - ActualDamage);
-
-	UE_LOG(LogTemp, Error, TEXT("CurrentHP: %d"), HP);
 
 	if (HP == 0 && !IsDie)
 	{

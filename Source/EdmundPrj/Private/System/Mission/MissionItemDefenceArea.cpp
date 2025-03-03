@@ -18,6 +18,7 @@ void AMissionItemDefenceArea::SetIsActive(bool Value)
 
 	SetVisible(Value);
 	MissionHandle->NotifyStartDefenceMode();
+	ProgressValue = 1.0f;
 }
 
 AMissionItemDefenceArea::AMissionItemDefenceArea() : Super()
@@ -40,7 +41,8 @@ void AMissionItemDefenceArea::Tick(float DeltaTime)
 	{
 		CurrentTime = 0.0f;
 		ProgressValue -= 0.01f;
-		InteractionWidget->UpdateProgressBar(ProgressValue);
+		//InteractionWidget->UpdateProgressBar(ProgressValue);
+		MissionHandle->UpdateDefenceProgress(ProgressValue);
 
 		if (ProgressValue <= 0.0f)
 		{
@@ -60,7 +62,8 @@ void AMissionItemDefenceArea::ActionBeginOverlap()
 
 	bIsPlayingInteraction = true;
 	SetActorTickEnabled(true);
-	InteractionWidget->VisibleProgressBar(true);
+	//InteractionWidget->VisibleProgressBar(true);
+	MissionHandle->UpdateDefenceState(true);
 	PrintMissionActiveText();
 }
 
@@ -74,7 +77,8 @@ void AMissionItemDefenceArea::ActionEndOverlap()
 	Super::ActionEndOverlap();
 
 	SetActorTickEnabled(false);
-	InteractionWidget->VisibleProgressBar(false);
+	//InteractionWidget->VisibleProgressBar(false);
+	MissionHandle->UpdateDefenceState(false);
 }
 
 void AMissionItemDefenceArea::CompleteProgress()

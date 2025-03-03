@@ -30,16 +30,43 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetBondageMode(bool NewState);
 
+	UFUNCTION(BlueprintCallable)
+	void SetMoveMode(bool NewState);
+
+	UFUNCTION(BlueprintCallable)
+	void InitSpawnParticlePlay();
+
+	void PlayBondageMontage();
+
+	void PlaySound();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
+	ENpcType NpcType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Animation")
+	UAnimMontage* BondageAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Particle")
+	UParticleSystem* SpawnParticle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Particle")
+	UParticleSystem* InitSpawnParticle;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
 	bool bIsFightMode = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
 	bool bIsBondageMode = false;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
+	bool bIsMoveMode = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Attack")
 	TSubclassOf<ANPCAttack> AttackClass;
 
 	bool bIsAttacked = false;
+
+	FTimerHandle BondageTimerHandle;
 
 	//void SetAttackedfalse();
 
@@ -51,6 +78,9 @@ public:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void NPCMonsterAttack();
 
 	//void PlayParticle() override;
 	//void PlaySound() override;

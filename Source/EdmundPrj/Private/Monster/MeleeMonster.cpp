@@ -8,6 +8,7 @@
 
 AMeleeMonster::AMeleeMonster()
 {
+    MonsterType = EMonsterType::Melee;
 }
 
 void AMeleeMonster::MonsterAttackCheck()
@@ -54,7 +55,7 @@ void AMeleeMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
     {
         PlayParticle();
 
-        UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
+        //UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
         AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
         ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
         if (Monster)
@@ -95,6 +96,7 @@ void AMeleeMonster::PlayParticle()
 
 void AMeleeMonster::PlaySound()
 {
-    CurrentAudioComp->SetSound(AttackSound);
-    CurrentAudioComp->Play();
+    GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
+    //CurrentAudioComp->SetSound(AttackSound);
+    //CurrentAudioComp->Play();
 }

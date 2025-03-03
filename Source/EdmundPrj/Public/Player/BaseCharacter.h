@@ -109,7 +109,7 @@ protected:
 		AActor* DamageCauser) override;
 
 	// 강화해놓은 스테이터스값 받기
-	void GetUpgradeStatus();
+	virtual void GetUpgradeStatus();
 
 	// 죽음
 	virtual void ActiveDieAction();

@@ -8,6 +8,7 @@
 
 ASuicideMonster::ASuicideMonster()
 {
+    MonsterType = EMonsterType::Suicide;
 }
 
 void ASuicideMonster::MonsterAttackCheck()
@@ -66,7 +67,7 @@ void ASuicideMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 {
     if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
     {
-        UE_LOG(LogTemp, Warning, TEXT("Suicide Attack Succeed")); // 공격 성공 Log
+        //UE_LOG(LogTemp, Warning, TEXT("Suicide Attack Succeed")); // 공격 성공 Log
         AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
         ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
         if (Monster)
@@ -106,6 +107,7 @@ void ASuicideMonster::PlayParticle()
 
 void ASuicideMonster::PlaySound()
 {
-    CurrentAudioComp->SetSound(AttackSound);
-    CurrentAudioComp->Play();
+    GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
+    //CurrentAudioComp->SetSound(AttackSound);
+    //CurrentAudioComp->Play();
 }

@@ -7,6 +7,9 @@
 #include "System/EdmundGameMode.h"
 #include "System/EdmundGameState.h"
 #include "System/Mission/MissionItemBossSpawnPoint.h"
+#include "NPC/NPCMonster.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include <Blueprint/AIBlueprintHelperLibrary.h>
 
 // Sets default values
 AMissionHandle::AMissionHandle()
@@ -94,6 +97,52 @@ void AMissionHandle::RequestSwapBgm(EBGMSoundType Type)
 	EdmundGameMode->SwapBgm(Type);
 }
 
+void AMissionHandle::SpawnNpc(const FVector& SpawnPos)
+{
+	if (!IsValid(NpcClass))
+	{
+		return;
+	}
+
+	if (!IsValid(NpcBT))
+	{
+		return;
+	}
+
+	APawn* NewNpc = UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), NpcClass, NpcBT, SpawnPos, FRotator::ZeroRotator, true);
+	NpcPawn = Cast<ANPCMonster>(NewNpc);
+}
+
+void AMissionHandle::SetNpcBondageMode(bool bIsBondage)
+{
+	if (!IsValid(NpcPawn))
+	{
+		return;
+	}
+
+	NpcPawn->SetBondageMode(bIsBondage);
+}
+
+void AMissionHandle::SetNpcBattleMode(bool bIsBattle)
+{
+	if (!IsValid(NpcPawn))
+	{
+		return;
+	}
+
+	NpcPawn->SetBattleMode(bIsBattle);
+}
+
+void AMissionHandle::SetNpcMoveMode(bool bIsMove)
+{
+	if (!IsValid(NpcPawn))
+	{
+		return;
+	}
+
+	NpcPawn->SetMoveMode(bIsMove);
+}
+
 void AMissionHandle::SetPrison(ABaseMissionItem* NewPrison)
 {
 	Prison = NewPrison;
@@ -124,6 +173,13 @@ void AMissionHandle::TeleportPlayerToTargetPoint()
 
 	FVector TargetVector = TargetPointLocation - FVector(-200, -200, 0);
 	PlayerPawn->SetActorLocation(TargetVector);
+
+	if (!IsValid(NpcPawn))
+	{
+		return;
+	}
+
+	NpcPawn->SetActorLocation(TargetVector - FVector(0, -500, 0));
 }
 
 void AMissionHandle::NotifyStartDefenceMode()
@@ -135,6 +191,16 @@ void AMissionHandle::ApplyNpcEquip()
 {
 	bGetNpcEquip = true;
 	// npc가 도움 주게 변경 필요
+}
+
+void AMissionHandle::UpdateDefenceState(bool bIsOn)
+{
+	EdmundGameState->NotifyOnOverlapedDefenceArea(bIsOn);
+}
+
+void AMissionHandle::UpdateDefenceProgress(float Value)
+{
+	EdmundGameState->NotifyUpdateStageProgress(Value);
 }
 
 void AMissionHandle::ApplyBossWeaken()
@@ -215,6 +281,11 @@ void AMissionHandle::NotifyStartedBossStage(AMissionItemBossSpawnPoint* NewBossH
 {
 	BossHandle = NewBossHandle;
 	EdmundGameMode->StartBossMission();
+
+	for (ABaseMissionItem* TargetAlter : AlterSet)
+	{
+		TargetAlter->SetIsActive(false);
+	}
 }
 
 bool AMissionHandle::GetWeakenBoss() const
@@ -235,6 +306,12 @@ void AMissionHandle::RequestSpawnToSpawnerHandle()
 	{
 		DimensionPosSet.Add(Dimension->GetActorLocation());
 		Dimension->SetIsActive(false);
+	}
+
+	if (DimensionPosSet.Num() == 0)
+	{
+		ApplyNextPatternFromHalf();
+		return;
 	}
 
 	EdmundGameMode->SpawnMonsterByBoss(DimensionPosSet);

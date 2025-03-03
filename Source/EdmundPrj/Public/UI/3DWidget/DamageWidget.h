@@ -15,6 +15,7 @@ class EDMUNDPRJ_API UDamageWidget : public UUserWidget
 	
 public:
 	void ApplyDamage(int32 DamageValue);
+	void ResetDamage();
 
 private:
 	void PlayHitAnim();
