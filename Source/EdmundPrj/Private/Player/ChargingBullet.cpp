@@ -12,10 +12,22 @@ void AChargingBullet::SetBulletHidden(bool IsHidden)
 {
 	Super::SetBulletHidden(IsHidden);
 
-	if (!IsHidden)
+	if (IsHidden)
 	{
-		SetActorRelativeScale3D(Player->BulletMesh->GetRelativeScale3D());
+		return;
 	}
+
+	if (!IsValid(Player))
+	{
+		return;
+	}
+
+	if (!IsValid(Player->BulletMesh))
+	{
+		return;
+	}
+
+	SetActorRelativeScale3D(Player->BulletMesh->GetRelativeScale3D());
 }
 
 void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
