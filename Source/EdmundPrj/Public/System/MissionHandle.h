@@ -37,6 +37,8 @@ public:
 
 	void RequestSwapBgm(EBGMSoundType Type);
 
+	void RequestPrintStory();
+
 	// Npc Controll
 	void SpawnNpc(const FVector& SpawnPos);
 	void SetNpcBondageMode(bool bIsBondage);

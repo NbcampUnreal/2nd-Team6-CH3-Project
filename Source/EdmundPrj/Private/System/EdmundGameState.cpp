@@ -12,6 +12,12 @@
 #include "System/SpawnerHandle.h"
 #include "Player/SkillManager.h"
 
+AEdmundGameState::AEdmundGameState() : Super()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	SetActorTickEnabled(false);
+}
+
 void AEdmundGameState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,6 +31,27 @@ void AEdmundGameState::BeginPlay()
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
+}
+
+void AEdmundGameState::Tick(float DeltaTime)
+{
+	CurrentTime += DeltaTime;
+
+	if (CurrentTime >= IntervalTime)
+	{
+		CurrentTime = 0;
+		
+		// CurrentText = substring
+		CurrentText = StoryText.ToString().LeftChop(StoryIndex);
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), *CurrentText);
+		NotifyPrintText(CurrentText);
+		--StoryIndex;
+
+		if (StoryIndex == StoryLastIndex)
+		{
+			OnEndedCurrentStory();
+		}
+	}
 }
 
 void AEdmundGameState::BeginDestroy()
@@ -53,6 +80,34 @@ void AEdmundGameState::AddCurrentLevelMoney(int32 Money)
 	}
 
 	CurrentLevelMoney += Money;
+}
+
+void AEdmundGameState::PrintStoryText(const FText& TargetText)
+{
+	StoryText = TargetText;
+	StoryLastIndex = StoryText.ToString().Len();
+	StoryIndex = StoryLastIndex;
+	CurrentTime = 0;
+	SetActorTickEnabled(true);
+}
+
+void AEdmundGameState::OnEndedCurrentStory()
+{
+	if (!EdmundGameMode->CheckRemainCurrentStory())
+	{
+		SetActorTickEnabled(false);
+	}
+}
+
+void AEdmundGameState::StopPrintStory()
+{
+	StoryIndex = 0;
+	SetActorTickEnabled(false);
+}
+
+void AEdmundGameState::SkipCurrentStory()
+{
+	EdmundGameMode->OnEndedCurrentStory();
 }
 
 void AEdmundGameState::InitMainLevelPlayerController()
@@ -515,6 +570,18 @@ void AEdmundGameState::NotifyOnMissionInfo()
 			continue;
 		}
 		Observer->ChangedMissionInfoOnOff();
+	}
+}
+
+void AEdmundGameState::NotifyPrintText(const FString& TargetText)
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedStoryText(TargetText);
 	}
 }
 

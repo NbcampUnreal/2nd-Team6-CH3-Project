@@ -70,6 +70,7 @@ void AMissionHandle::StartMainMission()
 {
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
 	MainMissionSet[MainMissionIndex]->PrintMissionInfoText();
+	RequestPrintStory(); //
 	MainMissionSet[MainMissionIndex]->SetIsActive(true);
 }
 
@@ -95,6 +96,11 @@ void AMissionHandle::CompleteMission()
 void AMissionHandle::RequestSwapBgm(EBGMSoundType Type)
 {
 	EdmundGameMode->SwapBgm(Type);
+}
+
+void AMissionHandle::RequestPrintStory()
+{
+	EdmundGameMode->PrintCurrentStory();
 }
 
 void AMissionHandle::SpawnNpc(const FVector& SpawnPos)

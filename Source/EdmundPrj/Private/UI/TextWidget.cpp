@@ -2,23 +2,24 @@
 
 
 #include "UI/TextWidget.h"
+#include "System/UIHandle.h"
+#include "Components/Button.h"
+#include "Components/TextBlock.h"
 
 void UTextWidget::InitWidget(UUIHandle* NewUIHandle)
 {
+	OpenAnimation = OpenAnim;
+	CloseAnimation = CloseAnim;
+
 	Super::InitWidget(NewUIHandle);
 
+	SkipButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedSkipButton);
 }
 
-void UTextWidget::PlayAddAnim()
+void UTextWidget::ChangedStoryText(const FString& TargetText)
 {
-	Super::PlayAddAnim();
-
-}
-
-void UTextWidget::PlayRemoveAnim()
-{
-	Super::PlayRemoveAnim();
-
+	Super::ChangedStoryText(TargetText);
+	StoryText->SetText(FText::FromString(TargetText));
 }
 
 void UTextWidget::OnClickedNextText()
@@ -26,29 +27,15 @@ void UTextWidget::OnClickedNextText()
 
 }
 
-void UTextWidget::OnClickedSkilButton()
+void UTextWidget::OnClickedSkipButton()
 {
-
-}
-
-void UTextWidget::EndAddAnim()
-{
-	Super::EndAddAnim();
-
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->ClickedSkipStory();
 }
 
 void UTextWidget::EndRemoveAnim()
 {
 	Super::EndRemoveAnim();
 
-}
-
-void UTextWidget::PrintStoryText()
-{
-
-}
-
-void UTextWidget::CheckCurrentStory()
-{
-
+	UIHandle->RemoveCoverFromViewport(EWidgetType::OptionWidget);
 }

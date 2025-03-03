@@ -22,6 +22,8 @@ class EDMUNDPRJ_API AEdmundGameState : public AGameState
 	GENERATED_BODY()
 	
 public:
+	AEdmundGameState();
+
 	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
 
@@ -51,6 +53,11 @@ public:
 	void ChangeInputMode(const FInputModeDataBase& InputMode);
 
 	void AddCurrentLevelMoney(int32 Money);
+
+	void PrintStoryText(const FText& TargetText);
+	void OnEndedCurrentStory();
+	void StopPrintStory();
+	void SkipCurrentStory();
 
 	void CreateRandomSkillSet();
 	const TArray<FPlayerSkillRow*>& GetRandomSkillSet() const;
@@ -82,17 +89,24 @@ public:
 	void NotifyBossHp(const int32 MaxHp, const int32 CurrentHp);
 	void NotifyOnOverlapedDefenceArea(const bool bIsOverlaped);
 	void NotifyOnMissionInfo();
+	void NotifyPrintText(const FString& TargetText);
 
 	APlayerController* GetPlayerController();
 	void SetPlayerPawn(AActor* NewPawn);
 	AActor* GetPlayerPawn();
 
 private:
+	virtual void Tick(float DeltaTime) override;
+
 	void CalculateSkillList(); 
 
 	void NotifyCreateRandomSkill() const;
 	void NotifySelectCharacterType(ECharacterType CharacterType) const;
 	void NotifyResultValue(int32 CurrnetMoney, int32 TotalMoney, int32 MissionMoney) const;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Story")
+	float IntervalTime = 0.1f;
 
 private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
@@ -120,4 +134,9 @@ private:
 	int32 MissionClearMoney = 500;
 	float EffectVolume = 0;
 	ECharacterType CurrentCharacterType = ECharacterType::Gunner;
+	FText StoryText;
+	FString CurrentText;
+	float CurrentTime = 0;
+	int32 StoryIndex = 0;
+	int32 StoryLastIndex = 0;
 };

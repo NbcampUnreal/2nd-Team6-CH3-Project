@@ -17,26 +17,27 @@ class EDMUNDPRJ_API UTextWidget : public UBaseWidget
 	
 public:
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
-	virtual void PlayAddAnim() override;
-	virtual void PlayRemoveAnim() override;
-
+	virtual void ChangedStoryText(const FString& TargetText) override;
+	
 private:
 	UFUNCTION()
 	void OnClickedNextText();
 	
 	UFUNCTION()
-	void OnClickedSkilButton();
+	void OnClickedSkipButton();
 
-	virtual void EndAddAnim() override;
 	virtual void EndRemoveAnim() override;
 
-	void PrintStoryText();
-	void CheckCurrentStory();
-
 private:
-	UPROPERTY()
+	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UButton> SkipButton;
 
-	UPROPERTY()
+	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UTextBlock> StoryText;
+
+	UPROPERTY(Meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> OpenAnim;
+
+	UPROPERTY(Meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> CloseAnim;
 };

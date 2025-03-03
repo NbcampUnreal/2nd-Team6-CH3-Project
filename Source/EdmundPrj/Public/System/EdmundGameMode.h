@@ -32,6 +32,10 @@ public:
 	void ClearMission();
 	void FailMission();
 
+	void PrintCurrentStory();
+	bool CheckRemainCurrentStory();
+	void OnEndedCurrentStory();
+
 	void StartDefenceMode();
 	void StartBossMission();
 	void SpawnMonsterByBoss(const TArray<FVector>& ActiveDimensionPosSet);

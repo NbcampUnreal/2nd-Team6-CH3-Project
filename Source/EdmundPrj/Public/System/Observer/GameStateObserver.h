@@ -57,4 +57,7 @@ public:
 
 	UFUNCTION()
 	virtual void ChangedMissionInfoOnOff() = 0;
+
+	UFUNCTION()
+	virtual void ChangedStoryText(const FString& TargetText) = 0;
 };

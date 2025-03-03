@@ -422,6 +422,12 @@ void UUIHandle::ClickedSelectSkill(const int32 Index) const
 	EdmundGameInstance->ApplySelectSkill(Index);
 }
 
+void UUIHandle::ClickedSkipStory() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->SkipMissionStory();
+}
+
 const FShopCatalogRow* UUIHandle::ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
@@ -516,6 +522,7 @@ void UUIHandle::CreateCoverWidgets(const UUIHandleSettings* UISettings)
 	checkf(IsValid(UISettings->TextWidgetClass), TEXT("TextWidgetClass is invalid"));
 	TextWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->TextWidgetClass);
 	TextWidget->InitWidget(this);
+	UIObservers.Add(TextWidget);
 
 	checkf(IsValid(UISettings->CharacterListWidgetClass), TEXT("CharacterListWidgetClass is invalid"));
 	CharacterListWidget = CreateWidget<UBaseWidget>(EdmundGameInstance, UISettings->CharacterListWidgetClass);

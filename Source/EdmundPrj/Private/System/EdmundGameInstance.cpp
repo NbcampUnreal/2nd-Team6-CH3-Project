@@ -150,6 +150,24 @@ void UEdmundGameInstance::DestroyedGameState()
 	EdmundGameState = nullptr;
 }
 
+void UEdmundGameInstance::VisibleMissionStory() const
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::TextWidget);
+}
+
+void UEdmundGameInstance::InvisibleMissionStory() const
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->RequestRemoveCoverFromViewport(EWidgetType::TextWidget);
+}
+
+void UEdmundGameInstance::SkipMissionStory() const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->SkipCurrentStory();
+}
+
 void UEdmundGameInstance::MoveScene(const ESceneType SceneType) const
 {
 	checkf(IsValid(SceneHandle), TEXT("SceneHandle is invalid"));
