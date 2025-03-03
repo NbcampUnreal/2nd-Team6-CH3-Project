@@ -232,13 +232,23 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 				);
 			}
 
-			if (PlayerController->InteractionAction)
+			if (PlayerController->PauseAction)
 			{
 				EnhancedInput->BindAction(
 					PlayerController->PauseAction,
 					ETriggerEvent::Started,
 					this,
 					&ABaseCharacter::PauseAction
+				);
+			}
+
+			if (PlayerController->MissionOnAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->MissionOnAction,
+					ETriggerEvent::Started,
+					this,
+					&ABaseCharacter::MissionOnAction
 				);
 			}
 		}
@@ -440,6 +450,14 @@ void ABaseCharacter::PauseAction(const FInputActionValue& value)
 	if (IsValid(CurrentGameState))
 	{
 		CurrentGameState->OnPressedPauseKey();
+	}
+}
+
+void ABaseCharacter::MissionOnAction(const FInputActionValue& value)
+{
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyOnMissionInfo();
 	}
 }
 

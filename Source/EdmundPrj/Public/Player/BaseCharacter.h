@@ -98,8 +98,11 @@ protected:
 	void StartCrouch(const FInputActionValue& value);
 	void StopCrouch(const FInputActionValue& value);
 
-	// 상호작용
+	// 퍼즈
 	void PauseAction(const FInputActionValue& value);
+
+	// 미션창
+	void MissionOnAction(const FInputActionValue& value);
 
 	// 피격
 	virtual float TakeDamage(
