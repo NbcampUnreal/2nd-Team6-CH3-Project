@@ -193,6 +193,16 @@ void AMissionHandle::ApplyNpcEquip()
 	// npc가 도움 주게 변경 필요
 }
 
+void AMissionHandle::UpdateDefenceState(bool bIsOn)
+{
+	EdmundGameState->NotifyOnOverlapedDefenceArea(bIsOn);
+}
+
+void AMissionHandle::UpdateDefenceProgress(float Value)
+{
+	EdmundGameState->NotifyUpdateStageProgress(Value);
+}
+
 void AMissionHandle::ApplyBossWeaken()
 {
 	bWeakenBoss = true;

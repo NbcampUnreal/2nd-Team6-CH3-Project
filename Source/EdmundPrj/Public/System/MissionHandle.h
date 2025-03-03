@@ -53,6 +53,10 @@ public:
 	void NotifyStartDefenceMode();
 	void ApplyNpcEquip();
 
+	// Defence Progress
+	void UpdateDefenceState(bool bIsOn);
+	void UpdateDefenceProgress(float Value);
+
 	// Mission3
 	void ApplyBossWeaken();
 	void AddAlter(ABaseMissionItem* Alter);

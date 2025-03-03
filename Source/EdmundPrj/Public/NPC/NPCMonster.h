@@ -38,6 +38,11 @@ public:
 
 	void PlayBondageMontage();
 
+	void PlaySound();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
+	ENpcType NpcType;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Animation")
 	UAnimMontage* BondageAnimation;
 
