@@ -381,8 +381,9 @@ void UUIHandle::ClickedMoveToMission(const ESceneType SceneType)
 
 void UUIHandle::ClickedRetry()
 {
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	ESceneType CurrentScene = EdmundGameInstance->GetCurrentSceneName();
-	FadeOut(false, CurrentScene);
+	ClickedMoveToMission(CurrentScene);
 }
 
 void UUIHandle::ClickedQuitGame() const
