@@ -54,13 +54,6 @@ void AFireBall::EndBulletLife()
 		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Weapon);
 	}
 
-	// 폭발 사운드
-	if (FireSound)
-	{
-		CurrentAudioComp->SetSound(FireSound);
-		CurrentAudioComp->Play();
-	}
-
 	SetBulletHidden(true);
 
 	FVector Start = GetActorLocation(); // 공격 시작 위치

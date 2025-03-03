@@ -22,6 +22,10 @@ public:
 	virtual float GetAttackDamage() const override;
 
 	// 공격 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
+	UAnimMontage* ChargeMontage;
+
+	// 공격 애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
 	UAnimMontage* AttackMontage;
 

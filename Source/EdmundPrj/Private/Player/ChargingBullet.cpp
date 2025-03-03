@@ -1,11 +1,15 @@
 #include "Player/ChargingBullet.h"
 #include "Player/PlayerCharacterWraith.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/EdmundGameState.h"
 
 AChargingBullet::AChargingBullet() : Super()
 {
 	// 차징에 따라 바뀜
 	BulletDamage = 30;
+
+	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	CurrentAudioComp->SetupAttachment(RootComponent);
 }
 
 void AChargingBullet::SetBulletScale()
@@ -35,7 +39,16 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation());
 	}
+
+	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
+
+	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
 	
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Weapon);
+	}
+
 	// 몬스터는 관통
 	if (OtherActor && !(OtherActor->ActorHasTag("Monster")))
 	{

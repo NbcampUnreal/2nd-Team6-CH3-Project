@@ -24,10 +24,10 @@ protected:
     void PlaySkill2Animation();
 
     UPROPERTY()
-    UBehaviorTreeComponent* CachedOwnerComp;
+    UBehaviorTreeComponent* CachedOwnerComp = nullptr;
 
     UPROPERTY()
-    ABoss* BossRef;
+    ABoss* BossRef = nullptr;
 
 private:
     UMaterialInterface* OriginalMaterial = nullptr;

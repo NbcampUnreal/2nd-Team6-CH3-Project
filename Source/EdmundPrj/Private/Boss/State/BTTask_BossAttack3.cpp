@@ -12,10 +12,15 @@
 UBTTask_BossAttack3::UBTTask_BossAttack3()
 {
     NodeName = TEXT("Boss Attack3");
-    bNotifyTick = false; 
+    bNotifyTick = true; 
     BossRef = nullptr;
     CachedOwnerComp = nullptr;
     ComboPhase = 0;
+
+    bIsDashing = false;
+    DashFrequency = 0;
+    DashDamping = 0;
+    DashCurrentVelocity = FVector::ZeroVector;
 }
 
 EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -44,9 +49,17 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
         return EBTNodeResult::Failed;
     }
 
+    DashFrequency = BossRef->BossDashFrequency;
+    DashDamping = BossRef->BossDashFrequency;
+
+    if (BossRef->GetWorld()->GetTimerManager().IsTimerActive(BulletFireTimerHandle))
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+    }
+    FiredBulletCount = 0;
+
     BossRef->SetComboPhase(1);
     ComboPhase = 1;
-    //UE_LOG(LogTemp, Log, TEXT("ExecuteTask: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
 
     PlayAttack3Montage();
     return EBTNodeResult::InProgress;
@@ -110,11 +123,8 @@ void UBTTask_BossAttack3::FinishComboAttack()
 {
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: BossRef is NULL!"));
         return;
     }
-
-    //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Executing, ComboPhase=%d"), BossRef->GetComboPhase());
 
     BossRef->UpdateAttackCooldown(3);
     BossRef->CurrentAttackTask = nullptr;
@@ -122,23 +132,46 @@ void UBTTask_BossAttack3::FinishComboAttack()
     ComboPhase = 0;
     BossRef->SetComboPhase(0);
 
-    //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
+    if (BossRef->GetWorld()->GetTimerManager().IsTimerActive(BulletFireTimerHandle))
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+    }
+    FiredBulletCount = 0;
 
     if (CachedOwnerComp)
     {
         BossRef->SetbChaseComplete(true);
-        //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Behavior Tree Task Succeeded"));
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
-    }
-    else
-    {
-        //UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: CachedOwnerComp is NULL! Behavior Tree Task could not finish properly."));
     }
 }
 
+
 void UBTTask_BossAttack3::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+    if (bIsDashing && BossRef)
+    {
+        FVector CurrentLocation = BossRef->GetActorLocation();
+        // 스프링 물리 공식:
+        // acceleration = Frequency^2 * (Target - Current) - 2 * Damping * Frequency * CurrentVelocity
+        float Frequency = DashFrequency;
+        float Damping = DashDamping;
+        FVector Displacement = DashTargetLocation - CurrentLocation;
+        FVector Acceleration = Frequency * Frequency * Displacement - 2.0f * Damping * Frequency * DashCurrentVelocity;
+        DashCurrentVelocity += Acceleration * DeltaSeconds;
+        FVector NewLocation = CurrentLocation + DashCurrentVelocity * DeltaSeconds;
+        BossRef->SetActorLocation(NewLocation, true);
+
+        // 목표에 근접하면 돌진을 종료합니다.
+        if (FVector::DistSquared(NewLocation, DashTargetLocation) < FMath::Square(10.0f))
+        {
+            BossRef->SetActorLocation(DashTargetLocation, true);
+            bIsDashing = false;
+            // 돌진 종료 후, 필요한 후속 처리(예: 공격 체크)를 호출할 수 있습니다.
+            BossRef->MonsterAttackCheck();
+        }
+    }
 }
+
 
 void UBTTask_BossAttack3::PlayAttack3Montage()
 {
@@ -160,15 +193,12 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
 {
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("ExecuteMeleeAttack: BossRef is NULL!"));
         return;
     }
 
     float DashDistance = 0.0f;
     float DashSpeed = 0.0f;
-
     int32 CurrentPhase = BossRef->GetComboPhase();
-    //UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: CurrentPhase = %d"), CurrentPhase);
 
     switch (CurrentPhase)
     {
@@ -181,18 +211,24 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack2;
         break;
     default:
-        //UE_LOG(LogTemp, Warning, TEXT("ExecuteMeleeAttack: Unexpected ComboPhase = %d"), CurrentPhase);
         return;
     }
 
-    //UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: Using DashDistance = %f, DashSpeed = %f"), DashDistance, DashSpeed);
-
+    // 돌진 시작 위치와 목표 위치를 계산합니다.
+    bIsDashing = true;
+    DashStartLocation = BossRef->GetActorLocation();
     FVector DashDirection = BossRef->GetActorForwardVector();
-    FVector LaunchVelocity = DashDirection * DashSpeed;
-    BossRef->LaunchCharacter(LaunchVelocity, true, true);
+    DashTargetLocation = DashStartLocation + DashDirection * DashDistance;
+    // 초기 속도를 돌진속도를 참조하여 설정 (방향은 DashDirection)
+    DashCurrentVelocity = DashDirection * DashSpeed;
 
-    BossRef->MonsterAttackCheck();
+    // 기존의 일정 속도 이동 대신, 물리 기반 돌진이므로 이동을 멈추고 TickTask에서 업데이트하도록 합니다.
+    if (BossRef->GetCharacterMovement())
+    {
+        BossRef->GetCharacterMovement()->StopMovementImmediately();
+    }
 }
+
 
 void UBTTask_BossAttack3::Attack3_ActivateMeleeCollision_Check1()
 {
@@ -309,24 +345,80 @@ void UBTTask_BossAttack3::Attack3_RangedAttackNotify()
         BossRef->GetCharacterMovement()->StopMovementImmediately();
     }
 
-    FRotator CurrentRotation = BossRef->GetActorRotation();
+    BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
 
-    if (!BossRef->GetWorld() || !BossRef->MuzzleLocation || !BossRef->Attack1BulletClass)
-        return;
-
-    FVector SpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
-
-    for (int32 i = 0; i < 10; i++)
+    if (BossRef->GetCharacterMovement())
     {
-        float RandomYawOffset = FMath::RandRange(-30.0f, 30.0f);
-        FRotator BulletRotation = CurrentRotation;
-        BulletRotation.Yaw += RandomYawOffset;
-        FVector BulletDirection = BulletRotation.Vector();
-
-        ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
-        if (Bullet)
-        {
-            Bullet->FireProjectile(SpawnLocation, BulletRotation, BulletDirection);
-        }
+        BossRef->GetCharacterMovement()->StopMovementImmediately();
     }
+
+    CurrentRotation = BossRef->MuzzleLocation->GetComponentRotation();
+    SpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
+
+    AccumulatedDeltaTime = 0.0f;
+    FiredBulletCount = 0;
+
+    BossRef->GetWorld()->GetTimerManager().SetTimer(BulletFireTimerHandle, this, &UBTTask_BossAttack3::FireSingleBullet, BossRef->Attack3_3FireInterval, true);
 }
+
+FVector UBTTask_BossAttack3::GetAdjustedSpawnLocation(const FVector& Offset) const
+{
+    return SpawnLocation + Offset;
+}
+
+void UBTTask_BossAttack3::FireSingleBullet()
+{
+    if (!BossRef)
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+        return;
+    }
+
+    if (FiredBulletCount >= BossRef->Attack3_3BulletNum)
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+        return;
+    }
+
+    AccumulatedDeltaTime += BossRef->Attack3_3FireInterval;
+    if (AccumulatedDeltaTime >= BossRef->Attack3_3FiringDuration)
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+        return;
+    }
+
+    FRotator NewRotation = BossRef->MuzzleLocation->GetComponentRotation();
+    FVector NewSpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
+
+    TArray<AActor*> PlayerActors;
+    UGameplayStatics::GetAllActorsWithTag(BossRef->GetWorld(), FName("Player"), PlayerActors);
+    if (PlayerActors.Num() > 0)
+    {
+        AActor* PlayerActor = PlayerActors[0];
+        USkeletalMeshComponent* SkeletalMesh = PlayerActor->FindComponentByClass<USkeletalMeshComponent>();
+        if (SkeletalMesh && SkeletalMesh->DoesSocketExist(FName("CharacterHead")))
+        {
+            FVector HeadLocation = SkeletalMesh->GetSocketLocation(FName("CharacterHead"));
+            NewSpawnLocation.Z = HeadLocation.Z;
+        }
+        else
+        {
+            NewSpawnLocation.Z = 150.0f;
+        }
+
+        
+    }
+
+    FVector BulletDirection = NewRotation.Vector();
+
+    ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
+    if (Bullet)
+    {
+        Bullet->FireProjectile(NewSpawnLocation, NewRotation, BulletDirection);
+    }
+
+    FiredBulletCount++;
+}
+
+
+
