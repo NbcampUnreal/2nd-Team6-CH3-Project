@@ -23,8 +23,9 @@ public:
 	virtual void ChangedPlayerExp(const int32 MaxExp, const int32 CurrentExp) override;
 	virtual void ChangedPlayerLevel(const int32 LevelValue) override;
 	virtual void ChangedCharacterType(const ECharacterType CharacterType) override;
-	virtual void ChangedStageToBoss() override;
+	virtual void ChangedStageToProgress(const FString& ProgressText, const bool bIsOn) override;
 	virtual void ChangedBossHp(const int32 MaxHp, const int32 CurrentHp) override;
+	virtual void ChangedMissionInfoOnOff() override;
 
 private:
 	void SetAmmoTextVisibility(bool bIsVisible);
@@ -49,6 +50,9 @@ private:
 	TObjectPtr<UTextBlock> LevelText;
 
 	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UTextBlock> BossHpBarText;
+
+	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UProgressBar> HpBar;
 
 	UPROPERTY(Meta = (BindWidget))
@@ -66,5 +70,9 @@ private:
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> BossHpAnimation;
 
+	UPROPERTY(Meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> MissionInfoAnimation;
+
 	bool bIsMaxLevel = false;
+	bool bOnMissionInfo = true;
 };

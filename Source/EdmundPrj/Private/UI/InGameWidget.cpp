@@ -19,6 +19,9 @@ void UInGameWidget::ChangedNotifyText(const FString& NotifyText)
 void UInGameWidget::ChangedMissionText(const FString& MissionText)
 {
 	MissionInfoText->SetText(FText::FromString(MissionText));
+
+	bOnMissionInfo = true;
+	PlayAnimationReverse(MissionInfoAnimation);
 }
 
 void UInGameWidget::ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp)
@@ -86,14 +89,37 @@ void UInGameWidget::ChangedCharacterType(const ECharacterType CharacterType)
 	}
 }
 
-void UInGameWidget::ChangedStageToBoss()
+void UInGameWidget::ChangedStageToProgress(const FString& ProgressText, const bool bIsOn)
 {
-	PlayAnimation(BossHpAnimation);
+	BossHpBarText->SetText(FText::FromString(ProgressText));
+
+	if (bIsOn)
+	{
+		PlayAnimation(BossHpAnimation);
+	}
+	else
+	{
+		PlayAnimationReverse(BossHpAnimation);
+	}
 }
 
 void UInGameWidget::ChangedBossHp(const int32 MaxHp, const int32 CurrentHp)
 {
 	BossHpBar->SetPercent((float)CurrentHp / (float)MaxHp);
+}
+
+void UInGameWidget::ChangedMissionInfoOnOff()
+{
+	if (bOnMissionInfo)
+	{
+		bOnMissionInfo = false;
+		PlayAnimation(MissionInfoAnimation);
+	}
+	else
+	{
+		bOnMissionInfo = true;
+		PlayAnimationReverse(MissionInfoAnimation);
+	}
 }
 
 void UInGameWidget::SetAmmoTextVisibility(bool bIsVisible)
