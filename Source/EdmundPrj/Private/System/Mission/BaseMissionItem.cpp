@@ -100,6 +100,21 @@ void ABaseMissionItem::UpdateNotifyTextToUI(const FString& TargetText)
 	MissionHandle->RequestUpdateNotifyText(TargetText);
 }
 
+void ABaseMissionItem::PrintEndMissionStory()
+{
+	if (!bIsContainStory)
+	{
+		return;
+	}
+
+	if (bIsBegin)
+	{
+		return;
+	}
+
+	MissionHandle->RequestPrintStory(StoryIndex);
+}
+
 void ABaseMissionItem::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!IsValid(OtherActor))
@@ -179,6 +194,18 @@ void ABaseMissionItem::SetMissionText(const FString& NewInfoText, const FString&
 	MissionClearText = NewClearText;
 }
 
+void ABaseMissionItem::SetMissionStory(const bool Value, const bool BeginValue, const int32 Index)
+{
+	bIsContainStory = Value;
+	bIsBegin = BeginValue;
+	StoryIndex = Index;
+}
+
+bool ABaseMissionItem::GetIsContainStory() const
+{
+	return bIsContainStory;
+}
+
 void ABaseMissionItem::PrintMissionInfoText()
 {
 	UpdateMissionTextToUI(MissionInfoText);
@@ -192,6 +219,21 @@ void ABaseMissionItem::PrintMissionActiveText()
 void ABaseMissionItem::PrintMissionClearText()
 {
 	UpdateNotifyTextToUI(MissionClearText);
+}
+
+void ABaseMissionItem::PrintBeginMissionStory()
+{
+	if (!bIsContainStory)
+	{
+		return;
+	}
+
+	if (!bIsBegin)
+	{
+		return;
+	}
+
+	MissionHandle->RequestPrintStory(StoryIndex);
 }
 
 

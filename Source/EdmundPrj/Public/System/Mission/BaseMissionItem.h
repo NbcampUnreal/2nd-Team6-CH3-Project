@@ -23,9 +23,13 @@ public:
 	virtual void SetIsActive(bool Value);
 
 	void SetMissionText(const FString& NewInfoText, const FString& NewActiveText, const FString& NewClearText);
+	void SetMissionStory(const bool Value, const bool BeginValue, const int32 Index);
+	bool GetIsContainStory() const;
 	void PrintMissionInfoText();
 	void PrintMissionActiveText();
 	void PrintMissionClearText();
+	void PrintBeginMissionStory();
+	void PrintEndMissionStory();
 	
 protected:
 	UFUNCTION()
@@ -72,6 +76,10 @@ protected:
 	FString MissionInfoText;
 	FString MissionActiveText;
 	FString MissionClearText;
+
+	bool bIsContainStory = false;
+	bool bIsBegin = false;
+	int32 StoryIndex = 0;
 
 	bool bIsPlayingInteraction = false;
 	bool bIsActive = false;

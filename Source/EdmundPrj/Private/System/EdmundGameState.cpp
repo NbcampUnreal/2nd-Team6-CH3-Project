@@ -11,6 +11,12 @@
 #include "System/MissionHandle.h"
 #include "System/SpawnerHandle.h"
 #include "Player/SkillManager.h"
+#include "Kismet/GameplayStatics.h"
+
+AEdmundGameState::AEdmundGameState() : Super()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
 
 void AEdmundGameState::BeginPlay()
 {
@@ -20,11 +26,28 @@ void AEdmundGameState::BeginPlay()
 	EdmundGameMode = GetWorld()->GetAuthGameMode<AEdmundGameMode>();
 	PlayerController = GetWorld()->GetPlayerControllerIterator()->Get();
 
-	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
-	//PlayerPawn = PlayerController->GetPawn();
-
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
+}
+
+void AEdmundGameState::Tick(float DeltaTime)
+{
+	if (StoryIndex < 0)
+	{
+		SetActorTickEnabled(false);
+		return;
+	}
+
+	CurrentTime += DeltaTime;
+
+	if (CurrentTime >= IntervalTime * SlowTime)
+	{
+		CurrentTime = 0;
+		
+		CurrentText = StoryText.ToString().LeftChop(StoryIndex);
+		NotifyPrintText(CurrentText);
+		--StoryIndex;
+	}
 }
 
 void AEdmundGameState::BeginDestroy()
@@ -53,6 +76,45 @@ void AEdmundGameState::AddCurrentLevelMoney(int32 Money)
 	}
 
 	CurrentLevelMoney += Money;
+}
+
+void AEdmundGameState::PrintStoryText(const FText& TargetText)
+{
+	StoryText = TargetText;
+	StoryLastIndex = StoryText.ToString().Len();
+	StoryIndex = StoryLastIndex;
+	CurrentTime = 0;
+
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), SlowTime);
+	SetActorTickEnabled(true);
+}
+
+void AEdmundGameState::OnEndedCurrentStory()
+{
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	SetActorTickEnabled(false);
+}
+
+void AEdmundGameState::StopPrintStory()
+{
+	if (StoryIndex < 0)
+	{
+		if (!EdmundGameMode->CheckRemainCurrentStory())
+		{
+			OnEndedCurrentStory();
+		}
+	}
+	else
+	{
+		StoryIndex = 0;
+	}
+}
+
+void AEdmundGameState::SkipCurrentStory()
+{
+	EdmundGameMode->OnEndedCurrentStory();
+	StoryIndex = 0;
+	OnEndedCurrentStory();
 }
 
 void AEdmundGameState::InitMainLevelPlayerController()
@@ -515,6 +577,18 @@ void AEdmundGameState::NotifyOnMissionInfo()
 			continue;
 		}
 		Observer->ChangedMissionInfoOnOff();
+	}
+}
+
+void AEdmundGameState::NotifyPrintText(const FString& TargetText)
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedStoryText(TargetText);
 	}
 }
 
