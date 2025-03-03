@@ -131,12 +131,9 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 
 	if (ActiveWeapon())
 	{
-		// 총소리 재생
-		if (FireSound)
+		if (IsValid(CurrentGameState))
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-			CurrentAudioComp->SetSound(FireSound);
-			CurrentAudioComp->Play();
+			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
 		}
 
 		if (IsValid(AttackMontage))
@@ -181,11 +178,9 @@ void APlayerCharacter::MeleeAttack(const FInputActionValue& value)
 		PlayAnimMontage(MeleeAttackMontage);
 	}
 
-	// 근접공격 소리 재생
-	if (MeleeAttackSound)
+	if (IsValid(CurrentGameState))
 	{
-		CurrentAudioComp->SetSound(MeleeAttackSound);
-		CurrentAudioComp->Play();
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
 	}
 
 	// 근접 공격 딜레이
@@ -312,10 +307,9 @@ void APlayerCharacter::Reload()
 {
 	CurrentAmmo = MaxAmmo;
 
-	if (IsValid(ReloadSound))
+	if (IsValid(CurrentGameState))
 	{
-		CurrentAudioComp->SetSound(ReloadSound);
-		CurrentAudioComp->Play();
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Reload);
 	}
 
 	if (IsValid(ReloadMontage))

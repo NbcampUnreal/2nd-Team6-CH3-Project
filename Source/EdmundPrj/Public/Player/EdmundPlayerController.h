@@ -51,6 +51,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* PauseAction = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* MissionOnAction = nullptr;
+
 protected:
 	virtual void BeginPlay() override;
 };

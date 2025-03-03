@@ -2,6 +2,8 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BaseCharacter.h"
+#include "System/EdmundGameState.h"
+#include "System/EnumSet.h"
 
 AFireBall::AFireBall() : Super()
 {
@@ -41,6 +43,15 @@ void AFireBall::EndBulletLife()
 	if (BulletLandParticle)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation(), FVector(1.0f, 1.0f, 1.0f) * AttackRadiusMultifler);
+	}
+
+	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
+
+	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Weapon);
 	}
 
 	// Æø¹ß »ç¿îµå

@@ -30,21 +30,15 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 		IsAttack = true;
 
 		Super::Attack(value);
+
 		switch (ComboCount)
 		{
 			case 0:
 				if (IsValid(AttackMontages[0]))
 				{
-					if (IsValid(AttackSounds[0]))
+					if (IsValid(CurrentGameState))
 					{
-						CurrentAudioComp->SetSound(AttackSounds[0]);
-						CurrentAudioComp->Play();
-					}
-
-					if (IsValid(WeaponSounds[0]))
-					{
-						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[0], GetActorLocation());
-						WeaponAudioComp->Play();
+						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
 					}
 
 					PlayAnimMontage(AttackMontages[0], ComboTimeDuration);
@@ -55,17 +49,9 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 			case 1:
 				if (IsValid(AttackMontages[1]))
 				{
-
-					if (IsValid(AttackSounds[1]))
+					if (IsValid(CurrentGameState))
 					{
-						CurrentAudioComp->SetSound(AttackSounds[1]);
-						CurrentAudioComp->Play();
-					}
-
-					if (IsValid(WeaponSounds[1]))
-					{
-						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[1], GetActorLocation());
-						WeaponAudioComp->Play();
+						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack2);
 					}
 
 					PlayAnimMontage(AttackMontages[1], ComboTimeDuration);
@@ -76,16 +62,9 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 			case 2:
 				if (IsValid(AttackMontages[2]))
 				{
-					if (IsValid(AttackSounds[2]))
+					if (IsValid(CurrentGameState))
 					{
-						CurrentAudioComp->SetSound(AttackSounds[2]);
-						CurrentAudioComp->Play();
-					}
-
-					if (IsValid(WeaponSounds[2]))
-					{
-						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[2], GetActorLocation());
-						WeaponAudioComp->Play();
+						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack3);
 					}
 
 					PlayAnimMontage(AttackMontages[2], ComboTimeDuration);
@@ -96,16 +75,9 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 			case 3:
 				if (IsValid(AttackMontages[3]))
 				{
-					if (IsValid(AttackSounds[3]))
+					if (IsValid(CurrentGameState))
 					{
-						CurrentAudioComp->SetSound(AttackSounds[3]);
-						CurrentAudioComp->Play();
-					}
-
-					if (IsValid(WeaponSounds[3]))
-					{
-						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[3], GetActorLocation());
-						WeaponAudioComp->Play();
+						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack4);
 					}
 
 					PlayAnimMontage(AttackMontages[3], ComboTimeDuration);
@@ -126,75 +98,6 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 			false
 		);
 	}
-}
-
-float APlayerCharacterAurora::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	if (IsDie)
-	{
-		return 0.0f;
-	}
-
-	int32 DamageProb = FMath::RandRange(1, 100);
-
-	// 회피 성공
-	if (DamageProb <= EvasionProb)
-	{
-		// 회피 성공 사운드
-		if (IsValid(EvasionSuccessSound))
-		{
-			CurrentAudioComp->SetSound(EvasionSuccessSound);
-			CurrentAudioComp->Play();
-		}
-
-		return 0.0f;
-	}
-
-	// 공격 중에 피격 애니메이션 실행하면 다음 공격 못함
-	if (IsValid(HitActionMontage) && !CheckAction() && !IsAttack)
-	{
-
-		PlayAnimMontage(HitActionMontage);
-	}
-
-	float ActualDamage = Super::Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	// 방어력 적용
-	ActualDamage = (100 - Defense) * ActualDamage / 100;
-
-	// HP는 정수, 데미지는 소수?
-	// HP 음수 방지
-	HP = FMath::Max(0.0f, HP - ActualDamage);
-
-	if (HP == 0 && !IsDie)
-	{
-		// 부활 횟수가 있다면
-		if (RevivalCount >= 1)
-		{
-			RevivalCount--;
-			HP = MaxHP;
-
-			// 부활 사운드
-			if (IsValid(RevivalSuccessSound))
-			{
-				CurrentAudioComp->SetSound(RevivalSuccessSound);
-				CurrentAudioComp->Play();
-			}
-		}
-		// 부활 횟수가 없다면
-		else
-		{
-			IsDie = true;
-			ActiveDieAction();
-		}
-	}
-
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
-	}
-
-	return ActualDamage;
 }
 
 void APlayerCharacterAurora::AttackTrace()
