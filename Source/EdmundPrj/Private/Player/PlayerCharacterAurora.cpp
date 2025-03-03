@@ -141,7 +141,7 @@ void APlayerCharacterAurora::AttackTrace()
 			{
 				UGameplayStatics::ApplyDamage(
 					HitActor,
-					30.0f,
+					GetAttackDamage(),
 					nullptr,
 					this,
 					UDamageType::StaticClass()
