@@ -206,4 +206,17 @@ protected:
 	FTimerHandle AttackAnimTimerHandle;
 	FTimerHandle HitAnimTimerHandle;
 	FTimerHandle OverHeadUITimerHandle;
+
+	// 이하는 NPC 관련
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
+	bool bIsFightMode = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
+	bool bIsBondageMode = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
+	bool bIsMoveMode = false;
 };

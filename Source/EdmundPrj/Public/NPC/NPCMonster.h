@@ -54,15 +54,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Particle")
 	UParticleSystem* InitSpawnParticle;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
-	bool bIsFightMode = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
-	bool bIsBondageMode = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
-	bool bIsMoveMode = false;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Attack")
 	TSubclassOf<ANPCAttack> AttackClass;
 
