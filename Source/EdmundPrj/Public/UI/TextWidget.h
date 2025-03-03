@@ -34,5 +34,9 @@ private:
 	void CheckCurrentStory();
 
 private:
+	UPROPERTY()
+	TObjectPtr<UButton> SkipButton;
 
+	UPROPERTY()
+	TObjectPtr<UTextBlock> StoryText;
 };
