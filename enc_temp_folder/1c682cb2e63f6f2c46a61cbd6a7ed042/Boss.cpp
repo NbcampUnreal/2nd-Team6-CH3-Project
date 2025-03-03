@@ -156,15 +156,6 @@ void ABoss::Tick(float DeltaTime)
             FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
         );
     }
-
-    //**************
-    if (GEngine && GetCharacterMovement())
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Cyan,
-            FString::Printf(TEXT("%d"), (int32)GetCharacterMovement()->MovementMode));
-    }
-    //**************
-
 #pragma region Soket
     if (GetMesh())
     {

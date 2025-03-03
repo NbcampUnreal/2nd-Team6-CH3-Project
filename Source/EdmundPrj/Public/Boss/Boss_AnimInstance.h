@@ -49,6 +49,9 @@ public:
     int32 UpDown = 1;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+    UAnimMontage* Initialize;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Attack1Montage;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
