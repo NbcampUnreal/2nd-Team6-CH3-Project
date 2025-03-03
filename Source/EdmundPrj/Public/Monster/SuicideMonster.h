@@ -15,6 +15,8 @@ class EDMUNDPRJ_API ASuicideMonster : public ABaseMonster
 	GENERATED_BODY()
 
 public:
+	void SetMonsterStatsByLevel() override;
+
 	ASuicideMonster();
 
 	void MonsterAttackCheck() override;

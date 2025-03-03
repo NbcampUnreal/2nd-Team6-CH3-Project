@@ -59,25 +59,29 @@ void ARangedMonsterBullet::SetDamage(float Damage)
 
 void ARangedMonsterBullet::OnMonsterBulletOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor->ActorHasTag("Skill")) return;
+	if (OtherActor->ActorHasTag("Skill")) return;
 
-	if (OtherActor && OtherActor->ActorHasTag("Player"))
+	if (OtherActor)
 	{
-		UGameplayStatics::ApplyDamage(
-			OtherActor,
-			DamageValue,
-			nullptr,
-			nullptr,
-			UDamageType::StaticClass()
-		);
+		if (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("NPC"))
+		{
+			{
+				UGameplayStatics::ApplyDamage(
+					OtherActor,
+					DamageValue,
+					nullptr,
+					nullptr,
+					UDamageType::StaticClass()
+				);
 
-		GetWorld()->GetTimerManager().ClearTimer(MonsterBulletLifeTimerHandle);
+				GetWorld()->GetTimerManager().ClearTimer(MonsterBulletLifeTimerHandle);
 
-		//UE_LOG(LogTemp, Warning, TEXT("%f"), DamageValue);
+				//UE_LOG(LogTemp, Warning, TEXT("%f"), DamageValue);
 
-		EndMonsterBulletLife();
+				EndMonsterBulletLife();
+			}
+		}
 	}
-
 	//if (OtherActor && !OtherActor->ActorHasTag("Monster"))
 	//{
 	//	EndMonsterBulletLife();

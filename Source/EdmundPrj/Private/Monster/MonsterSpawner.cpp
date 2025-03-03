@@ -46,6 +46,8 @@ void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawn
 
 	SetBossMode(false);
 
+	//UE_LOG(LogTemp, Warning, TEXT("레벨: %d"), NewLevelIndex);
+
 }
 
 void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount)
@@ -221,6 +223,7 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 			if (IsValid(MonsterClass))
 			{
 				ABaseMonster* NewMonster = GetWorld()->SpawnActor<ABaseMonster>(MonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
+				NewMonster->SetMonsterLevel(LevelIndex + 1);
 
 				// 몬스터가 자신의 스포너를 참조하게 설정
 				NewMonster->MonsterSpawner = this;
@@ -262,7 +265,8 @@ void AMonsterSpawner::SpawnMonster()
 				AIController->SetActorTickEnabled(true);
 			}
 
-			Monster->SetMonsterLevel(LevelIndex);
+			Monster->SetMonsterLevel(LevelIndex + 1);
+			Monster->SetMonsterStatsByLevel();
 			Monster->Tags.Add(FName("Monster"));
 			Monster->SetCanDropReward(true);
 			Monster->SetIsDead(false);
