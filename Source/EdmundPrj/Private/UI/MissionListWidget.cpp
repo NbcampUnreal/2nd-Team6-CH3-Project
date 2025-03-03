@@ -37,6 +37,7 @@ void UMissionListWidget::PlayRemoveAnim()
 {
 	Super::PlayRemoveAnim();
 	OnSelectedImage(0);
+	UIHandle->RequestPlayUISound(EUISoundType::Open);
 }
 
 void UMissionListWidget::EndRemoveAnim()
@@ -82,6 +83,7 @@ void UMissionListWidget::OnClickedClose()
 void UMissionListWidget::OnClickedEnter()
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	UIHandle->ClickedMoveToMission(TargetScene);
 }
 

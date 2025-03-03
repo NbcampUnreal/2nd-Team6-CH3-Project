@@ -42,10 +42,12 @@ void UOptionWidget::OnClickedBGMVolume(float Value)
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 	UIHandle->ClickedBGMVolume(Value);
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 }
 
 void UOptionWidget::OnClickedEffectVolume(float Value)
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 	UIHandle->ClickedEffectVolume(Value);
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 }

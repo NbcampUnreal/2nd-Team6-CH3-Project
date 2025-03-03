@@ -279,11 +279,13 @@ bool UUIHandle::CheckClearedMission(int32 Index) const
 
 void UUIHandle::OpenOption()
 {
+	RequestPlayUISound(EUISoundType::Open);
 	//RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseOption()
 {
+	RequestPlayUISound(EUISoundType::Open);
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->RequestUnpause();
 	RequestChangeCursorMode(false, FInputModeGameOnly());
@@ -301,6 +303,7 @@ void UUIHandle::CloseText()
 
 void UUIHandle::OpenShop()
 {
+	RequestPlayUISound(EUISoundType::Open);
 	CurrentBaseWidget->PlayRemoveAnim();
 	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
@@ -309,6 +312,7 @@ void UUIHandle::CloseShop()
 {
 	CurrentBaseWidget->PlayAddAnim();
 	RequestChangeCursorMode(false, FInputModeGameOnly());
+	RequestPlayUISound(EUISoundType::Open);
 }
 
 void UUIHandle::OpenCharacterList()
@@ -319,6 +323,7 @@ void UUIHandle::OpenCharacterList()
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->ChangeCursorMode(true);
 	EdmundGameInstance->ChangeInputMode(FInputModeGameAndUI());
+	RequestPlayUISound(EUISoundType::Open);
 }
 
 void UUIHandle::CloseCharacterList()
@@ -330,6 +335,7 @@ void UUIHandle::CloseCharacterList()
 	EdmundGameInstance->CheckClosedPlayerType();
 	EdmundGameInstance->ChangeCursorMode(true);
 	EdmundGameInstance->ChangeInputMode(FInputModeUIOnly());
+	RequestPlayUISound(EUISoundType::Open);
 }
 
 void UUIHandle::OpenSkillList()
@@ -347,11 +353,19 @@ void UUIHandle::CloseSkillList()
 void UUIHandle::OpenMissionList()
 {
 	RequestChangeCursorMode(true, FInputModeGameOnly());
+	RequestPlayUISound(EUISoundType::Open);
+
 }
 
 void UUIHandle::CloseMissionList()
 {
 	RequestChangeCursorMode(false, FInputModeGameOnly());
+}
+
+void UUIHandle::RequestPlayUISound(EUISoundType Type)
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
+	EdmundGameInstance->PlayUISound(Type);
 }
 
 void UUIHandle::ClickedCloseCoverWidget() const
@@ -387,7 +401,7 @@ void UUIHandle::ClickedRetry()
 	ClickedMoveToMission(CurrentScene);
 }
 
-void UUIHandle::ClickedQuitGame() const
+void UUIHandle::ClickedQuitGame()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->QuitGame();
@@ -405,7 +419,7 @@ void UUIHandle::ClickedEffectVolume(const float Volume) const
 	EdmundGameInstance->SetEffectVolume(Volume);
 }
 
-void UUIHandle::ClickedSelectCharacter(const ECharacterType CharacterType) const
+void UUIHandle::ClickedSelectCharacter(const ECharacterType CharacterType)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->SetPlayerType(CharacterType);
@@ -417,19 +431,19 @@ void UUIHandle::ClickedCancleSelectCharacter()
 	EdmundGameInstance->CancleSelectedType();
 }
 
-void UUIHandle::ClickedSelectSkill(const int32 Index) const
+void UUIHandle::ClickedSelectSkill(const int32 Index)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->ApplySelectSkill(Index);
 }
 
-void UUIHandle::ClickedSkipStory() const
+void UUIHandle::ClickedSkipStory()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->SkipMissionStory();
 }
 
-void UUIHandle::ClickedNextStory() const
+void UUIHandle::ClickedNextStory()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->MoveNextMissionStory();
