@@ -48,8 +48,16 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 
 		Damage = BulletDamage;
 
+		// 랜덤 데미지 적용
+		float RandomRange = 0.2f;
+
+		float MinDamage = (1.0f - RandomRange) * Damage;
+		float MaxDamage = (1.0f + RandomRange) * Damage;
+
+		Damage = FMath::RandRange(MinDamage, MaxDamage);
+
 		// 데미지 적용
-		UGameplayStatics::ApplyDamage(OtherActor, BulletDamage, nullptr, this, UDamageType::StaticClass());
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, nullptr, this, UDamageType::StaticClass());
 	}
 
 	else
