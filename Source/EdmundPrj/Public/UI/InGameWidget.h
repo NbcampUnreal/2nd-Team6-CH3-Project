@@ -8,6 +8,7 @@
 
 class UTextBlock;
 class UProgressBar;
+class UCanvasPanel;
 
 UCLASS()
 class EDMUNDPRJ_API UInGameWidget : public UBaseWidget
@@ -15,6 +16,7 @@ class EDMUNDPRJ_API UInGameWidget : public UBaseWidget
 	GENERATED_BODY()
 	
 public:
+	virtual void Update() override;
 	virtual void ChangedNotifyText(const FString& NotifyText) override;
 	virtual void ChangedMissionText(const FString& MissionText) override;
 	virtual void ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp) override;
@@ -63,6 +65,9 @@ private:
 
 	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UProgressBar> BossHpBar;
+
+	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UCanvasPanel> BossHpBox;
 
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> NotifyAnimation;

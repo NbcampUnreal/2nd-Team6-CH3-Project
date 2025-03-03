@@ -30,6 +30,7 @@ public:
 	virtual void ChangedStageToProgress(const FString& ProgressText, const bool bIsOn) override {};
 	virtual void ChangedBossHp(const int32 MaxHp, const int32 CurrentHp) override {};
 	virtual void ChangedMissionInfoOnOff() override {};
+	virtual void ChangedStoryText(const FString& TargetText) override {};
 
 	virtual void InitWidget(UUIHandle* uiHandle);
 	virtual void Action();

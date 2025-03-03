@@ -14,6 +14,7 @@ class ASpawnerHandle;
 class ABaseCharacter;
 struct FMissionDataRow;
 struct FSpawnerDataRow;
+struct FStoryDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API AEdmundGameMode : public AGameMode
@@ -26,11 +27,19 @@ public:
 		UEdmundGameInstance* NewGameInstance,
 		const TArray<FMissionDataRow*>& MissionDataSet,
 		const TArray<FSpawnerDataRow*>& SpawnerDataSet,
+		const TArray<FStoryDataRow*>& StoryDataSet,
 		UClass* CharacterClass
 	);
 	void StartMission(ESceneType CurrentScene);
 	void ClearMission();
 	void FailMission();
+
+	void NotifyAllClearedMission();
+
+	void OnStartedPrintStory(const int32 Index);
+	void PrintCurrentStory();
+	bool CheckRemainCurrentStory();
+	void OnEndedCurrentStory();
 
 	void StartDefenceMode();
 	void StartBossMission();
@@ -55,4 +64,12 @@ private:
 	TObjectPtr<AEdmundGameState> EdmundGameState = nullptr;
 	TObjectPtr<AMissionHandle> MissionHandle = nullptr;
 	TObjectPtr<ASpawnerHandle> SpawnerHandle = nullptr;
+
+	TArray<FStoryDataRow*> MissionStoryData;
+	FStoryDataRow* CurrentStoryData;
+
+	int32 CurrentStoryIndex = 0;
+
+	bool bIsCleared = false;
+	bool bIsPlayingStory = false;
 };

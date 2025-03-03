@@ -34,15 +34,11 @@ void AMissionHandle::InitMissionHandle(const TArray<FMissionDataRow*>& MissionDa
 void AMissionHandle::OnBeginOverlapedItem(ABaseMissionItem* MissionItem)
 {
 	TargetMissionItem = MissionItem;
-
-	//GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &ThisClass::OnPressedKeyFromPlayer, 2.0f, false);
 }
 
 void AMissionHandle::OnEndOverlapedItem()
 {
 	TargetMissionItem = nullptr;
-
-	//GetWorld()->GetTimerManager().ClearTimer(TestTimer);
 }
 
 void AMissionHandle::OnPressedKeyFromPlayer()
@@ -68,23 +64,24 @@ void AMissionHandle::RequestUpdateNotifyText(const FString& NotifyText)
 
 void AMissionHandle::StartMainMission()
 {
+	UE_LOG(LogTemp, Warning, TEXT("MainMission Index : %d, Mission Set Num : %d"), MainMissionIndex, MainMissionSet.Num());
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
 	MainMissionSet[MainMissionIndex]->PrintMissionInfoText();
 	MainMissionSet[MainMissionIndex]->SetIsActive(true);
+	MainMissionSet[MainMissionIndex]->PrintBeginMissionStory();
 }
 
 void AMissionHandle::CompleteMission()
 {
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
 	MainMissionSet[MainMissionIndex]->PrintMissionClearText();
-
-	
+	MainMissionSet[MainMissionIndex]->PrintEndMissionStory();
 
 	++MainMissionIndex;
 
 	if (MainMissionIndex == MainMissionSet.Num())
 	{
-		EdmundGameMode->ClearMission();
+		EdmundGameMode->NotifyAllClearedMission();
 	}
 	else
 	{
@@ -95,6 +92,11 @@ void AMissionHandle::CompleteMission()
 void AMissionHandle::RequestSwapBgm(EBGMSoundType Type)
 {
 	EdmundGameMode->SwapBgm(Type);
+}
+
+void AMissionHandle::RequestPrintStory(int32 Index)
+{
+	EdmundGameMode->OnStartedPrintStory(Index);
 }
 
 void AMissionHandle::SpawnNpc(const FVector& SpawnPos)
@@ -187,12 +189,23 @@ void AMissionHandle::TeleportPlayerToTargetPoint()
 
 void AMissionHandle::NotifyStartDefenceMode()
 {
+	bIsDefence = true;
 	EdmundGameMode->StartDefenceMode();
 }
 
 void AMissionHandle::ApplyNpcEquip()
 {
 	bGetNpcEquip = true;
+
+	if (!bIsDefence)
+	{
+		return;
+	}
+
+	if (IsValid(NpcPawn))
+	{
+		SetNpcBattleMode(true);
+	}
 }
 
 void AMissionHandle::UpdateDefenceState(bool bIsOn)
@@ -332,6 +345,11 @@ void AMissionHandle::BeginPlay()
 
 void AMissionHandle::ApplyMissionDataInLevel()
 {
+	if (MissionDataSet.Num() == 0)
+	{
+		return;
+	}
+
 	for (const FMissionDataRow* MissionDataRow : MissionDataSet)
 	{
 		UClass* SpawnClass = MissionDataRow->MissionItemClass.Get();
@@ -364,6 +382,7 @@ void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPo
 
 	NewMissionItem->InitMissionItem(this, MissionType);
 	NewMissionItem->SetMissionText(InfoText, ActiveText, ClearText);
+	NewMissionItem->SetMissionStory(MissionData->bIsContainStory, MissionData->bIsBeginStory, MissionData->StoryIndex);
 
 	if (MissionType == "Main")
 	{

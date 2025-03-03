@@ -31,4 +31,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
 	TSoftObjectPtr<UDataTable> SpawnerDataTable;
+
+	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
+	TSoftObjectPtr<UDataTable> StoryDataTable;
 };

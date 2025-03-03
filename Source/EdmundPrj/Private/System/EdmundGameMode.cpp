@@ -7,16 +7,20 @@
 #include "System/MissionHandle.h"
 #include "System/SpawnerHandle.h"
 #include "Player/BaseCharacter.h"
+#include "System/DataStructure/StoryDataRow.h"
 
 void AEdmundGameMode::InitGameMode(
 	UEdmundGameInstance* NewGameInstance, 
 	const TArray<FMissionDataRow*>& MissionDataSet, 
 	const TArray<FSpawnerDataRow*>& SpawnerDataSet,
+	const TArray<FStoryDataRow*>& StoryDataSet,
 	UClass* CharacterClass
 )
 {
 	EdmundGameInstance = NewGameInstance;
 	EdmundGameState = Cast<AEdmundGameState>(GameState);
+
+	MissionStoryData = StoryDataSet;
 
 	checkf(IsValid(MissionHandleClass), TEXT("Mission Handle Class is invalid"));
 	MissionHandle = GetWorld()->SpawnActor<AMissionHandle>(MissionHandleClass);
@@ -65,9 +69,78 @@ void AEdmundGameMode::ClearMission()
 
 void AEdmundGameMode::FailMission()
 {
+	if (bIsCleared)
+	{
+		return;
+	}
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameState->EndCurrentLevel(false);
 	EdmundGameInstance->EndMission(false);
+}
+
+void AEdmundGameMode::NotifyAllClearedMission()
+{
+	bIsCleared = true;
+
+	if (!bIsPlayingStory)
+	{
+		ClearMission();
+	}
+}
+
+void AEdmundGameMode::OnStartedPrintStory(const int32 Index)
+{
+	CurrentStoryData = nullptr;
+
+	if (Index < MissionStoryData.Num())
+	{
+		for (FStoryDataRow* StoryDataRow : MissionStoryData)
+		{
+			if (StoryDataRow->Index == Index)
+			{
+				CurrentStoryData = StoryDataRow;
+				break;
+			}
+		}
+
+		checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+		EdmundGameInstance->VisibleMissionStory();
+		CurrentStoryIndex = 0;
+		bIsPlayingStory = true;
+		CheckRemainCurrentStory();
+	}
+}
+
+void AEdmundGameMode::PrintCurrentStory()
+{
+	EdmundGameState->PrintStoryText(CurrentStoryData->StoryText[CurrentStoryIndex]);
+	++CurrentStoryIndex;
+}
+
+bool AEdmundGameMode::CheckRemainCurrentStory()
+{
+	if (CurrentStoryIndex < CurrentStoryData->StoryText.Num())
+	{
+		PrintCurrentStory();
+		return true;
+	}
+	else
+	{
+		OnEndedCurrentStory();
+		return false;
+	}
+}
+
+void AEdmundGameMode::OnEndedCurrentStory()
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->InvisibleMissionStory();
+	bIsPlayingStory = false;
+
+	if (bIsCleared)
+	{
+		ClearMission();
+	}
 }
 
 void AEdmundGameMode::StartDefenceMode()

@@ -11,6 +11,7 @@
 #include "System/EdmundGameMode.h"
 #include "System/DataStructure/MissionDataRow.h"
 #include "System/DataStructure/SpawnerDataRow.h"
+#include "System/DataStructure/StoryDataRow.h"
 
 
 void UEdmundGameInstance::Init()
@@ -50,9 +51,10 @@ void UEdmundGameInstance::ApplyCurrentDataToGameMode()
 	ESceneType CurrentScene = GetCurrentSceneName();
 	const TArray<FMissionDataRow*> CurrentMissionData = GetCurrentMissionData(CurrentScene);
 	const TArray<FSpawnerDataRow*> CurrentSpawnerData = GetCurrentSpawnerData(CurrentScene);
+	const TArray<FStoryDataRow*> CurrentStoryData = DataHandle->GetStoryDataBySceneType(CurrentScene);
 	UClass* CurrentPlayerClass = DataHandle->GetCharacterClass();
 
-	EdmundGameMode->InitGameMode(this, CurrentMissionData, CurrentSpawnerData, CurrentPlayerClass);
+	EdmundGameMode->InitGameMode(this, CurrentMissionData, CurrentSpawnerData, CurrentStoryData, CurrentPlayerClass);
 
 	StartMission(CurrentScene);
 }
@@ -148,6 +150,30 @@ void UEdmundGameInstance::DestroyedGameState()
 {
 	EdmundGameMode = nullptr;
 	EdmundGameState = nullptr;
+}
+
+void UEdmundGameInstance::VisibleMissionStory() const
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->AddToViewportByCoverType(EWidgetType::TextWidget);
+}
+
+void UEdmundGameInstance::InvisibleMissionStory() const
+{
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->RequestRemoveCoverFromViewport(EWidgetType::TextWidget);
+}
+
+void UEdmundGameInstance::MoveNextMissionStory() const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->StopPrintStory();
+}
+
+void UEdmundGameInstance::SkipMissionStory() const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->SkipCurrentStory();
 }
 
 void UEdmundGameInstance::MoveScene(const ESceneType SceneType) const

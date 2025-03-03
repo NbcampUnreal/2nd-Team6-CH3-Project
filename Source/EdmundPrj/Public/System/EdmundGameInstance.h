@@ -48,6 +48,12 @@ public:
 	bool CheckClearedMission(const int32 Index) const;
 	void DestroyedGameState();
 
+	// Game Story Controll
+	void VisibleMissionStory() const;
+	void InvisibleMissionStory() const;
+	void MoveNextMissionStory() const;
+	void SkipMissionStory() const;
+
 	// Scene Move Controll
 	void MoveScene(const ESceneType SceneType) const;
 	void MoveNextScene() const;
