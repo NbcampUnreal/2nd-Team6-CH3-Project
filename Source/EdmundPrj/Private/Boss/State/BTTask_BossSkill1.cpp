@@ -47,6 +47,16 @@ EBTNodeResult::Type UBTTask_BossSkill1::ExecuteTask(UBehaviorTreeComponent& Owne
     }
 
     PlaySkill1Animation();
+    if (BossRef->Skill1UpperEffect)
+    {
+        FVector UpperEffectLocation = BossRef->GetActorLocation() + FVector(0.f, 0.f, 200.f);
+        UGameplayStatics::SpawnEmitterAtLocation(BossRef->GetWorld(), BossRef->Skill1UpperEffect, UpperEffectLocation);
+    }
+    if (BossRef->Skill1LowerEffect)
+    {
+        FVector LowerEffectLocation = BossRef->GetActorLocation() + FVector(0.f, 0.f, -50.f);
+        UGameplayStatics::SpawnEmitterAtLocation(BossRef->GetWorld(), BossRef->Skill1LowerEffect, LowerEffectLocation);
+    }
 
     CurrentOverlapCount = 0;
     if (BossRef->GetWorld())
@@ -122,10 +132,21 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
     }
     else
     {
-        Center.Z += 110.f; // 캐릭터 머리 높이
+        ACharacter* PlayerChar = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(World, 0));
+        if (PlayerChar && PlayerChar->GetMesh())
+        {
+            FVector FootPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterFoot"));
+            FVector HeadPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterHead"));
+            float DynamicOffset = (HeadPos.Z - FootPos.Z) * 0.5f;
+            Center.Z = FootPos.Z + DynamicOffset;
+        }
+        else
+        {
+            Center.Z += 110.f;
+        }
     }
 
-    FVector BoxExtent(1000.f, 1000.f, 10.f); // 콜리전 크기
+    FVector BoxExtent(5000.f, 5000.f, 10.f);
 
     TArray<FOverlapResult> OverlapResults;
     FCollisionShape Shape = FCollisionShape::MakeBox(BoxExtent);
@@ -150,7 +171,7 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
                 {
                     if (OverChar != BossRef)
                     {
-                        float DamageValue = 10.0f;
+                        float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetSkill1Multiplier();
                         UGameplayStatics::ApplyDamage(
                             OverChar,
                             DamageValue,
@@ -164,6 +185,7 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
         }
     }
 }
+
 
 void UBTTask_BossSkill1::OnOverlapEnd()
 {

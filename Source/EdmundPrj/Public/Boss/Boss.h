@@ -9,10 +9,12 @@
 #include "Boss/Attack/Boss_Attack4_Bullet.h"
 #include "Boss/Attack/Boss_Skill3_Wall.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Boss/State/BTTask_BossAttack2.h"
 #include "Boss.generated.h"
 
 class ABossAIController;
 class AMissionHandle;
+
 
 UCLASS()
 class EDMUNDPRJ_API ABoss : public ABaseMonster {
@@ -84,6 +86,7 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     void SetState(EBossState NewState);
+    float GetSkill1Multiplier() { return Skill1Multiplier; }
     void OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted);
     void InitiallizeBullerPool();
     float GetMonsterMoveSpeed() const { return MonsterMoveSpeed; }
@@ -108,9 +111,18 @@ public:
     virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
     bool GetbChaseComplete() const { return bChaseComplete; }
     void SetbChaseComplete(bool NewbChaseComplete) { bChaseComplete = NewbChaseComplete; }
-    float GetBossSkill1Damage() { return BossSkill1Damage; }
+    float GetBossSkill1Damage() const { return BossSkill1Damage; }
     void ActivateAttack2Collision();   
     void DeactivateAttack2Collision();
+    void DisableMovement();
+    void DisableRotation();
+    void EnableMovement();
+    void EnableRotation();
+    float GetTurnSpeed() { return TurnSpeed; }
+    void Skill2HealOverTime();
+    void SetSkill2Invulnerable(bool NewIsInvulnerable);
+    void HpbarUpdate();
+
 
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
@@ -121,6 +133,20 @@ public:
         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
         bool bFromSweep, const FHitResult& SweepResult);
 
+    UFUNCTION(BlueprintCallable)
+    void FireBullet();
+
+    UFUNCTION(BlueprintCallable)
+    void HandleAttack2State(int32 State);
+
+    UFUNCTION(BlueprintCallable)
+    void OnAttack2Finished();
+
+    UPROPERTY()
+    class UBTTask_BossAttack2* BTTask_BossAttack2Instance;
+
+
+
 private:
     UPROPERTY()
     UBossState* BossState;
@@ -128,16 +154,42 @@ private:
     UPROPERTY()
     UBoss_AnimInstance* AnimInstance;
 
-    int32 PoolSize = 15;
+    int32 PoolSize = 70;
     int32 ComboPhase = 0;
     bool bSkill1Used = false;
     bool bSkill2Used = false;
     bool bSkill3Used = false;
     bool bIsInvulnerable = false;
     bool bChaseComplete = false;
+    float Skill2InvulnerableStartHP;
+
+
+    FTimerHandle Skill2HealingTimerHandle;
 
 public:
-    float Chase_AcceptanceRadius = 60.0f; // Chase 반경
+    // ***********************Stat*************************
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack1Multiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack2Multiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack3MeleeMultiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack3RangeMultiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack4Multiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Skill1Multiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float TurnSpeed = 5.0f; // 회전 속도
+
+    float Chase_AcceptanceRadius = 100.0f; // Chase 반경
 
     // ***********************Attack 1*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
@@ -162,13 +214,13 @@ public:
     float Attack2_CooldownEnd = 0.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
-    float Attack2_AscendSpeed = 300.0f;   // 상승 속도
+    float Attack2_AscendSpeed = 30000.0f;   // 상승 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_DescendSpeed = 600.0f;   // 하강 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
-    float Attack2_TargetHeight = 1000.0f;  // 목표 높이 (Z)
+    float Attack2_TargetHeight = 10000.0f;  // 목표 높이 (Z)
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_HorizontalMoveSpeed = 500.0f; // 수평 이동 속도 (X, Y)
@@ -189,17 +241,32 @@ public:
     UPROPERTY(BlueprintReadWrite)
     class UBTTask_BossAttack3* CurrentAttackTask;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
-    float MeleeAttackDashDistance_Attack1 = 10000.0f; // 1타 돌진 거리
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    float MeleeAttackDashDistance_Attack1 = 50.0f; // 1타 돌진 거리
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
-    float MeleeAttackDashDistance_Attack2 = 10000.0f; // 2타 돌진 거리
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    float MeleeAttackDashDistance_Attack2 = 50.0f; // 2타 돌진 거리
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
-    float MeleeAttackDashSpeed_Attack1 = 1200.0f; // 1타 돌진 속도
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    float MeleeAttackDashSpeed_Attack1 = 10.0f; // 1타 돌진 속도
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BossAttack")
-    float MeleeAttackDashSpeed_Attack2 = 1300.0f; // 2타 돌진 속도
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    float MeleeAttackDashSpeed_Attack2 = 10.0f; // 2타 돌진 속도
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    float BossDashFrequency = 0.8f; // 목표 위치 가속 힘
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    float BossDashDamping = 0.7f; // 부드럽게 정지
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    float Attack3_3FiringDuration = 3.0f; // 3타 지속시간
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    float Attack3_3FireInterval = 0.1f; // 3타 발사 간격
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
+    int32 Attack3_3BulletNum = 20; // 탄 발사 수
 
     // ***********************Attack 4*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
@@ -254,11 +321,25 @@ public:
 
 
     // ***********************Skill 1*************************
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill1")
+    UParticleSystem* Skill1UpperEffect;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill1")
+    UParticleSystem* Skill1LowerEffect;
+
     // ***********************Skill 2*************************
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UMaterialInterface* Skill2NewMaterial;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    float Skill2HealingInterval = 10.0f; // 회복 간격
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    float Skill2HealingPercentPerInterval = 1.0f; // 회복 비율
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill2")
+    float Skill2MaxHealingPercent = 10.0f; // 최대 회복 가능 비율
 
 
     // ***********************Skill 3*************************
@@ -315,6 +396,6 @@ public:
 
     TObjectPtr<ABossAIController> BossController = nullptr;
     TObjectPtr<AMissionHandle> MissionHandle = nullptr;
-    bool bIsStart = false;
+    
 };
 
