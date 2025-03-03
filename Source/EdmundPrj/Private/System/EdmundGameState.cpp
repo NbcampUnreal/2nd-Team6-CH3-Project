@@ -465,7 +465,7 @@ void AEdmundGameState::NotifyPlayerLevel(const int32 LevelValue)
 	}
 }
 
-void AEdmundGameState::NotifySpawnedBoss()
+void AEdmundGameState::NotifyOnStageProgress(const FString& ProgressText, bool bIsOn)
 {
 	for (TScriptInterface<IGameStateObserver> Observer : Observers)
 	{
@@ -473,7 +473,19 @@ void AEdmundGameState::NotifySpawnedBoss()
 		{
 			continue;
 		}
-		Observer->ChangedStageToBoss();
+		Observer->ChangedStageToProgress(ProgressText, bIsOn);
+	}
+}
+
+void AEdmundGameState::NotifyUpdateStageProgress(const float Value)
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedBossHp(100, Value * 100);
 	}
 }
 
@@ -486,6 +498,23 @@ void AEdmundGameState::NotifyBossHp(const int32 MaxHp, const int32 CurrentHp)
 			continue;
 		}
 		Observer->ChangedBossHp(MaxHp, CurrentHp);
+	}
+}
+
+void AEdmundGameState::NotifyOnOverlapedDefenceArea(const bool bIsOverlaped)
+{
+	NotifyOnStageProgress("For Complete", bIsOverlaped);
+}
+
+void AEdmundGameState::NotifyOnMissionInfo()
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedMissionInfoOnOff();
 	}
 }
 
