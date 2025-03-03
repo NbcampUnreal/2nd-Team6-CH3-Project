@@ -18,7 +18,7 @@ ABoss_Attack1_Bullet::ABoss_Attack1_Bullet()
 	CollisionComp->InitSphereRadius(10.0f);
 	CollisionComp->SetCollisionProfileName(TEXT("IgnoreAll"));
 	// Pawn 채널은 Overlap 처리하여 물리 밀림 방지
-	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	// CCD 활성화 (빠른 이동에도 충돌 감지)
 	CollisionComp->BodyInstance.bUseCCD = true;
 	// Hit와 Overlap 이벤트 바인딩

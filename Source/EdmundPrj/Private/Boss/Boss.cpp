@@ -20,10 +20,12 @@ ABoss::ABoss()
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     BossState = nullptr;
-    MonsterMoveSpeed = 5000.0f;
     MonsterHP = 500.0f;
     MonsterMaxHP = 1000.0f;
     MonsterAttackDamage = 10.0f;
+    MonsterArmor = 10;
+    MonsterMoveSpeed = 5000.0f;
+
 
     // 공격2 범위
     Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2Collision"));
@@ -119,17 +121,17 @@ void ABoss::BeginPlay()
 
     InitiallizeBullerPool();
     BossController = Cast<ABossAIController>(GetOwner());
-    MonsterMoveSpeed = 5000.0f;
-    //MonsterHP = 500.0f;
-    MonsterHP = MonsterMaxHP = 2000.0f;
-    MonsterAttackDamage = 10.0f;
     if (GetCharacterMovement())
     {
         GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-        UE_LOG(LogTemp, Warning, TEXT("Boss 초기 이동 모드 설정: MOVE_Walking"));
     }
 
-    
+    // Stat
+    MonsterMoveSpeed = 5000.0f;
+    MonsterHP = MonsterMaxHP = 2000.0f;
+    MonsterAttackDamage = 10.0f;
+
+    HpbarUpdate();
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -410,11 +412,14 @@ void ABoss::MonsterDead()
 
 float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-    if (bIsInvulnerable)
+    float DamageDealt = 0.f;
+    if (!bIsInvulnerable)
     {
-        return 0.f;
+        DamageDealt = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+        MonsterHP -= DamageDealt;
+        HpbarUpdate();
     }
-    return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    return DamageDealt;
 }
 
 void ABoss::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -479,7 +484,7 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
                     FVector(1.0f)
                 );
             }
-            float DamageValue = 10.0f;
+            float DamageValue = MonsterAttackDamage * Attack2Multiplier;
             UGameplayStatics::ApplyDamage(
                 OtherActor,
                 DamageValue,
@@ -612,7 +617,9 @@ void ABoss::OnAttack2Finished()
 
 void ABoss::SetSkill2Invulnerable(bool NewIsInvulnerable)
 {
-    if (bIsInvulnerable)
+    bIsInvulnerable = NewIsInvulnerable;
+
+    if (NewIsInvulnerable)
     {
         Skill2InvulnerableStartHP = MonsterHP;
         GetWorldTimerManager().SetTimer(Skill2HealingTimerHandle, this, &ABoss::Skill2HealOverTime, Skill2HealingInterval, true);
@@ -637,8 +644,28 @@ void ABoss::Skill2HealOverTime()
     {
         float HealAmount = MonsterMaxHP * (Skill2HealingPercentPerInterval / 100.0f);
         MonsterHP = FMath::Min(MonsterHP + HealAmount, Skill2InvulnerableStartHP + MaxHealAmount);
+
+        int32 ConvertedMaxHp = FMath::RoundToInt(MonsterMaxHP);
+        int32 ConvertedCurrentHp = FMath::RoundToInt(MonsterHP);
+        if (AEdmundGameState* MyGameState = GetWorld()->GetGameState<AEdmundGameState>())
+        {
+            MyGameState->NotifyBossHp(ConvertedMaxHp, ConvertedCurrentHp);
+        }
+        HpbarUpdate();
     }
 }
+
+void ABoss::HpbarUpdate()
+{
+    int32 ConvertedMaxHp = FMath::RoundToInt(MonsterMaxHP);
+    int32 ConvertedCurrentHp = FMath::RoundToInt(MonsterHP);
+
+    if (AEdmundGameState* MyGameState = GetWorld()->GetGameState<AEdmundGameState>())
+    {
+        MyGameState->NotifyBossHp(ConvertedMaxHp, ConvertedCurrentHp);
+    }
+}
+
 
 
 void ABoss::InitBoss(AMissionHandle* NewMissionHandle)

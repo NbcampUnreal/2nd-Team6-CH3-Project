@@ -94,11 +94,11 @@ void ABossAIController::Tick(float DeltaTime)
         );
 
         if (maxWeight == finalWeight4)      NextAttack = 4;
-        else if (maxWeight == finalWeight3) NextAttack = 1;
-        else if (maxWeight == finalWeight2) NextAttack = 2;
+        else if (maxWeight == finalWeight3) NextAttack = 3;
+        else if (maxWeight == finalWeight2) NextAttack = 1;
         else if (maxWeight == finalWeight1) NextAttack = 1;
         else                                NextAttack = 0;
-        NextAttack = 3;
+        //NextAttack = 3;
         float Attack1Remaining = FMath::Max(0.0f, BossCharacter->Attack1_CooldownEnd - CurrentTime);
         float Attack2Remaining = FMath::Max(0.0f, BossCharacter->Attack2_CooldownEnd - CurrentTime);
         float Attack3Remaining = FMath::Max(0.0f, BossCharacter->Attack3_CooldownEnd - CurrentTime);

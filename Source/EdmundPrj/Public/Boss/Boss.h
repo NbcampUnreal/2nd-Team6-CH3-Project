@@ -86,6 +86,7 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     void SetState(EBossState NewState);
+    float GetSkill1Multiplier() { return Skill1Multiplier; }
     void OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted);
     void InitiallizeBullerPool();
     float GetMonsterMoveSpeed() const { return MonsterMoveSpeed; }
@@ -120,6 +121,7 @@ public:
     float GetTurnSpeed() { return TurnSpeed; }
     void Skill2HealOverTime();
     void SetSkill2Invulnerable(bool NewIsInvulnerable);
+    void HpbarUpdate();
 
 
     UFUNCTION(BlueprintCallable)
@@ -167,9 +169,27 @@ private:
 public:
     // ***********************Stat*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack1Multiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack2Multiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack3MeleeMultiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack3RangeMultiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack4Multiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Skill1Multiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float TurnSpeed = 5.0f; // 회전 속도
 
-    float Chase_AcceptanceRadius = 60.0f; // Chase 반경
+    float Chase_AcceptanceRadius = 100.0f; // Chase 반경
 
     // ***********************Attack 1*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
@@ -222,22 +242,22 @@ public:
     class UBTTask_BossAttack3* CurrentAttackTask;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack1 = 200.0f; // 1타 돌진 거리
+    float MeleeAttackDashDistance_Attack1 = 50.0f; // 1타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack2 = 200.0f; // 2타 돌진 거리
+    float MeleeAttackDashDistance_Attack2 = 50.0f; // 2타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack1 = 100.0f; // 1타 돌진 속도
+    float MeleeAttackDashSpeed_Attack1 = 10.0f; // 1타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack2 = 100.0f; // 2타 돌진 속도
+    float MeleeAttackDashSpeed_Attack2 = 10.0f; // 2타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashFrequency = 5.0f; // 목표 위치 가속 힘
+    float BossDashFrequency = 0.8f; // 목표 위치 가속 힘
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashDamping = 2.0f; // 부드럽게 정지
+    float BossDashDamping = 0.7f; // 부드럽게 정지
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_3FiringDuration = 3.0f; // 3타 지속시간
@@ -301,6 +321,12 @@ public:
 
 
     // ***********************Skill 1*************************
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill1")
+    UParticleSystem* Skill1UpperEffect;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill1")
+    UParticleSystem* Skill1LowerEffect;
+
     // ***********************Skill 2*************************
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

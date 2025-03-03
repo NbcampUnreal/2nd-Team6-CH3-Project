@@ -123,11 +123,8 @@ void UBTTask_BossAttack3::FinishComboAttack()
 {
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: BossRef is NULL!"));
         return;
     }
-
-    //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Executing, ComboPhase=%d"), BossRef->GetComboPhase());
 
     BossRef->UpdateAttackCooldown(3);
     BossRef->CurrentAttackTask = nullptr;
@@ -135,19 +132,19 @@ void UBTTask_BossAttack3::FinishComboAttack()
     ComboPhase = 0;
     BossRef->SetComboPhase(0);
 
-    //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: ComboPhase 초기화 -> %d"), BossRef->GetComboPhase());
+    if (BossRef->GetWorld()->GetTimerManager().IsTimerActive(BulletFireTimerHandle))
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+    }
+    FiredBulletCount = 0;
 
     if (CachedOwnerComp)
     {
         BossRef->SetbChaseComplete(true);
-        //UE_LOG(LogTemp, Log, TEXT("FinishComboAttack: Behavior Tree Task Succeeded"));
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
     }
-    else
-    {
-        //UE_LOG(LogTemp, Error, TEXT("FinishComboAttack: CachedOwnerComp is NULL! Behavior Tree Task could not finish properly."));
-    }
 }
+
 
 void UBTTask_BossAttack3::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
@@ -377,6 +374,19 @@ void UBTTask_BossAttack3::FireSingleBullet()
         return;
     }
 
+    if (FiredBulletCount >= BossRef->Attack3_3BulletNum)
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+        return;
+    }
+
+    AccumulatedDeltaTime += BossRef->Attack3_3FireInterval;
+    if (AccumulatedDeltaTime >= BossRef->Attack3_3FiringDuration)
+    {
+        BossRef->GetWorld()->GetTimerManager().ClearTimer(BulletFireTimerHandle);
+        return;
+    }
+
     FRotator NewRotation = BossRef->MuzzleLocation->GetComponentRotation();
     FVector NewSpawnLocation = BossRef->MuzzleLocation->GetComponentLocation();
 
@@ -386,16 +396,17 @@ void UBTTask_BossAttack3::FireSingleBullet()
     {
         AActor* PlayerActor = PlayerActors[0];
         USkeletalMeshComponent* SkeletalMesh = PlayerActor->FindComponentByClass<USkeletalMeshComponent>();
-        if (SkeletalMesh && SkeletalMesh->DoesSocketExist(FName("Head")))
+        if (SkeletalMesh && SkeletalMesh->DoesSocketExist(FName("CharacterHead")))
         {
-            FVector HeadLocation = SkeletalMesh->GetSocketLocation(FName("Head"));
-            //UE_LOG(LogTemp, Error, TEXT("머리 감지O"));
+            FVector HeadLocation = SkeletalMesh->GetSocketLocation(FName("CharacterHead"));
             NewSpawnLocation.Z = HeadLocation.Z;
         }
-        //else
-        //{
-        //    UE_LOG(LogTemp, Error, TEXT("머리 감지X"));
-        //}
+        else
+        {
+            NewSpawnLocation.Z = 150.0f;
+        }
+
+        
     }
 
     FVector BulletDirection = NewRotation.Vector();
@@ -408,4 +419,6 @@ void UBTTask_BossAttack3::FireSingleBullet()
 
     FiredBulletCount++;
 }
+
+
 
