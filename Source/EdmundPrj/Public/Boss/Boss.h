@@ -118,7 +118,8 @@ public:
     void EnableMovement();
     void EnableRotation();
     float GetTurnSpeed() { return TurnSpeed; }
-
+    void Skill2HealOverTime();
+    void SetSkill2Invulnerable(bool NewIsInvulnerable);
 
 
     UFUNCTION(BlueprintCallable)
@@ -159,8 +160,7 @@ private:
     bool bIsInvulnerable = false;
     bool bChaseComplete = false;
     float Skill2InvulnerableStartHP;
-    //void Skill2HealOverTime();
-    //void SetSkill2Invulnerable(bool NewIsInvulnerable);
+
 
     FTimerHandle Skill2HealingTimerHandle;
 

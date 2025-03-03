@@ -20,9 +20,9 @@ void UMissionListWidget::InitWidget(UUIHandle* NewUIHandle)
 	CloseButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedClose);
 	EnterButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedEnter);
 
-	MissionButton2->SetIsEnabled(false);
-	MissionButton3->SetIsEnabled(false);
-	MissionButton4->SetIsEnabled(false);
+	//MissionButton2->SetIsEnabled(false);
+	//MissionButton3->SetIsEnabled(false);
+	//MissionButton4->SetIsEnabled(false);
 }
 
 void UMissionListWidget::PlayAddAnim()
@@ -122,20 +122,20 @@ void UMissionListWidget::OnSelectedImage(int32 Index)
 
 void UMissionListWidget::CheckCleard()
 {
-	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	//checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 
-	if (UIHandle->CheckClearedMission(0))
-	{
-		MissionButton2->SetIsEnabled(true);
-	}
+	//if (UIHandle->CheckClearedMission(0))
+	//{
+	//	MissionButton2->SetIsEnabled(true);
+	//}
 
-	if (UIHandle->CheckClearedMission(1))
-	{
-		MissionButton3->SetIsEnabled(true);
-	}
+	//if (UIHandle->CheckClearedMission(1))
+	//{
+	//	MissionButton3->SetIsEnabled(true);
+	//}
 
-	if (UIHandle->CheckClearedMission(2))
-	{
-		MissionButton4->SetIsEnabled(true);
-	}
+	//if (UIHandle->CheckClearedMission(2))
+	//{
+	//	MissionButton4->SetIsEnabled(true);
+	//}
 }
