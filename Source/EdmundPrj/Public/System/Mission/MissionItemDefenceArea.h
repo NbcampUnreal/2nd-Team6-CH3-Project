@@ -25,7 +25,14 @@ private:
 	virtual void ActionEndOverlap() override;
 	virtual void CompleteProgress() override;
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission Info")
+	float TargetTime = 30.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission Info")
+	float UpdateTime = 0.01f;
+
 private:
 	float CurrentTime = 0.0f;
-	float TargetTime = 0.1f;
+	float DeltaTargetTime = 0.0;
 };

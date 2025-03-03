@@ -177,10 +177,9 @@ void APlayerCharacterFey::MeleeAttack(const FInputActionValue& value)
 	}
 
 	// 근접공격 소리 재생
-	if (MeleeAttackSound)
+	if (IsValid(CurrentGameState))
 	{
-		CurrentAudioComp->SetSound(MeleeAttackSound);
-		CurrentAudioComp->Play();
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
 	}
 
 	// 근접 공격 딜레이
@@ -211,7 +210,7 @@ void APlayerCharacterFey::Attack(const FInputActionValue& value)
 
 	IsAttack = true;
 	Stamina -= 10;
-	
+
 	if (IsValid(CurrentGameState))
 	{
 		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
@@ -229,16 +228,8 @@ void APlayerCharacterFey::ActiveWeapon()
 	{
 		if (WeaponActor->Fire(AttackDelay))
 		{
-			// 총소리 재생
-			if (FireSound)
-			{
-				//UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-				CurrentAudioComp->SetSound(FireSound);
-				CurrentAudioComp->Play();
-			}
-
 			GetWorld()->GetTimerManager().SetTimer(
-				HoveringDelayHandle,
+				AttackDelayHandle,
 				this,
 				&APlayerCharacterFey::SetIsAttack,
 				AttackDelay,

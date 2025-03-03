@@ -10,6 +10,10 @@ void AMissionItemDefenceArea::InitMissionItem(AMissionHandle* NewMissionHandle, 
 	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyOverlapCollision(false);
+
+	DeltaTargetTime = 1.0f / TargetTime;
+	ProgressValue = 1.0f;
+	MissionHandle->UpdateDefenceProgress(ProgressValue);
 }
 
 void AMissionItemDefenceArea::SetIsActive(bool Value)
@@ -36,11 +40,11 @@ void AMissionItemDefenceArea::Tick(float DeltaTime)
 
 	CurrentTime += DeltaTime;
 
-	if (CurrentTime >= TargetTime)
+	if (CurrentTime >= UpdateTime)
 	{
 		CurrentTime = 0.0f;
-		ProgressValue -= 0.01f;
-		InteractionWidget->UpdateProgressBar(ProgressValue);
+		ProgressValue -= DeltaTargetTime * UpdateTime;
+		MissionHandle->UpdateDefenceProgress(ProgressValue);
 
 		if (ProgressValue <= 0.0f)
 		{
@@ -60,7 +64,7 @@ void AMissionItemDefenceArea::ActionBeginOverlap()
 
 	bIsPlayingInteraction = true;
 	SetActorTickEnabled(true);
-	InteractionWidget->VisibleProgressBar(true);
+	MissionHandle->UpdateDefenceState(true);
 	PrintMissionActiveText();
 }
 
@@ -74,7 +78,7 @@ void AMissionItemDefenceArea::ActionEndOverlap()
 	Super::ActionEndOverlap();
 
 	SetActorTickEnabled(false);
-	InteractionWidget->VisibleProgressBar(false);
+	MissionHandle->UpdateDefenceState(false);
 }
 
 void AMissionItemDefenceArea::CompleteProgress()

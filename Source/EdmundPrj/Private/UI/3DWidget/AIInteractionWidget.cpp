@@ -27,6 +27,7 @@ void UAIInteractionWidget::SetIsVisible(bool IsVisible)
 	}
 	else
 	{
+		ResetAllElements();
 		TotalPanel->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
@@ -52,8 +53,27 @@ void UAIInteractionWidget::UpdateDamageText(int32 Damage)
 
 	DamageIndex = DamageIndex % DamageWidgetSet.Num();
 
+	DamageWidgetSet[DamageIndex]->SetVisibility(ESlateVisibility::Visible);
 	DamageWidgetSet[DamageIndex]->ApplyDamage(Damage);
 
 	++DamageIndex;
+}
+
+void UAIInteractionWidget::ResetAllElements()
+{
+	for (UDamageWidget* DamageWidget : DamageWidgetSet)
+	{
+		DamageWidget->ResetDamage();
+		DamageWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	HpBar->SetPercent(1.0f);
+
+	if (IsAnimationPlaying(HpAnimation))
+	{
+		StopAnimation(HpAnimation);
+	}
+
+	HpBar->SetVisibility(ESlateVisibility::Collapsed);
 }
 

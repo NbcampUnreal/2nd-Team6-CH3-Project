@@ -50,8 +50,11 @@ public:
 	virtual void ChangedPlayerLevel(const int32 LevelValue) = 0;
 
 	UFUNCTION()
-	virtual void ChangedStageToBoss() = 0;
+	virtual void ChangedStageToProgress(const FString& ProgressText, const bool bIsOn) = 0;
 
 	UFUNCTION()
 	virtual void ChangedBossHp(const int32 MaxHp, const int32 CurrentHp) = 0;
+
+	UFUNCTION()
+	virtual void ChangedMissionInfoOnOff() = 0;
 };

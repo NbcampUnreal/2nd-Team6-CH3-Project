@@ -14,6 +14,7 @@
 #include "Player/TimerSkillSpawnManagerComponent.h"
 #include "Player/ActiveSkillSpawnManager.h"
 #include "Player/ElectricEffectPool.h"
+#include "System/EnumSet.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -72,6 +73,7 @@ ABaseCharacter::ABaseCharacter()
 	IsSprint = false;
 	IsCrouch = false;
 	IsDie = false;
+	IsAttack = false;
 
 	HitActionMontage = nullptr;
 	DieActionMontage = nullptr;
@@ -112,6 +114,7 @@ void ABaseCharacter::BeginPlay()
 		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 		CurrentGameState->NotifyPlayerExp(MaxExp, CurrentExp);
+		CurrentGameState->NotifyPlayerLevel(CurrentLevel);
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -229,13 +232,23 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 				);
 			}
 
-			if (PlayerController->InteractionAction)
+			if (PlayerController->PauseAction)
 			{
 				EnhancedInput->BindAction(
 					PlayerController->PauseAction,
 					ETriggerEvent::Started,
 					this,
 					&ABaseCharacter::PauseAction
+				);
+			}
+
+			if (PlayerController->MissionOnAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->MissionOnAction,
+					ETriggerEvent::Started,
+					this,
+					&ABaseCharacter::MissionOnAction
 				);
 			}
 		}
@@ -440,6 +453,14 @@ void ABaseCharacter::PauseAction(const FInputActionValue& value)
 	}
 }
 
+void ABaseCharacter::MissionOnAction(const FInputActionValue& value)
+{
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyOnMissionInfo();
+	}
+}
+
 float ABaseCharacter::GetAttackDamage() const
 {
 	float Damage = AttackDamage;
@@ -486,16 +507,16 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	if (DamageProb <= EvasionProb)
 	{
 		// 회피 성공 사운드
-		if (IsValid(EvasionSuccessSound))
+		if (IsValid(CurrentGameState))
 		{
-			CurrentAudioComp->SetSound(EvasionSuccessSound);
-			CurrentAudioComp->Play();
+			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Avoid);
 		}
 
 		return 0.0f;
 	}
 
-	if (IsValid(HitActionMontage) && !CheckAction())
+	// 공격 중에 피격 애니메이션 실행하면 다음 공격 못함
+	if (IsValid(HitActionMontage) && !CheckAction() && !IsAttack)
 	{
 		PlayAnimMontage(HitActionMontage);
 	}
@@ -518,10 +539,9 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 			HP = MaxHP;
 
 			// 부활 사운드
-			if (IsValid(RevivalSuccessSound))
+			if (IsValid(CurrentGameState))
 			{
-				CurrentAudioComp->SetSound(RevivalSuccessSound);
-				CurrentAudioComp->Play();
+				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Respawn);
 			}
 		}
 		// 부활 횟수가 없다면
@@ -578,6 +598,7 @@ void ABaseCharacter::LevelUp()
 	{
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
+		CurrentGameState->NotifyPlayerLevel(CurrentLevel);
 		CurrentGameState->CreateRandomSkillSet();
 	}
 }
@@ -663,10 +684,9 @@ void ABaseCharacter::GetUpgradeStatus()
 void ABaseCharacter::ActiveDieAction()
 {
 	// 죽음 사운드
-	if (IsValid(DeathSound))
+	if (IsValid(CurrentGameState))
 	{
-		CurrentAudioComp->SetSound(DeathSound);
-		CurrentAudioComp->Play();
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Die);
 	}
 
 	if (IsValid(DieActionMontage))

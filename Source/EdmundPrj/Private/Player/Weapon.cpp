@@ -6,6 +6,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
 #include "Particles/ParticleSystem.h"
+#include "System/EdmundGameState.h"
+#include "Player/ChargingBullet.h"
+#include "Player/PlayerCharacterWraith.h"
 
 AWeapon::AWeapon()
 {
@@ -74,6 +77,28 @@ ABaseProjectile* AWeapon::GetBulletFromPool()
 		if (ABaseProjectile && ABaseProjectile->IsHidden())
 		{
 			ABaseProjectile->SetBulletHidden(false);  // 숨겨둔 총알을 보이게 설정
+
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0은 첫 번째 플레이어
+
+			if (PlayerController)
+			{
+				APawn* ControlledPawn = PlayerController->GetPawn();
+				if (ControlledPawn)
+				{
+					ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
+					if (IsValid(Player) && Player->GetCharacterType() == ECharacterType::Sparrow)
+					{
+						AChargingBullet* CharingBullet = Cast<AChargingBullet>(ABaseProjectile);
+						APlayerCharacterWraith* Wraith = Cast<APlayerCharacterWraith>(Player);
+
+						if (IsValid(CharingBullet))
+						{
+							CharingBullet->SetBulletScale();
+						}
+					}
+				}
+			}
+
 			return ABaseProjectile;
 		}
 	}
@@ -104,6 +129,27 @@ bool AWeapon::Fire(float NewAttackDelay)
 	ABaseProjectile* BulletToFire = GetBulletFromPool();
 	if (BulletToFire)
 	{
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0은 첫 번째 플레이어
+
+		if (PlayerController)
+		{
+			APawn* ControlledPawn = PlayerController->GetPawn();
+			if (ControlledPawn)
+			{
+				ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
+				if (IsValid(Player) && Player->GetCharacterType() == ECharacterType::Sparrow)
+				{
+					AChargingBullet* CharingBullet = Cast<AChargingBullet>(BulletToFire);
+					APlayerCharacterWraith* Wraith = Cast<APlayerCharacterWraith>(Player);
+
+					if (IsValid(CharingBullet))
+					{
+						CharingBullet->SetBulletDamage(Wraith->GetAttackDamage());
+					}
+				}
+			}
+		}
+
 		FRotator SpawnRotation = MuzzleOffset->GetComponentRotation();
 		FVector SpawnLocation = MuzzleOffset->GetComponentLocation();
 

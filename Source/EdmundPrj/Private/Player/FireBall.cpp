@@ -2,6 +2,8 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BaseCharacter.h"
+#include "System/EdmundGameState.h"
+#include "System/EnumSet.h"
 
 AFireBall::AFireBall() : Super()
 {
@@ -41,6 +43,15 @@ void AFireBall::EndBulletLife()
 	if (BulletLandParticle)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation(), FVector(1.0f, 1.0f, 1.0f) * AttackRadiusMultifler);
+	}
+
+	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
+
+	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Weapon);
 	}
 
 	// 폭발 사운드
@@ -99,6 +110,23 @@ void AFireBall::EndBulletLife()
 
 			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 			{
+				float Damage = 30.0f;
+
+				// 현재 플레이어 캐릭터로부터 데미지 값을 얻는 코드
+				APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0은 첫 번째 플레이어
+				if (PlayerController)
+				{
+					APawn* ControlledPawn = PlayerController->GetPawn();
+					if (ControlledPawn)
+					{
+						ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
+						if (IsValid(Player))
+						{
+							Damage = Player->GetAttackDamage();
+						}
+					}
+				}
+
 				UGameplayStatics::ApplyDamage(
 					HitActor,
 					30.0f,

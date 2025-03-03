@@ -46,7 +46,7 @@ public:
 	TObjectPtr<UElectricEffectPool> ElectricEffectPool;
 
 	// 공격력 Getter
-	float GetAttackDamage() const;
+	virtual float GetAttackDamage() const;
 
 	// 공격력 Setter
 	void SetAttackDamage(float NewAttackDamage);
@@ -98,8 +98,11 @@ protected:
 	void StartCrouch(const FInputActionValue& value);
 	void StopCrouch(const FInputActionValue& value);
 
-	// 상호작용
+	// 퍼즈
 	void PauseAction(const FInputActionValue& value);
+
+	// 미션창
+	void MissionOnAction(const FInputActionValue& value);
 
 	// 피격
 	virtual float TakeDamage(
@@ -231,7 +234,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	UAnimMontage* DieActionMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	UAudioComponent* CurrentAudioComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
@@ -258,6 +260,7 @@ private:
 
 protected:
 	bool IsDie;
+	bool IsAttack;
 
 	AEdmundGameState* CurrentGameState;
 

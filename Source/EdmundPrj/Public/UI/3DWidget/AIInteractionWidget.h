@@ -23,6 +23,7 @@ public:
 private:
 	void UpdateHpBar(int32 MaxHp, int32 CurrentHp);
 	void UpdateDamageText(int32 Damage);
+	void ResetAllElements();
 
 private:
 	UPROPERTY(Meta = (BindWidget))
