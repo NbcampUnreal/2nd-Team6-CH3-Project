@@ -15,6 +15,7 @@ struct FPlayerSkillRow;
 struct FCharacterDataRow;
 struct FMissionDataRow;
 struct FSpawnerDataRow;
+struct FStoryDataRow;
 
 UCLASS()
 class EDMUNDPRJ_API UDataHandle : public UGameInstanceSubsystem
@@ -52,6 +53,9 @@ public:
 	// Controll Spawner Data
 	const TArray<FSpawnerDataRow*>& GetSpawnerDataBySceneType(const ESceneType SceneType);
 
+	// Controll Story Data
+	const TArray<FStoryDataRow*>& GetStoryDataBySceneType(const ESceneType SceneType);
+
 	// Controll Play Data
 	void UpdateClearMission(const ESceneType SceneType);
 	const bool GetIsClearedMission(const int32 Index) const;
@@ -81,6 +85,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> SpawnerDataTable = nullptr;
 
+	UPROPERTY()
+	TObjectPtr<UDataTable> StoryDataTable = nullptr;
+
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 
 	TArray<FShopCatalogRow*> CurrentAdvance;
@@ -89,7 +96,9 @@ private:
 	TArray<FCharacterDataRow*> CharacterData;
 	TArray<FMissionDataRow*> MissionData;
 	TArray<FSpawnerDataRow*> SpawnerData;
+	TArray<FStoryDataRow*> StoryData;
 
 	TArray<FMissionDataRow*> CurrentMissionData;
 	TArray<FSpawnerDataRow*> CurrentSpawnerData;
+	TArray<FStoryDataRow*> CurrentStoryData;
 };

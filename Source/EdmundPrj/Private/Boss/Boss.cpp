@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Boss/Attack/Boss_Attack1_Bullet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
@@ -19,10 +20,12 @@ ABoss::ABoss()
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     BossState = nullptr;
-    MonsterMoveSpeed = 5000.0f;
     MonsterHP = 500.0f;
     MonsterMaxHP = 1000.0f;
     MonsterAttackDamage = 10.0f;
+    MonsterArmor = 10;
+    MonsterMoveSpeed = 5000.0f;
+
 
     // 공격2 범위
     Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2Collision"));
@@ -111,23 +114,29 @@ void ABoss::BeginPlay()
         AnimInstance = Cast<UBoss_AnimInstance>(GetMesh()->GetAnimInstance());
     }
 
-    InitiallizeBullerPool();
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+    }
 
+    InitiallizeBullerPool();
     BossController = Cast<ABossAIController>(GetOwner());
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+    }
+
+    // Stat
     MonsterMoveSpeed = 5000.0f;
-    //MonsterHP = 500.0f;
     MonsterHP = MonsterMaxHP = 2000.0f;
     MonsterAttackDamage = 10.0f;
+
+    HpbarUpdate();
 }
 
 void ABoss::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-    if (!bIsStart)
-    {
-        return;
-    }
 
     if (BossState)
     {
@@ -147,6 +156,15 @@ void ABoss::Tick(float DeltaTime)
             FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
         );
     }
+
+    //**************
+    if (GEngine && GetCharacterMovement())
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Cyan,
+            FString::Printf(TEXT("%d"), (int32)GetCharacterMovement()->MovementMode));
+    }
+    //**************
+
 #pragma region Soket
     if (GetMesh())
     {
@@ -323,8 +341,7 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
     // Attack1 풀 정리
     ABoss_Attack1_Bullet::BulletPool.Empty();
     ABoss_Attack4_Bullet::Bullet4Pool.Empty();
-    ABoss_Skill3_Wall::WallPool.Empty();
-    
+    ABoss_Skill3_Wall::WallPool.Empty();    
 }
 
 void ABoss::UpdateAttackCooldown(int32 AttackID)
@@ -404,11 +421,14 @@ void ABoss::MonsterDead()
 
 float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-    if (bIsInvulnerable)
+    float DamageDealt = 0.f;
+    if (!bIsInvulnerable)
     {
-        return 0.f;
+        DamageDealt = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+        MonsterHP -= DamageDealt;
+        HpbarUpdate();
     }
-    return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    return DamageDealt;
 }
 
 void ABoss::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -473,7 +493,7 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
                     FVector(1.0f)
                 );
             }
-            float DamageValue = 10.0f;
+            float DamageValue = MonsterAttackDamage * Attack2Multiplier;
             UGameplayStatics::ApplyDamage(
                 OtherActor,
                 DamageValue,
@@ -485,13 +505,183 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
     }
 }
 
+void ABoss::DisableMovement()
+{
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->StopMovementImmediately();
+        GetCharacterMovement()->DisableMovement();
+    }
+}
+
+void ABoss::DisableRotation()
+{
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->bOrientRotationToMovement = false;
+        GetCharacterMovement()->bUseControllerDesiredRotation = false;
+    }
+
+    bUseControllerRotationYaw = false;
+
+    AAIController* AIController = Cast<AAIController>(GetController());
+    if (AIController)
+    {
+        AIController->SetControlRotation(GetActorRotation());
+    }
+}
+
+void ABoss::EnableMovement()
+{
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+    }
+}
+
+void ABoss::EnableRotation()
+{
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->bOrientRotationToMovement = true;
+        GetCharacterMovement()->bUseControllerDesiredRotation = true;
+    }
+
+    FRotator CurrentRotation = GetActorRotation();
+
+    FRotator NewRotation = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, 0.0f);
+    SetActorRotation(NewRotation);
+
+    bUseControllerRotationYaw = true;
+}
+
+
+void ABoss::FireBullet()
+{
+    if (!GetWorld() || !MuzzleLocation || !Attack1BulletClass)
+    {
+        return;
+    }
+
+    FVector SpawnLocation = MuzzleLocation->GetComponentLocation();
+    AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    if (!Player)
+    {
+        return;
+    }
+
+    FVector PlayerLocation = Player->GetActorLocation();
+    FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
+    FRotator TargetRotation = Direction.Rotation();
+    FRotator CurrentRotation = GetActorRotation();
+    FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 2.0f);
+
+    SmoothRotation.Pitch = 0.0f;
+    SmoothRotation.Roll = 0.0f;
+
+    SetActorRotation(SmoothRotation);
+    DisableRotation();
+    TargetRotation = (PlayerLocation - SpawnLocation).Rotation();
+
+    ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(GetWorld(), Attack1BulletClass);
+    if (Bullet)
+    {
+        Bullet->FireProjectile(SpawnLocation, TargetRotation, Direction);
+    }
+
+    FTimerHandle ResetRotationTimer;
+    GetWorldTimerManager().SetTimer(ResetRotationTimer, this, &ABoss::EnableRotation, 1.0f, false); // 1초 후 회전 다시 활성화
+}
+
+void ABoss::HandleAttack2State(int32 State)
+{
+
+    switch (State)
+    {
+    case 1:
+        GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+        LaunchCharacter(FVector(0, 0, 1000), false, false);
+        break;
+
+    case 2:
+        GetCharacterMovement()->StopMovementImmediately();
+        GetCharacterMovement()->GravityScale = 0.0f;
+        break;
+
+    case 3:
+        GetCharacterMovement()->GravityScale = 1.0f;
+        GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+        break;
+    }
+}
+
+void ABoss::OnAttack2Finished()
+{
+    if (BTTask_BossAttack2Instance)
+    {
+        BTTask_BossAttack2Instance->OnAttack2Completed();
+    }
+}
+
+
+void ABoss::SetSkill2Invulnerable(bool NewIsInvulnerable)
+{
+    bIsInvulnerable = NewIsInvulnerable;
+
+    if (NewIsInvulnerable)
+    {
+        Skill2InvulnerableStartHP = MonsterHP;
+        GetWorldTimerManager().SetTimer(Skill2HealingTimerHandle, this, &ABoss::Skill2HealOverTime, Skill2HealingInterval, true);
+    }
+    else
+    {
+        GetWorldTimerManager().ClearTimer(Skill2HealingTimerHandle);
+        Skill2InvulnerableStartHP = 0.0f;
+    }
+}
+
+void ABoss::Skill2HealOverTime()
+{
+    if (!bIsInvulnerable)
+    {
+        GetWorldTimerManager().ClearTimer(Skill2HealingTimerHandle);
+        return;
+    }
+    float MaxHealAmount = MonsterMaxHP * (Skill2MaxHealingPercent / 100.0f);
+    float AlreadyHealed = MonsterHP - Skill2InvulnerableStartHP;
+    if (AlreadyHealed < MaxHealAmount)
+    {
+        float HealAmount = MonsterMaxHP * (Skill2HealingPercentPerInterval / 100.0f);
+        MonsterHP = FMath::Min(MonsterHP + HealAmount, Skill2InvulnerableStartHP + MaxHealAmount);
+
+        int32 ConvertedMaxHp = FMath::RoundToInt(MonsterMaxHP);
+        int32 ConvertedCurrentHp = FMath::RoundToInt(MonsterHP);
+        if (AEdmundGameState* MyGameState = GetWorld()->GetGameState<AEdmundGameState>())
+        {
+            MyGameState->NotifyBossHp(ConvertedMaxHp, ConvertedCurrentHp);
+        }
+        HpbarUpdate();
+    }
+}
+
+void ABoss::HpbarUpdate()
+{
+    int32 ConvertedMaxHp = FMath::RoundToInt(MonsterMaxHP);
+    int32 ConvertedCurrentHp = FMath::RoundToInt(MonsterHP);
+
+    if (AEdmundGameState* MyGameState = GetWorld()->GetGameState<AEdmundGameState>())
+    {
+        MyGameState->NotifyBossHp(ConvertedMaxHp, ConvertedCurrentHp);
+    }
+}
+
+
+
 void ABoss::InitBoss(AMissionHandle* NewMissionHandle)
 {
     BossController->InitBlackboard(NewMissionHandle);
     MissionHandle = NewMissionHandle;
     CheckWeaken();
-
-    bIsStart = true;
 }
 
 void ABoss::CheckWeaken()

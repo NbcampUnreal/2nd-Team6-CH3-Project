@@ -28,7 +28,7 @@ public:
     
 private:
     bool CheckHpPattern();
-    void CheckBossHeight();
+    //void CheckBossHeight();
     void CheckLockedSkill(float CurrentTime);
     void EnableHalfPattern();
 

@@ -25,20 +25,24 @@ EBTNodeResult::Type UBTTask_BossAttack2::ExecuteTask(UBehaviorTreeComponent& Own
 	{
 		return EBTNodeResult::Failed;
 	}
-	BossRef = Cast<ABoss>(AIController->GetPawn());
+
+	this->BossRef = Cast<ABoss>(AIController->GetPawn());
 	if (!BossRef)
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	CachedOwnerComp = &OwnerComp;
-	CurrentPhase = 0;
+	BossRef->BTTask_BossAttack2Instance = this;
 
-	BossRef->GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_Phase, this, &UBTTask_BossAttack2::StartAscend, 0.5f, false);
+	UBoss_AnimInstance* AnimInst = Cast<UBoss_AnimInstance>(BossRef->GetMesh()->GetAnimInstance());
+	if (AnimInst && AnimInst->Attack2Montage)
+	{
+		BossRef->GetMesh()->GetAnimInstance()->Montage_Play(AnimInst->Attack2Montage);
+	}
 
 	return EBTNodeResult::InProgress;
 }
+
 
 void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
@@ -52,6 +56,11 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	{
 	case 1:
 	{
+		if (BossRef->GetCharacterMovement()->MovementMode != MOVE_Flying)
+		{
+			BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+			UE_LOG(LogTemp, Warning, TEXT("TickTask - 강제 MOVE_Flying 적용"));
+		}
 		FVector CurrentLocation = BossRef->GetActorLocation();
 		FVector NewLocation = CurrentLocation + FVector(0, 0, BossRef->Attack2_AscendSpeed * DeltaSeconds);
 		if (NewLocation.Z >= BossRef->Attack2_TargetHeight)
@@ -79,25 +88,23 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	{
 		FVector CurrentLocation = BossRef->GetActorLocation();
 		FVector NewLocation = CurrentLocation - FVector(0, 0, BossRef->Attack2_DescendSpeed * DeltaSeconds);
+
 		FHitResult HitResult;
 		FVector TraceStart = CurrentLocation;
-		FVector TraceEnd = CurrentLocation - FVector(0, 0, 20000.0f);
+		FVector TraceEnd = TraceStart - FVector(0, 0, 5000.0f);
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(BossRef);
 
 		if (BossRef->GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 		{
 			float GroundZ = HitResult.Location.Z;
-			float CapsuleOffset = (BossRef->Front_Left_FootCapsuleComponent
-				? BossRef->Front_Left_FootCapsuleComponent->GetScaledCapsuleHalfHeight()
-				: 300.0f) + 100.0f;
+			float CapsuleOffset = BossRef->GetCapsuleComponent() ?
+				BossRef->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() : 200.0f;
+
 			if (NewLocation.Z <= GroundZ + CapsuleOffset)
 			{
 				NewLocation.Z = GroundZ + CapsuleOffset;
 				BossRef->SetActorLocation(NewLocation, false);
-
-				FRotator CurrentRotation = BossRef->GetActorRotation();
-				BossRef->SetActorRotation(CurrentRotation);
 
 				if (BossRef->GetCharacterMovement())
 				{
@@ -114,15 +121,11 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 				FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
 				return;
 			}
-			else
-			{
-				BossRef->SetActorLocation(NewLocation, false);
-			}
 		}
+
+		BossRef->SetActorLocation(NewLocation, false);
 		break;
 	}
-
-
 	default:
 		break;
 	}
@@ -134,6 +137,7 @@ void UBTTask_BossAttack2::StartAscend()
 
 	if (BossRef->GetCharacterMovement())
 	{
+		BossRef->GetCharacterMovement()->NavAgentProps.bCanFly = true;
 		BossRef->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	}
@@ -199,3 +203,10 @@ void UBTTask_BossAttack2::StartDescend()
 	}
 }
 
+void UBTTask_BossAttack2::OnAttack2Completed()
+{
+	if (CachedOwnerComp)
+	{
+		FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
+	}
+}

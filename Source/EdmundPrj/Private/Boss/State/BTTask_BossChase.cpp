@@ -17,7 +17,6 @@ UBTTask_BossChase::UBTTask_BossChase()
 
 EBTNodeResult::Type UBTTask_BossChase::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	UE_LOG(LogTemp, Log, TEXT("체이스"));
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)
 	{
@@ -30,8 +29,13 @@ EBTNodeResult::Type UBTTask_BossChase::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Failed;
 	}
 
+
 	CachedOwnerComp = &OwnerComp;
 	AccumulatedTime = 0.0f;
+
+	BossRef->bUseControllerRotationYaw = false;
+	BossRef->GetCharacterMovement()->bOrientRotationToMovement = true;
+
 	return EBTNodeResult::InProgress;
 }
 
@@ -44,7 +48,7 @@ void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 	BossRef->GetCharacterMovement()->MaxWalkSpeed = BossRef->GetMonsterMoveSpeed();
 	AccumulatedTime += DeltaSeconds;
-	if (AccumulatedTime >= FMath::RandRange(2.0f, 3.0f)) // 랜덤 2~3초 지속
+	if (AccumulatedTime >= FMath::RandRange(2.0f, 3.0f))
 	{
 		BossRef->SetbChaseComplete(false);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -64,6 +68,16 @@ void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	{
 		BossRef->Chase_AcceptanceRadius += 100.0f;
 	}
+
+	FRotator CurrentRotation = BossRef->GetActorRotation();
+
+	FVector Direction = (Player->GetActorLocation() - BossRef->GetActorLocation()).GetSafeNormal();
+	FRotator TargetRotation = Direction.Rotation();
+
+	FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, BossRef->GetTurnSpeed());
+	SmoothRotation.Pitch = 0.0f;
+	SmoothRotation.Roll = 0.0f;
+	BossRef->SetActorRotation(SmoothRotation);
 
 	AICon->MoveToActor(Player, BossRef->Chase_AcceptanceRadius);
 	BossRef->SetbChaseComplete(false);

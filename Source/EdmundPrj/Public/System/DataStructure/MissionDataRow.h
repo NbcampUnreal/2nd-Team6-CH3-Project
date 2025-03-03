@@ -38,4 +38,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName MissionType;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsContainStory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsBeginStory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 StoryIndex;
 };

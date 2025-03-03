@@ -31,6 +31,7 @@ EBTNodeResult::Type UBTTask_BossSkill2::ExecuteTask(UBehaviorTreeComponent& Owne
     if (BossRef && BossRef->Skill2NewMaterial)
     {
         BossRef->SetbSkill2Used(true);
+        BossRef->SetSkill2Invulnerable(true);
         BossRef->SetbIsInvulnerable(true);
         BossRef->GetMesh()->SetMaterial(0, BossRef->Skill2NewMaterial);
     }

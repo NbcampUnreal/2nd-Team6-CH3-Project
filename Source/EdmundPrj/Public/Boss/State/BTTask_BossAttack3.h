@@ -56,6 +56,7 @@ public:
 	void ExecuteMeleeAttack();
 	void PlayAttack3Montage();
 	
+	void FireSingleBullet();
 
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	int32 GetComboPhase() { return ComboPhase; }
@@ -67,5 +68,21 @@ public:
 
 	FTimerHandle CollisionDisableTimerHandle_Check1;
 	FTimerHandle CollisionDisableTimerHandle_Check2;
+
+private:
+	FRotator CurrentRotation;
+	FVector SpawnLocation;
+	FTimerHandle BulletFireTimerHandle;
+	float AccumulatedDeltaTime;
+	int32 FiredBulletCount;
+
+	FVector GetAdjustedSpawnLocation(const FVector& Offset) const;
+
+	bool bIsDashing;
+	FVector DashStartLocation;
+	FVector DashTargetLocation;
+	FVector DashCurrentVelocity;
+	float DashFrequency;
+	float DashDamping;
 
 };
