@@ -108,6 +108,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Story")
 	float IntervalTime = 0.1f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Story")
+	float SlowTime = 0.2f;
+
 private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
@@ -137,6 +140,6 @@ private:
 	FText StoryText;
 	FString CurrentText;
 	float CurrentTime = 0;
-	int32 StoryIndex = 0;
-	int32 StoryLastIndex = 0;
+	int32 StoryIndex = -1;
+	int32 StoryLastIndex = -1;
 };

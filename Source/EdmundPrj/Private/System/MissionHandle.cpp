@@ -64,24 +64,24 @@ void AMissionHandle::RequestUpdateNotifyText(const FString& NotifyText)
 
 void AMissionHandle::StartMainMission()
 {
+	UE_LOG(LogTemp, Warning, TEXT("MainMission Index : %d, Mission Set Num : %d"), MainMissionIndex, MainMissionSet.Num());
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
 	MainMissionSet[MainMissionIndex]->PrintMissionInfoText();
-	RequestPrintStory(); //
 	MainMissionSet[MainMissionIndex]->SetIsActive(true);
+	MainMissionSet[MainMissionIndex]->PrintBeginMissionStory();
 }
 
 void AMissionHandle::CompleteMission()
 {
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
 	MainMissionSet[MainMissionIndex]->PrintMissionClearText();
-
-	
+	MainMissionSet[MainMissionIndex]->PrintEndMissionStory();
 
 	++MainMissionIndex;
 
 	if (MainMissionIndex == MainMissionSet.Num())
 	{
-		EdmundGameMode->ClearMission();
+		EdmundGameMode->NotifyAllClearedMission();
 	}
 	else
 	{
@@ -94,9 +94,9 @@ void AMissionHandle::RequestSwapBgm(EBGMSoundType Type)
 	EdmundGameMode->SwapBgm(Type);
 }
 
-void AMissionHandle::RequestPrintStory()
+void AMissionHandle::RequestPrintStory(int32 Index)
 {
-	EdmundGameMode->PrintCurrentStory();
+	EdmundGameMode->OnStartedPrintStory(Index);
 }
 
 void AMissionHandle::SpawnNpc(const FVector& SpawnPos)
@@ -382,6 +382,7 @@ void AMissionHandle::SpawnMissionItem(UClass* SpawnClass, const FVector& SpawnPo
 
 	NewMissionItem->InitMissionItem(this, MissionType);
 	NewMissionItem->SetMissionText(InfoText, ActiveText, ClearText);
+	NewMissionItem->SetMissionStory(MissionData->bIsContainStory, MissionData->bIsBeginStory, MissionData->StoryIndex);
 
 	if (MissionType == "Main")
 	{

@@ -11,11 +11,11 @@
 #include "System/MissionHandle.h"
 #include "System/SpawnerHandle.h"
 #include "Player/SkillManager.h"
+#include "Kismet/GameplayStatics.h"
 
 AEdmundGameState::AEdmundGameState() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	SetActorTickEnabled(false);
 }
 
 void AEdmundGameState::BeginPlay()
@@ -26,33 +26,27 @@ void AEdmundGameState::BeginPlay()
 	EdmundGameMode = GetWorld()->GetAuthGameMode<AEdmundGameMode>();
 	PlayerController = GetWorld()->GetPlayerControllerIterator()->Get();
 
-	checkf(IsValid(PlayerController), TEXT("PlayerController is invalid"));
-	//PlayerPawn = PlayerController->GetPawn();
-
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
-	//NotifyOnStageProgress("Boss", false);
 }
 
 void AEdmundGameState::Tick(float DeltaTime)
 {
+	if (StoryIndex < 0)
+	{
+		SetActorTickEnabled(false);
+		return;
+	}
+
 	CurrentTime += DeltaTime;
 
-	if (CurrentTime >= IntervalTime)
+	if (CurrentTime >= IntervalTime * SlowTime)
 	{
 		CurrentTime = 0;
 		
 		CurrentText = StoryText.ToString().LeftChop(StoryIndex);
 		NotifyPrintText(CurrentText);
 		--StoryIndex;
-
-		if (StoryIndex < 0)
-		{
-			if (!EdmundGameMode->CheckRemainCurrentStory())
-			{
-				OnEndedCurrentStory();
-			}
-		}
 	}
 }
 
@@ -90,24 +84,37 @@ void AEdmundGameState::PrintStoryText(const FText& TargetText)
 	StoryLastIndex = StoryText.ToString().Len();
 	StoryIndex = StoryLastIndex;
 	CurrentTime = 0;
+
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), SlowTime);
 	SetActorTickEnabled(true);
 }
 
 void AEdmundGameState::OnEndedCurrentStory()
 {
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 	SetActorTickEnabled(false);
 }
 
 void AEdmundGameState::StopPrintStory()
 {
-	StoryIndex = 0;
+	if (StoryIndex < 0)
+	{
+		if (!EdmundGameMode->CheckRemainCurrentStory())
+		{
+			OnEndedCurrentStory();
+		}
+	}
+	else
+	{
+		StoryIndex = 0;
+	}
 }
 
 void AEdmundGameState::SkipCurrentStory()
 {
 	EdmundGameMode->OnEndedCurrentStory();
 	StoryIndex = 0;
-	SetActorTickEnabled(false);
+	OnEndedCurrentStory();
 }
 
 void AEdmundGameState::InitMainLevelPlayerController()

@@ -37,7 +37,7 @@ public:
 
 	void RequestSwapBgm(EBGMSoundType Type);
 
-	void RequestPrintStory();
+	void RequestPrintStory(int32 Index);
 
 	// Npc Controll
 	void SpawnNpc(const FVector& SpawnPos);
@@ -104,7 +104,7 @@ private:
 
 	FVector TargetPointLocation = FVector::ZeroVector;
 
-	int32 MainMissionIndex = 0;
+	int32 MainMissionIndex = -1;
 	int32 SpawnerCountFromBoss = 0;
 	EBossState LockTarget = EBossState::Idle;
 	bool bGetNpcEquip = false;
