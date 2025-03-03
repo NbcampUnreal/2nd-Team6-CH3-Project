@@ -60,7 +60,7 @@ void ASuicideMonster::MonsterAttackCheck()
          // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
         FTimerHandle TimerHandle;
 
-        if (GetWorld())
+        if (IsValid(GetWorld()))
         {
             this->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]()
                 {
