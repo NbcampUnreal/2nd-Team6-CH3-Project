@@ -114,6 +114,7 @@ void ABaseCharacter::BeginPlay()
 		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 		CurrentGameState->NotifyPlayerExp(MaxExp, CurrentExp);
+		CurrentGameState->NotifyPlayerLevel(CurrentLevel);
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -488,12 +489,9 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	if (DamageProb <= EvasionProb)
 	{
 		// 회피 성공 사운드
-		if (/*IsValid(EvasionSuccessSound) &&*/ IsValid(CurrentGameState))
+		if (IsValid(CurrentGameState))
 		{
 			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Avoid);
-			
-			/*CurrentAudioComp->SetSound(EvasionSuccessSound);
-			CurrentAudioComp->Play();*/
 		}
 
 		return 0.0f;
@@ -523,12 +521,9 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 			HP = MaxHP;
 
 			// 부활 사운드
-			if (/*IsValid(RevivalSuccessSound) &&*/ IsValid(CurrentGameState))
+			if (IsValid(CurrentGameState))
 			{
 				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Respawn);
-
-				/*CurrentAudioComp->SetSound(RevivalSuccessSound);
-				CurrentAudioComp->Play();*/
 			}
 		}
 		// 부활 횟수가 없다면
@@ -585,6 +580,7 @@ void ABaseCharacter::LevelUp()
 	{
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
+		CurrentGameState->NotifyPlayerLevel(CurrentLevel);
 		CurrentGameState->CreateRandomSkillSet();
 	}
 }
@@ -670,12 +666,9 @@ void ABaseCharacter::GetUpgradeStatus()
 void ABaseCharacter::ActiveDieAction()
 {
 	// 죽음 사운드
-	if (/*IsValid(RevivalSuccessSound) &&*/ IsValid(CurrentGameState))
+	if (IsValid(CurrentGameState))
 	{
 		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Die);
-
-		/*CurrentAudioComp->SetSound(DeathSound);
-		CurrentAudioComp->Play();*/
 	}
 
 	if (IsValid(DieActionMontage))

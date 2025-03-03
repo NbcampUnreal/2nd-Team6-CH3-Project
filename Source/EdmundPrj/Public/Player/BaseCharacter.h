@@ -46,7 +46,7 @@ public:
 	TObjectPtr<UElectricEffectPool> ElectricEffectPool;
 
 	// 공격력 Getter
-	float GetAttackDamage() const;
+	virtual float GetAttackDamage() const;
 
 	// 공격력 Setter
 	void SetAttackDamage(float NewAttackDamage);
@@ -231,7 +231,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	UAnimMontage* DieActionMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
 	UAudioComponent* CurrentAudioComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")

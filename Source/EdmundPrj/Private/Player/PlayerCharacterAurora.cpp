@@ -30,21 +30,15 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 		IsAttack = true;
 
 		Super::Attack(value);
+
 		switch (ComboCount)
 		{
 			case 0:
 				if (IsValid(AttackMontages[0]))
 				{
-					if (IsValid(AttackSounds[0]))
+					if (IsValid(CurrentGameState))
 					{
-						CurrentAudioComp->SetSound(AttackSounds[0]);
-						CurrentAudioComp->Play();
-					}
-
-					if (IsValid(WeaponSounds[0]))
-					{
-						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[0], GetActorLocation());
-						WeaponAudioComp->Play();
+						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
 					}
 
 					PlayAnimMontage(AttackMontages[0], ComboTimeDuration);
@@ -55,17 +49,9 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 			case 1:
 				if (IsValid(AttackMontages[1]))
 				{
-
-					if (IsValid(AttackSounds[1]))
+					if (IsValid(CurrentGameState))
 					{
-						CurrentAudioComp->SetSound(AttackSounds[1]);
-						CurrentAudioComp->Play();
-					}
-
-					if (IsValid(WeaponSounds[1]))
-					{
-						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[1], GetActorLocation());
-						WeaponAudioComp->Play();
+						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack2);
 					}
 
 					PlayAnimMontage(AttackMontages[1], ComboTimeDuration);
@@ -76,16 +62,9 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 			case 2:
 				if (IsValid(AttackMontages[2]))
 				{
-					if (IsValid(AttackSounds[2]))
+					if (IsValid(CurrentGameState))
 					{
-						CurrentAudioComp->SetSound(AttackSounds[2]);
-						CurrentAudioComp->Play();
-					}
-
-					if (IsValid(WeaponSounds[2]))
-					{
-						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[2], GetActorLocation());
-						WeaponAudioComp->Play();
+						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack3);
 					}
 
 					PlayAnimMontage(AttackMontages[2], ComboTimeDuration);
@@ -96,16 +75,9 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 			case 3:
 				if (IsValid(AttackMontages[3]))
 				{
-					if (IsValid(AttackSounds[3]))
+					if (IsValid(CurrentGameState))
 					{
-						CurrentAudioComp->SetSound(AttackSounds[3]);
-						CurrentAudioComp->Play();
-					}
-
-					if (IsValid(WeaponSounds[3]))
-					{
-						UAudioComponent* WeaponAudioComp = UGameplayStatics::SpawnSoundAtLocation(this, WeaponSounds[3], GetActorLocation());
-						WeaponAudioComp->Play();
+						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack4);
 					}
 
 					PlayAnimMontage(AttackMontages[3], ComboTimeDuration);
