@@ -51,6 +51,7 @@ public:
 	// Game Story Controll
 	void VisibleMissionStory() const;
 	void InvisibleMissionStory() const;
+	void MoveNextMissionStory() const;
 	void SkipMissionStory() const;
 
 	// Scene Move Controll

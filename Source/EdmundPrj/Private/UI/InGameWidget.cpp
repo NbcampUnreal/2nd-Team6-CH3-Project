@@ -4,6 +4,12 @@
 #include "UI/InGameWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
+#include "Components/CanvasPanel.h"
+
+void UInGameWidget::Update()
+{
+	BossHpBox->SetVisibility(ESlateVisibility::Collapsed);
+}
 
 void UInGameWidget::ChangedNotifyText(const FString& NotifyText)
 {

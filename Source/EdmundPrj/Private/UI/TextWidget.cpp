@@ -14,6 +14,7 @@ void UTextWidget::InitWidget(UUIHandle* NewUIHandle)
 	Super::InitWidget(NewUIHandle);
 
 	SkipButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedSkipButton);
+	NextButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedNextText);
 }
 
 void UTextWidget::ChangedStoryText(const FString& TargetText)
@@ -24,7 +25,8 @@ void UTextWidget::ChangedStoryText(const FString& TargetText)
 
 void UTextWidget::OnClickedNextText()
 {
-
+	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->ClickedNextStory();
 }
 
 void UTextWidget::OnClickedSkipButton()

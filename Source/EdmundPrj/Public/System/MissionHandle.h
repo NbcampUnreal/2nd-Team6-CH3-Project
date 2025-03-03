@@ -109,6 +109,7 @@ private:
 	EBossState LockTarget = EBossState::Idle;
 	bool bGetNpcEquip = false;
 	bool bWeakenBoss = false;
+	bool bIsDefence = false;
 
 	FTimerHandle TestTimer;
 };

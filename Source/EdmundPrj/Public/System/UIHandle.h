@@ -65,6 +65,7 @@ public:
 	void ClickedCancleSelectCharacter();
 	void ClickedSelectSkill(const int32 Index) const;
 	void ClickedSkipStory() const;
+	void ClickedNextStory() const;
 	const FShopCatalogRow* ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const;
 
 	const TArray<TScriptInterface<IGameStateObserver>>& GetUIObservers() const;

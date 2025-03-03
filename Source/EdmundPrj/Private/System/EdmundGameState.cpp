@@ -31,6 +31,7 @@ void AEdmundGameState::BeginPlay()
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
+	//NotifyOnStageProgress("Boss", false);
 }
 
 void AEdmundGameState::Tick(float DeltaTime)
@@ -41,15 +42,16 @@ void AEdmundGameState::Tick(float DeltaTime)
 	{
 		CurrentTime = 0;
 		
-		// CurrentText = substring
 		CurrentText = StoryText.ToString().LeftChop(StoryIndex);
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), *CurrentText);
 		NotifyPrintText(CurrentText);
 		--StoryIndex;
 
-		if (StoryIndex == StoryLastIndex)
+		if (StoryIndex < 0)
 		{
-			OnEndedCurrentStory();
+			if (!EdmundGameMode->CheckRemainCurrentStory())
+			{
+				OnEndedCurrentStory();
+			}
 		}
 	}
 }
@@ -93,21 +95,19 @@ void AEdmundGameState::PrintStoryText(const FText& TargetText)
 
 void AEdmundGameState::OnEndedCurrentStory()
 {
-	if (!EdmundGameMode->CheckRemainCurrentStory())
-	{
-		SetActorTickEnabled(false);
-	}
+	SetActorTickEnabled(false);
 }
 
 void AEdmundGameState::StopPrintStory()
 {
 	StoryIndex = 0;
-	SetActorTickEnabled(false);
 }
 
 void AEdmundGameState::SkipCurrentStory()
 {
 	EdmundGameMode->OnEndedCurrentStory();
+	StoryIndex = 0;
+	SetActorTickEnabled(false);
 }
 
 void AEdmundGameState::InitMainLevelPlayerController()

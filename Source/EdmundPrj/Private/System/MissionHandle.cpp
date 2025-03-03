@@ -34,15 +34,11 @@ void AMissionHandle::InitMissionHandle(const TArray<FMissionDataRow*>& MissionDa
 void AMissionHandle::OnBeginOverlapedItem(ABaseMissionItem* MissionItem)
 {
 	TargetMissionItem = MissionItem;
-
-	//GetWorld()->GetTimerManager().SetTimer(TestTimer, this, &ThisClass::OnPressedKeyFromPlayer, 2.0f, false);
 }
 
 void AMissionHandle::OnEndOverlapedItem()
 {
 	TargetMissionItem = nullptr;
-
-	//GetWorld()->GetTimerManager().ClearTimer(TestTimer);
 }
 
 void AMissionHandle::OnPressedKeyFromPlayer()
@@ -193,12 +189,23 @@ void AMissionHandle::TeleportPlayerToTargetPoint()
 
 void AMissionHandle::NotifyStartDefenceMode()
 {
+	bIsDefence = true;
 	EdmundGameMode->StartDefenceMode();
 }
 
 void AMissionHandle::ApplyNpcEquip()
 {
 	bGetNpcEquip = true;
+
+	if (!bIsDefence)
+	{
+		return;
+	}
+
+	if (IsValid(NpcPawn))
+	{
+		SetNpcBattleMode(true);
+	}
 }
 
 void AMissionHandle::UpdateDefenceState(bool bIsOn)
@@ -338,6 +345,11 @@ void AMissionHandle::BeginPlay()
 
 void AMissionHandle::ApplyMissionDataInLevel()
 {
+	if (MissionDataSet.Num() == 0)
+	{
+		return;
+	}
+
 	for (const FMissionDataRow* MissionDataRow : MissionDataSet)
 	{
 		UClass* SpawnClass = MissionDataRow->MissionItemClass.Get();

@@ -162,6 +162,12 @@ void UEdmundGameInstance::InvisibleMissionStory() const
 	UIHandle->RequestRemoveCoverFromViewport(EWidgetType::TextWidget);
 }
 
+void UEdmundGameInstance::MoveNextMissionStory() const
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->StopPrintStory();
+}
+
 void UEdmundGameInstance::SkipMissionStory() const
 {
 	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));

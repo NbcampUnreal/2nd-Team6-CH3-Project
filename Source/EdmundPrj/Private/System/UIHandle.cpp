@@ -76,6 +76,7 @@ void UUIHandle::AddToViewportBySceneType(ESceneType SceneType)
 		break;
 	}
 
+	CurrentBaseWidget->Update();
 	AddWidgetToViewport(CurrentBaseWidget);
 }
 
@@ -426,6 +427,12 @@ void UUIHandle::ClickedSkipStory() const
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->SkipMissionStory();
+}
+
+void UUIHandle::ClickedNextStory() const
+{
+	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
+	EdmundGameInstance->MoveNextMissionStory();
 }
 
 const FShopCatalogRow* UUIHandle::ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const

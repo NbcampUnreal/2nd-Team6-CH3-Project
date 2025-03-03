@@ -80,18 +80,17 @@ void AEdmundGameMode::PrintCurrentStory()
 
 bool AEdmundGameMode::CheckRemainCurrentStory()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Called GameMode CheckRemainCurrentStory"));
+	PrintCurrentStory();
 	// 남아있으면 인덱스 바꿔서 PrintCurrentStory
 	// 남아있지 않으면 OnEndedCurrentStory
-	return false; // 남아있으면 true, 없으면 false
+	return true; // 남아있으면 true, 없으면 false
 }
 
 void AEdmundGameMode::OnEndedCurrentStory()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Called GameMode OnEndedCurrentStory"));
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
 	EdmundGameInstance->InvisibleMissionStory();
-	EdmundGameState->StopPrintStory();
+	UE_LOG(LogTemp, Warning, TEXT("GameMode OnEndedCurrentStory"));
 }
 
 void AEdmundGameMode::StartDefenceMode()

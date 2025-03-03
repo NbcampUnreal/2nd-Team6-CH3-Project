@@ -33,6 +33,9 @@ private:
 	TObjectPtr<UButton> SkipButton;
 
 	UPROPERTY(Meta = (BindWidget))
+	TObjectPtr<UButton> NextButton;
+
+	UPROPERTY(Meta = (BindWidget))
 	TObjectPtr<UTextBlock> StoryText;
 
 	UPROPERTY(Meta = (BindWidgetAnim), Transient)
