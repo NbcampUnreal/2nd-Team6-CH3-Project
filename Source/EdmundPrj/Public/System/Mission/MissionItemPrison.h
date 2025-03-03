@@ -24,7 +24,12 @@ private:
 	virtual void Tick(float DeltaTime) override;
 	virtual void CompleteProgress() override;
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MissionInfo)
+	float TargetTime = 5.0f;
+
 private:
 	float CurrentTime = 0.0f;
-	float TargetTime = 0.1f;
+	float DeltaTargetTime = 0.0f;
+	float UpdateTime = 0.01f;
 };

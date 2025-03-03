@@ -17,6 +17,8 @@ void AMissionItemMainAltar::InitMissionItem(AMissionHandle* NewMissionHandle, co
 
 	ApplyOverlapCollision(true);
 	SetActorTickEnabled(false);
+
+	DeltaTargetTime = 1.0f / TargetTime;
 }
 
 void AMissionItemMainAltar::ActionEventByPressedKey()
@@ -63,10 +65,10 @@ void AMissionItemMainAltar::Tick(float DeltaTime)
 
 	CurrentTime += DeltaTime;
 
-	if (CurrentTime >= TargetTime)
+	if (CurrentTime >= UpdateTime)
 	{
 		CurrentTime = 0.0f;
-		ProgressValue -= TargetTime;
+		ProgressValue -= DeltaTargetTime * UpdateTime;
 		InteractionWidget->UpdateProgressBar(ProgressValue);
 
 		if (ProgressValue <= 0.0f)
