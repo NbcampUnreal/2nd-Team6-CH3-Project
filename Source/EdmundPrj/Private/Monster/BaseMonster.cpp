@@ -18,6 +18,16 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "System/MissionHandle.h"
 
+// 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 여긴 베이스임 적용안됨
+void ABaseMonster::SetMonsterStatsByLevel()
+{
+	MonsterHP = 100 + (MonsterLevel * 50);
+	MonsterMaxHP = 100 + (MonsterLevel * 50);
+	MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+	MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+}
+
+
 // Sets default values
 ABaseMonster::ABaseMonster()
 {
@@ -51,11 +61,6 @@ void ABaseMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MonsterHP = 100 + (MonsterLevel * 50);
-	MonsterMaxHP = 100 + (MonsterLevel * 50);
-	MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
-	MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
-
 	MonsterOverHeadWidget->SetVisibility(true, true);
 
 	if (MonsterOverHeadWidget)
@@ -77,11 +82,17 @@ void ABaseMonster::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("MonsterOverHeadWidget 없음"));
 	}
 }
+void ABaseMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+}
 
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 
-	if (bIsDead) return 0;
+	if (bIsDead || bIsBondageMode) return 0;
 
 	if (TakeDamageSound)
 	{
@@ -268,8 +279,8 @@ void ABaseMonster::DropReward()
 	float RandomValue = FMath::RandRange(0, 100);
 
 
-	//인덱스 0번(힐), 임시로 확률 50배
-	if (RandomValue <= MonsterHealKitProbability * 50.0f)
+	//인덱스 0번(힐)
+	if (RandomValue <= MonsterHealKitProbability)
 	{
 		if (AllItems.Num() > 0)
 		{
@@ -281,6 +292,10 @@ void ABaseMonster::DropReward()
 				{
 					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
 				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("0번 아이템이 없습니다."));
 			}
 		}
 		else
@@ -302,6 +317,35 @@ void ABaseMonster::DropReward()
 				{
 					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
 				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("1번 아이템이 없습니다."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AllItems가 없습니다."));
+		}
+	}
+
+	//인덱스 2번(왕골드)
+	if (RandomValue <= MonsterGoldProbability / 3)
+	{
+		if (AllItems.Num() > 0)
+		{
+			if (IsValid(AllItems[2]))
+			{
+				ItemClass = AllItems[2];
+
+				if (IsValid(ItemClass))
+				{
+					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("2번 아이템이 없습니다."));
 			}
 		}
 		else

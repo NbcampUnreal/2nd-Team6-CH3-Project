@@ -15,6 +15,8 @@ class EDMUNDPRJ_API ANPCMonster : public ABaseMonster
 	GENERATED_BODY()
 
 public:
+	void SetMonsterStatsByLevel() override;
+
 	ANPCMonster();
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Components")
@@ -51,15 +53,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Particle")
 	UParticleSystem* InitSpawnParticle;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
-	bool bIsFightMode = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
-	bool bIsBondageMode = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
-	bool bIsMoveMode = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC|Attack")
 	TSubclassOf<ANPCAttack> AttackClass;

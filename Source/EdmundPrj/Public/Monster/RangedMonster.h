@@ -17,6 +17,8 @@ class EDMUNDPRJ_API ARangedMonster : public ABaseMonster
 
 public:
 
+	void SetMonsterStatsByLevel() override;
+
 	ARangedMonster();
 
 	void MonsterAttackCheck() override;

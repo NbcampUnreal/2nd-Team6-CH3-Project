@@ -10,6 +10,16 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Actor.h"
 
+// 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 여긴 NPC라 적용안됨
+void ANPCMonster::SetMonsterStatsByLevel()
+{
+    MonsterHP = 100 + (MonsterLevel * 50);
+    MonsterMaxHP = 100 + (MonsterLevel * 50);
+    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+}
+
+
 ANPCMonster::ANPCMonster()
 {
     NpcType = ENpcType::Baldor;
@@ -33,6 +43,11 @@ void ANPCMonster::BeginPlay()
     UpdatePatrolSpeed();
 
     GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
+
+    MonsterHP = 100 + (MonsterLevel * 50);
+    MonsterMaxHP = 100 + (MonsterLevel * 50);
+    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
 }
 
 
@@ -46,20 +61,21 @@ void ANPCMonster::MonsterAttackCheck()
     if (Monster)
     {
 
-        PlaySound();
-
         UCapsuleComponent* CollisionComp = NewObject<UCapsuleComponent>(this);
-        CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
-        // 콜리전 컴포넌트 초기화
-        CollisionComp->SetCapsuleSize(300.0f, 300.0f); // 필요에 따라 사이즈 조정
-        CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-        CollisionComp->SetRelativeLocation(FVector(0.0f, 0, 0.0f)); // 액터의 앞에 콜리전 위치
+        if (IsValid(CollisionComp))
+        {
+            CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
-        CollisionComp->RegisterComponent();
+            // 콜리전 컴포넌트 초기화
+            CollisionComp->SetCapsuleSize(300.0f, 300.0f); // 필요에 따라 사이즈 조정
+            CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+            CollisionComp->SetRelativeLocation(FVector(0.0f, 0, 0.0f)); // 액터의 앞에 콜리전 위치
 
-        CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ANPCMonster::OnOverlapBegin);
+            CollisionComp->RegisterComponent();
 
+            CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ANPCMonster::OnOverlapBegin);
+        }
 
         //  공격 Collision Visible 활성화
          //FVector CapsuleLocation = CollisionComp->GetComponentLocation();
@@ -67,14 +83,17 @@ void ANPCMonster::MonsterAttackCheck()
 
 
          // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
-        FTimerHandle TimerHandle;
-        this->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]()
-            {
-                if (CollisionComp)
+        if (GetWorld())
+        {
+            FTimerHandle TimerHandle;
+            this->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]()
                 {
-                    CollisionComp->DestroyComponent();
-                }
-            }), 0.01f, false);
+                    if (CollisionComp && CollisionComp->IsValidLowLevel())
+                    {
+                        CollisionComp->DestroyComponent();
+                    }
+                }), 0.01f, false);
+        }
     }
 }
 void ANPCMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -119,6 +138,8 @@ void ANPCMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 
 void ANPCMonster::NPCMonsterAttack()
 {
+    
+    PlaySound();
 
     UParticleSystemComponent* Particle = nullptr;
 

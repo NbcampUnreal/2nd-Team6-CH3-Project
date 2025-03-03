@@ -6,6 +6,16 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
 
+// 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+void AMeleeMonster::SetMonsterStatsByLevel()
+{
+    MonsterHP = 100 + (MonsterLevel * 50);
+    MonsterMaxHP = 100 + (MonsterLevel * 50);
+    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+}
+
+
 AMeleeMonster::AMeleeMonster()
 {
     MonsterType = EMonsterType::Melee;
@@ -21,17 +31,20 @@ void AMeleeMonster::MonsterAttackCheck()
         PlaySound();
 
         UCapsuleComponent* CollisionComp = NewObject<UCapsuleComponent>(this);
-        CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
-        // 콜리전 컴포넌트 초기화
-        CollisionComp->SetCapsuleSize(100.0f, 100.0f); // 필요에 따라 사이즈 조정
-        CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-        CollisionComp->SetRelativeLocation(FVector(0.0f, 150.0f, 0.0f)); // 액터의 앞에 콜리전 위치
+        if (IsValid(CollisionComp))
+        {
+            CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
-        CollisionComp->RegisterComponent();
+            // 콜리전 컴포넌트 초기화
+            CollisionComp->SetCapsuleSize(100.0f, 100.0f); // 필요에 따라 사이즈 조정
+            CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+            CollisionComp->SetRelativeLocation(FVector(0.0f, 150.0f, 0.0f)); // 액터의 앞에 콜리전 위치
 
-        CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMeleeMonster::OnOverlapBegin);
+            CollisionComp->RegisterComponent();
 
+            CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMeleeMonster::OnOverlapBegin);
+        }
 
        //  공격 Collision Visible 활성화
         //FVector CapsuleLocation = CollisionComp->GetComponentLocation();
@@ -39,36 +52,43 @@ void AMeleeMonster::MonsterAttackCheck()
 
 
         // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
-        FTimerHandle TimerHandle;
-        this->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]()
-            {
-                if (CollisionComp)
+
+        if (GetWorld())
+        {
+            FTimerHandle TimerHandle;
+            this->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]()
                 {
-                    CollisionComp->DestroyComponent();
-                }
-            }), 0.01f, false);
+                    if (CollisionComp && CollisionComp->IsValidLowLevel())
+                    {
+                        CollisionComp->DestroyComponent();
+                    }
+                }), 0.01f, false);
+        }
     }
 }
 void AMeleeMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+    if (OtherActor)
     {
-        PlayParticle();
-
-        //UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
-        AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
-        ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
-        if (Monster)
+        if (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("NPC"))
         {
-            float DamageValue = Monster->GetMonsterAttackDamage();
+            PlayParticle();
 
-            UGameplayStatics::ApplyDamage(
-                OtherActor,
-                DamageValue,
-                nullptr,
-                nullptr,
-                UDamageType::StaticClass()
-            );
+            //UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
+            AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
+            ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
+            if (Monster)
+            {
+                float DamageValue = Monster->GetMonsterAttackDamage();
+
+                UGameplayStatics::ApplyDamage(
+                    OtherActor,
+                    DamageValue,
+                    nullptr,
+                    nullptr,
+                    UDamageType::StaticClass()
+                );
+            }
         }
     }
 }

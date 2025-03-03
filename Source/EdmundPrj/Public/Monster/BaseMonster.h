@@ -29,6 +29,8 @@ public:
 
 	void BeginPlay() override;
 
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 float GetMonsterAttackDamage();
 
 virtual void MonsterAttackCheck();
@@ -40,6 +42,8 @@ void SetIsDead(bool bNewIsDead);
 void SetCanDropReward(bool NewState);
 
 void SetMonsterLevel(int32 NewLevel);
+
+virtual void SetMonsterStatsByLevel();
 
 AEdmundGameState* GameState;
 
@@ -149,7 +153,7 @@ protected:
 	float MonsterGoldReward = 3.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Item")
-	float MonsterHealKitProbability = 2.0f;
+	float MonsterHealKitProbability = 20.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Item")
 	float MonsterGoldProbability = 100.0f;
@@ -202,4 +206,17 @@ protected:
 	FTimerHandle AttackAnimTimerHandle;
 	FTimerHandle HitAnimTimerHandle;
 	FTimerHandle OverHeadUITimerHandle;
+
+	// 이하는 NPC 관련
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
+	bool bIsFightMode = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
+	bool bIsBondageMode = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
+	bool bIsMoveMode = false;
 };
