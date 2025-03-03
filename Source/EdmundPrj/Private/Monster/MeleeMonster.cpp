@@ -6,6 +6,16 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
 
+// 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+void AMeleeMonster::SetMonsterStatsByLevel()
+{
+    MonsterHP = 100 + (MonsterLevel * 50);
+    MonsterMaxHP = 100 + (MonsterLevel * 50);
+    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+}
+
+
 AMeleeMonster::AMeleeMonster()
 {
     MonsterType = EMonsterType::Melee;
@@ -51,24 +61,27 @@ void AMeleeMonster::MonsterAttackCheck()
 }
 void AMeleeMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+    if (OtherActor)
     {
-        PlayParticle();
-
-        //UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
-        AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
-        ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
-        if (Monster)
+        if (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("NPC"))
         {
-            float DamageValue = Monster->GetMonsterAttackDamage();
+            PlayParticle();
 
-            UGameplayStatics::ApplyDamage(
-                OtherActor,
-                DamageValue,
-                nullptr,
-                nullptr,
-                UDamageType::StaticClass()
-            );
+            //UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
+            AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
+            ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
+            if (Monster)
+            {
+                float DamageValue = Monster->GetMonsterAttackDamage();
+
+                UGameplayStatics::ApplyDamage(
+                    OtherActor,
+                    DamageValue,
+                    nullptr,
+                    nullptr,
+                    UDamageType::StaticClass()
+                );
+            }
         }
     }
 }

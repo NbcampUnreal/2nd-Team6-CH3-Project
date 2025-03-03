@@ -6,6 +6,16 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
 
+// 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+void ASuicideMonster::SetMonsterStatsByLevel()
+{
+    MonsterHP = 100 + (MonsterLevel * 50);
+    MonsterMaxHP = 100 + (MonsterLevel * 50);
+    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+}
+
+
 ASuicideMonster::ASuicideMonster()
 {
     MonsterType = EMonsterType::Suicide;
@@ -29,7 +39,7 @@ void ASuicideMonster::MonsterAttackCheck()
         CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
         // 콜리전 컴포넌트 초기화
-        CollisionComp->SetCapsuleSize(5000.0f, 5000.0f); // 필요에 따라 사이즈 조정
+        CollisionComp->SetCapsuleSize(2500.0f, 2500.0f); // 필요에 따라 사이즈 조정
         CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
         CollisionComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f)); // 액터의 앞에 콜리전 위치
 
@@ -39,8 +49,8 @@ void ASuicideMonster::MonsterAttackCheck()
 
 
         //  공격 Collision Visible 활성화
-        /* FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-         DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);*/
+        FVector CapsuleLocation = CollisionComp->GetComponentLocation();
+         DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
 
 
          // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
@@ -65,22 +75,25 @@ void ASuicideMonster::MonsterAttackCheck()
 }
 void ASuicideMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
+    if (OtherActor)
     {
-        //UE_LOG(LogTemp, Warning, TEXT("Suicide Attack Succeed")); // 공격 성공 Log
-        AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
-        ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
-        if (Monster)
+        if (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("NPC"))
         {
-            float DamageValue = Monster->GetMonsterAttackDamage();
+            //UE_LOG(LogTemp, Warning, TEXT("Suicide Attack Succeed")); // 공격 성공 Log
+            AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
+            ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
+            if (Monster)
+            {
+                float DamageValue = Monster->GetMonsterAttackDamage();
 
-            UGameplayStatics::ApplyDamage(
-                OtherActor,
-                DamageValue,
-                nullptr,
-                nullptr,
-                UDamageType::StaticClass()
-            );
+                UGameplayStatics::ApplyDamage(
+                    OtherActor,
+                    DamageValue,
+                    nullptr,
+                    nullptr,
+                    UDamageType::StaticClass()
+                );
+            }
         }
     }
 }
@@ -92,7 +105,7 @@ void ASuicideMonster::PlayParticle()
 
     if (AttackParticle)
     {
-        FVector ParticleScale = FVector(2.0f, 2.0f, 2.0f);
+        FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
 
         Particle = UGameplayStatics::SpawnEmitterAtLocation(
             GetWorld(),

@@ -10,6 +10,15 @@
 #include "Monster/MonsterSpawner.h"
 #include "Engine/World.h"
 
+// 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+void ARangedMonster::SetMonsterStatsByLevel()
+{
+    MonsterHP = 150 + (MonsterLevel * 50);
+    MonsterMaxHP = 150 + (MonsterLevel * 50);
+    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+}
+
 ARangedMonster::ARangedMonster()
 {
     MonsterType = EMonsterType::Ranger;
