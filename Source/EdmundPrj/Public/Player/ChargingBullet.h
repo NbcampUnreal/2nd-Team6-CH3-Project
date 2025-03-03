@@ -13,7 +13,7 @@ class EDMUNDPRJ_API AChargingBullet : public ABaseProjectile
 	
 public:
 	AChargingBullet();
-	virtual void SetBulletHidden(bool IsHidden);
+	virtual void SetBulletScale();
 
 	virtual void OnProjectileOverlap(
 		UPrimitiveComponent* OverlappedComp,
@@ -29,6 +29,5 @@ protected:
 	void BeginPlay();
 
 private:
-	APlayerCharacterWraith* Player;
 	float BulletDamage;
 };

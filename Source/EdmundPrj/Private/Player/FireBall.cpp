@@ -110,6 +110,23 @@ void AFireBall::EndBulletLife()
 
 			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 			{
+				float Damage = 30.0f;
+
+				// 현재 플레이어 캐릭터로부터 데미지 값을 얻는 코드
+				APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0은 첫 번째 플레이어
+				if (PlayerController)
+				{
+					APawn* ControlledPawn = PlayerController->GetPawn();
+					if (ControlledPawn)
+					{
+						ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
+						if (IsValid(Player))
+						{
+							Damage = Player->GetAttackDamage();
+						}
+					}
+				}
+
 				UGameplayStatics::ApplyDamage(
 					HitActor,
 					30.0f,

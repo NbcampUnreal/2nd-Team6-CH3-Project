@@ -77,16 +77,6 @@ float APlayerCharacterWraith::GetAttackDamage() const
 		Damage *= CriticalMultiplier;
 	}
 
-	// 랜덤 데미지 적용
-	float RandomRange = 0.2f;
-
-	float MinDamage = (1.0f - RandomRange) * Damage;
-	float MaxDamage = (1.0f + RandomRange) * Damage;
-
-	Damage = FMath::RandRange(MinDamage, MaxDamage);
-
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Activate: %f"), Damage * AttackMultipler));
-
 	return Damage * AttackMultipler;
 }
 
@@ -209,6 +199,11 @@ void APlayerCharacterWraith::Attack(const FInputActionValue& value)
 
 void APlayerCharacterWraith::EndAttack(const FInputActionValue& value)
 {
+	if (!IsAttack)
+	{
+		return;
+	}
+
 	NormalizeScale();
 }
 
