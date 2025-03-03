@@ -92,7 +92,7 @@ void ABaseMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
 float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 
-	if (bIsDead) return 0;
+	if (bIsDead || bIsBondageMode) return 0;
 
 	if (TakeDamageSound)
 	{
