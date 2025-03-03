@@ -26,7 +26,9 @@ EBTNodeResult::Type UBTTask_BossAttack2::ExecuteTask(UBehaviorTreeComponent& Own
 		return EBTNodeResult::Failed;
 	}
 
-	this->BossRef = Cast<ABoss>(AIController->GetPawn());
+	CachedOwnerComp = &OwnerComp;
+
+	BossRef = Cast<ABoss>(AIController->GetPawn());
 	if (!BossRef)
 	{
 		return EBTNodeResult::Failed;
@@ -39,6 +41,8 @@ EBTNodeResult::Type UBTTask_BossAttack2::ExecuteTask(UBehaviorTreeComponent& Own
 	{
 		BossRef->GetMesh()->GetAnimInstance()->Montage_Play(AnimInst->Attack2Montage);
 	}
+
+	StartAscend();
 
 	return EBTNodeResult::InProgress;
 }
@@ -59,7 +63,6 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		if (BossRef->GetCharacterMovement()->MovementMode != MOVE_Flying)
 		{
 			BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-			UE_LOG(LogTemp, Warning, TEXT("TickTask - 강제 MOVE_Flying 적용"));
 		}
 		FVector CurrentLocation = BossRef->GetActorLocation();
 		FVector NewLocation = CurrentLocation + FVector(0, 0, BossRef->Attack2_AscendSpeed * DeltaSeconds);
