@@ -12,10 +12,15 @@
 UBTTask_BossAttack3::UBTTask_BossAttack3()
 {
     NodeName = TEXT("Boss Attack3");
-    bNotifyTick = false; 
+    bNotifyTick = true; 
     BossRef = nullptr;
     CachedOwnerComp = nullptr;
     ComboPhase = 0;
+
+    bIsDashing = false;
+    DashFrequency = 0;
+    DashDamping = 0;
+    DashCurrentVelocity = FVector::ZeroVector;
 }
 
 EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -43,6 +48,9 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
         //UE_LOG(LogTemp, Error, TEXT("Boss Pawn is NULL"));
         return EBTNodeResult::Failed;
     }
+
+    DashFrequency = BossRef->BossDashFrequency;
+    DashDamping = BossRef->BossDashFrequency;
 
     if (BossRef->GetWorld()->GetTimerManager().IsTimerActive(BulletFireTimerHandle))
     {
@@ -143,7 +151,30 @@ void UBTTask_BossAttack3::FinishComboAttack()
 
 void UBTTask_BossAttack3::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+    if (bIsDashing && BossRef)
+    {
+        FVector CurrentLocation = BossRef->GetActorLocation();
+        // 스프링 물리 공식:
+        // acceleration = Frequency^2 * (Target - Current) - 2 * Damping * Frequency * CurrentVelocity
+        float Frequency = DashFrequency;
+        float Damping = DashDamping;
+        FVector Displacement = DashTargetLocation - CurrentLocation;
+        FVector Acceleration = Frequency * Frequency * Displacement - 2.0f * Damping * Frequency * DashCurrentVelocity;
+        DashCurrentVelocity += Acceleration * DeltaSeconds;
+        FVector NewLocation = CurrentLocation + DashCurrentVelocity * DeltaSeconds;
+        BossRef->SetActorLocation(NewLocation, true);
+
+        // 목표에 근접하면 돌진을 종료합니다.
+        if (FVector::DistSquared(NewLocation, DashTargetLocation) < FMath::Square(10.0f))
+        {
+            BossRef->SetActorLocation(DashTargetLocation, true);
+            bIsDashing = false;
+            // 돌진 종료 후, 필요한 후속 처리(예: 공격 체크)를 호출할 수 있습니다.
+            BossRef->MonsterAttackCheck();
+        }
+    }
 }
+
 
 void UBTTask_BossAttack3::PlayAttack3Montage()
 {
@@ -165,15 +196,12 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
 {
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("ExecuteMeleeAttack: BossRef is NULL!"));
         return;
     }
 
     float DashDistance = 0.0f;
     float DashSpeed = 0.0f;
-
     int32 CurrentPhase = BossRef->GetComboPhase();
-    //UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: CurrentPhase = %d"), CurrentPhase);
 
     switch (CurrentPhase)
     {
@@ -186,18 +214,24 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack2;
         break;
     default:
-        //UE_LOG(LogTemp, Warning, TEXT("ExecuteMeleeAttack: Unexpected ComboPhase = %d"), CurrentPhase);
         return;
     }
 
-    //UE_LOG(LogTemp, Log, TEXT("ExecuteMeleeAttack: Using DashDistance = %f, DashSpeed = %f"), DashDistance, DashSpeed);
-
+    // 돌진 시작 위치와 목표 위치를 계산합니다.
+    bIsDashing = true;
+    DashStartLocation = BossRef->GetActorLocation();
     FVector DashDirection = BossRef->GetActorForwardVector();
-    FVector LaunchVelocity = DashDirection * DashSpeed;
-    BossRef->LaunchCharacter(LaunchVelocity, true, true);
+    DashTargetLocation = DashStartLocation + DashDirection * DashDistance;
+    // 초기 속도를 돌진속도를 참조하여 설정 (방향은 DashDirection)
+    DashCurrentVelocity = DashDirection * DashSpeed;
 
-    BossRef->MonsterAttackCheck();
+    // 기존의 일정 속도 이동 대신, 물리 기반 돌진이므로 이동을 멈추고 TickTask에서 업데이트하도록 합니다.
+    if (BossRef->GetCharacterMovement())
+    {
+        BossRef->GetCharacterMovement()->StopMovementImmediately();
+    }
 }
+
 
 void UBTTask_BossAttack3::Attack3_ActivateMeleeCollision_Check1()
 {

@@ -222,22 +222,16 @@ public:
     class UBTTask_BossAttack3* CurrentAttackTask;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack1 = 200.0f; // 1타 돌진 거리
+    float MeleeAttackDashDistance_Attack1 = 5000.0f; // 1타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack2 = 200.0f; // 2타 돌진 거리
+    float MeleeAttackDashDistance_Attack2 = 5000.0f; // 2타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack1 = 100.0f; // 1타 돌진 속도
+    float MeleeAttackDashSpeed_Attack1 = 1200.0f; // 1타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack2 = 100.0f; // 2타 돌진 속도
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashFrequency = 5.0f; // 목표 위치 가속 힘
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashDamping = 2.0f; // 부드럽게 정지
+    float MeleeAttackDashSpeed_Attack2 = 1200.0f; // 2타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_3FiringDuration = 3.0f; // 3타 지속시간

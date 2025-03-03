@@ -78,4 +78,11 @@ private:
 
 	FVector GetAdjustedSpawnLocation(const FVector& Offset) const;
 
+	bool bIsDashing;
+	FVector DashStartLocation;
+	FVector DashTargetLocation;
+	FVector DashCurrentVelocity;
+	float DashFrequency;
+	float DashDamping;
+
 };
