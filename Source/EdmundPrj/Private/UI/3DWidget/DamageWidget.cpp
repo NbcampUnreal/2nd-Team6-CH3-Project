@@ -10,6 +10,14 @@ void UDamageWidget::ApplyDamage(int32 DamageValue)
 	PlayHitAnim();
 }
 
+void UDamageWidget::ResetDamage()
+{
+	if (IsAnimationPlaying(HitAnimation))
+	{
+		StopAnimation(HitAnimation);
+	}
+}
+
 void UDamageWidget::PlayHitAnim()
 {
 	if (IsAnimationPlaying(HitAnimation))
