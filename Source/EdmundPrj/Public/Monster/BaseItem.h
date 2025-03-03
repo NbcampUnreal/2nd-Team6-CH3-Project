@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "System/EnumSet.h"
+#include "System/EdmundGameState.h"
 #include "BaseItem.generated.h"
 
 class USphereComponent;
@@ -21,6 +23,14 @@ public:
 	void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	EItemType ItemType;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	AEdmundGameState* GameState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Component")
 	UStaticMeshComponent* StaticMeshComp;

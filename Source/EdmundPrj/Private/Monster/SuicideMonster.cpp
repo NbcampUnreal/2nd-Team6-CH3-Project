@@ -39,7 +39,7 @@ void ASuicideMonster::MonsterAttackCheck()
         CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
         // 콜리전 컴포넌트 초기화
-        CollisionComp->SetCapsuleSize(2500.0f, 2500.0f); // 필요에 따라 사이즈 조정
+        CollisionComp->SetCapsuleSize(3000.0f, 3000.0f); // 필요에 따라 사이즈 조정
         CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
         CollisionComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f)); // 액터의 앞에 콜리전 위치
 
@@ -49,8 +49,8 @@ void ASuicideMonster::MonsterAttackCheck()
 
 
         //  공격 Collision Visible 활성화
-        FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-         DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
+        //FVector CapsuleLocation = CollisionComp->GetComponentLocation();
+        //DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
 
 
          // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,

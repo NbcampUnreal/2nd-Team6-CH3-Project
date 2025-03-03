@@ -61,8 +61,6 @@ void ANPCMonster::MonsterAttackCheck()
     if (Monster)
     {
 
-        PlaySound();
-
         UCapsuleComponent* CollisionComp = NewObject<UCapsuleComponent>(this);
         CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
@@ -134,6 +132,8 @@ void ANPCMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 
 void ANPCMonster::NPCMonsterAttack()
 {
+    
+    PlaySound();
 
     UParticleSystemComponent* Particle = nullptr;
 
