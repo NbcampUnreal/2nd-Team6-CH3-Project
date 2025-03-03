@@ -236,15 +236,6 @@ public:
 
 	UAudioComponent* CurrentAudioComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> EvasionSuccessSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> RevivalSuccessSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> DeathSound;
-
 	// 앉을 수 없는 캐릭 - Fey
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Crouch")
 	bool CanCrouchCharacter;

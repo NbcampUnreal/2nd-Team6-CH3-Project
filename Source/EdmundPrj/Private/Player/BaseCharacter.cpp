@@ -79,10 +79,6 @@ ABaseCharacter::ABaseCharacter()
 	DieActionMontage = nullptr;
 	CurrentGameState = nullptr;
 
-	EvasionSuccessSound = nullptr;
-	RevivalSuccessSound = nullptr;
-	DeathSound = nullptr;
-
 	CanCrouchCharacter = true;
 }
 
