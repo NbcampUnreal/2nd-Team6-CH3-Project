@@ -71,6 +71,9 @@ public:
 
 	// Notify에서 호출하기 위해 public
 	void AttackTrace() override;
+	virtual void ActiveWeapon();
+	void PlayReloadSound();
+	void SetIsAttack();
 
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -80,7 +83,6 @@ protected:
 
 	// 공격
 	virtual void Attack(const FInputActionValue& value) override;
-	virtual bool ActiveWeapon();
 
 	// 근접공격
 	void MeleeAttack(const FInputActionValue& value);
@@ -117,4 +119,5 @@ protected:
 
 private:
 	float ReloadTimeMultipler;
+	FTimerHandle AttackDelayHandle;
 };

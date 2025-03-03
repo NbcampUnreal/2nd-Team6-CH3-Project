@@ -124,30 +124,42 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 void APlayerCharacter::Attack(const FInputActionValue& value)
 {
 
-	if (CurrentAmmo <= 0 || CheckAction())
+	if (CurrentAmmo <= 0 || CheckAction() || IsAttack)
 	{
 		return;
 	}
 
-	if (ActiveWeapon())
+	Super::Attack(value);
+
+	IsAttack = true;
+
+	GetWorld()->GetTimerManager().SetTimer(
+		AttackDelayHandle,
+		this,
+		&APlayerCharacter::SetIsAttack,
+		AttackDelay,
+		false
+	);
+
+	if (IsValid(AttackMontage))
 	{
-		if (IsValid(CurrentGameState))
-		{
-			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
-		}
-
-		if (IsValid(AttackMontage))
-		{
-			PlayAnimMontage(AttackMontage);
-		}
-
-		Super::Attack(value);
-		CurrentAmmo--;
+		PlayAnimMontage(AttackMontage);
 	}
+}
 
-	if (IsValid(CurrentGameState))
+void APlayerCharacter::ActiveWeapon()
+{
+	if (IsValid(WeaponActor))
 	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+		if (WeaponActor->Fire(AttackDelay))
+		{
+			if (IsValid(CurrentGameState))
+			{
+				CurrentAmmo--;
+				CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
+			}
+		}
 	}
 
 	if (CurrentAmmo <= 0)
@@ -156,22 +168,14 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 	}
 }
 
-bool APlayerCharacter::ActiveWeapon()
-{
-	if (IsValid(WeaponActor))
-	{
-		return WeaponActor->Fire(AttackDelay);
-	}
-
-	return false;
-}
-
 void APlayerCharacter::MeleeAttack(const FInputActionValue& value)
 {
 	if (CheckAction() || IsDie)
 	{
 		return;
 	}
+
+	IsAttack = false;
 
 	if (IsValid(MeleeAttackMontage))
 	{
@@ -305,12 +309,9 @@ void APlayerCharacter::ReloadAction(const FInputActionValue& value)
 
 void APlayerCharacter::Reload()
 {
-	CurrentAmmo = MaxAmmo;
+	IsReload = true;
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Reload);
-	}
+	CurrentAmmo = MaxAmmo;
 
 	if (IsValid(ReloadMontage))
 	{
@@ -318,16 +319,6 @@ void APlayerCharacter::Reload()
 		{
 			PlayAnimMontage(ReloadMontage, ReloadTimeMultipler);
 		}
-
-		IsReload = true;
-
-		GetWorld()->GetTimerManager().SetTimer(
-			ReloadDelayHandle,
-			this,
-			&APlayerCharacter::StopReload,
-			ReloadDelay,
-			false
-		);
 	}
 }
 
@@ -395,7 +386,7 @@ void APlayerCharacter::AmountAmmo(int32 AmountAmmo)
 
 bool APlayerCharacter::CheckAction()
 {
-	return IsDie || IsAttack || IsMeleeAttack || IsReload;
+	return IsDie || IsMeleeAttack || IsReload;
 }
 
 void APlayerCharacter::ActiveDieAction()
@@ -427,4 +418,25 @@ void APlayerCharacter::GetUpgradeStatus()
 	// ReloadTime
 	ReloadTimeMultipler = ReloadTimeMultipler * (1.0f + ShopStatusList[11]->CurrentLevel * ShopStatusList[11]->AdvanceValue);
 	ReloadDelay *= (1.0f - ShopStatusList[11]->CurrentLevel * ShopStatusList[11]->AdvanceValue / 2);
+}
+
+void APlayerCharacter::SetIsAttack()
+{
+	IsAttack = false;
+}
+
+void APlayerCharacter::PlayReloadSound()
+{
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Reload);
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(
+		ReloadDelayHandle,
+		this,
+		&APlayerCharacter::StopReload,
+		ReloadDelay,
+		false
+	);
 }

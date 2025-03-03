@@ -49,6 +49,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
 	float BulletSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
+	float BulletDuraion;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComponent;
