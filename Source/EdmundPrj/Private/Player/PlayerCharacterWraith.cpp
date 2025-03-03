@@ -209,6 +209,11 @@ void APlayerCharacterWraith::Attack(const FInputActionValue& value)
 
 void APlayerCharacterWraith::EndAttack(const FInputActionValue& value)
 {
+	if (!IsAttack)
+	{
+		return;
+	}
+
 	NormalizeScale();
 }
 

@@ -8,26 +8,19 @@ AChargingBullet::AChargingBullet() : Super()
 	BulletDamage = 30;
 }
 
-void AChargingBullet::SetBulletHidden(bool IsHidden)
+void AChargingBullet::SetBulletScale()
 {
-	Super::SetBulletHidden(IsHidden);
-
-	if (IsHidden)
+	ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	
+	if (IsValid(PlayerCharacter))
 	{
-		return;
-	}
+		APlayerCharacterWraith* Player = Cast<APlayerCharacterWraith>(PlayerCharacter);
 
-	if (!IsValid(Player))
-	{
-		return;
+		if (IsValid(Player) && IsValid(Player->BulletMesh))
+		{
+			SetActorRelativeScale3D(Player->BulletMesh->GetRelativeScale3D());
+		}
 	}
-
-	if (!IsValid(Player->BulletMesh))
-	{
-		return;
-	}
-
-	SetActorRelativeScale3D(Player->BulletMesh->GetRelativeScale3D());
 }
 
 void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -41,6 +34,12 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 	if (BulletLandParticle)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation());
+	}
+	
+	// 몬스터는 관통
+	if (OtherActor && !(OtherActor->ActorHasTag("Monster")))
+	{
+		SetBulletHidden(true);
 	}
 
 	if (OtherActor && (OtherActor->ActorHasTag("Monster") || OtherActor->ActorHasTag("MissionItem")))
@@ -67,11 +66,4 @@ void AChargingBullet::SetBulletDamage(float NewDamage)
 void AChargingBullet::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-
-	if (PlayerCharacter)
-	{
-		Player = Cast<APlayerCharacterWraith>(PlayerCharacter);
-	}
 }

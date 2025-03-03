@@ -77,6 +77,28 @@ ABaseProjectile* AWeapon::GetBulletFromPool()
 		if (ABaseProjectile && ABaseProjectile->IsHidden())
 		{
 			ABaseProjectile->SetBulletHidden(false);  // 숨겨둔 총알을 보이게 설정
+
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0은 첫 번째 플레이어
+
+			if (PlayerController)
+			{
+				APawn* ControlledPawn = PlayerController->GetPawn();
+				if (ControlledPawn)
+				{
+					ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
+					if (IsValid(Player) && Player->GetCharacterType() == ECharacterType::Sparrow)
+					{
+						AChargingBullet* CharingBullet = Cast<AChargingBullet>(ABaseProjectile);
+						APlayerCharacterWraith* Wraith = Cast<APlayerCharacterWraith>(Player);
+
+						if (IsValid(CharingBullet))
+						{
+							CharingBullet->SetBulletScale();
+						}
+					}
+				}
+			}
+
 			return ABaseProjectile;
 		}
 	}
