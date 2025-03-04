@@ -9,8 +9,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Boss/Attack/Boss_Attack1_Bullet.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "NiagaraFunctionLibrary.h"
-#include "NiagaraSystem.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
 #include "System/MissionHandle.h"
@@ -22,8 +20,12 @@ ABoss::ABoss()
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     BossState = nullptr;
+    MonsterHP = 500.0f;
+    MonsterMaxHP = 1000.0f;
+    MonsterAttackDamage = 10.0f;
+    MonsterArmor = 10;
+    MonsterMoveSpeed = 5000.0f;
 
-    MonsterType = EMonsterType::Boss;
 
     // 공격2 범위
     Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2Collision"));
@@ -112,15 +114,6 @@ void ABoss::BeginPlay()
 {
     Super::BeginPlay();
     Tags.Add(TEXT("Boss"));
-
-    MonsterHP = 30000.0f;
-    MonsterMaxHP = 30000.0f;
-    MonsterAttackDamage = 100.0f;
-    MonsterArmor = 30;
-    MonsterMoveSpeed = 400.0f;
-    ApplyWeaken();
-
-
     if (GetMesh() && GetMesh()->GetAnimInstance())
     {
         AnimInstance = Cast<UBoss_AnimInstance>(GetMesh()->GetAnimInstance());
@@ -721,43 +714,6 @@ void ABoss::CheckWeaken()
 
 void ABoss::ApplyWeaken()
 {
-    if (bWeakenitem1 == 1)
-    {
-        MonsterHP *= 0.9f;
-        MonsterMaxHP *= 0.9f;
-        MonsterAttackDamage *= 0.9f;
-        MonsterArmor *= 0.9f;
-    }
-
-    if(bWeakenitem2 == 1)
-    {
-        MonsterHP *= 0.9f;
-        MonsterMaxHP *= 0.9f;
-        MonsterAttackDamage *= 0.9f;
-        MonsterArmor *= 0.9f;
-    }
-            
+    // TODO : 보스 약화 구현 필요
 }
 
-void ABoss::PlayBossSound(ESoundType SoundType)
-{
-    if (!GameState || !CurrentAudioComp)
-        return;
-
-    GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, SoundType);
-}
-
-
-void ABoss::SpawnNiagaraEffect(FVector Location)
-{
-    if (Attack2ImpactEffect && GetWorld())
-    {
-        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-            GetWorld(),
-            Attack2ImpactEffect,
-            Location,
-            FRotator::ZeroRotator,
-            FVector(1.0f)
-        );
-    }
-}

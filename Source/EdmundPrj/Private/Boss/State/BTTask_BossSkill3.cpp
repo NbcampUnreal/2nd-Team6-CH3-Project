@@ -187,6 +187,7 @@ void UBTTask_BossSkill3::PerformDetection()
 
             if (bWallBlocking && WallHit.GetActor() && WallHit.GetActor()->ActorHasTag("Skill3Wall"))
             {
+                //UE_LOG(LogTemp, Warning, TEXT("[Wall Blocked]: %s"), *WallHit.GetActor()->GetName());
                 continue;
             }
 
@@ -195,6 +196,12 @@ void UBTTask_BossSkill3::PerformDetection()
             DetectedActorsLog += HitActor->GetName() + TEXT(" ");
         }
     }
+
+    //UE_LOG(LogTemp, Warning, TEXT("HitResults Count: %d"), HitResults.Num());
+
+    UE_LOG(LogTemp, Warning, TEXT("%s"),bCharacterDetected ? TEXT("Player Die") : TEXT("Hide"));
+
+    DrawDebugSphere(World, BossLocation, DetectionRadius, 32, bCharacterDetected ? FColor::Red : FColor::Blue, false, 0.5f);
 }
 
 void UBTTask_BossSkill3::StopDetection()
