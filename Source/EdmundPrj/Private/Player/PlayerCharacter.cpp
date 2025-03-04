@@ -237,34 +237,30 @@ void APlayerCharacter::AttackTrace()
 
 	if (bHit)
 	{
-		bool IsBossAttack = false;
-
 		// 여러 충돌 객체가 있다면
 		for (const FHitResult& Hit : HitResults)
 		{
 			// 충돌한 객체가 있다면
 			AActor* HitActor = Hit.GetActor();
 
-			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+			if (HitActor)
 			{
-				if (!IsBossAttack && HitActor->ActorHasTag("Boss"))
-				{
-					if (IsBossAttack)
-					{
-						continue;
-					}
+				continue;
+			}
 
-					IsBossAttack = true;
-				}
+			if (HitActor->ActorHasTag("Boss"))
+			{
+				continue;
+			}
 
+			if (!DamagedActors.Contains(HitActor) && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+			{
 				// 미션 아이템 + 보스 데미지 주기
-				if (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Boss"))
+				if (HitActor->ActorHasTag("MissionItem"))
 				{
-					float temp2 = GetAttackDamage();
-
 					UGameplayStatics::ApplyDamage(
 						HitActor,
-						temp2,
+						GetAttackDamage(),
 						nullptr,
 						this,
 						UDamageType::StaticClass()
