@@ -31,7 +31,7 @@ protected:
 
 private:
     UMaterialInterface* OriginalMaterial = nullptr;
-
+    FTimerHandle TimerHandle;
 public:
 
 };

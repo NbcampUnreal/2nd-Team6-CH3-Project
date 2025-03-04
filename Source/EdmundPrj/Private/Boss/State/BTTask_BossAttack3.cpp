@@ -69,24 +69,18 @@ void UBTTask_BossAttack3::OnAttack1Notify()
 {
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("OnAttack1Notify: BossRef is NULL!"));
         return;
     }
 
-    //UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify BEFORE: ComboPhase = %d"), BossRef->GetComboPhase());
-
     if (BossRef->GetComboPhase() != 1)
     {
-        //UE_LOG(LogTemp, Error, TEXT("OnAttack1Notify: ComboPhase is not 1, something went wrong!"));
         return;
     }
 
     BossRef->SetComboPhase(2);
     ComboPhase = 2;
 
-    //UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify AFTER: ComboPhase = %d"), BossRef->GetComboPhase());
-
-    ExecuteMeleeAttack();
+    
 }
 
 
@@ -94,19 +88,16 @@ void UBTTask_BossAttack3::OnAttack2Notify()
 {
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("OnAttack2Notify: BossRef is NULL!"));
         return;
     }
 
-    //UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify BEFORE: ComboPhase = %d"), BossRef->GetComboPhase());
-
     if (ComboPhase != 2)
+    {
         return;
-
+    }
     BossRef->SetComboPhase(3);
     ComboPhase = 3;
-
-    //UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify AFTER: ComboPhase = %d"), BossRef->GetComboPhase());
+    ExecuteMeleeAttack();
 }
 
 void UBTTask_BossAttack3::OnAttack3Notify()

@@ -41,56 +41,59 @@ EBTNodeResult::Type UBTTask_BossChase::ExecuteTask(UBehaviorTreeComponent& Owner
 
 void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	if (!BossRef)
-	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		return;
-	}
-	BossRef->GetCharacterMovement()->MaxWalkSpeed = BossRef->GetMonsterMoveSpeed();
-	AccumulatedTime += DeltaSeconds;
-	if (AccumulatedTime >= FMath::RandRange(2.0f, 3.0f))
-	{
-		BossRef->SetbChaseComplete(false);
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		return;
-	}
+    if (!BossRef)
+    {
+        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+        return;
+    }
 
-	AAIController* AICon = Cast<AAIController>(BossRef->GetController());
-	AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
-	if (!AICon || !Player)
-	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-		return;
-	}
+    BossRef->GetCharacterMovement()->MaxWalkSpeed = BossRef->GetMonsterMoveSpeed();
+    AccumulatedTime += DeltaSeconds;
+    if (AccumulatedTime >= FMath::RandRange(2.0f, 3.0f))
+    {
+        BossRef->SetbChaseComplete(false);
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+        return;
+    }
 
-	float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
-	if (Distance >= 1500.0f)
-	{
-		BossRef->Chase_AcceptanceRadius += 100.0f;
-	}
+    AAIController* AICon = Cast<AAIController>(BossRef->GetController());
+    AActor* Player = UGameplayStatics::GetPlayerPawn(BossRef->GetWorld(), 0);
+    if (!AICon || !Player)
+    {
+        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+        return;
+    }
 
-	FRotator CurrentRotation = BossRef->GetActorRotation();
+    float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
+    if (Distance >= 1500.0f)
+    {
+        BossRef->Chase_AcceptanceRadius += 100.0f;
+    }
 
-	FVector Direction = (Player->GetActorLocation() - BossRef->GetActorLocation()).GetSafeNormal();
-	FRotator TargetRotation = Direction.Rotation();
+    FRotator CurrentRotation = BossRef->GetActorRotation();
+    FVector Direction = (Player->GetActorLocation() - BossRef->GetActorLocation()).GetSafeNormal();
+    FRotator TargetRotation = Direction.Rotation();
+    FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, BossRef->GetTurnSpeed());
+    SmoothRotation.Pitch = 0.0f;
+    SmoothRotation.Roll = 0.0f;
+    BossRef->SetActorRotation(SmoothRotation);
 
-	FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, BossRef->GetTurnSpeed());
-	SmoothRotation.Pitch = 0.0f;
-	SmoothRotation.Roll = 0.0f;
-	BossRef->SetActorRotation(SmoothRotation);
+    AICon->MoveToActor(Player, BossRef->Chase_AcceptanceRadius);
+    BossRef->SetbChaseComplete(false);
 
-	AICon->MoveToActor(Player, BossRef->Chase_AcceptanceRadius);
-	BossRef->SetbChaseComplete(false);
+    int32 NextAttack = 0;
+    if (UBlackboardComponent* BBComp = OwnerComp.GetBlackboardComponent())
+    {
+        NextAttack = BBComp->GetValueAsInt("NextAttack");
+    }
 
-	int32 NextAttack = 0;
-	if (UBlackboardComponent* BBComp = OwnerComp.GetBlackboardComponent())
-	{
-		NextAttack = BBComp->GetValueAsInt("NextAttack");
-	}
-
-	if (NextAttack != 0 || Distance <= BossRef->Chase_AcceptanceRadius + 500.0f)
-	{
-		BossRef->SetbChaseComplete(true);
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
+    if (NextAttack != 0 || Distance <= BossRef->Chase_AcceptanceRadius + 500.0f)
+    {
+        BossRef->SetbChaseComplete(true);
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+    }
+    {
+        FVector PlayerVelocity = Player->GetVelocity();
+        FVector DataDirection = (Player->GetActorLocation() - BossRef->GetActorLocation()).GetSafeNormal();
+    }
 }

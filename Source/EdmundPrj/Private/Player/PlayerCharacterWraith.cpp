@@ -317,7 +317,7 @@ void APlayerCharacterWraith::AttackTrace()
 				{
 					UGameplayStatics::ApplyDamage(
 						HitActor,
-						30.0f,	// 수정필요
+						GetAttackDamage(),
 						nullptr,
 						this,
 						UDamageType::StaticClass()

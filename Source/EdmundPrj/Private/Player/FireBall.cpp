@@ -39,7 +39,7 @@ void AFireBall::EndBulletLife()
 {
 	Super::EndBulletLife();
 
-	// Æø¹ß ÀÌÆåÆ® Àç»ý
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½
 	if (BulletLandParticle)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation(), FVector(1.0f, 1.0f, 1.0f) * AttackRadiusMultifler);
@@ -56,57 +56,43 @@ void AFireBall::EndBulletLife()
 
 	SetBulletHidden(true);
 
-	FVector Start = GetActorLocation(); // °ø°Ý ½ÃÀÛ À§Ä¡
-	FVector End = Start; // °ø°Ý ³¡ À§Ä¡
+	FVector Start = GetActorLocation(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+	FVector End = Start; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ä¡
 
 	TArray<FHitResult> HitResults;
 
-	// Æ®·¹ÀÌ½º ¼öÇà
+	// Æ®ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // ÀÚ½ÅÀº ¹«½ÃÇÏµµ·Ï ¼³Á¤
+	QueryParams.AddIgnoredActor(this); // ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	bool bHit = GetWorld()->SweepMultiByChannel(
 		HitResults,
-		Start,               // ½ÃÀÛ À§Ä¡
-		End,                 // ³¡ À§Ä¡
-		FQuat::Identity,     // È¸Àü°ª (È¸Àü ¾øÀÌ)
-		ECollisionChannel::ECC_OverlapAll_Deprecated, // Ãæµ¹ Ã¤³Î
-		FCollisionShape::MakeSphere(100.0f * AttackRadiusMultifler), // ¹üÀ§ ¼³Á¤ (±¸Ã¼ ¸ð¾ç)
+		Start,               // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+		End,                 // ï¿½ï¿½ ï¿½ï¿½Ä¡
+		FQuat::Identity,     // È¸ï¿½ï¿½ï¿½ï¿½ (È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+		ECollisionChannel::ECC_OverlapAll_Deprecated, // ï¿½æµ¹ Ã¤ï¿½ï¿½
+		FCollisionShape::MakeSphere(100.0f * AttackRadiusMultifler), // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½)
 		QueryParams
 	);
 
-	// ±¸Ã¼ º¸ÀÌ°Ô ÇÏ±â
-	if (GEngine)
-	{
-		DrawDebugSphere(
-			GetWorld(),
-			Start,
-			100.0f * AttackRadiusMultifler,
-			12,
-			FColor::Red,        // »ö»ó
-			false,              // Áö¼Ó¼º (°ÔÀÓ Áß °è¼Ó Ç¥½ÃÇÒÁö ¿©ºÎ)
-			1.0f                // Áö¼Ó ½Ã°£
-		);
-	}
-
-	// µ¥¹ÌÁö¸¦ ÀÔÈù ¾×ÅÍ¸¦ ÃßÀûÇÒ Set (Áßº¹ ¹æÁö)
-	// SetÀÌ ¾øÀ¸¸é ±ÙÁ¢°ø°ÝÇÑ¹ø¿¡ ¿©·¯¹ø µ¥¹ÌÁö ¹Þ´Â Çö»ó ¹ß»ý
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Set (ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½)
+	// Setï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½
 	TSet<AActor*> DamagedActors;
 
 	if (bHit)
 	{
-		// ¿©·¯ Ãæµ¹ °´Ã¼°¡ ÀÖ´Ù¸é
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½
 		for (const FHitResult& Hit : HitResults)
 		{
-			// Ãæµ¹ÇÑ °´Ã¼°¡ ÀÖ´Ù¸é
+			// ï¿½æµ¹ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½
 			AActor* HitActor = Hit.GetActor();
 
 			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 			{
 				float Damage = 30.0f;
 
-				// ÇöÀç ÇÃ·¹ÀÌ¾î Ä³¸¯ÅÍ·ÎºÎÅÍ µ¥¹ÌÁö °ªÀ» ¾ò´Â ÄÚµå
-				APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0Àº Ã¹ ¹øÂ° ÇÃ·¹ÀÌ¾î
+				// ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Ä³ï¿½ï¿½ï¿½Í·Îºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Úµï¿½
+				APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0ï¿½ï¿½ Ã¹ ï¿½ï¿½Â° ï¿½Ã·ï¿½ï¿½Ì¾ï¿½
 				if (PlayerController)
 				{
 					APawn* ControlledPawn = PlayerController->GetPawn();
@@ -122,14 +108,14 @@ void AFireBall::EndBulletLife()
 
 				UGameplayStatics::ApplyDamage(
 					HitActor,
-					30.0f,
+					Damage,
 					nullptr,
 					this,
 					UDamageType::StaticClass()
 				);
 			}
 
-			// µ¥¹ÌÁö¸¦ ÀÔÈù ¾×ÅÍ¸¦ Set¿¡ Ãß°¡
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ Setï¿½ï¿½ ï¿½ß°ï¿½
 			DamagedActors.Add(HitActor);
 		}
 	}
@@ -142,7 +128,7 @@ void AFireBall::SetBulletHidden(bool IsHidden)
 {
 	bIsHidden = IsHidden;
 
-	// 3ÃÊ µÚ±îÁö ¿À¹ö·¦ ¾ÈµÉ °æ¿ì Ç®¸µ
+	// 3ï¿½ï¿½ ï¿½Ú±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Èµï¿½ ï¿½ï¿½ï¿½ Ç®ï¿½ï¿½
 	if (!IsHidden)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
@@ -162,7 +148,7 @@ void AFireBall::SetBulletHidden(bool IsHidden)
 		);
 	}
 
-	SetActorHiddenInGame(bIsHidden);  // ÃÑ¾Ë ¼û±è Ã³¸®
+	SetActorHiddenInGame(bIsHidden);  // ï¿½Ñ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
 }
 
 void AFireBall::CreateParticle()
@@ -172,6 +158,6 @@ void AFireBall::CreateParticle()
 		return;
 	}
 
-	// ÆÄÆ¼Å¬ »ý¼º
+	// ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½
 	UParticleSystemComponent* ParticleComponent = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireBallParticle, GetActorLocation(), GetActorRotation(), true);
 }
