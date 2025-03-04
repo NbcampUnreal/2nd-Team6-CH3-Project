@@ -48,4 +48,6 @@ class EDMUNDPRJ_API UTimerSkillSpawnManagerComponent : public USceneComponent
 		TMap<ETimerSkillType, TArray<TObjectPtr<ATimerSkill>>> TimerSkillMap;
 		UPROPERTY()
 		TMap<ETimerSkillType, FTimerHandle> SkillTimerMap;
+
+		TMap<ETimerSkillType, int> TimerSkillUpgardeCountMap;
 	};
