@@ -210,10 +210,10 @@ void UBTTask_BossSkill1::OnGapEnd()
     {
         StartOverlap();
     }
-    else
-    {
-        EndTask();
-    }
+    //else
+    //{
+    //    EndTask();
+    //}
 }
 
 void UBTTask_BossSkill1::EndTask()

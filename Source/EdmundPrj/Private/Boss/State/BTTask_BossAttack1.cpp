@@ -28,7 +28,7 @@ EBTNodeResult::Type UBTTask_BossAttack1::ExecuteTask(UBehaviorTreeComponent& Own
 	{
 		return EBTNodeResult::Failed;
 	}
-
+	
 	CachedOwnerComp = &OwnerComp;
 
 	BossRef->DisableMovement();

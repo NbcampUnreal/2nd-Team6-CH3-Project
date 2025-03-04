@@ -10,6 +10,8 @@
 #include "Boss/Attack/Boss_Skill3_Wall.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Boss/State/BTTask_BossAttack2.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h" 
 #include "Boss.generated.h"
 
@@ -124,7 +126,12 @@ public:
     void SetSkill2Invulnerable(bool NewIsInvulnerable);
     void HpbarUpdate();
     bool IsSkill2Invulnerable() const { return bIsInvulnerable; }
-
+    bool GetbWeakenitem1() const { return bWeakenitem1; }
+    bool GetbWeakenitem2() const { return bWeakenitem2; }
+    void SetbWeakenitem1(bool NewbWeakenitem1) { bWeakenitem1 = NewbWeakenitem1; }
+    void SetbWeakenitem2(bool NewbWeakenitem2) { bWeakenitem2 = NewbWeakenitem2; }
+    void PlayBossSound(ESoundType SoundType);
+    void SpawnNiagaraEffect(FVector Location);
 
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
@@ -154,6 +161,12 @@ public:
     UNiagaraComponent* Skill2ShieldNiagara;
 
 
+    UPROPERTY(EditAnywhere, Category = "Effects")
+    UNiagaraSystem* Attack2ImpactEffect;
+
+    
+
+
 private:
     UPROPERTY()
     UBossState* BossState;
@@ -167,8 +180,10 @@ private:
     bool bSkill2Used = false;
     bool bSkill3Used = false;
     bool bChaseComplete = false;
-    float Skill2InvulnerableStartHP;
+    bool bWeakenitem1 = false;
+    bool bWeakenitem2 = false;
 
+    float Skill2InvulnerableStartHP;
 
     FTimerHandle Skill2HealingTimerHandle;
 

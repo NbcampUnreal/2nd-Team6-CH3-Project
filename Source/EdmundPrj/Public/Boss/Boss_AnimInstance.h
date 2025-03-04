@@ -46,7 +46,7 @@ public:
     bool bIsSkill1 = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill1")
-    int32 Skill1HintType = 0;
+    int32 Skill1HintType = 1;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skill1")
     int32 Skill1Iteration = 0;

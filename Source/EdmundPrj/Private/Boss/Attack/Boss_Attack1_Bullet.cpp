@@ -87,16 +87,22 @@ void ABoss_Attack1_Bullet::Tick(float DeltaTime)
 
 void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnRotation, FVector Direction)
 {
-	// 발사 위치 및 회전 설정
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
 
-	// 탄환 활성화 및 초기화
+	if (Attack1Niagara)
+	{
+		Attack1Niagara->SetWorldLocation(SpawnLocation);
+		Attack1Niagara->SetWorldRotation(SpawnRotation);
+		Attack1Niagara->Activate(true);
+	}
+
 	bIsActive = true;
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 }
+
 
 void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

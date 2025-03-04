@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Boss/Boss_AnimInstance.h"
+#include "Monster/BaseMonster.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -123,7 +124,12 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 			float NewSocketZ = (NewActorLocation.Z - ActorSocketOffset);
 			if (NewSocketZ <= GroundZ)
 			{
-				// 소켓이 지면보다 내려가지 않도록 보정
+				AEdmundGameState* GameState = BossRef->GetWorld()->GetGameState<AEdmundGameState>();
+				BossRef->PlayBossSound(ESoundType::Attack2);
+
+				FVector ParticleLocation = FVector(NewActorLocation.X, NewActorLocation.Y, GroundZ);
+				BossRef->SpawnNiagaraEffect(ParticleLocation);
+
 				float TargetActorZ = GroundZ + ActorSocketOffset;
 				NewActorLocation.Z = TargetActorZ;
 				BossRef->SetActorLocation(NewActorLocation, false);
