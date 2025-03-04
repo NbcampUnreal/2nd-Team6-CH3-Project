@@ -643,6 +643,21 @@ void ABaseCharacter::AmountHP(int32 AmountHP)
 	OnBerserkerSkillActivate.Broadcast();
 }
 
+float ABaseCharacter::GetExpMultipler()
+{
+	return ExpMultipler;
+}
+
+float ABaseCharacter::GetGoldMultipler()
+{
+	return GoldMultipler;
+}
+
+int32 ABaseCharacter::GetItempDropProb()
+{
+	return ItemDropProb;
+}
+
 void ABaseCharacter::GetUpgradeStatus()
 {
 	if (!IsValid(CurrentGameState))

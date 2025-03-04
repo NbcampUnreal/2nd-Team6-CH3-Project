@@ -90,6 +90,15 @@ public:
 	// 체력 회복
 	void AmountHP(int32 AmountHP);
 
+	// 경험치 배율 Getter
+	float GetExpMultipler();
+
+	// 골드 배율 Getter
+	float GetGoldMultipler();
+
+	// 아이템 드랍률 Getter
+	int32 GetItempDropProb();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
