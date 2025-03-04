@@ -51,7 +51,7 @@ TObjectPtr<AActor> AFreezing::FindDeactivateFrozenEffect()
 
 void AFreezing::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 {
-	//Monster ½ºÅÏ
+	Monster->FreezeMonster(FrozenTime);
 	UGameplayStatics::ApplyDamage(
 		Monster,
 		3.f,
@@ -64,7 +64,7 @@ void AFreezing::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 	FTimerHandle EndFreezingTimer;
 	GetWorldTimerManager().SetTimer(
 		EndFreezingTimer,
-		[frozen] {
+		[frozen, Monster] {
 			if (frozen.IsValid())
 			{
 				frozen->SetActorHiddenInGame(true);

@@ -20,6 +20,7 @@ public:
 	virtual void Deactivate() override;
 	virtual void UpgradeSkill() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 public:
 	FTimerHandle AttackCycleHandle;
 	FTimerHandle SpawnAnimHandle;

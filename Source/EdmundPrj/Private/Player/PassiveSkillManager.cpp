@@ -4,6 +4,7 @@
 #include "Player/PassiveSkillManager.h"
 #include "Player\BaseCharacter.h"
 #include "Player\ElectricEffectPool.h"
+#include "System\EdmundGameState.h"
 // Sets default values for this component's properties
 UPassiveSkillManager::UPassiveSkillManager()
 {
@@ -33,24 +34,41 @@ void UPassiveSkillManager::ActivatePassiveSkill(EPassiveSkillType passiveSkillTy
 		TObjectPtr<AActor> Owner = GetOwner();
 		Character = Cast<ABaseCharacter>(Owner);
 	}
-	PassiveSkillMap[passiveSkillType]++;
+	PassiveSkillMap.FindOrAdd(passiveSkillType);
+	if (PassiveSkillMap[passiveSkillType] == 0)
+	{
+		++PassiveSkillMap[passiveSkillType];
+	}
 	switch (passiveSkillType)
 	{
 	case EPassiveSkillType::Null:
 		break;
 	case EPassiveSkillType::Berserker:
-		//캐릭터의 델리게이트에 접근하여 BerserkerSkill 바인딩
+		if (PassiveSkillMap[passiveSkillType] == 1)
+		{
+			Character->OnBerserkerSkillActivate.AddDynamic(this, &UPassiveSkillManager::BerserkerSkill);
+		}
 		break;
 	case EPassiveSkillType::BloodAbsorbing:
-		//캐릭터의 델리게이트에 접근하여 BloodAbsorbing 바인딩
+		if (PassiveSkillMap[passiveSkillType] == 1)
+		{
+			Character->OnBloodAbsorbingSkillActivate.AddDynamic(this, &UPassiveSkillManager::BloodAbsorbingSkill);
+		}
 		break;
 	case EPassiveSkillType::ElectricChain:
+		if (PassiveSkillMap[passiveSkillType] == 1)
+		{
+			Character->OnElectricChainSkillActivate.AddDynamic(this, &UPassiveSkillManager::ElectricChainSkill);
+		}
 		break;
 	case EPassiveSkillType::AmountMaxHp:
+		AmountMaxHpSkill();
 		break;
 	case EPassiveSkillType::AmountMaxStamina:
+		AmountMaxStaminaSkill();
 		break;
 	case EPassiveSkillType::AmountStaminaRecovery:
+		AmountStaminaRecoverySkill();
 		break;
 	default:
 		break;
@@ -88,12 +106,22 @@ void UPassiveSkillManager::AmountMaxHpSkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::AmountMaxHp];
 	Character->MaxHP += SkillLevel * 5;
+	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GetWorld()->GetGameState());
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerHp(Character->MaxHP, Character->GetHP());
+	}
 }
 
 void UPassiveSkillManager::AmountMaxStaminaSkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::AmountMaxStamina];
 	Character->MaxStamina += SkillLevel * 5;
+	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GetWorld()->GetGameState());
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->NotifyPlayerOther(Character->MaxStamina, Character->Stamina);
+	}
 }
 
 void UPassiveSkillManager::AmountStaminaRecoverySkill()
