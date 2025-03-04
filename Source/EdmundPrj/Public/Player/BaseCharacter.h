@@ -6,6 +6,10 @@
 #include "Components/AudioComponent.h"
 #include "BaseCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBerserkerSkillActivate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBloodAbsorbingSkillActivate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnElectricChainSkillActivate, FVector, MonsterLocation);
+
 class USpringArmComponent;
 class UCameraComponent;
 struct FInputActionValue;
@@ -15,6 +19,7 @@ class UTimerSkillSpawnManagerComponent;
 class UPassiveSkillManager;
 class UActiveSkillSpawnManager;
 class UElectricEffectPool;
+class ASupportCharacter;
 
 UCLASS()
 class EDMUNDPRJ_API ABaseCharacter : public ACharacter
@@ -23,6 +28,15 @@ class EDMUNDPRJ_API ABaseCharacter : public ACharacter
 
 public:
 	ABaseCharacter();
+
+	UPROPERTY(BlueprintAssignable, Category = "Skill")
+	FOnBerserkerSkillActivate OnBerserkerSkillActivate;
+
+	UPROPERTY(BlueprintAssignable, Category = "Skill")
+	FOnBloodAbsorbingSkillActivate OnBloodAbsorbingSkillActivate;
+
+	UPROPERTY(BlueprintAssignable, Category = "Skill")
+	FOnElectricChainSkillActivate OnElectricChainSkillActivate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera");
 	USpringArmComponent* SpringArmComp;
@@ -44,6 +58,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<UElectricEffectPool> ElectricEffectPool;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TSubclassOf<ASupportCharacter> SupportCharClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<ASupportCharacter> SupportCharInstance;
+	
 
 	// °ø°Ý·Â Getter
 	virtual float GetAttackDamage() const;

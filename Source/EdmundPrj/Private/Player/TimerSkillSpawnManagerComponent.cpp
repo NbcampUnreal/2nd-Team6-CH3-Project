@@ -7,38 +7,35 @@
 #include "Player\BaseCharacter.h"
 #include "Player\TimerSkill.h"
 #include "System\EnumSet.h"
+#include "Player\SupportCharacter.h"
 // Sets default values for this component's properties
 UTimerSkillSpawnManagerComponent::UTimerSkillSpawnManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
-	EnemySearchCollision = CreateDefaultSubobject<USphereComponent>(TEXT("EnemySearchCollision"));
-	EnemySearchCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	EnemySearchCollision->SetupAttachment(this);
 }
 
 FVector UTimerSkillSpawnManagerComponent::GetRandomMonsterLocation()
 {
-	TObjectPtr<ABaseMonster> Monster;
-	TArray<AActor*> overlappingActors;
-	EnemySearchCollision->GetOverlappingActors(overlappingActors);
-	int randomIndex = FMath::RandRange(0, overlappingActors.Num() - 1);
-	int currentIndex = 0;
-	for (AActor* activator : overlappingActors)
+	if (Character == nullptr)
 	{
-		if (activator && activator->ActorHasTag("Monster"))
+		Character = Cast<ABaseCharacter>(GetOwner());
+	}
+	Character->SupportCharInstance->CheckMonster();
+	TSet<TObjectPtr<ABaseMonster>> Monsters; 
+	for (auto& Monster : Character->SupportCharInstance->Monsters)
+	{
+		Monsters.Add(Monster.Key);
+	}
+	int randomIndex = FMath::RandRange(0, Monsters.Num() - 1);
+	int currentIndex = 0;
+	for (ABaseMonster* Monster : Monsters)
+	{
+		if (currentIndex == randomIndex)
 		{
-			if (currentIndex == randomIndex)
-			{
-				if (Monster = Cast<ABaseMonster>(activator))
-				{
-					break;
-				}
-			}
+			return Monster->GetActorLocation();
 		}
 		currentIndex++;
 	}
-	if (Monster != nullptr) return Monster->GetActorLocation();
 	return FVector::ZeroVector;
 }
 
@@ -88,7 +85,7 @@ void UTimerSkillSpawnManagerComponent::ClearSkillTimer()
 void UTimerSkillSpawnManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	EnemySearchCollision->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+	Character = Cast<ABaseCharacter>(GetOwner());
 }
 
 void UTimerSkillSpawnManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -143,8 +140,10 @@ void UTimerSkillSpawnManagerComponent::DeactivateTimerSkill(TObjectPtr<ATimerSki
 void UTimerSkillSpawnManagerComponent::CreateTimerSkill(TSubclassOf<ATimerSkill> timerSkill, ETimerSkillType skillType, int createCount)
 {
 	if (!timerSkill) return;
-	TObjectPtr<ABaseCharacter> Character = Cast<ABaseCharacter>(GetOwner());
-	if (Character == nullptr) return;
+	if (Character == nullptr)
+	{
+		Character = Cast<ABaseCharacter>(GetOwner());
+	}
 	for (int i = 0; i < createCount; i++)
 	{
 		if (!IsValid(GetWorld())) return;

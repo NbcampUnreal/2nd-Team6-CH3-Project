@@ -51,4 +51,9 @@ private:
     float Attack2_CooldownEnd = 0.0f;
     float Attack3_CooldownEnd = 0.0f;
     float Attack4_CooldownEnd = 0.0f;
+
+    float ComputeAttack1Weight();
+    float ComputeAttack2Weight();
+    float ComputeAttack3Weight();
+    float ComputeAttack4Weight();
 };

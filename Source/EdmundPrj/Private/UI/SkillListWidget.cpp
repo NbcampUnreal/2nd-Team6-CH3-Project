@@ -67,6 +67,7 @@ void USkillListWidget::OnClickedSelectButton()
 
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
 	UIHandle->ClickedSelectSkill(SelectedSkill->GetSkillNumber());
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	SelectedSkill->InvisibleBorder();
 	SelectedSkill = nullptr;
 	OnClickedCloseWidget(EWidgetType::SkillListWidget);

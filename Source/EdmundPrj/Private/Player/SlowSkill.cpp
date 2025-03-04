@@ -8,8 +8,8 @@
 void ASlowSkill::HitToMonster(TObjectPtr<ABaseMonster> monster)
 {
 	if (!IsValid(monster)) return;
-	//float CurrentSpeed = monster->MonsterCurrentSpeed;
-	//monster->ChangeCurrentSpeed(CurrentSpeed - SlowApplicationRate);
+	float CurrentSpeed = monster->GetCurrentSpeed();
+	monster->ChangeCurrentSpeed(CurrentSpeed - SlowApplicationRate);
 	UGameplayStatics::ApplyDamage(
 		monster,
 		DamageMultiplier,
@@ -18,9 +18,9 @@ void ASlowSkill::HitToMonster(TObjectPtr<ABaseMonster> monster)
 		UDamageType::StaticClass()
 	);
 	GetWorldTimerManager().SetTimer(SlowHandle,
-		[/*CurrentSpeed,*/ monster] {
+		[CurrentSpeed, monster] {
 			if (!IsValid(monster)) return;
-			//monster->ChangeCurrentSpeed(CurrentSpeed);
+			monster->ChangeCurrentSpeed(CurrentSpeed);
 		},
 		SlowTime,
 		false

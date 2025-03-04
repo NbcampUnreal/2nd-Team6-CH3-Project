@@ -4,6 +4,8 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BaseCharacter.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 
@@ -35,6 +37,11 @@ ABoss_Attack1_Bullet::ABoss_Attack1_Bullet()
 	ExplosionEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplosionEffect"));
 	ExplosionEffect->SetupAttachment(RootComponent);
 	ExplosionEffect->bAutoActivate = false;
+
+	Attack1Niagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Attack1Niagara"));
+	Attack1Niagara->SetupAttachment(RootComponent);
+	Attack1Niagara->bAutoActivate = false;
+
 
 	// 초기 상태: 탄환은 숨기고 충돌 비활성
 	SetActorHiddenInGame(true);

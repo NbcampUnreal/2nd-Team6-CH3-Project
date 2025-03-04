@@ -43,7 +43,8 @@ enum class ETimerSkillType : uint8
 	Meteor,
 	AttackPlants,
 	HealPlants,
-	Plants
+	Plants,
+	SolarDisk
 };
 
 UENUM(BlueprintType)
@@ -119,7 +120,11 @@ UENUM(BlueprintType)
 enum class EUISoundType : uint8
 {
 	Open = 0,
-	Click
+	Click,
+	Buy,
+	Select,
+	LevelUp,
+	FailBuy
 };
 
 UENUM(BlueprintType)

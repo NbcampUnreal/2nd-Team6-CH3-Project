@@ -38,10 +38,8 @@ void UCharacterListWidget::ChangedCharacterType(const ECharacterType CharacterTy
 	Super::ChangedCharacterType(CharacterType);
 	TargetCharacterType = CharacterType;
 	SetEnableButton(true);
+	UIHandle->RequestPlayUISound(EUISoundType::Select);
 	PrintCharacterInfo();
-	/*UEnum* CharacterEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ECharacterType"));
-	FString TypeName = CharacterEnum->GetNameStringByValue((int64)CharacterType);
-	UE_LOG(LogTemp, Warning, TEXT("Selected Character Type is %s"), *TypeName);*/
 }
 
 void UCharacterListWidget::OnClickedSelect()
@@ -57,7 +55,7 @@ void UCharacterListWidget::OnClickedCancle()
 {
 	SetEnableButton(false);
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
-
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	UIHandle->ClickedCancleSelectCharacter();
 	TargetCharacterType = ECharacterType::Gunner;
 

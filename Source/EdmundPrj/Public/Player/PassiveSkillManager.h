@@ -20,11 +20,17 @@ public:
 	UPassiveSkillManager();
 	virtual void BeginPlay() override;
 	void ActivatePassiveSkill(EPassiveSkillType passiveSkillType);
+	UFUNCTION()
 	void BerserkerSkill();
+	UFUNCTION()
 	void BloodAbsorbingSkill();
+	UFUNCTION()
 	void ElectricChainSkill(FVector MonsterLocation);
+	UFUNCTION()
 	void AmountMaxHpSkill();
+	UFUNCTION()
 	void AmountMaxStaminaSkill();
+	UFUNCTION()
 	void AmountStaminaRecoverySkill();
 public:	
 

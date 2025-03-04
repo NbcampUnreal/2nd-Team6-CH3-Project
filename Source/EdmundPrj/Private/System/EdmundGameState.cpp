@@ -179,6 +179,7 @@ void AEdmundGameState::CreateRandomSkillSet()
 
 	NotifyCreateRandomSkill();
 	EdmundGameInstance->OnSkillListUI();
+	EdmundGameInstance->PlayUISound(EUISoundType::LevelUp);
 }
 
 const TArray<FPlayerSkillRow*>& AEdmundGameState::GetRandomSkillSet() const
