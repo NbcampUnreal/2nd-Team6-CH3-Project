@@ -81,6 +81,8 @@ void AFireBall::EndBulletLife()
 
 	if (bHit)
 	{
+		bool IsBossAttack = false;
+
 		// ���� �浹 ��ü�� �ִٸ�
 		for (const FHitResult& Hit : HitResults)
 		{
@@ -89,6 +91,16 @@ void AFireBall::EndBulletLife()
 
 			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 			{
+				if (!IsBossAttack && HitActor->ActorHasTag("Boss"))
+				{
+					if (IsBossAttack)
+					{
+						continue;
+					}
+
+					IsBossAttack = true;
+				}
+
 				float Damage = 30.0f;
 
 				// ���� �÷��̾� ĳ���ͷκ��� ������ ���� ��� �ڵ�
