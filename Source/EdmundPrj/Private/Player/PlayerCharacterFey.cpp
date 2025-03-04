@@ -278,7 +278,7 @@ void APlayerCharacterFey::AttackTrace()
 			// 충돌한 객체가 있다면
 			AActor* HitActor = Hit.GetActor();
 
-			if (HitActor)
+			if (!HitActor)
 			{
 				continue;
 			}
