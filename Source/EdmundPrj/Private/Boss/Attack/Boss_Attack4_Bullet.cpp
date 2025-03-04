@@ -6,6 +6,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h" 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Engine/World.h"
 #include "Player/BaseCharacter.h"
 #include "TimerManager.h"
@@ -33,6 +35,10 @@ ABoss_Attack4_Bullet::ABoss_Attack4_Bullet()
     ExplosionEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplosionEffect"));
     ExplosionEffect->SetupAttachment(RootComponent);
     ExplosionEffect->bAutoActivate = false;
+
+    Attack4Niagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Attack4Niagara"));
+    Attack4Niagara->SetupAttachment(RootComponent);
+    Attack4Niagara->bAutoActivate = false;
 
     ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
     if (ProjectileMovement)

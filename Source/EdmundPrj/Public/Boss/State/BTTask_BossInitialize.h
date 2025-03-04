@@ -4,6 +4,10 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "BTTask_BossInitialize.generated.h"
 
+class ABoss;
+class UBehaviorTreeComponent;
+class UAnimMontage;
+
 UCLASS()
 class EDMUNDPRJ_API UBTTask_BossInitialize : public UBTTaskNode
 {
@@ -12,13 +16,16 @@ class EDMUNDPRJ_API UBTTask_BossInitialize : public UBTTaskNode
 public:
     UBTTask_BossInitialize();
 
-protected:
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
     virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-    virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+protected:
+    void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 private:
-    class ABoss* BossCharacter;
-    UPROPERTY()
+    ABoss* BossCharacter;
     UBehaviorTreeComponent* OwnerCompRef;
+    bool bDescentSpeedCalculated;
+    float DescentSpeed;
+    FVector TargetGroundLocation;
 };

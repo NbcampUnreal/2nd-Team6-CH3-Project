@@ -6,11 +6,15 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Animation/AnimMontage.h"
 
 UBTTask_BossInitialize::UBTTask_BossInitialize()
 {
     NodeName = TEXT("Boss Initialize");
     bNotifyTick = true;
+    bDescentSpeedCalculated = false;
+    DescentSpeed = 0.f;
+    TargetGroundLocation = FVector::ZeroVector;
 }
 
 EBTNodeResult::Type UBTTask_BossInitialize::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -20,21 +24,18 @@ EBTNodeResult::Type UBTTask_BossInitialize::ExecuteTask(UBehaviorTreeComponent& 
     AAIController* AIController = OwnerComp.GetAIOwner();
     if (!AIController)
     {
-        UE_LOG(LogTemp, Warning, TEXT("UBTTask_BossInitialize::ExecuteTask - AI Controller is null"));
         return EBTNodeResult::Failed;
     }
 
     BossCharacter = Cast<ABoss>(AIController->GetPawn());
     if (!BossCharacter || !BossCharacter->GetCharacterMovement())
     {
-        UE_LOG(LogTemp, Warning, TEXT("UBTTask_BossInitialize::ExecuteTask - BossCharacter is null or has no movement component"));
         return EBTNodeResult::Failed;
     }
 
     UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
     if (!BlackboardComp)
     {
-        UE_LOG(LogTemp, Warning, TEXT("UBTTask_BossInitialize::ExecuteTask - Blackboard Component is null"));
         return EBTNodeResult::Failed;
     }
 
@@ -44,6 +45,10 @@ EBTNodeResult::Type UBTTask_BossInitialize::ExecuteTask(UBehaviorTreeComponent& 
         return EBTNodeResult::Succeeded;
     }
     BossCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+
+    bDescentSpeedCalculated = false;
+    DescentSpeed = 0.f;
+    TargetGroundLocation = FVector::ZeroVector;
 
     UAnimInstance* AnimInstance = BossCharacter->GetMesh()->GetAnimInstance();
     if (AnimInstance)
@@ -75,18 +80,56 @@ void UBTTask_BossInitialize::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
     {
         FName CurrentSection = AnimInstance->Montage_GetCurrentSection(CurrentMontage);
 
-        if (CurrentSection == "BossDown")
+        if (CurrentSection == TEXT("BossDown"))
         {
-            if (GEngine)
+            if (!bDescentSpeedCalculated)
             {
-                GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, TEXT("Boss is descending..."));
+                FVector FootSocketLocation = BossCharacter->GetMesh()->GetSocketLocation(TEXT("Back_Left_FootCapsuleComponent"));
+                FHitResult Hit;
+                FVector TraceStart = FootSocketLocation;
+                FVector TraceEnd = FootSocketLocation - FVector(0.f, 0.f, 5000.f);
+                FCollisionQueryParams QueryParams;
+                QueryParams.AddIgnoredActor(BossCharacter);
+
+                if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+                {
+                    TargetGroundLocation = Hit.Location;
+                    float DistanceToGround = FootSocketLocation.Z - TargetGroundLocation.Z;
+
+                    const FName TargetSectionName(TEXT("BossDown"));
+                    int32 SectionIndex = CurrentMontage->GetSectionIndex(TargetSectionName);
+                    if (SectionIndex != INDEX_NONE)
+                    {
+                        float SectionStartTime = 0.f;
+                        float SectionEndTime = 0.f;
+                        CurrentMontage->GetSectionStartAndEndTime(SectionIndex, SectionStartTime, SectionEndTime);
+                        float CurrentTime = AnimInstance->Montage_GetPosition(CurrentMontage);
+                        float RemainingTime = SectionEndTime - CurrentTime;
+                        if (RemainingTime > 0.f)
+                        {
+                            DescentSpeed = DistanceToGround / RemainingTime;
+                        }
+                    }
+                }
+                bDescentSpeedCalculated = true;
             }
+
             FVector NewLocation = BossCharacter->GetActorLocation();
-            NewLocation.Z -= 200.0f * DeltaSeconds;
+            NewLocation.Z -= DescentSpeed * DeltaSeconds;
+
+            FVector NewFootSocketLocation = BossCharacter->GetMesh()->GetSocketLocation(TEXT("Back_Left_FootCapsuleComponent"));
+            if (NewFootSocketLocation.Z <= TargetGroundLocation.Z)
+            {
+                float ActorSocketOffset = BossCharacter->GetActorLocation().Z - BossCharacter->GetMesh()->GetSocketLocation(TEXT("Back_Left_FootCapsuleComponent")).Z;
+                float AdditionalDownOffset = 3000.f;
+                NewLocation.Z = TargetGroundLocation.Z + ActorSocketOffset - AdditionalDownOffset;
+            }
+
             BossCharacter->SetActorLocation(NewLocation);
         }
     }
 }
+
 
 void UBTTask_BossInitialize::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
@@ -95,15 +138,20 @@ void UBTTask_BossInitialize::OnMontageEnded(UAnimMontage* Montage, bool bInterru
         return;
     }
     FHitResult Hit;
-    FVector Start = BossCharacter->GetActorLocation();
-    FVector End = Start - FVector(0, 0, 5000);
+    FVector FootSocketLocation = BossCharacter->GetMesh()->GetSocketLocation(TEXT("Back_Left_FootCapsuleComponent"));
+    FVector TraceStart = FootSocketLocation;
+    FVector TraceEnd = FootSocketLocation - FVector(0.f, 0.f, 5000.f);
 
     FCollisionQueryParams QueryParams;
     QueryParams.AddIgnoredActor(BossCharacter);
 
-    if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, QueryParams))
+    if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
     {
-        BossCharacter->SetActorLocation(Hit.Location);
+        float ActorSocketOffset = BossCharacter->GetActorLocation().Z - BossCharacter->GetMesh()->GetSocketLocation(TEXT("Back_Left_FootCapsuleComponent")).Z;
+        FVector NewLocation = BossCharacter->GetActorLocation();
+        float AdditionalDownOffset = 50.f;
+        NewLocation.Z = Hit.Location.Z + ActorSocketOffset - AdditionalDownOffset;
+        BossCharacter->SetActorLocation(NewLocation);
     }
 
     BossCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -121,3 +169,4 @@ void UBTTask_BossInitialize::OnMontageEnded(UAnimMontage* Montage, bool bInterru
         FinishLatentTask(*OwnerCompRef, EBTNodeResult::Succeeded);
     }
 }
+

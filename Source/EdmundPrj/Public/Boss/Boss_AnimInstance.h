@@ -42,12 +42,18 @@ public:
     UPROPERTY(BlueprintReadOnly)
     float Fly;
 
-    UPROPERTY(BlueprintReadOnly)
-    int32 Situation = 0;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skill2")
+    bool bIsSkill2 = false;
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    int32 Skill2HintType = 0;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skill2")
+    int32 Skill2Iteration = 0;
+    
     UPROPERTY(BlueprintReadOnly)
     int32 UpDown = 1;
-
+    
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Initialize;
 
@@ -72,6 +78,11 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Skill3Montage;
 
+
     UFUNCTION(BlueprintCallable)
     bool GetbIsFalling() const { return bIsFalling; }
+
+    void SetSkill2Iteration(int32 NewSkill2Iteration) { Skill2Iteration = NewSkill2Iteration; }
+    void SetSkill2HintType(int32 NewSkill2HintType) { Skill2Iteration = NewSkill2HintType; }
+    void SetbIsSkill2(bool NewbIsSkill2) { bIsSkill2 = NewbIsSkill2; }
 };
