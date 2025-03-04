@@ -520,6 +520,11 @@ void ABaseMonster::ChangeCurrentSpeed(float ChangeSpeed)
 	MonsterCurrentSpeed = ChangeSpeed;
 }
 
+float ABaseMonster::GetCurrentSpeed()
+{
+	return MonsterCurrentSpeed;
+}
+
 void ABaseMonster::UpdateState(EMonsterState NewMonsterState)
 {
 	MonsterState = NewMonsterState;

@@ -4,8 +4,10 @@
 #include "Player/BaseCharacter.h"
 #include "PlayerCharacter.generated.h"
 
+
 class AWeapon;
 struct FInputActionValue;
+
 
 UCLASS()
 class EDMUNDPRJ_API APlayerCharacter : public ABaseCharacter
@@ -46,15 +48,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
 	TSubclassOf<AWeapon> Weapon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> FireSound;			// 총소리
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> MeleeAttackSound;	// 근접공격 사운드
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> ReloadSound;
 
 	// 최대 탄환
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")

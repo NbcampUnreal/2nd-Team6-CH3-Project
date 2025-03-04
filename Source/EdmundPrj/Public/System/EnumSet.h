@@ -43,7 +43,8 @@ enum class ETimerSkillType : uint8
 	Meteor,
 	AttackPlants,
 	HealPlants,
-	Plants
+	Plants,
+	SolarDisk
 };
 
 UENUM(BlueprintType)

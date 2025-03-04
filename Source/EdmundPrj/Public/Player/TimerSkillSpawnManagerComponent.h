@@ -9,6 +9,7 @@
 enum class ETimerSkillType : uint8;
 class USphereComponent;
 class ATimerSkill;
+class ABaseCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class EDMUNDPRJ_API UTimerSkillSpawnManagerComponent : public USceneComponent
@@ -35,7 +36,7 @@ class EDMUNDPRJ_API UTimerSkillSpawnManagerComponent : public USceneComponent
 		virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 	public:
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Setting")
-		TObjectPtr<USphereComponent> EnemySearchCollision = nullptr;
+		TObjectPtr<ABaseCharacter> Character = nullptr;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 		float AttackRadius = 0;

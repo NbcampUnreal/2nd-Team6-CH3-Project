@@ -131,6 +131,8 @@ void APlayerCharacterAurora::AttackTrace()
 
 	if (bHit)
 	{
+		bool IsBossAttack = false;
+
 		// 여러 충돌 객체가 있다면
 		for (const FHitResult& Hit : HitResults)
 		{
@@ -139,6 +141,16 @@ void APlayerCharacterAurora::AttackTrace()
 
 			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 			{
+				if (!IsBossAttack && HitActor->ActorHasTag("Boss"))
+				{
+					if (IsBossAttack)
+					{
+						continue;
+					}
+
+					IsBossAttack = true;
+				}
+
 				UGameplayStatics::ApplyDamage(
 					HitActor,
 					GetAttackDamage(),

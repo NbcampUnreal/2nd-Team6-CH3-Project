@@ -129,6 +129,8 @@ void ABaseProjectile::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 				if (IsValid(Player))
 				{
 					Damage = Player->GetAttackDamage();
+					Player->OnBloodAbsorbingSkillActivate.Broadcast();
+					Player->OnElectricChainSkillActivate.Broadcast(GetActorLocation());
 				}
 			}
 		}

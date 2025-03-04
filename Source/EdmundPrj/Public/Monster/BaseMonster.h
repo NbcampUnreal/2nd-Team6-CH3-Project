@@ -45,6 +45,11 @@ void SetMonsterLevel(int32 NewLevel);
 
 virtual void SetMonsterStatsByLevel();
 
+UFUNCTION(BlueprintCallable)
+void ChangeCurrentSpeed(float ChangeSpeed);
+
+float GetCurrentSpeed();
+
 AEdmundGameState* GameState;
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Sound")
@@ -190,9 +195,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdatePatrolSpeed();
-
-	UFUNCTION(BlueprintCallable)
-	void ChangeCurrentSpeed(float ChangeSpeed);
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateState(EMonsterState NewMonsterState);
