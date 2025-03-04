@@ -96,9 +96,12 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	if (TakeDamageSound)
 	{
-		GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Hit);
-		//CurrentAudioComp->SetSound(TakeDamageSound);
-		//CurrentAudioComp->Play();
+		if (GameState)
+		{
+			GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Hit);
+			//CurrentAudioComp->SetSound(TakeDamageSound);
+			//CurrentAudioComp->Play();
+		}
 	}
 	else
 	{
@@ -381,10 +384,12 @@ void ABaseMonster::MonsterHit()
 void ABaseMonster::MonsterHitEnd()
 {
 	bIsHit = false;
-
-	GetMesh()->GetAnimInstance()->Montage_Stop(0.1f, HitAnimation);
-	GetCharacterMovement()->Activate();
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	if (!bIsFrozen)
+	{
+		GetMesh()->GetAnimInstance()->Montage_Stop(0.1f, HitAnimation);
+		GetCharacterMovement()->Activate();
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
 }
 
 void ABaseMonster::MonsterAttack()
@@ -556,6 +561,8 @@ void ABaseMonster::UnfreezeMonster()
 	bIsFrozen = false; // 상태 해제
 
 	// 이동 복구
+	GetMesh()->GetAnimInstance()->Montage_Stop(0.1f, HitAnimation);
+	GetCharacterMovement()->Activate();
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
 	// 애니메이션 재개
