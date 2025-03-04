@@ -223,26 +223,11 @@ void ABoss_Attack4_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 {
     if (!bIsActive) return;
 
-    if (!OtherActor || OtherActor == this || OtherActor->IsA(ABoss_Attack4_Bullet::StaticClass()))
+    if (OtherActor && OtherActor != this && !OtherActor->IsA(ABoss_Attack4_Bullet::StaticClass()))
     {
-        return;
-    }
-
-    //UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
-
-    if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
-    {
-        if (OtherActor->ActorHasTag("Player"))
+        if (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Ground"))
         {
-            AActor* LocalOwner = OverlappedComp->GetOwner();
-            ABoss_Attack4_Bullet* Bullet = Cast<ABoss_Attack4_Bullet>(LocalOwner);
-
-            if (Bullet)
-            {
-                float DamageValue = 10.0f;
-                UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
-            }
+            Explode();
         }
-        Explode();
     }
 }
