@@ -7,6 +7,7 @@ AChargingBullet::AChargingBullet() : Super()
 {
 	// 차징에 따라 바뀜
 	BulletDamage = 30;
+	IsBossAttack = false;
 
 	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
 	CurrentAudioComp->SetupAttachment(RootComponent);
@@ -14,6 +15,9 @@ AChargingBullet::AChargingBullet() : Super()
 
 void AChargingBullet::SetBulletScale()
 {
+	// 보스 한 번만 때리게
+	IsBossAttack = false;
+
 	ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	
 	if (IsValid(PlayerCharacter))
@@ -34,20 +38,9 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 		return;
 	}
 
-	// 충돌 발생 시 처리
-	if (BulletLandParticle)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation());
-	}
-
 	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
 
 	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
-	
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Weapon);
-	}
 
 	// 몬스터는 관통
 	if (OtherActor && !(OtherActor->ActorHasTag("Monster")))
@@ -57,6 +50,16 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 
 	if (OtherActor && (OtherActor->ActorHasTag("Monster") || OtherActor->ActorHasTag("MissionItem")))
 	{
+		if (OtherActor->ActorHasTag("Boss"))
+		{
+			if (IsBossAttack)
+			{
+				return;
+			}
+
+			IsBossAttack = true;
+		}
+
 		float Damage = 30.0f;
 
 		Damage = BulletDamage;
@@ -76,6 +79,17 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 	else
 	{
 		SetBulletHidden(true);
+	}
+
+	// 충돌 발생 시 처리
+	if (BulletLandParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation());
+	}
+
+	if (IsValid(CurrentGameState))
+	{
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Weapon);
 	}
 }
 

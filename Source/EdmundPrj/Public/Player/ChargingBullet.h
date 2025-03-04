@@ -32,4 +32,5 @@ protected:
 
 private:
 	float BulletDamage;
+	bool IsBossAttack;
 };

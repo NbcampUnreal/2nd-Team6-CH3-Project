@@ -83,10 +83,6 @@ ABaseCharacter::ABaseCharacter()
 	DieActionMontage = nullptr;
 	CurrentGameState = nullptr;
 
-	EvasionSuccessSound = nullptr;
-	RevivalSuccessSound = nullptr;
-	DeathSound = nullptr;
-
 	CanCrouchCharacter = true;
 }
 
@@ -645,6 +641,21 @@ void ABaseCharacter::AmountHP(int32 AmountHP)
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
 	OnBerserkerSkillActivate.Broadcast();
+}
+
+float ABaseCharacter::GetExpMultipler()
+{
+	return ExpMultipler;
+}
+
+float ABaseCharacter::GetGoldMultipler()
+{
+	return GoldMultipler;
+}
+
+int32 ABaseCharacter::GetItempDropProb()
+{
+	return ItemDropProb;
 }
 
 void ABaseCharacter::GetUpgradeStatus()

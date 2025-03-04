@@ -20,14 +20,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	TArray<UAnimMontage*> AttackMontages;
 
-	// 공격 보이스
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TArray<TObjectPtr<USoundBase>> AttackSounds;
-
-	// 공격 사운드
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TArray<TObjectPtr<USoundBase>> WeaponSounds;
-
 	// Notify에서 호출하기 위해 public
 	void AttackTrace();
 
