@@ -23,6 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	void UpgradeActiveSkill(EActiveSkillType skillType);
 	void ActivateProbCalculate();
 	void CreateActiveSkill(TSubclassOf<AAttackSkill> attackSkill, EActiveSkillType skillType, int createCount);
 	void ActivateActiveSkill(EActiveSkillType skillType, FVector ForwardVector);
@@ -36,4 +37,6 @@ public:
 	TSet<EActiveSkillType> ActivateSkillList;
 
 	TMap<EActiveSkillType, TArray<TObjectPtr<AAttackSkill>>> ActiveSkillMap;
+
+	TMap<EActiveSkillType, int> ActiveSkillUpgradeCount;
 };
