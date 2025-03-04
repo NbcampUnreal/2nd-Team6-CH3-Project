@@ -10,6 +10,7 @@
 #include "Boss/Attack/Boss_Skill3_Wall.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Boss/State/BTTask_BossAttack2.h"
+#include "NiagaraComponent.h" 
 #include "Boss.generated.h"
 
 class ABossAIController;
@@ -122,6 +123,7 @@ public:
     void Skill2HealOverTime();
     void SetSkill2Invulnerable(bool NewIsInvulnerable);
     void HpbarUpdate();
+    bool IsSkill2Invulnerable() const { return bIsInvulnerable; }
 
 
     UFUNCTION(BlueprintCallable)
@@ -145,6 +147,11 @@ public:
     UPROPERTY()
     class UBTTask_BossAttack2* BTTask_BossAttack2Instance;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool bIsInvulnerable;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+    UNiagaraComponent* Skill2ShieldNiagara;
 
 
 private:
@@ -159,7 +166,6 @@ private:
     bool bSkill1Used = false;
     bool bSkill2Used = false;
     bool bSkill3Used = false;
-    bool bIsInvulnerable = false;
     bool bChaseComplete = false;
     float Skill2InvulnerableStartHP;
 
