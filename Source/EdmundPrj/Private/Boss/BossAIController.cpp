@@ -163,9 +163,17 @@ void ABossAIController::EnableHalfPattern()
     }
 
     bIsEnableHalf = true;
+    BossCharacter->SetSkill2Invulnerable(true);
+    BossCharacter->SetbIsInvulnerable(true);
+
+    if (BossCharacter->Skill2ShieldNiagara)
+    {
+        BossCharacter->Skill2ShieldNiagara->Activate(true);
+    }
 
     MissionHandle->RequestSpawnToSpawnerHandle();
 }
+
 
 void ABossAIController::NotifyClearHalfPattern()
 {

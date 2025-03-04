@@ -45,12 +45,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
 	UAnimMontage* MeleeAttackMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> FireSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> MeleeAttackSound;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	float HoveringZSpeed;
 

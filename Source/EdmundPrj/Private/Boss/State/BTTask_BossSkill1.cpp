@@ -45,7 +45,7 @@ EBTNodeResult::Type UBTTask_BossSkill1::ExecuteTask(UBehaviorTreeComponent& Owne
     {
         BossRef->GetCharacterMovement()->StopMovementImmediately();
     }
-
+    //SetbIsSkill1
     PlaySkill1Animation();
     if (BossRef->Skill1UpperEffect)
     {
