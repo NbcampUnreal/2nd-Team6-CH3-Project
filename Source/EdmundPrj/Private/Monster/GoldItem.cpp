@@ -3,7 +3,7 @@
 
 #include "Monster/GoldItem.h"
 #include "Player/PlayerCharacter.h"
-#include "Kismet/GameplayStatics.h"""
+#include "Kismet/GameplayStatics.h"
 #include "System/EdmundGameState.h"
 
 AGoldItem::AGoldItem()

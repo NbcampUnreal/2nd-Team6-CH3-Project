@@ -96,9 +96,12 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	if (TakeDamageSound)
 	{
-		GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Hit);
-		//CurrentAudioComp->SetSound(TakeDamageSound);
-		//CurrentAudioComp->Play();
+		if (GameState)
+		{
+			GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Hit);
+			//CurrentAudioComp->SetSound(TakeDamageSound);
+			//CurrentAudioComp->Play();
+		}
 	}
 	else
 	{
