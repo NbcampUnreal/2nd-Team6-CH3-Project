@@ -73,6 +73,11 @@ void USoundHandle::PlayBgmBySceneType(ESceneType SceneType)
 
 void USoundHandle::PlayBgmByBgmType(EBGMSoundType BgmSoundType)
 {
+	if (!BgmSet.Contains(BgmSoundType))
+	{
+		return;
+	}
+
 	USoundBase* SoundSource = BgmSet[BgmSoundType];
 
 	if (!IsValid(SoundSource))
@@ -97,6 +102,11 @@ void USoundHandle::PlayBgmByBgmType(EBGMSoundType BgmSoundType)
 
 void USoundHandle::PlayUISound(EUISoundType UISoundType)
 {
+	if (!UISet.Contains(UISoundType))
+	{
+		return;
+	}
+
 	USoundBase* SoundSource = UISet[UISoundType];
 
 	if (!IsValid(SoundSource))
@@ -108,6 +118,11 @@ void USoundHandle::PlayUISound(EUISoundType UISoundType)
 	{
 		UIAudio = UGameplayStatics::CreateSound2D(EdmundGameInstance, SoundSource, EffectVolume);
 		UIAudio->bAutoDestroy = false;
+	}
+
+	if (UIAudio->IsPlaying())
+	{
+		UIAudio->Stop();
 	}
 
 	UIAudio->SetSound(SoundSource);

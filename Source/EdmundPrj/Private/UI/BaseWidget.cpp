@@ -81,24 +81,28 @@ void UBaseWidget::EndRemoveAnim()
 void UBaseWidget::OnClickedMoveNext()
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	UIHandle->ClickedMoveToNext();
 }
 
 void UBaseWidget::OnClickedMoveMain()
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	UIHandle->ClickedMoveToMain();
 }
 
 void UBaseWidget::OnClickedMoveTitle()
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	UIHandle->ClickedMoveToTitle();
 }
 
 void UBaseWidget::OnClickedQuitGame()
 {
 	checkf(IsValid(UIHandle), TEXT("UIHandle is invalid"));
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	UIHandle->ClickedQuitGame();
 }
 

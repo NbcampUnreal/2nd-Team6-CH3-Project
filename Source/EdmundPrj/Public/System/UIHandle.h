@@ -52,20 +52,21 @@ public:
 	bool CheckClearedMission(int32 Index) const;
 
 	// UI Button Click Event
+	void RequestPlayUISound(EUISoundType Type);
 	void ClickedCloseCoverWidget() const;
 	void ClickedMoveToTitle();
 	void ClickedMoveToMain();
 	void ClickedMoveToNext();
 	void ClickedMoveToMission(const ESceneType SceneType);
 	void ClickedRetry();
-	void ClickedQuitGame() const;
+	void ClickedQuitGame();
 	void ClickedBGMVolume(const float Volume) const;
 	void ClickedEffectVolume(const float Volume) const;
-	void ClickedSelectCharacter(const ECharacterType CharacterType) const;
+	void ClickedSelectCharacter(const ECharacterType CharacterType);
 	void ClickedCancleSelectCharacter();
-	void ClickedSelectSkill(const int32 Index) const;
-	void ClickedSkipStory() const;
-	void ClickedNextStory() const;
+	void ClickedSelectSkill(const int32 Index);
+	void ClickedSkipStory();
+	void ClickedNextStory();
 	const FShopCatalogRow* ClickedBuyAgree(const FName& TargetRow, const int32 UpdateValue) const;
 
 	const TArray<TScriptInterface<IGameStateObserver>>& GetUIObservers() const;
