@@ -34,4 +34,7 @@ private:
     void OnOverlapEnd();
     void OnGapEnd();
     void EndTask();
+
+    FTimerHandle TimerHandle;
+    FTimerHandle TimerHandle_Update;
 };

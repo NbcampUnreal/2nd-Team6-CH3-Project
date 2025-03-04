@@ -4,15 +4,32 @@
 #include "Monster/SuicideMonster.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacter.h"
 #include "GameFramework/Actor.h"
 
 // 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void ASuicideMonster::SetMonsterStatsByLevel()
 {
-    MonsterHP = 100 + (MonsterLevel * 50);
-    MonsterMaxHP = 100 + (MonsterLevel * 50);
-    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
-    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+    APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    if (IsValid(PlayerController))
+    {
+        APawn* PlayerPawn = PlayerController->GetPawn();
+        if (IsValid(PlayerPawn))
+        {
+            ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
+            if (PlayerCharacter)
+            {
+                MonsterHP = 100 + (MonsterLevel * 50);
+                MonsterMaxHP = 100 + (MonsterLevel * 50);
+                MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+                MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+                MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultipler() - 100) / 100;
+                MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultipler() - 100) / 100;
+                MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
+                MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
+            }
+        }
+    }
 }
 
 

@@ -25,18 +25,25 @@ void UActiveSkillSpawnManager::BeginPlay()
 }
 
 
+void UActiveSkillSpawnManager::UpgradeActiveSkill(EActiveSkillType skillType)
+{
+	if (ActiveSkillUpgradeCount.Contains(skillType))
+	{
+		for (TObjectPtr<AAttackSkill> ActiveSkill : ActiveSkillMap[skillType])
+		{
+			ActiveSkill->UpgradeSkill();
+		}
+	}
+}
+
 void UActiveSkillSpawnManager::ActivateProbCalculate()
 {
 	if (ActivateSkillList.IsEmpty()) return;
 	for (EActiveSkillType skillType : ActivateSkillList)
 	{
-
-		UE_LOG(LogTemp, Warning, TEXT("I'm Here_1!!"));
 		int RandomInt = FMath::RandRange(1, 100);
 		if (RandomInt > ActivateProb)
 		{
-
-			UE_LOG(LogTemp, Warning, TEXT("I'm Here_2!!"));
 			ActivateActiveSkill(skillType, GetOwner()->GetActorForwardVector());
 		}
 	}
@@ -56,6 +63,13 @@ void UActiveSkillSpawnManager::CreateActiveSkill(TSubclassOf<AAttackSkill> attac
 		skill->SetActorHiddenInGame(true);
 		skill->SetActorEnableCollision(false);
 		skill->SetActorTickEnabled(false);
+		if (ActiveSkillUpgradeCount.Contains(skillType))
+		{
+			for (int j = 0; j < ActiveSkillUpgradeCount[skillType]; j++)
+			{
+				skill->UpgradeSkill();
+			}			
+		}
 		ActiveSkillMap.FindOrAdd(skillType).Add(skill);
 	}
 }
