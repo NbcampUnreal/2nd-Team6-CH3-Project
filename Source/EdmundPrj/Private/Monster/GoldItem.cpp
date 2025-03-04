@@ -17,7 +17,7 @@ AGoldItem::AGoldItem()
 			ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
 			if (PlayerCharacter)
 			{
-				//GoldAmount += GoldAmount * (PlayerCharacter->GetGoldMultiplier() - 100) / 100;
+				GoldAmount += GoldAmount * (PlayerCharacter->GetGoldMultipler() - 100) / 100;
 			}
 		}
 	}

@@ -14,21 +14,21 @@ void AMeleeMonster::SetMonsterStatsByLevel()
     if (IsValid(PlayerController))
     {
         APawn* PlayerPawn = PlayerController->GetPawn();
-            if (IsValid(PlayerPawn))
+        if (IsValid(PlayerPawn))
+        {
+            ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
+            if (PlayerCharacter)
             {
-                ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
-                if (PlayerCharacter)
-                {
-                    MonsterHP = 100 + (MonsterLevel * 50);
-                    MonsterMaxHP = 100 + (MonsterLevel * 50);
-                    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
-                    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
-                    //MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultiplier() - 100) / 100;
-                    //MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultiplier() - 100) / 100;
-                    //MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
-                    //MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
-                }
+                MonsterHP = 100 + (MonsterLevel * 50);
+                MonsterMaxHP = 100 + (MonsterLevel * 50);
+                MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
+                MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+                MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultipler() - 100) / 100;
+                MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultipler() - 100) / 100;
+                MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
+                MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
             }
+        }
     }
 }
 

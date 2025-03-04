@@ -23,10 +23,10 @@ void ASuicideMonster::SetMonsterStatsByLevel()
                 MonsterMaxHP = 100 + (MonsterLevel * 50);
                 MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
                 MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
-                //MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultiplier() - 100) / 100;
-                //MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultiplier() - 100) / 100;
-                //MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
-                //MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
+                MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultipler() - 100) / 100;
+                MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultipler() - 100) / 100;
+                MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
+                MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
             }
         }
     }
