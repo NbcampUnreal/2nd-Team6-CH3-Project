@@ -13,8 +13,10 @@
 #include "Player/SkillManager.h"
 #include "Player/TimerSkillSpawnManagerComponent.h"
 #include "Player/ActiveSkillSpawnManager.h"
+#include "Player\PassiveSkillManager.h"
 #include "Player/ElectricEffectPool.h"
 #include "System/EnumSet.h"
+#include "Player\SupportCharacter.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -33,6 +35,8 @@ ABaseCharacter::ABaseCharacter()
 	CurrentAudioComp->SetupAttachment(RootComponent);
 
 	SkillManager = CreateDefaultSubobject<USkillManager>(TEXT("SkillManager"));
+
+	PassiveSkillManager = CreateDefaultSubobject<UPassiveSkillManager>(TEXT("PassiveSkillManager"));
 
 	TimerSkillSpawnManagerComponent = CreateDefaultSubobject<UTimerSkillSpawnManagerComponent>(TEXT("TimerSkillManager"));
 	TimerSkillSpawnManagerComponent->SetupAttachment(RootComponent);
@@ -124,6 +128,16 @@ void ABaseCharacter::BeginPlay()
 		StaminaRecoveryAndConsumDelay,
 		true
 	);
+
+	if (IsValid(SupportCharClass))
+	{
+		SupportCharInstance = GetWorld()->SpawnActor<ASupportCharacter>(SupportCharClass, GetActorLocation(), GetActorRotation());
+		if (IsValid(SupportCharInstance))
+		{
+			SupportCharInstance->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+		}
+	}
+	
 }
 
 void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -556,6 +570,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	{
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
+	OnBerserkerSkillActivate.Broadcast();
 
 	return ActualDamage;
 }
@@ -617,6 +632,8 @@ void ABaseCharacter::SetHP(int32 NewHP)
 	{
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
+
+	OnBerserkerSkillActivate.Broadcast();
 }
 
 void ABaseCharacter::AmountHP(int32 AmountHP)
@@ -627,6 +644,7 @@ void ABaseCharacter::AmountHP(int32 AmountHP)
 	{
 		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	}
+	OnBerserkerSkillActivate.Broadcast();
 }
 
 void ABaseCharacter::GetUpgradeStatus()

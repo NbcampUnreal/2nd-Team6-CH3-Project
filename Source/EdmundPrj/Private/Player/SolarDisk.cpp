@@ -96,3 +96,9 @@ void ASolarDisk::Tick(float DeltaTime)
 		SetActorRotation(NewRotation);
 	}
 }
+
+void ASolarDisk::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	GetWorldTimerManager().ClearTimer(SpawnAnimHandle);
+}

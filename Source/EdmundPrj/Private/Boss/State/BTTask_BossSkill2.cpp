@@ -3,6 +3,7 @@
 #include "Boss/Boss_AnimInstance.h"
 #include "AIController.h"
 #include "Engine/World.h"
+#include "Boss/Boss_AnimInstance.h"
 #include "TimerManager.h"
 
 UBTTask_BossSkill2::UBTTask_BossSkill2()
@@ -20,41 +21,39 @@ EBTNodeResult::Type UBTTask_BossSkill2::ExecuteTask(UBehaviorTreeComponent& Owne
         return EBTNodeResult::Failed;
     }
 
-    BossRef = Cast<ABoss>(AICon->GetPawn());
-    if (!BossRef)
+    ABoss* BossRefLocal = Cast<ABoss>(AICon->GetPawn());
+    if (!BossRefLocal)
+    {
+        return EBTNodeResult::Failed;
+    }
+    BossRef = BossRefLocal;
+    CachedOwnerComp = &OwnerComp;
+
+    UBoss_AnimInstance* AnimInst = Cast<UBoss_AnimInstance>(BossRef->GetMesh()->GetAnimInstance());
+    if (!AnimInst)
     {
         return EBTNodeResult::Failed;
     }
 
-    PlaySkill2Animation();
+    AnimInst->bIsSkill2 = true;
+    AnimInst->Skill2HintType = 0; 
+    AnimInst->Skill2Iteration = 0; 
 
-    if (BossRef && BossRef->Skill2NewMaterial)
-    {
-        BossRef->SetbSkill2Used(true);
-        BossRef->SetSkill2Invulnerable(true);
-        BossRef->SetbIsInvulnerable(true);
-        BossRef->GetMesh()->SetMaterial(0, BossRef->Skill2NewMaterial);
-    }
-    return EBTNodeResult::Succeeded;
-}
+    float Skill2Duration = 5.0f; 
 
-void UBTTask_BossSkill2::PlaySkill2Animation()
-{
-    if (!BossRef) return;
+    BossRef->GetWorldTimerManager().SetTimer(
+        TimerHandle,
+        FTimerDelegate::CreateLambda([this, AnimInst]()
+            {
+                AnimInst->bIsSkill2 = false;
+                if (CachedOwnerComp)
+                {
+                    FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
+                }
+            }),
+        Skill2Duration,
+        false
+    );
 
-    USkeletalMeshComponent* Mesh = BossRef->GetMesh();
-    if (!Mesh) return;
-
-    UAnimInstance* AnimInst = Mesh->GetAnimInstance();
-    if (!AnimInst) return;
-
-    UBoss_AnimInstance* BossAnimInst = Cast<UBoss_AnimInstance>(AnimInst);
-    if (BossAnimInst && BossAnimInst->Skill2Montage)
-    {
-        if (AnimInst->Montage_IsPlaying(BossAnimInst->Skill2Montage))
-        {
-            AnimInst->Montage_Stop(0.1f, BossAnimInst->Skill2Montage);
-        }
-        AnimInst->Montage_Play(BossAnimInst->Skill2Montage);
-    }
+    return EBTNodeResult::InProgress;
 }

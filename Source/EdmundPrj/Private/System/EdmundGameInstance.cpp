@@ -107,6 +107,7 @@ void UEdmundGameInstance::OnUIByScene() const
 void UEdmundGameInstance::OnPause() const
 {
 	checkf(UIHandle, TEXT("UIHandle is invalid"));
+	PlayUISound(EUISoundType::Open);
 	UIHandle->AddToViewportByCoverType(EWidgetType::OptionWidget);
 }
 

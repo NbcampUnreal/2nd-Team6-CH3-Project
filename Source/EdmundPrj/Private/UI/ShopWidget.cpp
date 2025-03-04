@@ -60,10 +60,12 @@ void UShopWidget::OnClickedAgree()
 	if (SelectRow == nullptr)
 	{
 		OpenNotify(false);
+		UIHandle->RequestPlayUISound(EUISoundType::FailBuy);
 	}
 	else
 	{
 		OpenNotify(true);
+		UIHandle->RequestPlayUISound(EUISoundType::Buy);
 		UpdateStates(SelectRow);
 	}
 
@@ -72,11 +74,13 @@ void UShopWidget::OnClickedAgree()
 
 void UShopWidget::OnClickedCancle()
 {
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	CloseAgreeBox();
 }
 
 void UShopWidget::OnClickedNotifyClose()
 {
+	UIHandle->RequestPlayUISound(EUISoundType::Click);
 	NotifyBox->SetVisibility(ESlateVisibility::Collapsed);
 }
 
