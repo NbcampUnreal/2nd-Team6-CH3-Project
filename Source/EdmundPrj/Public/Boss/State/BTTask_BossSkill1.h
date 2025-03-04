@@ -19,22 +19,18 @@ public:
 
 private:
     ABoss* BossRef = nullptr;
-    UBehaviorTreeComponent* CachedOwnerComp;
-    int32 CurrentOverlapCount;
+    UBehaviorTreeComponent* CachedOwnerComp = nullptr;
 
-    FTimerHandle StartWaitTimerHandle; // 초기 대기
-    FTimerHandle OverlapTimerHandle;   // 오버랩
-    FTimerHandle GapTimerHandle;       // 대기
+    int32 AttackIterationCount = 0;
+    FTimerHandle InitialMontageTimerHandle;
+    FTimerHandle AttackIterationTimerHandle;
 
 private:
-    void PlaySkill1Animation();
-    void OnStartWaitComplete();
-    void StartOverlap();
+    void PlayInitialMontage();
+    void StartAttackPattern();
+    void PerformAttackIteration();
+    void OnAttackHintFinished(bool bIsHeadAttack);
+    void OnAttackIterationEnd();
     void PerformOverlapCheck(bool bFloorPattern);
-    void OnOverlapEnd();
-    void OnGapEnd();
     void EndTask();
-
-    FTimerHandle TimerHandle;
-    FTimerHandle TimerHandle_Update;
 };
