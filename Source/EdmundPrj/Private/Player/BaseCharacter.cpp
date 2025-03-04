@@ -134,7 +134,7 @@ void ABaseCharacter::BeginPlay()
 		SupportCharInstance = GetWorld()->SpawnActor<ASupportCharacter>(SupportCharClass, GetActorLocation(), GetActorRotation());
 		if (IsValid(SupportCharInstance))
 		{
-			SupportCharInstance->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+			SupportCharInstance->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		}
 	}
 	
