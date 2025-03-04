@@ -284,26 +284,14 @@ void APlayerCharacterWraith::AttackTrace()
 		QueryParams
 	);
 
-	// 구체 보이게 하기
-	if (GEngine)
-	{
-		DrawDebugSphere(
-			GetWorld(),
-			Start,
-			Radius,
-			12,
-			FColor::Red,        // 색상
-			false,              // 지속성 (게임 중 계속 표시할지 여부)
-			1.0f                // 지속 시간
-		);
-	}
-
 	// 데미지를 입힌 액터를 추적할 Set (중복 방지)
 	// Set이 없으면 근접공격한번에 여러번 데미지 받는 현상 발생
 	TSet<AActor*> DamagedActors;
 
 	if (bHit)
 	{
+		bool IsBossAttack = false;
+
 		// 여러 충돌 객체가 있다면
 		for (const FHitResult& Hit : HitResults)
 		{
@@ -312,8 +300,18 @@ void APlayerCharacterWraith::AttackTrace()
 
 			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 			{
-				// 미션 아이템은 데미지 주기
-				if (HitActor->ActorHasTag("MissionItem"))
+				if (!IsBossAttack && HitActor->ActorHasTag("Boss"))
+				{
+					if (IsBossAttack)
+					{
+						continue;
+					}
+
+					IsBossAttack = true;
+				}
+
+				// 미션 아이템 + 보스 데미지 주기
+				if (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Boss"))
 				{
 					UGameplayStatics::ApplyDamage(
 						HitActor,
@@ -325,7 +323,7 @@ void APlayerCharacterWraith::AttackTrace()
 				}
 
 				// 몬스터는 밀치기
-				if (HitActor->ActorHasTag("Monster"))
+				else if (HitActor->ActorHasTag("Monster"))
 				{
 					UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
 

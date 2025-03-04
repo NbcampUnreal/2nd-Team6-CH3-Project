@@ -272,6 +272,8 @@ void APlayerCharacterFey::AttackTrace()
 
 	if (bHit)
 	{
+		bool IsBossAttack = false;
+
 		// 여러 충돌 객체가 있다면
 		for (const FHitResult& Hit : HitResults)
 		{
@@ -280,8 +282,18 @@ void APlayerCharacterFey::AttackTrace()
 
 			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 			{
-				// 미션 아이템은 데미지 주기
-				if (HitActor->ActorHasTag("MissionItem"))
+				if (!IsBossAttack && HitActor->ActorHasTag("Boss"))
+				{
+					if (IsBossAttack)
+					{
+						continue;
+					}
+
+					IsBossAttack = true;
+				}
+
+				// 미션 아이템 + 보스 데미지 주기
+				if (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Boss"))
 				{
 					UGameplayStatics::ApplyDamage(
 						HitActor,
@@ -293,7 +305,7 @@ void APlayerCharacterFey::AttackTrace()
 				}
 
 				// 몬스터는 밀치기
-				if (HitActor->ActorHasTag("Monster"))
+				else if (HitActor->ActorHasTag("Monster"))
 				{
 					UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
 
