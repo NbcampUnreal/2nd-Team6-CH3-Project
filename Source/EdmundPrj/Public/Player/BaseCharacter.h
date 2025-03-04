@@ -90,6 +90,15 @@ public:
 	// 체력 회복
 	void AmountHP(int32 AmountHP);
 
+	// 경험치 배율 Getter
+	float GetExpMultipler();
+
+	// 골드 배율 Getter
+	float GetGoldMultipler();
+
+	// 아이템 드랍률 Getter
+	int32 GetItempDropProb();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -256,15 +265,6 @@ public:
 	UAnimMontage* DieActionMontage;
 
 	UAudioComponent* CurrentAudioComp;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> EvasionSuccessSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> RevivalSuccessSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Sound")
-	TObjectPtr<USoundBase> DeathSound;
 
 	// 앉을 수 없는 캐릭 - Fey
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Crouch")

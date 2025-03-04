@@ -15,9 +15,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet|Sound")
 	UAudioComponent* CurrentAudioComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet|Sound")
-	TObjectPtr<USoundBase> FireSound;
-
 	AFireBall();
 	void SetBulletHidden(bool IsHidden) override;
 
