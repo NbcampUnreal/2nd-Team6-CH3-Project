@@ -35,7 +35,7 @@ public:
 	TMap<EActiveSkillType, TSubclassOf<AAttackSkill>> ActiveSkillClassMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
-	TMap<EActiveSkillType, int> ActiveSkillProb;
+	TMap<EActiveSkillType, int32> ActiveSkillProb;
 
 	TSet<EActiveSkillType> ActivateSkillList;
 

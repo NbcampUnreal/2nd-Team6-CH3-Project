@@ -12,6 +12,7 @@ UActiveSkillSpawnManager::UActiveSkillSpawnManager()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 	ActiveSkillClassMap.Empty();
+	ActiveSkillProb.Empty();
 	// ...
 }
 
@@ -59,7 +60,6 @@ void UActiveSkillSpawnManager::CreateActiveSkill(TSubclassOf<AAttackSkill> attac
 		TObjectPtr<AAttackSkill> skill = GetWorld()->SpawnActor<AAttackSkill>(attackSkill);
 
 		if (!skill) continue;
-		skill->SetActorRotation(GetOwner()->GetActorRotation());
 		skill->DamageMultiplier = Character->AttackDamage;
 		skill->SetActorHiddenInGame(true);
 		skill->SetActorEnableCollision(false);
@@ -88,6 +88,7 @@ void UActiveSkillSpawnManager::ActivateActiveSkill(EActiveSkillType skillType, F
 
 	FVector skillLocation = GetOwner()->GetActorLocation();
 
+	skill->SetActorRotation(GetOwner()->GetActorRotation());
 	skill->CharForwardVector = GetOwner()->GetActorForwardVector();
 	skill->FinishPos = GetOwner()->GetActorLocation() + (skill->CharForwardVector * skill->SkillRange);
 	skill->SetActorLocation(skillLocation);
