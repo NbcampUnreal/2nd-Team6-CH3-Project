@@ -87,7 +87,7 @@ void USoundHandle::PlayBgmByBgmType(EBGMSoundType BgmSoundType)
 
 	if (!IsValid(BgmAudio))
 	{
-		BgmAudio = UGameplayStatics::CreateSound2D(EdmundGameInstance, SoundSource, BGMVolume); // 레벨 바뀔 때마다 없어서 생성해줌
+		BgmAudio = UGameplayStatics::CreateSound2D(EdmundGameInstance, SoundSource, BGMVolume);
 		BgmAudio->bAutoDestroy = false;
 	}
 

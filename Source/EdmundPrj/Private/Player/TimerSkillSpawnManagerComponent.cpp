@@ -53,8 +53,18 @@ void UTimerSkillSpawnManagerComponent::SetSkillTimer(ETimerSkillType skillType)
 		UE_LOG(LogTemp, Error, TEXT("TimerSkillClassMap[%d] is NULL!!!"), (int32)skillType);
 		return;
 	}
+	if (SkillTimerMap.Find(skillType))
+	{
+		for (TObjectPtr<ATimerSkill> TimerSkill : TimerSkillMap[skillType])
+		{
+			TimerSkill->UpgradeSkill();
+		}
+		TimerSkillUpgardeCountMap.FindOrAdd(skillType);
+		return;
+	}
 
 	FTimerHandle& SkillTimer = SkillTimerMap.FindOrAdd(skillType);
+	
 	if (!IsValid(TimerSkillClassMap[skillType])) return;
 	CreateTimerSkill(TimerSkillClassMap[skillType], skillType, 10);
 	
@@ -156,6 +166,13 @@ void UTimerSkillSpawnManagerComponent::CreateTimerSkill(TSubclassOf<ATimerSkill>
 		skill->SetActorEnableCollision(false);
 		skill->SetActorTickEnabled(false);
 		skill->TimerSkillSpanwManager = this;
+		if (TimerSkillUpgardeCountMap.Contains(skillType))
+		{
+			for (int j = 0; j < TimerSkillUpgardeCountMap[skillType]; j++)
+			{
+				skill->UpgradeSkill();
+			}
+		}
 		TimerSkillMap.FindOrAdd(skillType).Add(skill);
 	}
 }
