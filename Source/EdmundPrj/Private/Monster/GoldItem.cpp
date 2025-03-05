@@ -21,6 +21,8 @@ AGoldItem::AGoldItem()
 			}
 		}
 	}
+
+	ItemType = EItemType::Gold;
 }
 
 float AGoldItem::GetGoldAmount() const
