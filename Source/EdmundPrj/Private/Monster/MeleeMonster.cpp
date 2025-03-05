@@ -19,11 +19,11 @@ void AMeleeMonster::SetMonsterStatsByLevel()
             ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
             if (PlayerCharacter)
             {
-                MonsterHP = 100 + (MonsterLevel * 50);
-                MonsterMaxHP = 100 + (MonsterLevel * 50);
-                MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
-                MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
-                MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultipler() - 100) / 100;
+                MonsterHP = 50 + (MonsterLevel * 100);
+                MonsterMaxHP = 50 + (MonsterLevel * 100);
+                MonsterAttackDamage = 20.0f + (MonsterLevel * 10.0f);
+                MonsterArmor = 10.0f + (MonsterLevel * 10.0f);
+                MonsterExpReward += 100 * (PlayerCharacter->GetExpMultipler() - 100) / 100;
                 MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultipler() - 100) / 100;
                 MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
                 MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
