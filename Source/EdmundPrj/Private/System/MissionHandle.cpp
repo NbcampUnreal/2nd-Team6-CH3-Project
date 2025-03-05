@@ -324,7 +324,8 @@ void AMissionHandle::RequestSpawnToSpawnerHandle()
 
 	for (ABaseMissionItem* Dimension : DimensionPortalSet)
 	{
-		DimensionPosSet.Add(Dimension->GetActorLocation());
+		FVector AddVector(0, 0, 300);
+		DimensionPosSet.Add(Dimension->GetActorLocation() + AddVector);
 		Dimension->SetIsActive(false);
 	}
 
