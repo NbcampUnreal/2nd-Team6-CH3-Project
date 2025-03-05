@@ -22,7 +22,7 @@ void AMissionItemDimensionPortal::InitMissionItem(AMissionHandle* NewMissionHand
 	SetActorTickEnabled(false);
 
 	MeshStartPos = GateMesh->GetComponentLocation();
-	AddPos = FVector(0, 0, -MeshStartPos.Z);
+	AddPos = FVector(0, 0, -MeshStartPos.Z / 3 * 2);
 	DeltaTargetTime = 1.0f / TargetTime;
 	AddPos = AddPos * DeltaTargetTime;
 }
