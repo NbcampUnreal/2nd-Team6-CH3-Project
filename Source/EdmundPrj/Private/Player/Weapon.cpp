@@ -153,20 +153,54 @@ bool AWeapon::Fire(float NewAttackDelay)
 		FRotator SpawnRotation = MuzzleOffset->GetComponentRotation();
 		FVector SpawnLocation = MuzzleOffset->GetComponentLocation();
 
-		// 화면 중앙의 좌표 계산
-		int32 x, y;
 		APlayerController* PC = Cast<APlayerController>(Cast<ABaseCharacter>(GetOwner())->GetController());
 
-		PC->GetViewportSize(x, y);
+		FVector CamPos;
+		FRotator CamRotator;
+		PC->GetPlayerViewPoint(CamPos, CamRotator);
+		FHitResult HitResult;
+		FVector Start = CamPos; // 시작 위치
+		FVector ForwardVector = CamRotator.Vector(); // 배우의 전방 벡터
+		FVector End = Start + (ForwardVector * 20000.0f); // 1000 단위 앞까지 탐색
 
-		// 화면 중앙 좌표를 얻어 해당 방향으로 총알을 발사
-		FVector WorldCenter;
-		FVector WorldDirection;
-		PC->DeprojectScreenPositionToWorld(x / 2.0f, y / 2.0f, WorldCenter, WorldDirection);
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this); // 자기 자신은 감지에서 제외
 
-		// WorldCenter에서 WorldDirection 방향으로 발사
-		FVector TargetLocation = WorldCenter + WorldDirection * 3500;
-		SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, TargetLocation);
+		bool bHit = GetWorld()->LineTraceSingleByChannel(
+			HitResult, // 충돌 결과 저장
+			Start,     // 시작 위치
+			End,       // 끝 위치
+			ECC_Visibility, // 충돌 채널
+			CollisionParams // 충돌 파라미터
+		);
+
+		if (bHit && HitResult.Distance > 350)
+		{
+			FVector HitPos = HitResult.Location;
+			FVector Direction = HitPos - SpawnLocation;
+			if (!Direction.IsNearlyZero())
+			{
+				FRotator NewRotation = Direction.Rotation();
+				SpawnRotation = NewRotation;
+			}
+		}
+		else
+		{
+			// 화면 중앙의 좌표 계산
+			int32 x, y;
+
+			PC->GetViewportSize(x, y);
+
+			// 화면 중앙 좌표를 얻어 해당 방향으로 총알을 발사
+			FVector WorldCenter;
+			FVector WorldDirection;
+			PC->DeprojectScreenPositionToWorld(x / 2.0f, y / 2.0f, WorldCenter, WorldDirection);
+
+			// WorldCenter에서 WorldDirection 방향으로 발사
+			FVector TargetLocation = WorldCenter + WorldDirection * 3500;
+			SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, TargetLocation);
+		}
+		
 
 		BulletToFire->SetActorLocation(SpawnLocation);
 		BulletToFire->SetActorRotation(SpawnRotation);
