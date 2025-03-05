@@ -42,7 +42,7 @@ void UActiveSkillSpawnManager::ActivateProbCalculate()
 	for (EActiveSkillType skillType : ActivateSkillList)
 	{
 		int RandomInt = FMath::RandRange(1, 100);
-		if (RandomInt > ActivateProb)
+		if (RandomInt > ActiveSkillProb[skillType])
 		{
 			ActivateActiveSkill(skillType, GetOwner()->GetActorForwardVector());
 		}
@@ -59,6 +59,7 @@ void UActiveSkillSpawnManager::CreateActiveSkill(TSubclassOf<AAttackSkill> attac
 		TObjectPtr<AAttackSkill> skill = GetWorld()->SpawnActor<AAttackSkill>(attackSkill);
 
 		if (!skill) continue;
+		skill->SetActorRotation(GetOwner()->GetActorRotation());
 		skill->DamageMultiplier = Character->AttackDamage;
 		skill->SetActorHiddenInGame(true);
 		skill->SetActorEnableCollision(false);

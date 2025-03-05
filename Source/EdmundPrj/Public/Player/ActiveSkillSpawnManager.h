@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	TMap<EActiveSkillType, TSubclassOf<AAttackSkill>> ActiveSkillClassMap;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	TMap<EActiveSkillType, int> ActiveSkillProb;
+
 	TSet<EActiveSkillType> ActivateSkillList;
 
 	TMap<EActiveSkillType, TArray<TObjectPtr<AAttackSkill>>> ActiveSkillMap;
