@@ -7,6 +7,7 @@
 #include "HealingPlant.generated.h"
 
 class ABaseCharacter;
+class UNiagaraComponent;
 
 UCLASS()
 class EDMUNDPRJ_API AHealingPlant : public ATimerSkill
@@ -27,4 +28,7 @@ public:
 	float HealAmount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float HealCycleTime = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+	TObjectPtr<UNiagaraComponent> HealingEffectNiagara;
 };
