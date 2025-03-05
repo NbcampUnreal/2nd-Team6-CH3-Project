@@ -53,13 +53,13 @@ void UResultWidget::UpdateResult(bool bIsClear)
 	{
 		MoveNextButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedMoveNext);
 		TitleText->SetText(FText::FromString(FString::Printf(TEXT("Mission Clear"))));
-		MoveNextButtonText->SetText(FText::FromString(FString::Printf(TEXT("Move Next"))));
+		MoveNextButtonText->SetText(FText::FromString(FString::Printf(TEXT("다음으로"))));
 	}
 	else
 	{
 		MoveNextButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedRetry);
 		TitleText->SetText(FText::FromString(FString::Printf(TEXT("Mission Fail"))));
-		MoveNextButtonText->SetText(FText::FromString(FString::Printf(TEXT("Retry"))));
+		MoveNextButtonText->SetText(FText::FromString(FString::Printf(TEXT("재도전"))));
 	}
 }
 
