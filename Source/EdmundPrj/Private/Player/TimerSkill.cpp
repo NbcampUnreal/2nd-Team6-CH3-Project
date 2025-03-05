@@ -36,7 +36,7 @@ void ATimerSkill::BeginOverlaped(
 			HitToMonster(Monster);
 		}
 	}
-	if (otherActor)
+	if (otherActor && !otherActor->ActorHasTag("Skill") && !otherActor->ActorHasTag("NPC") && !otherActor->ActorHasTag("Bullet"))
 	{
 		HitToGround();
 	}

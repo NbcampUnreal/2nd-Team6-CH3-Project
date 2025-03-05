@@ -12,6 +12,7 @@ UActiveSkillSpawnManager::UActiveSkillSpawnManager()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 	ActiveSkillClassMap.Empty();
+	ActiveSkillProb.Empty();
 	// ...
 }
 
@@ -42,7 +43,7 @@ void UActiveSkillSpawnManager::ActivateProbCalculate()
 	for (EActiveSkillType skillType : ActivateSkillList)
 	{
 		int RandomInt = FMath::RandRange(1, 100);
-		if (RandomInt > ActivateProb)
+		if (RandomInt > ActiveSkillProb[skillType])
 		{
 			ActivateActiveSkill(skillType, GetOwner()->GetActorForwardVector());
 		}
@@ -87,6 +88,7 @@ void UActiveSkillSpawnManager::ActivateActiveSkill(EActiveSkillType skillType, F
 
 	FVector skillLocation = GetOwner()->GetActorLocation();
 
+	skill->SetActorRotation(GetOwner()->GetActorRotation());
 	skill->CharForwardVector = GetOwner()->GetActorForwardVector();
 	skill->FinishPos = GetOwner()->GetActorLocation() + (skill->CharForwardVector * skill->SkillRange);
 	skill->SetActorLocation(skillLocation);
