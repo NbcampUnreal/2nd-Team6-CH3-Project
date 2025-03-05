@@ -14,6 +14,7 @@
 // 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void ARangedMonster::SetMonsterStatsByLevel()
 {
+
     APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     if (IsValid(PlayerController))
     {
@@ -23,11 +24,11 @@ void ARangedMonster::SetMonsterStatsByLevel()
             ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
             if (PlayerCharacter)
             {
-                MonsterHP = 100 + (MonsterLevel * 50);
-                MonsterMaxHP = 100 + (MonsterLevel * 50);
+                MonsterHP = 50 + (MonsterLevel * 50);
+                MonsterMaxHP = 50 + (MonsterLevel * 50);
                 MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
                 MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
-                MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultipler() - 100) / 100;
+                MonsterExpReward += 50 * (PlayerCharacter->GetExpMultipler() - 100) / 100;
                 MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultipler() - 100) / 100;
                 MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
                 MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
