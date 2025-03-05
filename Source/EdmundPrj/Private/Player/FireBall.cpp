@@ -89,7 +89,7 @@ void AFireBall::EndBulletLife()
 			// �浹�� ��ü�� �ִٸ�
 			AActor* HitActor = Hit.GetActor();
 
-			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster") || HitActor->ActorHasTag("Area") || HitActor->ActorHasTag("NPC")))
 			{
 				if (!IsBossAttack && HitActor->ActorHasTag("Boss"))
 				{
