@@ -95,7 +95,7 @@ void UShopWidget::OnClickedShopClose()
 void UShopWidget::OpenAgreeCheck()
 {
 	FName TargetName = TargetElement->GetElementName();
-	FText SelectedText = FText::FromString(FString::Printf(TEXT("Buy %s?"), *TargetName.ToString()));
+	FText SelectedText = FText::FromString(FString::Printf(TEXT("%s 를 구매 하시겠습니까?"), *TargetName.ToString()));
 	SelectedElementText->SetText(SelectedText);
 	CheckBuyBox->SetVisibility(ESlateVisibility::Visible);
 }
@@ -110,11 +110,11 @@ void UShopWidget::OpenNotify(bool bIsSuccess)
 {
 	if (bIsSuccess)
 	{
-		ResultText->SetText(FText::FromString(FString::Printf(TEXT("Completed"))));
+		ResultText->SetText(FText::FromString(FString::Printf(TEXT("구매 완료"))));
 	}
 	else
 	{
-		ResultText->SetText(FText::FromString(FString::Printf(TEXT("Insufficient"))));
+		ResultText->SetText(FText::FromString(FString::Printf(TEXT("구매 실패"))));
 	}
 
 	NotifyBox->SetVisibility(ESlateVisibility::Visible);
