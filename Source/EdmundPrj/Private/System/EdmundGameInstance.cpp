@@ -90,7 +90,6 @@ void UEdmundGameInstance::BindGameStateObserver() const
 
 void UEdmundGameInstance::QuitGame() const
 {
-	//게임이 종료될 때 필요한 기능 처리.
 	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 }
 

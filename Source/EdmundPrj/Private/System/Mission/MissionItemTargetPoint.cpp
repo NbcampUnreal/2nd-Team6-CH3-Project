@@ -12,7 +12,7 @@ void AMissionItemTargetPoint::InitMissionItem(AMissionHandle* NewMissionHandle, 
 
 	ApplyOverlapCollision(false);
 	
-	FVector SpawnPos = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation() + FVector(0, 500, 0);
+	FVector SpawnPos = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation() + FVector(0, 200, 0);
 	MissionHandle->SetTargetPointLocation(GetActorLocation());
 	MissionHandle->SpawnNpc(SpawnPos);
 	MissionHandle->SetNpcMoveMode(true);

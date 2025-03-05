@@ -9,6 +9,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Actor.h"
+#include "System/MissionHandle.h"
 
 // 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 여긴 NPC라 적용안됨
 void ANPCMonster::SetMonsterStatsByLevel()
@@ -159,6 +160,19 @@ void ANPCMonster::NPCMonsterAttack()
     }
 
     Super::MonsterAttack();
+}
+
+void ANPCMonster::MonsterDead()
+{
+    Super::MonsterDead();
+
+    checkf(IsValid(MissionHandle), TEXT("MissionHandle is invalid"));
+    MissionHandle->NotifyDieNpc();
+}
+
+void ANPCMonster::SetMissionHandle(AMissionHandle* NewMissionHandle)
+{
+    MissionHandle = NewMissionHandle;
 }
 
 void ANPCMonster::SetBattleMode(bool NewState)
