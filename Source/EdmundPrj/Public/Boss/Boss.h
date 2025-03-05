@@ -395,19 +395,34 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "Skill3")
     float Skill3AttackRadius = 1000.0f;  // 광역 공격 반경
 
-    // ***********************Skill 4*************************
-
-
-
-
-
-    ////
     void InitBoss(AMissionHandle* NewMissionHandle);
     void CheckWeaken();
     void ApplyWeaken();
 
     TObjectPtr<ABossAIController> BossController = nullptr;
     TObjectPtr<AMissionHandle> MissionHandle = nullptr;
-    
+
+
+    // ***********************Sounds*************************
+    UFUNCTION(BlueprintCallable)
+    void BossFireballSounds();
+
+    UFUNCTION(BlueprintCallable)
+    void BossWingSounds();
+
+    UFUNCTION(BlueprintCallable)
+    void BossAttack3_1Sounds();
+
+    UFUNCTION(BlueprintCallable)
+    void BossAttack3_2Sounds();
+
+    UFUNCTION(BlueprintCallable)
+    void BossLightLandingSounds();
+
+    UFUNCTION(BlueprintCallable)
+    void BossIntroRoarSounds();
+
+    UFUNCTION(BlueprintCallable)
+    void BossSkill3RoarSounds();
 };
 

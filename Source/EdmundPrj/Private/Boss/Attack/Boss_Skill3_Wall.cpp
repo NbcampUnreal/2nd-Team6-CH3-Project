@@ -1,5 +1,6 @@
 #include "Boss/Attack/Boss_Skill3_Wall.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/AudioComponent.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 
@@ -17,6 +18,9 @@ ABoss_Skill3_Wall::ABoss_Skill3_Wall()
     MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     MeshComp->SetCollisionObjectType(ECC_PhysicsBody);
     MeshComp->SetCollisionResponseToAllChannels(ECR_Block);
+
+    CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+    CurrentAudioComp->SetupAttachment(RootComponent);
 
     GravityAcceleration = 980.f;
     CurrentVelocity = FVector::ZeroVector;
@@ -119,4 +123,13 @@ void ABoss_Skill3_Wall::PerformLowering()
         GetWorldTimerManager().ClearTimer(LowerTimerHandle);
         DeactivateWall();
     }
+}
+
+void ABoss_Skill3_Wall::BossSkill3WallSounds()
+{
+    //if (GameState && CurrentAudioComp)
+    //{
+    //    MonsterType = EMonsterType::Boss;
+    //    GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Weapon);
+    //}
 }

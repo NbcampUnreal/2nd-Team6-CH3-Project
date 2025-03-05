@@ -14,7 +14,7 @@ class EDMUNDPRJ_API UBTTask_BossSkill1 : public UBTTaskNode
 
 public:
     UBTTask_BossSkill1();
-
+    void OnSkill1MontageEnded(UAnimMontage* Montage, bool bInterrupted);
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 private:
