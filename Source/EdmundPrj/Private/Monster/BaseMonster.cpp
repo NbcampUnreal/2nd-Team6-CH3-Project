@@ -94,19 +94,19 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	if (bIsDead || bIsBondageMode) return 0;
 
-	if (TakeDamageSound)
-	{
 		if (GameState)
 		{
-			GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Hit);
+			if (bIsBondageMode || bIsMoveMode || bIsFightMode)
+			{
+				GameState->PlayNpcSound(CurrentAudioComp, BaseNpcType, ESoundType::Hit);
+			}
+			else
+			{
+				GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Hit);
+			}
 			//CurrentAudioComp->SetSound(TakeDamageSound);
 			//CurrentAudioComp->Play();
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TakeDamageSound가 없습니다."));
-	}
 
 	if (TakeDamageParticle)
 	{

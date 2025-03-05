@@ -473,7 +473,6 @@ void UUIHandle::RequestChangeCursorMode(const bool bIsVisible, const FInputModeD
 
 	if (!bBaseCursorMode)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Change CursorMode"));
 		EdmundGameInstance->ChangeCursorMode(bIsVisible);
 		EdmundGameInstance->ChangeInputMode(InputMode);
 	}

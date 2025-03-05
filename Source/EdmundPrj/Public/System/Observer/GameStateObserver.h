@@ -60,4 +60,7 @@ public:
 
 	UFUNCTION()
 	virtual void ChangedStoryText(const FString& TargetText) = 0;
+
+	UFUNCTION()
+	virtual void ChangedIsGameClear(const bool bIsClear) = 0;
 };

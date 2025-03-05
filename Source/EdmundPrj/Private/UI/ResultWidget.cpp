@@ -16,20 +16,6 @@ void UResultWidget::InitWidget(UUIHandle* NewUIHandle)
 	MoveMainButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedMoveMain);
 }
 
-void UResultWidget::ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp)
-{
-	Super::ChangedPlayerHp(MaxHp, CurrentHp);
-
-	if (CurrentHp <= 0)
-	{
-		UpdateResult(false);
-	}
-	else
-	{
-		UpdateResult(true);
-	}
-}
-
 void UResultWidget::ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney)
 {
 	GetWorld()->GetTimerManager().ClearTimer(Timer);
@@ -43,6 +29,11 @@ void UResultWidget::ChangedMissionStateToEnd(const int32 StateMoney, const int32
 	ValueText3->SetText(FText::FromString(FString::FromInt(TempTotalMoney)));
 
 	TempTotalMoney += TempCurrentMoney + TempMissionMoney;
+}
+
+void UResultWidget::ChangedIsGameClear(const bool bIsClear)
+{
+	UpdateResult(bIsClear);
 }
 
 void UResultWidget::UpdateResult(bool bIsClear)
