@@ -127,8 +127,12 @@ public:
     void HpbarUpdate();
     bool IsSkill2Invulnerable() const { return bIsInvulnerable; }
     EMonsterType GetMonsterType() const { return MonsterType; }
-
-
+    float GetMonsterAttackDamage() { return MonsterAttackDamage; }
+    float GetAttack1Multiplier() { return Attack1Multiplier; }
+    float GetAttack3Multiplier() { return Attack3Multiplier; }
+    float GetAttack4Multiplier() { return Attack4Multiplier; }
+    
+    
 
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
@@ -189,6 +193,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float Attack3RangeMultiplier = 1.5;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float Attack3Multiplier = 1.5;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float Attack4Multiplier = 1.5;

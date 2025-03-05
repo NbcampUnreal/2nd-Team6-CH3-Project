@@ -353,7 +353,10 @@ void UBTTask_BossAttack3::OnMeleeCollisionOverlap_Check2(UPrimitiveComponent* Ov
         {
             BossRef->GetWorld()->GetTimerManager().ClearTimer(CollisionDisableTimerHandle_Check2);
         }
-        UGameplayStatics::ApplyDamage(OtherActor, 1000.0f, nullptr, BossRef, nullptr);
+
+        float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetAttack3Multiplier();
+
+        UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, BossRef, nullptr);
         Attack3_DeactivateCollision_Check2();
     }
 }

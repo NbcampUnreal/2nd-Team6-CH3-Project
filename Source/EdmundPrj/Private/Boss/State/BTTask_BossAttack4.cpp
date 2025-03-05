@@ -148,6 +148,10 @@ void UBTTask_BossAttack4::ExecuteBulletFire()
     ABoss_Attack4_Bullet* Bullet = ABoss_Attack4_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack4BulletClass);
     if (Bullet)
     {
+        if (BossRef->GameState)
+        {
+            BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack);
+        }
         Bullet->FireProjectile(SpawnLocation, TargetRotation, Direction);
     }
 
@@ -198,6 +202,8 @@ void UBTTask_BossAttack4::UpdateDescend(float DeltaTime)
     }
     BossRef->SetActorLocation(NewLocation, false);
 }
+
+
 
 
 //void UBTTask_BossAttack4::OnDescendComplete()

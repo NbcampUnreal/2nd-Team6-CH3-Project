@@ -22,7 +22,7 @@ ABoss::ABoss()
     BossState = nullptr;
     MonsterHP = 1000.0f;
     MonsterMaxHP = 1000.0f;
-    MonsterAttackDamage = 10.0f;
+    MonsterAttackDamage = 50.0f;
     MonsterArmor = 10;
     MonsterMoveSpeed = 5000.0f;
 
@@ -109,7 +109,7 @@ ABoss::ABoss()
     MuzzleLocation->SetupAttachment(GetMesh(), TEXT("MuzzleSocket"));
 
 
-    MonsterType = EMonsterType::Boss;
+    MonsterType = EMonsterType::Melee;
     GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
 
 }
@@ -139,7 +139,7 @@ void ABoss::BeginPlay()
     MonsterMoveSpeed = 100.0f;
     MonsterHP = MonsterMaxHP = 500000.0f;
     MonsterArmor = 30.0f;
-    MonsterAttackDamage = 10.0f;
+    MonsterAttackDamage = 50.0f;
 
     HpbarUpdate();
 }
@@ -595,10 +595,10 @@ void ABoss::FireBullet()
     DisableRotation();
     TargetRotation = (PlayerLocation - SpawnLocation).Rotation();
 
-    if (GameState)
-    {
-        GameState->PlayMonsterSound(CurrentAudioComp, GetMonsterType(), ESoundType::Attack);
-    }
+    //if (GameState)
+    //{
+    //    GameState->PlayMonsterSound(CurrentAudioComp, GetMonsterType(), ESoundType::Attack3);
+    //}
 
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(GetWorld(), Attack1BulletClass);
     if (Bullet)

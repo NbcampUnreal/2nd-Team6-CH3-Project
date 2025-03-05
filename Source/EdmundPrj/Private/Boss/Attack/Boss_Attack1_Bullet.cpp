@@ -7,6 +7,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
+#include "Boss/Boss.h"
 #include "Engine/World.h"
 
 TArray<ABoss_Attack1_Bullet*> ABoss_Attack1_Bullet::BulletPool;
@@ -96,6 +97,17 @@ void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnR
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
+
+	if (Attack1Niagara)
+	{
+		Attack1Niagara->SetAutoActivate(true);
+		Attack1Niagara->Activate();
+	}
+	ABoss* BossRef = Cast<ABoss>(GetOwner());
+	if (BossRef->GameState)
+	{
+		BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack);
+	}
 }
 
 void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
@@ -135,7 +147,8 @@ void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 
 			if (Bullet)
 			{
-				float DamageValue = 10.0f;
+				ABoss* BossRef = Cast<ABoss>(GetOwner());
+				float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetAttack1Multiplier();
 				UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
 			}
 		}
@@ -181,6 +194,12 @@ void ABoss_Attack1_Bullet::ResetBullet()
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+
+	if (Attack1Niagara)
+	{
+		Attack1Niagara->Deactivate();
+		Attack1Niagara->SetAutoActivate(false);
+	}
 
 	// 탄환 풀이 누락되었으면 추가
 	if (!BulletPool.Contains(this))
