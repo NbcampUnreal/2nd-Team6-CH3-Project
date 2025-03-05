@@ -45,8 +45,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float MoveSpeed = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
-	int ActivateProb = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float SkillRange = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float DamageMultiplier = 0;

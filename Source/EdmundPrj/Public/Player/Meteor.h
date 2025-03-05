@@ -7,7 +7,7 @@
 #include "Meteor.generated.h"
 
 class UParticleSystem;
-
+class UNiagaraComponent;
 
 UCLASS()
 class EDMUNDPRJ_API AMeteor : public ATimerSkill
@@ -25,4 +25,9 @@ public:
 	float MetoerHitPushStrength = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	TObjectPtr<USphereComponent> MonsterLaunchCollision = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+	TObjectPtr<UNiagaraComponent> GroundHitNiagara;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+	TObjectPtr<UNiagaraComponent> FallingEffectNiagara;
+	FTimerHandle ElplosionEffectDeactivateHandle;
 };

@@ -232,6 +232,11 @@ void ABaseMonster::SetMonsterLevel(int32 NewLevel)
 	}
 }
 
+void ABaseMonster::SetMonsterIsHit(bool NewState)
+{
+	bIsHit = NewState;
+}
+
 // DropReward 호출 후 Destroy
 void ABaseMonster::MonsterDestroy()
 {

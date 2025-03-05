@@ -8,6 +8,7 @@ void AMissionItemIndicator::InitMissionItem(AMissionHandle* NewMissionHandle, co
 	Super::InitMissionItem(NewMissionHandle, Type);
 
 	ApplyBlockCollision();
+	Tags.Add("MissionItem");
 }
 
 float AMissionItemIndicator::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

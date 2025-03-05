@@ -16,6 +16,7 @@ void AMissionItemTargetPoint::InitMissionItem(AMissionHandle* NewMissionHandle, 
 	MissionHandle->SetTargetPointLocation(GetActorLocation());
 	MissionHandle->SpawnNpc(SpawnPos);
 	MissionHandle->SetNpcMoveMode(true);
+	Tags.Add("Area");
 }
 
 void AMissionItemTargetPoint::ActionEventByPressedKey()
@@ -27,8 +28,7 @@ void AMissionItemTargetPoint::ActionEventByPressedKey()
 
 	Super::ActionEventByPressedKey();
 
-	bIsActive = false;
-	SetVisible(false);
+	SetIsActive(false);
 	MissionHandle->RequestSwapBgm(EBGMSoundType::Defence);
 	MissionHandle->SetNpcBattleMode(true);
 	MissionHandle->CompleteMission();

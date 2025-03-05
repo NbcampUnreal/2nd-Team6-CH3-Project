@@ -223,10 +223,6 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 			if (IsValid(MonsterClass))
 			{
 				ABaseMonster* NewMonster = GetWorld()->SpawnActor<ABaseMonster>(MonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
-				NewMonster->SetMonsterLevel(LevelIndex + 1);
-
-				// 몬스터가 자신의 스포너를 참조하게 설정
-				NewMonster->MonsterSpawner = this;
 
 				if (!NewMonster)
 				{
@@ -235,6 +231,10 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 
 				if (NewMonster)
 				{
+					NewMonster->SetMonsterLevel(LevelIndex + 1);
+
+					// 몬스터가 자신의 스포너를 참조하게 설정
+					NewMonster->MonsterSpawner = this;
 					NewMonster->SetActorHiddenInGame(true);
 					SpawnedMonstersPool.Add(NewMonster);
 				}
@@ -271,6 +271,7 @@ void AMonsterSpawner::SpawnMonster()
 			Monster->Tags.Add(FName("Monster"));
 			Monster->SetCanDropReward(true);
 			Monster->SetIsDead(false);
+			Monster->SetMonsterIsHit(false);
 			Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			Monster->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 			Monster->SetActorLocation(GetSpawnVolume());

@@ -14,6 +14,7 @@ void AMissionItemDefenceArea::InitMissionItem(AMissionHandle* NewMissionHandle, 
 	DeltaTargetTime = 1.0f / TargetTime;
 	ProgressValue = 1.0f;
 	MissionHandle->UpdateDefenceProgress(ProgressValue);
+	Tags.Add("Area");
 }
 
 void AMissionItemDefenceArea::SetIsActive(bool Value)
