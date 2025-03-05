@@ -268,3 +268,16 @@ float ABossAIController::ComputeAttack4Weight()
     Weight *= FMath::RandRange(0.8f, 1.2f);
     return Weight;
 }
+
+FVector ABossAIController::GetPlayerLocation()
+{
+    TArray<AActor*> PlayerActors;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Player"), PlayerActors);
+
+    if (PlayerActors.Num() > 0)
+    {
+        return PlayerActors[0]->GetActorLocation();
+    }
+
+    return FVector::ZeroVector; // 플레이어가 없으면 (0,0,0) 반환
+}

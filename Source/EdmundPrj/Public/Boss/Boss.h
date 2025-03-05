@@ -251,22 +251,22 @@ public:
     class UBTTask_BossAttack3* CurrentAttackTask;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack1 = 150.0f; // 1타 돌진 거리
+    float MeleeAttackDashDistance_Attack1 = 1500.0f; // 1타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack2 = 150.0f; // 2타 돌진 거리
+    float MeleeAttackDashDistance_Attack2 = 1500.0f; // 2타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack1 = 100.0f; // 1타 돌진 속도
+    float MeleeAttackDashSpeed_Attack1 = 300.0f; // 1타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack2 = 100.0f; // 2타 돌진 속도
+    float MeleeAttackDashSpeed_Attack2 = 300.0f; // 2타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashFrequency = 0.8f; // 목표 위치 가속 힘
+    float BossDashFrequency = 0.9f; // 목표 위치 가속 힘
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashDamping = 0.7f; // 부드럽게 정지
+    float BossDashDamping = 2.0f; // 부드럽게 정지
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_3FiringDuration = 3.0f; // 3타 지속시간
@@ -388,16 +388,16 @@ public:
 
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack1_CooldownDuration = 5.0f;
+    float Attack1_CooldownDuration = 10.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack2_CooldownDuration = 10.0f;
+    float Attack2_CooldownDuration = 60.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack3_CooldownDuration = 15.0f;
+    float Attack3_CooldownDuration = 20.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack4_CooldownDuration = 20.0f;
+    float Attack4_CooldownDuration = 50.0f;
 
     ////
     void InitBoss(AMissionHandle* NewMissionHandle);

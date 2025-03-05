@@ -717,7 +717,7 @@ void ABoss::CheckWeaken()
 
 void ABoss::ApplyWeaken()
 {
-    float WeakenFactor = 0.8f;
+    float WeakenFactor = 0.5f;
 
     MonsterMaxHP *= WeakenFactor;
     MonsterHP = FMath::Min(MonsterHP, MonsterMaxHP); 
