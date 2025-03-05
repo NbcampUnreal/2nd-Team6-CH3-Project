@@ -9,7 +9,7 @@ void AMissionItemTraceWeaken::InitMissionItem(AMissionHandle* NewMissionHandle, 
 {
 	Super::InitMissionItem(NewMissionHandle, Type);
 
-	ApplyOverlapCollision(false);
+	ApplyOverlapCollision(true);
 }
 
 void AMissionItemTraceWeaken::ActionEventByPressedKey()

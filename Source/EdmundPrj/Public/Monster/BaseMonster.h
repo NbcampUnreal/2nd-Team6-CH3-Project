@@ -43,6 +43,8 @@ void SetCanDropReward(bool NewState);
 
 void SetMonsterLevel(int32 NewLevel);
 
+void SetMonsterIsHit(bool NewState);
+
 virtual void SetMonsterStatsByLevel();
 
 UFUNCTION(BlueprintCallable)

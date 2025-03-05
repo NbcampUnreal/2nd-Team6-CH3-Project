@@ -101,3 +101,22 @@ void ABoss_Skill3_Wall::SimulateGravity()
     SetActorLocation(NewLocation);
 }
 
+void ABoss_Skill3_Wall::LowerAndDeactivate()
+{
+    LowerTargetZ = GetActorLocation().Z - 50.f;
+    GetWorldTimerManager().SetTimer(LowerTimerHandle, this, &ABoss_Skill3_Wall::PerformLowering, 0.02f, true);
+}
+
+void ABoss_Skill3_Wall::PerformLowering()
+{
+    FVector CurrentLocation = GetActorLocation();
+    float NewZ = FMath::FInterpConstantTo(CurrentLocation.Z, LowerTargetZ, 0.02f, 10.f);
+    FVector NewLocation = CurrentLocation;
+    NewLocation.Z = NewZ;
+    SetActorLocation(NewLocation);
+    if (FMath::IsNearlyEqual(NewZ, LowerTargetZ, 1.0f))
+    {
+        GetWorldTimerManager().ClearTimer(LowerTimerHandle);
+        DeactivateWall();
+    }
+}

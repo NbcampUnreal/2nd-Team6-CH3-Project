@@ -77,4 +77,6 @@ public:
 
 	// 탄환 풀
 	static TArray<ABoss_Attack1_Bullet*> BulletPool;
+
+	FTimerHandle LifetimeTimerHandle;
 };

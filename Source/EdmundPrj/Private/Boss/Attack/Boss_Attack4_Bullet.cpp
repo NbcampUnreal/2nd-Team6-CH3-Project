@@ -9,6 +9,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/World.h"
+#include "Boss/Boss.h"
 #include "Player/BaseCharacter.h"
 #include "TimerManager.h"
 
@@ -232,8 +233,12 @@ void ABoss_Attack4_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 
             if (Bullet)
             {
-                float DamageValue = 10.0f;
-                UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
+                ABoss* BossRef = Cast<ABoss>(GetOwner());
+                if (BossRef)
+                {
+                    float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetAttack4Multiplier();
+                    UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
+                }
             }
         }
         Explode();
