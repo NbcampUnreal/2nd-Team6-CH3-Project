@@ -14,10 +14,10 @@
 // 몬스터 스탯 설정은 여기서!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 여긴 NPC라 적용안됨
 void ANPCMonster::SetMonsterStatsByLevel()
 {
-    MonsterHP = 100 + (MonsterLevel * 50);
-    MonsterMaxHP = 100 + (MonsterLevel * 50);
-    MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
-    MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+    MonsterHP = 1000 + (MonsterLevel * 50);
+    MonsterMaxHP = 1000 + (MonsterLevel * 50);
+    MonsterAttackDamage = 50.0f + (MonsterLevel * 5.0f);
+    MonsterArmor = 50.0f + (MonsterLevel * 2.0f);
 }
 
 
