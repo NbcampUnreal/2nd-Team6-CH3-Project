@@ -27,10 +27,15 @@ private:
 	virtual void CompleteProgress() override;
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UStaticMeshComponent> GateMesh;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MissionInfo)
 	float TargetTime = 3.0f;
 
 private:
+	FVector MeshStartPos;
+	FVector AddPos;
 	float CurrentTime = 0;
 	float DeltaTargetTime = 0.0f;
 	float UpdateTime = 0.01f;
