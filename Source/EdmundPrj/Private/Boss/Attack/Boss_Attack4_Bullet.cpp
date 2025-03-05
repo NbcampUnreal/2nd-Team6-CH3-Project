@@ -234,8 +234,11 @@ void ABoss_Attack4_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
             if (Bullet)
             {
                 ABoss* BossRef = Cast<ABoss>(GetOwner());
-                float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetAttack4Multiplier();
-                UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
+                if (BossRef)
+                {
+                    float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetAttack4Multiplier();
+                    UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
+                }
             }
         }
         Explode();

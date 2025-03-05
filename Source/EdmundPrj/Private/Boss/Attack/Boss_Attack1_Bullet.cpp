@@ -104,6 +104,10 @@ void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnR
 		Attack1Niagara->Activate();
 	}
 	ABoss* BossRef = Cast<ABoss>(GetOwner());
+	if (BossRef)
+	{
+		return;
+	}
 	if (BossRef->GameState)
 	{
 		BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack);
