@@ -17,8 +17,8 @@ class EDMUNDPRJ_API UResultWidget : public UBaseWidget
 	
 public: // add notify
 	virtual void InitWidget(UUIHandle* NewUIHandle) override;
-	virtual void ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp) override;
 	virtual void ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney) override;
+	virtual void ChangedIsGameClear(const bool bIsClear) override;
 
 private: 
 	UFUNCTION()

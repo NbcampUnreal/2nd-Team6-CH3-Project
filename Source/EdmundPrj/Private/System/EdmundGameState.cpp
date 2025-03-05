@@ -395,10 +395,12 @@ void AEdmundGameState::EndCurrentLevel(bool bIsClear)
 	{
 		EdmundGameInstance->AddPossessMoney(MissionClearMoney);
 		NotifyResultValue(CurrentLevelMoney, TotalMoney, MissionClearMoney);
+		NotifyIsGameClear(true);
 	}
 	else
 	{
 		NotifyResultValue(CurrentLevelMoney, TotalMoney, 0);
+		NotifyIsGameClear(false);
 	}
 	
 	EdmundGameInstance->AddPossessMoney(CurrentLevelMoney);
@@ -590,6 +592,18 @@ void AEdmundGameState::NotifyPrintText(const FString& TargetText)
 			continue;
 		}
 		Observer->ChangedStoryText(TargetText);
+	}
+}
+
+void AEdmundGameState::NotifyIsGameClear(const bool bIsClear)
+{
+	for (TScriptInterface<IGameStateObserver> Observer : Observers)
+	{
+		if (!IsValid(Observer.GetObject()))
+		{
+			continue;
+		}
+		Observer->ChangedIsGameClear(bIsClear);
 	}
 }
 

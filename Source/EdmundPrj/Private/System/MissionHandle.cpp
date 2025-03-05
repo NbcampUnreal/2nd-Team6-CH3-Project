@@ -113,6 +113,7 @@ void AMissionHandle::SpawnNpc(const FVector& SpawnPos)
 
 	APawn* NewNpc = UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), NpcClass, NpcBT, SpawnPos, FRotator::ZeroRotator, true);
 	NpcPawn = Cast<ANPCMonster>(NewNpc);
+	NpcPawn->SetMissionHandle(this);
 }
 
 void AMissionHandle::SetNpcBondageMode(bool bIsBondage)
@@ -206,6 +207,11 @@ void AMissionHandle::ApplyNpcEquip()
 	{
 		SetNpcBattleMode(true);
 	}
+}
+
+void AMissionHandle::NotifyDieNpc()
+{
+	EdmundGameMode->FailMission();
 }
 
 void AMissionHandle::UpdateDefenceState(bool bIsOn)

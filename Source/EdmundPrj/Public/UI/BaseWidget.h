@@ -31,6 +31,7 @@ public:
 	virtual void ChangedBossHp(const int32 MaxHp, const int32 CurrentHp) override {};
 	virtual void ChangedMissionInfoOnOff() override {};
 	virtual void ChangedStoryText(const FString& TargetText) override {};
+	virtual void ChangedIsGameClear(const bool bIsClear) override {};
 
 	virtual void InitWidget(UUIHandle* uiHandle);
 	virtual void Action();
