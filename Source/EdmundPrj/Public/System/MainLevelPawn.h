@@ -8,6 +8,8 @@
 
 class UCameraComponent;
 class UPointLightComponent;
+class USpotLightComponent;
+class UParticleSystem;
 
 UCLASS()
 class EDMUNDPRJ_API AMainLevelPawn : public APawn
@@ -29,6 +31,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UPointLightComponent> LightComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USpotLightComponent> SpotLightComp;
 
 protected:
 	// Called when the game starts or when spawned

@@ -349,6 +349,11 @@ void AEdmundGameState::PlayItemSound(UAudioComponent* AudioComp, EItemType ItemT
 		return;
 	}
 
+	if (AudioComp->IsPlaying())
+	{
+		AudioComp->Stop();
+	}
+
 	AudioComp->SetSound(SoundSource);
 	AudioComp->SetVolumeMultiplier(EffectVolume);
 	AudioComp->Play();

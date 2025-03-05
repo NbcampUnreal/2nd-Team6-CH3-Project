@@ -4,6 +4,9 @@
 #include "System/MainLevelPawn.h"
 #include "Camera/CameraComponent.h"
 #include "Components/PointLightComponent.h"
+#include "Components/SpotLightComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "System/MainLevelPlayerController.h"
 
 // Sets default values
 AMainLevelPawn::AMainLevelPawn()
@@ -21,12 +24,14 @@ AMainLevelPawn::AMainLevelPawn()
 
 	LightComp = CreateDefaultSubobject<UPointLightComponent>(TEXT("Point Light"));
 	LightComp->SetupAttachment(RootComponent);
+
+	SpotLightComp = CreateDefaultSubobject<USpotLightComponent>(TEXT("Spot Light"));
+	SpotLightComp->SetupAttachment(RootComponent);
 }
 
 void AMainLevelPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 
