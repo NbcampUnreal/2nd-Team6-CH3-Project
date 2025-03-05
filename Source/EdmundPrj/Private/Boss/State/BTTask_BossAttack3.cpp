@@ -361,10 +361,17 @@ void UBTTask_BossAttack3::OnMeleeCollisionOverlap_Check2(UPrimitiveComponent* Ov
         {
             BossRef->GetWorld()->GetTimerManager().ClearTimer(CollisionDisableTimerHandle_Check2);
         }
-
         float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetAttack3Multiplier();
-
         UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, BossRef, nullptr);
+        ACharacter* PlayerCharacter = Cast<ACharacter>(OtherActor);
+        if (PlayerCharacter)
+        {
+            FVector KnockbackDirection = (PlayerCharacter->GetActorLocation() - BossRef->GetActorLocation()).GetSafeNormal();
+            KnockbackDirection.Z = 0.0f;
+            float KnockbackForce = 1500.0f;
+            PlayerCharacter->LaunchCharacter(KnockbackDirection * KnockbackForce, true, false);
+        }
+
         Attack3_DeactivateCollision_Check2();
     }
 }

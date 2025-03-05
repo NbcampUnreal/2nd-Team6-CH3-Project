@@ -164,7 +164,6 @@ enum class EMonsterType : uint8
 	Ranger,
 	Suicide,
 	Boss,
-	BossEtc
 };
 
 UENUM(BlueprintType)
@@ -212,7 +211,16 @@ UENUM(BlueprintType)
 enum class EItemType : uint8
 {
 	Gold = 0,
-	HealKit
+	HealKit,
+	Meteor,
+	Mjolnir,
+	Electric,
+	Thunder,
+	HealPlants,
+	AttackPlants,
+	Slow,
+	Freezing,
+	SolarDisk
 };
 
 UCLASS()

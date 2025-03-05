@@ -157,7 +157,7 @@ void ABoss::Tick(float DeltaTime)
     {
         GetCharacterMovement()->MaxWalkSpeed = MonsterChaseSpeed;
     }
-    if (GEngine)
+    /*if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(
             -1,
@@ -165,14 +165,22 @@ void ABoss::Tick(float DeltaTime)
             FColor::Green,
             FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
         );
+    }*/
+
+    if (GetCharacterMovement() && GetCharacterMovement()->MovementMode == MOVE_Walking)
+    {
+        if (!GetCharacterMovement()->IsMovingOnGround())
+        {
+            GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+        }
     }
 
     //**************
-    if (GEngine && GetCharacterMovement())
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Cyan,
-            FString::Printf(TEXT("%d"), (int32)GetCharacterMovement()->MovementMode));
-    }
+    //if (GEngine && GetCharacterMovement())
+    //{
+    //    GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Cyan,
+    //        FString::Printf(TEXT("%d"), (int32)GetCharacterMovement()->MovementMode));
+    //}
     //**************
     if (!bIsInvulnerable && Skill2ShieldNiagara && Skill2ShieldNiagara->IsActive())
     {
@@ -494,11 +502,27 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
         ACharacter* PlayerCharacter = Cast<ACharacter>(OtherActor);
         if (PlayerCharacter)
         {
-            FVector KnockbackDirection = PlayerCharacter->GetActorLocation() - GetActorLocation();
-            KnockbackDirection.Z = 0;
-            KnockbackDirection.Normalize();
+            FVector CollisionCenter = Attack2Collision ? Attack2Collision->GetComponentLocation() : GetActorLocation();
+            FVector Direction = PlayerCharacter->GetActorLocation() - CollisionCenter;
+            Direction.Z = 0.0f;
 
-            PlayerCharacter->LaunchCharacter(KnockbackDirection * KnockbackStrength, true, false);
+            float Distance = Direction.Size();
+            if (Direction.IsNearlyZero())
+            {
+                Direction = FVector(1.0f, 0.0f, 0.0f);
+                Distance = 1.0f;
+            }
+            Direction.Normalize();
+
+            float ExtraMultiplier = 1.0f;
+            const float Threshold = 100.0f;
+            if (Distance < Threshold)
+            {
+                ExtraMultiplier = 2.0f;
+            }
+
+            float FinalKnockbackStrength = KnockbackStrength * ExtraMultiplier;
+            PlayerCharacter->LaunchCharacter(Direction * FinalKnockbackStrength, true, false);
 
             if (LandImpactParticle && GetWorld())
             {
@@ -522,6 +546,8 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
         }
     }
 }
+
+
 
 
 void ABoss::DisableMovement()
@@ -728,7 +754,7 @@ void ABoss::CheckWeaken()
 
 void ABoss::ApplyWeaken()
 {
-    float WeakenFactor = 0.5f;
+    float WeakenFactor = 0.8f;
 
     MonsterMaxHP *= WeakenFactor;
     MonsterHP = FMath::Min(MonsterHP, MonsterMaxHP); 
@@ -737,4 +763,75 @@ void ABoss::ApplyWeaken()
 
     HpbarUpdate();
 }
+
+
+/******** Sounds ******/
+void ABoss::BossFireballSounds()
+{
+    if (GameState && CurrentAudioComp)
+    {
+        MonsterType = EMonsterType::Boss;
+        GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
+    }
+}
+
+void ABoss::BossWingSounds()
+{
+    if (GameState && CurrentAudioComp)
+    {
+        MonsterType = EMonsterType::Boss;
+        GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Reload);
+    }
+}
+
+void ABoss::BossAttack3_1Sounds()
+{
+    if (GameState && CurrentAudioComp)
+    {
+        MonsterType = EMonsterType::Boss;
+        GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack3);
+    }
+}
+
+void ABoss::BossAttack3_2Sounds()
+{
+    if (GameState && CurrentAudioComp)
+    {
+        MonsterType = EMonsterType::Boss;
+        GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::MeleeAttack);
+    }
+}
+
+//
+
+void ABoss::BossLightLandingSounds()
+{
+    if (GameState && CurrentAudioComp)
+    {
+        MonsterType = EMonsterType::Boss;
+        GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Avoid);
+    }
+}
+
+
+void ABoss::BossIntroRoarSounds()
+{
+    if (GameState && CurrentAudioComp)
+    {
+        MonsterType = EMonsterType::Boss;
+        GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Respawn);
+    }
+}
+
+
+void ABoss::BossSkill3RoarSounds()
+{
+    if (GameState && CurrentAudioComp)
+    {
+        GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
+        MonsterType = EMonsterType::Boss;
+        GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Weapon);
+    }
+}
+
 
