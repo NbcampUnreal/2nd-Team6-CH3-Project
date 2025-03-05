@@ -32,6 +32,7 @@ EBTNodeResult::Type UBTTask_BossSkill3::ExecuteTask(UBehaviorTreeComponent& Owne
     }
 
     PlaySkillAnimation();
+    BossRef->SetbSkill3Used(true);
     SpawnedWallCount = 0;
 
     UWorld* World = BossRef->GetWorld();
@@ -199,7 +200,7 @@ void UBTTask_BossSkill3::PerformDetection()
 
     //UE_LOG(LogTemp, Warning, TEXT("HitResults Count: %d"), HitResults.Num());
 
-    UE_LOG(LogTemp, Warning, TEXT("%s"),bCharacterDetected ? TEXT("Player Die") : TEXT("Hide"));
+    UE_LOG(LogTemp, Warning, TEXT("%s"), bCharacterDetected ? TEXT("Player Die") : TEXT("Hide"));
 
     DrawDebugSphere(World, BossLocation, DetectionRadius, 32, bCharacterDetected ? FColor::Red : FColor::Blue, false, 0.5f);
 }
@@ -216,5 +217,10 @@ void UBTTask_BossSkill3::StopDetection()
     if (BossRef->Skill3Particle)
     {
         BossRef->Skill3Particle->Deactivate();
+    }
+
+    if (CachedOwnerComp)
+    {
+        FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
     }
 }
