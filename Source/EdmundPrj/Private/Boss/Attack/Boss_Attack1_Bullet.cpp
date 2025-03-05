@@ -194,7 +194,6 @@ void ABoss_Attack1_Bullet::ResetBullet()
 		Attack1Niagara->SetAutoActivate(false);
 	}
 
-	// 탄환 풀이 누락되었으면 추가
 	if (!BulletPool.Contains(this))
 	{
 		BulletPool.Add(this);
@@ -203,7 +202,6 @@ void ABoss_Attack1_Bullet::ResetBullet()
 
 ABoss_Attack1_Bullet* ABoss_Attack1_Bullet::GetBulletFromPool(UWorld* World, TSubclassOf<ABoss_Attack1_Bullet> BulletClass)
 {
-	// 사용 중이지 않은 탄환 반환
 	for (ABoss_Attack1_Bullet* Bullet : BulletPool)
 	{
 		if (Bullet && !Bullet->bIsActive)
@@ -211,7 +209,6 @@ ABoss_Attack1_Bullet* ABoss_Attack1_Bullet::GetBulletFromPool(UWorld* World, TSu
 			return Bullet;
 		}
 	}
-	// 없으면 새로 생성 후 풀에 추가
 	if (World)
 	{
 		ABoss_Attack1_Bullet* NewBullet = World->SpawnActor<ABoss_Attack1_Bullet>(BulletClass);

@@ -50,14 +50,14 @@ ABaseCharacter::ABaseCharacter()
 	SprintSpeed = 1000.0f;
 	CrouchMoveSpeed = 300.0f;
 
-	HP = MaxHP = 200;
+	HP = MaxHP = 99900;
 	Stamina = MaxStamina = 100;
 	StaminaRecoveryAmount = 1.0f;
 	StaminaConsumAmount = 4.0f;
 
 	StaminaRecoveryAndConsumDelay = 1.0f;
 
-	AttackDamage = 20;
+	AttackDamage = 2000;
 	Defense = 10;
 	AttackDelay = 0.5;
 	CriticalProb = 5;
@@ -92,7 +92,7 @@ void ABaseCharacter::BeginPlay()
 	
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
-	// Ä¸½¶ ÄÝ¸®Àü Å©±â ÀúÀåÇÏ±â
+	// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 	if (IsValid(CapsuleComp))
@@ -338,7 +338,7 @@ void ABaseCharacter::StartSprint(const FInputActionValue& value)
 	{
 		IsSprint = true;
 
-		// ¾ÉÀº »óÅÂ¿¡¼­´Â ´Þ¸®±â ºÒ°¡
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½
 		if (!IsCrouch)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
@@ -357,7 +357,7 @@ void ABaseCharacter::StopSprint(const FInputActionValue& value)
 	{
 		IsSprint = false;
 
-		// ¾ÉÀº »óÅÂ¿¡¼­´Â ´Þ¸®±â ºÒ°¡
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½
 		if (!IsCrouch)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
@@ -386,27 +386,27 @@ void ABaseCharacter::StartCrouch(const FInputActionValue& value)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = CrouchMoveSpeed;
 
-		// Ä¸½¶ ÄÝ¸®Àü °¡Á®¿À±â
+		// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 		if (IsValid(CapsuleComp))
 		{
 			float NewCapsuleHeight = CapsuleHeight * 0.7;
 
-			// Ä¸½¶ Å©±â Á¶Á¤
+			// Ä¸ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight * 0.8);
 
-			// ¸Þ½¬ À§Ä¡ Á¶Á¤
+			// ï¿½Þ½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 			FVector NewLocation = GetMesh()->GetRelativeLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			GetMesh()->SetRelativeLocation(NewLocation);
 
-			// Ä«¸Þ¶ó À§Ä¡ Á¶Á¤
+			// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 			NewLocation = SpringArmComp->GetRelativeLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			SpringArmComp->SetRelativeLocation(NewLocation);
 
-			// ÀüÃ¼ ¾×ÅÍ Á¶Á¤
+			// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			NewLocation = GetActorLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			SetActorLocation(NewLocation);
@@ -427,25 +427,25 @@ void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
-		// Ä¸½¶ ÄÝ¸®Àü °¡Á®¿À±â
+		// Ä¸ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 
 		if (IsValid(CapsuleComp))
 		{
-			// Ä¸½¶ Å©±â Á¶Á¤
+			// Ä¸ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight);
 
-			// ¸Þ½¬ À§Ä¡ Á¶Á¤
+			// ï¿½Þ½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 			FVector NewLocation = GetMesh()->GetRelativeLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			GetMesh()->SetRelativeLocation(NewLocation);
 
-			// Ä«¸Þ¶ó À§Ä¡ Á¶Á¤
+			// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 			NewLocation = SpringArmComp->GetRelativeLocation();
 			NewLocation.Z -= CapsuleHeight * 0.2;
 			SpringArmComp->SetRelativeLocation(NewLocation);
 
-			// ÀüÃ¼ ¾×ÅÍ Á¶Á¤
+			// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			NewLocation = GetActorLocation();
 			NewLocation.Z += CapsuleHeight * 0.2;
 			SetActorLocation(NewLocation);
@@ -477,13 +477,13 @@ float ABaseCharacter::GetAttackDamage() const
 
 	int32 DamageProb = FMath::RandRange(1, 100);
 
-	// Å©¸®Æ¼ÄÃ
+	// Å©ï¿½ï¿½Æ¼ï¿½ï¿½
 	if (DamageProb <= CriticalProb)
 	{
 		Damage *= CriticalMultiplier;
 	}
 
-	// ·£´ý µ¥¹ÌÁö Àû¿ë
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	float RandomRange = 0.2f;
 
 	float MinDamage = (1.0f - RandomRange) * Damage;
@@ -513,10 +513,10 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 	int32 DamageProb = FMath::RandRange(1, 100);
 
-	// È¸ÇÇ ¼º°ø
+	// È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (DamageProb <= EvasionProb)
 	{
-		// È¸ÇÇ ¼º°ø »ç¿îµå
+		// È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		if (IsValid(CurrentGameState))
 		{
 			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Avoid);
@@ -525,7 +525,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
-	// °ø°Ý Áß¿¡ ÇÇ°Ý ¾Ö´Ï¸ÞÀÌ¼Ç ½ÇÇàÇÏ¸é ´ÙÀ½ °ø°Ý ¸øÇÔ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ß¿ï¿½ ï¿½Ç°ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (IsValid(HitActionMontage) && !CheckAction() && !IsAttack)
 	{
 		PlayAnimMontage(HitActionMontage);
@@ -533,28 +533,28 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	// ¹æ¾î·Â Àû¿ë
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	ActualDamage = (100 - Defense) * ActualDamage / 100;
 	
-	// HP´Â Á¤¼ö, µ¥¹ÌÁö´Â ¼Ò¼ö?
-	// HP À½¼ö ¹æÁö
+	// HPï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¼ï¿½?
+	// HP ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	HP = FMath::Max(0.0f, HP - ActualDamage);
 
 	if (HP == 0 && !IsDie)
 	{
-		// ºÎÈ° È½¼ö°¡ ÀÖ´Ù¸é
+		// ï¿½ï¿½È° È½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½
 		if (RevivalCount >= 1)
 		{
 			RevivalCount--;
 			HP = MaxHP;
 
-			// ºÎÈ° »ç¿îµå
+			// ï¿½ï¿½È° ï¿½ï¿½ï¿½ï¿½
 			if (IsValid(CurrentGameState))
 			{
 				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Respawn);
 			}
 		}
-		// ºÎÈ° È½¼ö°¡ ¾ø´Ù¸é
+		// ï¿½ï¿½È° È½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ù¸ï¿½
 		else
 		{
 			IsDie = true;
@@ -705,14 +705,14 @@ void ABaseCharacter::GetUpgradeStatus()
 	MaxStamina = MaxStamina * (100.0f + ShopStatusList[10]->CurrentLevel * ShopStatusList[10]->AdvanceValue) / 100;
 
 	// ReloadTime
-	// °Å³Ê¸¸ Àû¿ë
+	// ï¿½Å³Ê¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	RevivalCount = ShopStatusList[12]->CurrentLevel * ShopStatusList[12]->AdvanceValue;
 }
 
 void ABaseCharacter::ActiveDieAction()
 {
-	// Á×À½ »ç¿îµå
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (IsValid(CurrentGameState))
 	{
 		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Die);
@@ -731,7 +731,7 @@ ECharacterType ABaseCharacter::GetCharacterType()
 
 void ABaseCharacter::AttackTrace()
 {
-	// ÀÚ½Ä Å¬·¡½º ÇÔ¼ö ½ÇÇà
+	// ï¿½Ú½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½
 }
 
 void ABaseCharacter::UpdateStamina()

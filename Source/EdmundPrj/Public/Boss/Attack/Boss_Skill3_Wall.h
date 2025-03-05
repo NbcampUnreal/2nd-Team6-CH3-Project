@@ -52,6 +52,12 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gravity")
     FVector CurrentVelocity;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    UAudioComponent* CurrentAudioComp;
+
+    UFUNCTION(BlueprintCallable)
+    void BossSkill3WallSounds();
+
     FTimerHandle LowerTimerHandle;
     float LowerTargetZ;
 };
