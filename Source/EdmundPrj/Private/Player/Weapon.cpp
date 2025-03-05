@@ -174,7 +174,7 @@ bool AWeapon::Fire(float NewAttackDelay)
 			CollisionParams // 충돌 파라미터
 		);
 
-		if (bHit && HitResult.Distance > 350)
+		if (bHit && HitResult.Distance > 350 && !HitResult.GetActor()->ActorHasTag("Water"))
 		{
 			FVector HitPos = HitResult.Location;
 			FVector Direction = HitPos - SpawnLocation;
