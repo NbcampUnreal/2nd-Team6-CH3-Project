@@ -20,8 +20,6 @@ ABaseMissionItem::ABaseMissionItem()
 	WidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
 	WidgetComp->SetupAttachment(MeshComp);
 	WidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
-	
-	Tags.Add("MissionItem");
 }
 
 void ABaseMissionItem::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
