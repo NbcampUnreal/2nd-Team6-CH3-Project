@@ -8,17 +8,23 @@
 AMissionItemDimensionPortal::AMissionItemDimensionPortal() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	GateMesh = CreateDefaultSubobject<UStaticMeshComponent>("GateMesh");
+	GateMesh->SetupAttachment(RootComponent);
 }
 
 void AMissionItemDimensionPortal::InitMissionItem(AMissionHandle* NewMissionHandle, const FName& Type)
 {
 	Super::InitMissionItem(NewMissionHandle, Type);
 
-	ApplyOverlapCollision(true);
+	ApplyOverlapCollision(false);
 	MissionHandle->AddDimensionPortalSet(this);
 	SetActorTickEnabled(false);
 
+	MeshStartPos = GateMesh->GetComponentLocation();
+	AddPos = FVector(0, 0, -MeshStartPos.Z / 3 * 2);
 	DeltaTargetTime = 1.0f / TargetTime;
+	AddPos = AddPos * DeltaTargetTime;
 }
 
 void AMissionItemDimensionPortal::ActionEventByPressedKey()
@@ -50,6 +56,7 @@ void AMissionItemDimensionPortal::Tick(float DeltaTime)
 		CurrentTime = 0;
 		ProgressValue -= DeltaTargetTime * UpdateTime;
 		InteractionWidget->UpdateProgressBar(ProgressValue);
+		GateMesh->AddLocalOffset(AddPos * UpdateTime);
 
 		if (ProgressValue <= 0)
 		{
@@ -83,6 +90,9 @@ void AMissionItemDimensionPortal::ActionEndOverlap()
 	SetActorTickEnabled(false);
 	InteractionWidget->VisibleNotify(false);
 	InteractionWidget->VisibleProgressBar(false);
+	InteractionWidget->UpdateProgressBar(1.0f);
+	ProgressValue = 1.0f;
+	GateMesh->SetWorldLocation(MeshStartPos);
 }
 
 void AMissionItemDimensionPortal::CompleteProgress()
