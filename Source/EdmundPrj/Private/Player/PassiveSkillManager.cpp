@@ -105,7 +105,7 @@ void UPassiveSkillManager::ElectricChainSkill(FVector MonsterLocation)
 void UPassiveSkillManager::AmountMaxHpSkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::AmountMaxHp];
-	Character->MaxHP += SkillLevel * 5;
+	Character->MaxHP += SkillLevel * 20;
 	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GetWorld()->GetGameState());
 	if (IsValid(CurrentGameState))
 	{
@@ -116,7 +116,7 @@ void UPassiveSkillManager::AmountMaxHpSkill()
 void UPassiveSkillManager::AmountMaxStaminaSkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::AmountMaxStamina];
-	Character->MaxStamina += SkillLevel * 5;
+	Character->MaxStamina += SkillLevel * 20;
 	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GetWorld()->GetGameState());
 	if (IsValid(CurrentGameState))
 	{

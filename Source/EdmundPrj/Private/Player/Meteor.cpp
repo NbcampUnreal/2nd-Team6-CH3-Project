@@ -7,38 +7,61 @@
 #include "Kismet\GameplayStatics.h"
 #include "Components\SphereComponent.h"
 #include "GameFramework\CharacterMovementComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
 AMeteor::AMeteor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	MonsterLaunchCollision = CreateDefaultSubobject<USphereComponent>(TEXT("MonsterLaunchCollision"));
 	MonsterLaunchCollision->SetupAttachment(Scene);
 
+	GroundHitNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("GroundHitNiagara"));
+	GroundHitNiagara->SetupAttachment(RootComponent);
+	GroundHitNiagara->bAutoActivate = false;
+
+	FallingEffectNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("FallingEffectNiagara"));
+	FallingEffectNiagara->SetupAttachment(RootComponent);
+	FallingEffectNiagara->bAutoActivate = false;
 }
+
 
 void AMeteor::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 {
 	if (!IsValid(Monster)) return;
-	UGameplayStatics::ApplyDamage(
-		Monster,
-		DamageMultiplier,
-		nullptr,
-		this,
-		UDamageType::StaticClass()
-	);
 	HitToGround();
 }
 
+TSet < TObjectPtr<ABaseMonster>> HitMonsterSet;
 void AMeteor::HitToGround()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hit To Ground!!"));
 	TArray<AActor*> activators;
 	MonsterLaunchCollision->GetOverlappingActors(activators);
+	if (GroundHitNiagara)
+	{
+		GroundHitNiagara->Activate();
+		GroundHitNiagara->SetWorldLocation(GetActorLocation());
+		GetWorldTimerManager().SetTimer(ElplosionEffectDeactivateHandle,
+			[this] {
+				GroundHitNiagara->Deactivate();
+			},
+			5,
+			false);
+	}
 	for (AActor* activator : activators)
 	{
 		if (activator && activator->ActorHasTag("Monster"))
 		{
 			if (TObjectPtr<ABaseMonster> Monster = Cast<ABaseMonster>(activator))
 			{
+				if (HitMonsterSet.Find(Monster))
+				{
+					continue;
+				}
+				else
+				{
+					HitMonsterSet.Add(Monster);
+				}
 				UGameplayStatics::ApplyDamage(
 					Monster,
 					DamageMultiplier,
@@ -46,6 +69,7 @@ void AMeteor::HitToGround()
 					this,
 					UDamageType::StaticClass()
 				);
+				
 				Monster->GetCharacterMovement()->Activate();
 				UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(activator->GetRootComponent());
 
@@ -67,17 +91,20 @@ void AMeteor::HitToGround()
 			}
 		}
 	}
-	Deactivate();
 }
 
 void AMeteor::Deactivate()
 {
+	FallingEffectNiagara->Deactivate();
+	HitMonsterSet.Empty();
+	GetWorldTimerManager().ClearTimer(ElplosionEffectDeactivateHandle);
 	Super::Deactivate();
 }
 
 void AMeteor::SpawnTimerSkill()
 {
 	Super::SpawnTimerSkill();
+	FallingEffectNiagara->Activate();
 }
 
 void AMeteor::Tick(float deltaTime)
