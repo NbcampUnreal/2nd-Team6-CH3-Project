@@ -279,5 +279,5 @@ FVector ABossAIController::GetPlayerLocation()
         return PlayerActors[0]->GetActorLocation();
     }
 
-    return FVector::ZeroVector; // 플레이어가 없으면 (0,0,0) 반환
+    return FVector::ZeroVector;
 }

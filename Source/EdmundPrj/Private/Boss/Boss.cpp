@@ -108,6 +108,10 @@ ABoss::ABoss()
     MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
     MuzzleLocation->SetupAttachment(GetMesh(), TEXT("MuzzleSocket"));
 
+
+    MonsterType = EMonsterType::Boss;
+    GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
+
 }
 
 void ABoss::BeginPlay()
@@ -590,6 +594,11 @@ void ABoss::FireBullet()
     SetActorRotation(SmoothRotation);
     DisableRotation();
     TargetRotation = (PlayerLocation - SpawnLocation).Rotation();
+
+    if (GameState)
+    {
+        GameState->PlayMonsterSound(CurrentAudioComp, GetMonsterType(), ESoundType::Attack);
+    }
 
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(GetWorld(), Attack1BulletClass);
     if (Bullet)

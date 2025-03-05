@@ -126,6 +126,8 @@ public:
     void SetSkill2Invulnerable(bool NewIsInvulnerable);
     void HpbarUpdate();
     bool IsSkill2Invulnerable() const { return bIsInvulnerable; }
+    EMonsterType GetMonsterType() const { return MonsterType; }
+
 
 
     UFUNCTION(BlueprintCallable)

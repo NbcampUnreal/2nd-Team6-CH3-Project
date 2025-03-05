@@ -78,7 +78,7 @@ void UBTTask_BossAttack3::OnAttack1Notify()
         return;
     }
 
-    ExecuteMeleeAttack();  // ✅ 1타 돌진 실행
+    ExecuteMeleeAttack();
     BossRef->SetComboPhase(2);
     ComboPhase = 2;
     UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify Called, Phase: %d"), ComboPhase);
@@ -203,17 +203,17 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
 
     switch (CurrentPhase)
     {
-    case 1:  // 1타 돌진
+    case 1:
         DashDistance = BossRef->MeleeAttackDashDistance_Attack1;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack1;
         break;
-    case 2:  // 2타 돌진
+    case 2:
         DashDistance = BossRef->MeleeAttackDashDistance_Attack2;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack2;
         break;
-    case 3:  // ✅ 3타는 돌진 없이 제자리 공격 (미끄러짐 방지 추가)
+    case 3:
         bIsDashing = false;
-        DashCurrentVelocity = FVector::ZeroVector; // 이동 속도 초기화
+        DashCurrentVelocity = FVector::ZeroVector;
         if (BossRef->GetCharacterMovement())
         {
             BossRef->GetCharacterMovement()->StopMovementImmediately();
@@ -223,9 +223,9 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
         return;
     }
 
-    FVector DirectionToTarget = BossRef->GetActorForwardVector(); // 기본 방향
+    FVector DirectionToTarget = BossRef->GetActorForwardVector();
 
-    if (BossRef && BossRef->GetController() && CurrentPhase != 3) // 3타에서는 회전 X
+    if (BossRef && BossRef->GetController() && CurrentPhase != 3)
     {
         ABossAIController* BossAIController = Cast<ABossAIController>(BossRef->GetController());
         if (BossAIController)
@@ -234,17 +234,14 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
             DirectionToTarget = (TargetLocation - BossRef->GetActorLocation()).GetSafeNormal();
         }
     }
-
-    // ✅ 회전 속도 강화 (기존 5.0 → 10.0)
     if (CurrentPhase != 3)
     {
-        float RotationSpeed = 10.0f; // 회전 속도 증가
+        float RotationSpeed = 10.0f;
         FRotator TargetRotation = DirectionToTarget.Rotation();
         FRotator NewRotation = FMath::RInterpTo(BossRef->GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), RotationSpeed);
         BossRef->SetActorRotation(NewRotation);
     }
 
-    // 돌진 세팅
     bIsDashing = true;
     DashStartLocation = BossRef->GetActorLocation();
     DashTargetLocation = DashStartLocation + DirectionToTarget * DashDistance;
