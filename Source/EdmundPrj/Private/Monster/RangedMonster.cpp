@@ -24,8 +24,8 @@ void ARangedMonster::SetMonsterStatsByLevel()
             ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
             if (PlayerCharacter)
             {
-                MonsterHP = 50 + (MonsterLevel * 50);
-                MonsterMaxHP = 50 + (MonsterLevel * 50);
+                MonsterHP = 50 + (MonsterLevel * 30);
+                MonsterMaxHP = 50 + (MonsterLevel * 30);
                 MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
                 MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
                 MonsterExpReward += 50 * (PlayerCharacter->GetExpMultipler() - 100) / 100;

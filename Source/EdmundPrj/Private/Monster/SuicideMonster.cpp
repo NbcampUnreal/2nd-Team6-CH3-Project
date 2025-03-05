@@ -21,7 +21,7 @@ void ASuicideMonster::SetMonsterStatsByLevel()
             {
                 MonsterHP = 100 + (MonsterLevel * 50);
                 MonsterMaxHP = 100 + (MonsterLevel * 50);
-                MonsterAttackDamage = 50.0f + (MonsterLevel * 30.0f);
+                MonsterAttackDamage = 30.0f + (MonsterLevel * 20.0f);
                 MonsterArmor = -100.0f + (MonsterLevel * 0.0f);
                 MonsterExpReward += 50 * (PlayerCharacter->GetExpMultipler() - 100) / 100;
                 MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultipler() - 100) / 100;

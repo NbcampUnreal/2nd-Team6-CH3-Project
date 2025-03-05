@@ -271,6 +271,7 @@ void AMonsterSpawner::SpawnMonster()
 			Monster->Tags.Add(FName("Monster"));
 			Monster->SetCanDropReward(true);
 			Monster->SetIsDead(false);
+			Monster->SetMonsterIsHit(false);
 			Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			Monster->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 			Monster->SetActorLocation(GetSpawnVolume());
