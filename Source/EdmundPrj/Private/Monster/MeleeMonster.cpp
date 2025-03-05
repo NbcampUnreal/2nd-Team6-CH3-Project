@@ -19,8 +19,8 @@ void AMeleeMonster::SetMonsterStatsByLevel()
             ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
             if (PlayerCharacter)
             {
-                MonsterHP = 50 + (MonsterLevel * 100);
-                MonsterMaxHP = 50 + (MonsterLevel * 100);
+                MonsterHP = 100 + (MonsterLevel * 50);
+                MonsterMaxHP = 100 + (MonsterLevel * 50);
                 MonsterAttackDamage = 20.0f + (MonsterLevel * 10.0f);
                 MonsterArmor = 10.0f + (MonsterLevel * 10.0f);
                 MonsterExpReward += 100 * (PlayerCharacter->GetExpMultipler() - 100) / 100;
