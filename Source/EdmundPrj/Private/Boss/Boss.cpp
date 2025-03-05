@@ -20,7 +20,7 @@ ABoss::ABoss()
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     BossState = nullptr;
-    MonsterHP = 500.0f;
+    MonsterHP = 1000.0f;
     MonsterMaxHP = 1000.0f;
     MonsterAttackDamage = 10.0f;
     MonsterArmor = 10;
@@ -133,7 +133,8 @@ void ABoss::BeginPlay()
 
     // Stat
     MonsterMoveSpeed = 100.0f;
-    MonsterHP = MonsterMaxHP = 500.0f;
+    MonsterHP = MonsterMaxHP = 500000.0f;
+    MonsterArmor = 30.0f;
     MonsterAttackDamage = 10.0f;
 
     HpbarUpdate();
@@ -716,6 +717,13 @@ void ABoss::CheckWeaken()
 
 void ABoss::ApplyWeaken()
 {
-    // TODO : 보스 약화 구현 필요
+    float WeakenFactor = 0.8f;
+
+    MonsterMaxHP *= WeakenFactor;
+    MonsterHP = FMath::Min(MonsterHP, MonsterMaxHP); 
+    MonsterAttackDamage *= WeakenFactor;
+    MonsterArmor *= WeakenFactor;
+
+    HpbarUpdate();
 }
 
