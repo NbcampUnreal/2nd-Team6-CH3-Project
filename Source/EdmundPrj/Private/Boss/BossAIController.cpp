@@ -64,6 +64,20 @@ void ABossAIController::Tick(float DeltaTime)
         return;
     }
 
+    FVector BossForward = BossCharacter->GetActorForwardVector();
+    FVector PlayerLocation = GetPlayerLocation();
+    FVector DirectionToPlayer = PlayerLocation - BossCharacter->GetActorLocation();
+    DirectionToPlayer.Z = 0;
+    DirectionToPlayer.Normalize();
+    float DotProduct = FVector::DotProduct(BossForward, DirectionToPlayer);
+    float AngleInRadians = FMath::Acos(DotProduct);
+    float AngleInDegrees = FMath::RadiansToDegrees(AngleInRadians);
+
+    if (AngleInDegrees > 10.0f || AngleInDegrees < -10.0f)
+    {
+        BBComp->SetValueAsInt("NextAttack", 0);
+        return;
+    }
 
     float Weight1 = ComputeAttack1Weight();
     float Weight2 = ComputeAttack2Weight();
@@ -114,13 +128,14 @@ bool ABossAIController::CheckHpPattern()
     {
         HPPercent = (BossCharacter->GetMonsterHP() / BossCharacter->GetMonsterMaxHP()) * 100.f;
     }
-    if (!bS2Used && HPPercent <= 50.f)
-    {
-        BBComp->SetValueAsInt("NextAttack", 102);
-        EnableHalfPattern();
-        return true;
-    }
-    else if (!bS3Used && HPPercent <= 25.f)
+    //if (!bS2Used && HPPercent <= 50.f)
+    //{
+    //    BBComp->SetValueAsInt("NextAttack", 102);
+    //    EnableHalfPattern();
+    //    return true;
+    //}
+    //else
+        if (!bS3Used && HPPercent <= 25.f)
     {
         BBComp->SetValueAsInt("NextAttack", 103);
         return true;

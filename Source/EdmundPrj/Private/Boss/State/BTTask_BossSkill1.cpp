@@ -198,7 +198,7 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
         Shape
     );
 
-    //DrawDebugBox(World, Center, BoxExtent, (bFloorPattern ? FColor::Blue : FColor::Magenta), false, 0.5f);
+    DrawDebugBox(World, Center, BoxExtent, (bFloorPattern ? FColor::Blue : FColor::Magenta), false, 0.5f);
 
     if (bOverlapped)
     {
@@ -225,13 +225,20 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
     }
 }
 
-
 void UBTTask_BossSkill1::EndTask()
 {
     if (BossRef)
     {
         BossRef->SetbSkill1Used(true);
     }
+    if (CachedOwnerComp)
+    {
+        FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
+    }
+}
+
+void UBTTask_BossSkill1::OnSkill1MontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
     if (CachedOwnerComp)
     {
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
