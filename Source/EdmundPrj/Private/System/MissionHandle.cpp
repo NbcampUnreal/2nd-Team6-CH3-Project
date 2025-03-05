@@ -221,7 +221,6 @@ void AMissionHandle::UpdateDefenceProgress(float Value)
 void AMissionHandle::ApplyBossWeaken()
 {
 	bWeakenBoss = true;
-	// boss 초기화 시 확인 필요
 }
 
 void AMissionHandle::AddAlter(ABaseMissionItem* Alter)

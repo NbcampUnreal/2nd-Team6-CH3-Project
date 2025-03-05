@@ -145,7 +145,7 @@ void AEdmundGameState::InitSkillData(const TArray<FPlayerSkillRow*> PlayerSkillD
 	RandomSkillSet.Empty();
 }
 
-void AEdmundGameState::CalculateSkillList() // 성능 개선 필요
+void AEdmundGameState::CalculateSkillList()
 {
 	int32 RandomNum = FMath::RandRange(0, SkillDataSet.Num() - 1);
 
