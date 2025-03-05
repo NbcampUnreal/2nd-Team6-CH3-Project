@@ -10,6 +10,8 @@
 #include "Boss/Attack/Boss_Skill3_Wall.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Boss/State/BTTask_BossAttack2.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 #include "NiagaraComponent.h" 
 #include "Boss.generated.h"
 
@@ -215,6 +217,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
     TSubclassOf<ABoss_Attack1_Bullet> Attack1BulletClass;
 
+
     // ***********************Attack 2*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_CooldownEnd = 0.0f;
@@ -234,8 +237,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
     float Attack2_GroundZ = 0.0f;  // 하강 완료 기준 지면 높이
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
-    UParticleSystem* LandImpactParticle; // 착지 파티클
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack2")
+    UNiagaraSystem* LandImpactParticle; // 착지 파티클
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
     float KnockbackStrength = 25000.0f;  // 밀치는 힘
@@ -248,16 +251,16 @@ public:
     class UBTTask_BossAttack3* CurrentAttackTask;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack1 = 50.0f; // 1타 돌진 거리
+    float MeleeAttackDashDistance_Attack1 = 150.0f; // 1타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack2 = 50.0f; // 2타 돌진 거리
+    float MeleeAttackDashDistance_Attack2 = 150.0f; // 2타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack1 = 10.0f; // 1타 돌진 속도
+    float MeleeAttackDashSpeed_Attack1 = 100.0f; // 1타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack2 = 10.0f; // 2타 돌진 속도
+    float MeleeAttackDashSpeed_Attack2 = 100.0f; // 2타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float BossDashFrequency = 0.8f; // 목표 위치 가속 힘
@@ -328,10 +331,11 @@ public:
 
     // ***********************Skill 1*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill1")
-    UParticleSystem* Skill1UpperEffect;
+    UNiagaraSystem* Skill1UpperEffect;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill1")
-    UParticleSystem* Skill1LowerEffect;
+    UNiagaraSystem* Skill1LowerEffect;
+
 
     // ***********************Skill 2*************************
 

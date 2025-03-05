@@ -5,7 +5,7 @@
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
-
+#include "NiagaraFunctionLibrary.h"
 #include "Engine/OverlapResult.h"
 #include "Engine/EngineTypes.h"
 #include "WorldCollision.h"
@@ -24,7 +24,7 @@ UBTTask_BossSkill1::UBTTask_BossSkill1()
 
     BossRef = nullptr;
     CachedOwnerComp = nullptr;
-    CurrentOverlapCount = 0;
+    AttackIterationCount = 0;
 }
 
 EBTNodeResult::Type UBTTask_BossSkill1::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -45,39 +45,21 @@ EBTNodeResult::Type UBTTask_BossSkill1::ExecuteTask(UBehaviorTreeComponent& Owne
     {
         BossRef->GetCharacterMovement()->StopMovementImmediately();
     }
-    //SetbIsSkill1
-    PlaySkill1Animation();
-    if (BossRef->Skill1UpperEffect)
-    {
-        FVector UpperEffectLocation = BossRef->GetActorLocation() + FVector(0.f, 0.f, 200.f);
-        UGameplayStatics::SpawnEmitterAtLocation(BossRef->GetWorld(), BossRef->Skill1UpperEffect, UpperEffectLocation);
-    }
-    if (BossRef->Skill1LowerEffect)
-    {
-        FVector LowerEffectLocation = BossRef->GetActorLocation() + FVector(0.f, 0.f, -50.f);
-        UGameplayStatics::SpawnEmitterAtLocation(BossRef->GetWorld(), BossRef->Skill1LowerEffect, LowerEffectLocation);
-    }
 
-    CurrentOverlapCount = 0;
+    PlayInitialMontage();
+
     if (BossRef->GetWorld())
     {
-        BossRef->GetWorldTimerManager().SetTimer(
-            StartWaitTimerHandle,
-            this,
-            &UBTTask_BossSkill1::OnStartWaitComplete,
-            3.0f,
-            false
-        );
+        BossRef->GetWorldTimerManager().SetTimer(InitialMontageTimerHandle, this, &UBTTask_BossSkill1::StartAttackPattern, 1.0f, false);
     }
 
     return EBTNodeResult::InProgress;
 }
 
-void UBTTask_BossSkill1::PlaySkill1Animation()
+void UBTTask_BossSkill1::PlayInitialMontage()
 {
     if (!BossRef) return;
 
-    // 1) Mesh / AnimInst
     USkeletalMeshComponent* Mesh = BossRef->GetMesh();
     if (!Mesh) return;
 
@@ -85,36 +67,73 @@ void UBTTask_BossSkill1::PlaySkill1Animation()
     if (!AnimInst) return;
 
     UBoss_AnimInstance* BossAnimInst = Cast<UBoss_AnimInstance>(AnimInst);
-    if (BossAnimInst && BossAnimInst->Skill1Montage)
+    if (BossAnimInst && BossAnimInst->Skill1_1Montage)
     {
-        if (AnimInst->Montage_IsPlaying(BossAnimInst->Skill1Montage))
+        if (AnimInst->Montage_IsPlaying(BossAnimInst->Skill1_1Montage))
         {
-            AnimInst->Montage_Stop(0.1f, BossAnimInst->Skill1Montage);
+            AnimInst->Montage_Stop(0.1f, BossAnimInst->Skill1_1Montage);
         }
-        AnimInst->Montage_Play(BossAnimInst->Skill1Montage);
+        AnimInst->Montage_Play(BossAnimInst->Skill1_1Montage);
     }
 }
 
-void UBTTask_BossSkill1::OnStartWaitComplete()
+
+void UBTTask_BossSkill1::StartAttackPattern()
 {
-    StartOverlap();
+    AttackIterationCount = 0;
+    PerformAttackIteration();
 }
 
-void UBTTask_BossSkill1::StartOverlap()
+void UBTTask_BossSkill1::PerformAttackIteration()
 {
-    bool bFloorPattern = (FMath::RandRange(0, 1) == 0);
+    if (!BossRef) return;
 
+    bool bIsHeadAttack = (FMath::RandRange(0, 1) == 0);
+
+    USkeletalMeshComponent* Mesh = BossRef->GetMesh();
+    if (!Mesh) return;
+
+    UAnimInstance* AnimInst = Mesh->GetAnimInstance();
+    if (!AnimInst) return;
+
+    UBoss_AnimInstance* BossAnimInst = Cast<UBoss_AnimInstance>(AnimInst);
+    if (!BossAnimInst) return;
+
+    UAnimMontage* HintMontage = bIsHeadAttack ? BossAnimInst->Skill1_2Montage : BossAnimInst->Skill1_3Montage;
+    if (HintMontage)
+    {
+        float MontageDuration = AnimInst->Montage_Play(HintMontage);
+        FTimerHandle TimerHandle;
+        BossRef->GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateUObject(this, &UBTTask_BossSkill1::OnAttackHintFinished, bIsHeadAttack), MontageDuration, false);
+    }
+    else
+    {
+        OnAttackHintFinished(bIsHeadAttack);
+    }
+}
+
+
+void UBTTask_BossSkill1::OnAttackHintFinished(bool bIsHeadAttack)
+{
+    bool bFloorPattern = !bIsHeadAttack;
     PerformOverlapCheck(bFloorPattern);
 
     if (BossRef && BossRef->GetWorld())
     {
-        BossRef->GetWorldTimerManager().SetTimer(
-            OverlapTimerHandle,
-            this,
-            &UBTTask_BossSkill1::OnOverlapEnd,
-            0.5f,
-            false
-        );
+        BossRef->GetWorldTimerManager().SetTimer(AttackIterationTimerHandle, this, &UBTTask_BossSkill1::OnAttackIterationEnd, 1.0f, false);
+    }
+}
+
+void UBTTask_BossSkill1::OnAttackIterationEnd()
+{
+    AttackIterationCount++;
+    if (AttackIterationCount < 5)
+    {
+        PerformAttackIteration();
+    }
+    else
+    {
+        EndTask();
     }
 }
 
@@ -129,6 +148,15 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
     if (bFloorPattern)
     {
         Center.Z = 0.f;
+        if (BossRef->Skill1LowerEffect)
+        {
+            UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+                World,
+                BossRef->Skill1LowerEffect,
+                Center,
+                FRotator::ZeroRotator
+            );
+        }
     }
     else
     {
@@ -138,11 +166,22 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
             FVector FootPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterFoot"));
             FVector HeadPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterHead"));
             float DynamicOffset = (HeadPos.Z - FootPos.Z) * 0.5f;
-            Center.Z = FootPos.Z + DynamicOffset;
+            Center.Z = FootPos.Z + DynamicOffset + 10.0f;
         }
         else
         {
             Center.Z += 110.f;
+        }
+        if (BossRef->Skill1UpperEffect)
+        {
+            FVector EffectLocation = Center;
+            EffectLocation.Z += 500.f;
+            UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+                World,
+                BossRef->Skill1UpperEffect,
+                EffectLocation,
+                FRotator::ZeroRotator
+            );
         }
     }
 
@@ -159,7 +198,7 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
         Shape
     );
 
-    DrawDebugBox(World, Center, BoxExtent, (bFloorPattern ? FColor::Blue : FColor::Magenta), false, 0.5f);
+    //DrawDebugBox(World, Center, BoxExtent, (bFloorPattern ? FColor::Blue : FColor::Magenta), false, 0.5f);
 
     if (bOverlapped)
     {
@@ -186,35 +225,6 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
     }
 }
 
-
-void UBTTask_BossSkill1::OnOverlapEnd()
-{
-    if (BossRef && BossRef->GetWorld())
-    {
-        BossRef->GetWorldTimerManager().SetTimer(
-            GapTimerHandle,
-            this,
-            &UBTTask_BossSkill1::OnGapEnd,
-            1.0f,
-            false
-        );
-    }
-}
-
-void UBTTask_BossSkill1::OnGapEnd()
-{
-    CurrentOverlapCount++;
-    PlaySkill1Animation();
-
-    if (CurrentOverlapCount < 5)
-    {
-        StartOverlap();
-    }
-    else
-    {
-        EndTask();
-    }
-}
 
 void UBTTask_BossSkill1::EndTask()
 {
