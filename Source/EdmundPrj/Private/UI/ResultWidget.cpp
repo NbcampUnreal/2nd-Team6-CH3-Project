@@ -16,20 +16,6 @@ void UResultWidget::InitWidget(UUIHandle* NewUIHandle)
 	MoveMainButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedMoveMain);
 }
 
-void UResultWidget::ChangedPlayerHp(const int32 MaxHp, const int32 CurrentHp)
-{
-	Super::ChangedPlayerHp(MaxHp, CurrentHp);
-
-	if (CurrentHp <= 0)
-	{
-		UpdateResult(false);
-	}
-	else
-	{
-		UpdateResult(true);
-	}
-}
-
 void UResultWidget::ChangedMissionStateToEnd(const int32 StateMoney, const int32 InstanceMoney, const int32 MissionMoney)
 {
 	GetWorld()->GetTimerManager().ClearTimer(Timer);
@@ -45,6 +31,11 @@ void UResultWidget::ChangedMissionStateToEnd(const int32 StateMoney, const int32
 	TempTotalMoney += TempCurrentMoney + TempMissionMoney;
 }
 
+void UResultWidget::ChangedIsGameClear(const bool bIsClear)
+{
+	UpdateResult(bIsClear);
+}
+
 void UResultWidget::UpdateResult(bool bIsClear)
 {
 	MoveNextButton->OnClicked.Clear();
@@ -53,13 +44,13 @@ void UResultWidget::UpdateResult(bool bIsClear)
 	{
 		MoveNextButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedMoveNext);
 		TitleText->SetText(FText::FromString(FString::Printf(TEXT("Mission Clear"))));
-		MoveNextButtonText->SetText(FText::FromString(FString::Printf(TEXT("Move Next"))));
+		MoveNextButtonText->SetText(FText::FromString(FString::Printf(TEXT("다음으로"))));
 	}
 	else
 	{
 		MoveNextButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedRetry);
 		TitleText->SetText(FText::FromString(FString::Printf(TEXT("Mission Fail"))));
-		MoveNextButtonText->SetText(FText::FromString(FString::Printf(TEXT("Retry"))));
+		MoveNextButtonText->SetText(FText::FromString(FString::Printf(TEXT("재도전"))));
 	}
 }
 

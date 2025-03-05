@@ -113,6 +113,7 @@ void AMissionHandle::SpawnNpc(const FVector& SpawnPos)
 
 	APawn* NewNpc = UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), NpcClass, NpcBT, SpawnPos, FRotator::ZeroRotator, true);
 	NpcPawn = Cast<ANPCMonster>(NewNpc);
+	NpcPawn->SetMissionHandle(this);
 }
 
 void AMissionHandle::SetNpcBondageMode(bool bIsBondage)
@@ -208,6 +209,11 @@ void AMissionHandle::ApplyNpcEquip()
 	}
 }
 
+void AMissionHandle::NotifyDieNpc()
+{
+	EdmundGameMode->FailMission();
+}
+
 void AMissionHandle::UpdateDefenceState(bool bIsOn)
 {
 	EdmundGameState->NotifyOnOverlapedDefenceArea(bIsOn);
@@ -221,7 +227,6 @@ void AMissionHandle::UpdateDefenceProgress(float Value)
 void AMissionHandle::ApplyBossWeaken()
 {
 	bWeakenBoss = true;
-	// boss 초기화 시 확인 필요
 }
 
 void AMissionHandle::AddAlter(ABaseMissionItem* Alter)

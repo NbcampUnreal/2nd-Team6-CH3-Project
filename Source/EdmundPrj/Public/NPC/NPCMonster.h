@@ -8,6 +8,7 @@
 
 class ANPCAttack;
 class UCapsuleComponent;
+class AMissionHandle;
 
 UCLASS()
 class EDMUNDPRJ_API ANPCMonster : public ABaseMonster
@@ -75,6 +76,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void NPCMonsterAttack();
 
+	virtual void MonsterDead() override;
+
+	void SetMissionHandle(AMissionHandle* NewMissionHandle);
+
+	TObjectPtr<AMissionHandle> MissionHandle;
 	//void PlayParticle() override;
 	//void PlaySound() override;
 };

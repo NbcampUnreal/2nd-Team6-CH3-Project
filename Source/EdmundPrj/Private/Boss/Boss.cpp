@@ -132,8 +132,8 @@ void ABoss::BeginPlay()
     }
 
     // Stat
-    MonsterMoveSpeed = 5000.0f;
-    MonsterHP = MonsterMaxHP = 2000.0f;
+    MonsterMoveSpeed = 100.0f;
+    MonsterHP = MonsterMaxHP = 500.0f;
     MonsterAttackDamage = 10.0f;
 
     HpbarUpdate();
@@ -463,12 +463,12 @@ void ABoss::DeactivateAttack2Collision()
 
     if (LandImpactParticle)
     {
-        UGameplayStatics::SpawnEmitterAtLocation(
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
             GetWorld(),
             LandImpactParticle,
             GetActorLocation(),
             FRotator::ZeroRotator,
-            FVector(20.0f)
+            FVector(10.0f)
         );
     }
 }
@@ -490,7 +490,7 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
 
             if (LandImpactParticle && GetWorld())
             {
-                UGameplayStatics::SpawnEmitterAtLocation(
+                UNiagaraFunctionLibrary::SpawnSystemAtLocation(
                     GetWorld(),
                     LandImpactParticle,
                     PlayerCharacter->GetActorLocation(),
@@ -498,6 +498,7 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
                     FVector(1.0f)
                 );
             }
+
             float DamageValue = MonsterAttackDamage * Attack2Multiplier;
             UGameplayStatics::ApplyDamage(
                 OtherActor,
@@ -509,6 +510,7 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
         }
     }
 }
+
 
 void ABoss::DisableMovement()
 {

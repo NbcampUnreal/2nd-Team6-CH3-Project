@@ -90,6 +90,7 @@ public:
 	void NotifyOnOverlapedDefenceArea(const bool bIsOverlaped);
 	void NotifyOnMissionInfo();
 	void NotifyPrintText(const FString& TargetText);
+	void NotifyIsGameClear(const bool bIsClear);
 
 	APlayerController* GetPlayerController();
 	void SetPlayerPawn(AActor* NewPawn);

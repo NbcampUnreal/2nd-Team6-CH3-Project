@@ -54,6 +54,7 @@ public:
 	void TeleportPlayerToTargetPoint();
 	void NotifyStartDefenceMode();
 	void ApplyNpcEquip();
+	void NotifyDieNpc();
 
 	// Defence Progress
 	void UpdateDefenceState(bool bIsOn);
