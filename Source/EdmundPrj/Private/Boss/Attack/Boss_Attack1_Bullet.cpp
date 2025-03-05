@@ -103,14 +103,13 @@ void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnR
 		Attack1Niagara->SetAutoActivate(true);
 		Attack1Niagara->Activate();
 	}
+
+	GetWorld()->GetTimerManager().SetTimer(LifetimeTimerHandle, this, &ABoss_Attack1_Bullet::Explode, 10.0f, false);
+
 	ABoss* BossRef = Cast<ABoss>(GetOwner());
 	if (BossRef)
 	{
 		return;
-	}
-	if (BossRef->GameState)
-	{
-		BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack);
 	}
 }
 
@@ -151,8 +150,7 @@ void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 
 			if (Bullet)
 			{
-				ABoss* BossRef = Cast<ABoss>(GetOwner());
-				float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetAttack1Multiplier();
+				float DamageValue = 10.0f;
 				UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, Bullet, UDamageType::StaticClass());
 			}
 		}
@@ -161,31 +159,22 @@ void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 }
 
 
-
-
 void ABoss_Attack1_Bullet::Explode()
 {
 	if (!bIsActive)
 		return;
 
-	// 탄환은 즉시 숨기고 충돌 비활성화
+	GetWorld()->GetTimerManager().ClearTimer(LifetimeTimerHandle);
+
 	bIsActive = false;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 
-	// 현재 위치에서 폭발 파티클 스폰
 	if (ExplosionEffect->Template)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect->Template, GetActorLocation());
 	}
-	else
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("ExplosionEffect Template is not assigned!"));
-	}
 
-	//UE_LOG(LogTemp, Log, TEXT("Bullet exploded at: %s"), *GetActorLocation().ToString());
-
-	// ExplosionDelay 후에 ResetBullet() 호출하여 탄환을 풀에 반환
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss_Attack1_Bullet::ResetBullet, ExplosionDelay, false);
 }

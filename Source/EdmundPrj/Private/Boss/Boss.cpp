@@ -109,7 +109,7 @@ ABoss::ABoss()
     MuzzleLocation->SetupAttachment(GetMesh(), TEXT("MuzzleSocket"));
 
 
-    MonsterType = EMonsterType::Melee;
+    MonsterType = EMonsterType::Boss;
     GameState = Cast<AEdmundGameState>(UGameplayStatics::GetGameState(GetWorld()));
 
 }
@@ -137,8 +137,8 @@ void ABoss::BeginPlay()
 
     // Stat
     MonsterMoveSpeed = 100.0f;
-    MonsterHP = MonsterMaxHP = 500000.0f;
-    MonsterArmor = 30.0f;
+    MonsterHP = MonsterMaxHP = 20000.0f;
+    MonsterArmor = 15.0f;
     MonsterAttackDamage = 50.0f;
 
     HpbarUpdate();
@@ -174,7 +174,10 @@ void ABoss::Tick(float DeltaTime)
             FString::Printf(TEXT("%d"), (int32)GetCharacterMovement()->MovementMode));
     }
     //**************
-
+    if (!bIsInvulnerable && Skill2ShieldNiagara && Skill2ShieldNiagara->IsActive())
+    {
+        Skill2ShieldNiagara->Deactivate();
+    }
 #pragma region Soket
     if (GetMesh())
     {
@@ -468,6 +471,10 @@ void ABoss::DeactivateAttack2Collision()
 
     if (LandImpactParticle)
     {
+        FVector SpawnLocation = GetActorLocation();
+        float CustomZOffset = -50.0f;
+        SpawnLocation.Z += CustomZOffset;
+
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(
             GetWorld(),
             LandImpactParticle,
@@ -657,13 +664,8 @@ void ABoss::SetSkill2Invulnerable(bool NewIsInvulnerable)
     }
     else
     {
-        GetWorldTimerManager().ClearTimer(Skill2HealingTimerHandle);
         Skill2InvulnerableStartHP = 0.0f;
-
-        if (Skill2ShieldNiagara)
-        {
-            Skill2ShieldNiagara->Deactivate();
-        }
+        GetWorldTimerManager().ClearTimer(Skill2HealingTimerHandle);
     }
 }
 

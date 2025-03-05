@@ -183,19 +183,19 @@ private:
 public:
     // ***********************Stat*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack1Multiplier = 1.5; // 공격 1, 3 탄환 데미지 배율
+    float Attack1Multiplier = 1.8; // 공격 1, 3 탄환 데미지 배율
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack2Multiplier = 1.5; // 공격 2 데미지 배율 
+    float Attack2Multiplier = 3.0; // 공격 2 데미지 배율 
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack3Multiplier = 1.5; // 공격 3 근접 1/2타 데미지 배율
+    float Attack3Multiplier = 2.0; // 공격 3 근접 1/2타 데미지 배율
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack4Multiplier = 1.5; // 공격 4 데미지 배율
+    float Attack4Multiplier = 0.9; // 공격 4 데미지 배율
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Skill1Multiplier = 1.5; // 스킬1 데미지 배율
+    float Skill1Multiplier = 0.8; // 스킬1 데미지 배율
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float TurnSpeed = 5.0f; // 회전 속도
@@ -281,7 +281,7 @@ public:
     float BossDashFrequency = 0.9f; // 목표 위치 가속 힘
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashDamping = 2.0f; // 부드럽게 정지
+    float BossDashDamping = 1.0f; // 부드럽게 정지
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_3FiringDuration = 3.0f; // 3타 지속시간

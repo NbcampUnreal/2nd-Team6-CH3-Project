@@ -58,6 +58,13 @@ void ABossAIController::Tick(float DeltaTime)
         return;
     }
 
+    if (BossCharacter->IsSkill2Invulnerable())
+    {
+        BBComp->SetValueAsInt("NextAttack", 102);
+        return;
+    }
+
+
     float Weight1 = ComputeAttack1Weight();
     float Weight2 = ComputeAttack2Weight();
     float Weight3 = ComputeAttack3Weight();
@@ -107,16 +114,15 @@ bool ABossAIController::CheckHpPattern()
     {
         HPPercent = (BossCharacter->GetMonsterHP() / BossCharacter->GetMonsterMaxHP()) * 100.f;
     }
-
-    if (!bS3Used && HPPercent <= 25.f)
-    {
-        BBComp->SetValueAsInt("NextAttack", 103);
-        return true;
-    }
-    else if (!bS2Used && HPPercent <= 50.f)
+    if (!bS2Used && HPPercent <= 50.f)
     {
         BBComp->SetValueAsInt("NextAttack", 102);
         EnableHalfPattern();
+        return true;
+    }
+    else if (!bS3Used && HPPercent <= 25.f)
+    {
+        BBComp->SetValueAsInt("NextAttack", 103);
         return true;
     }
     else if (!bS1Used && HPPercent <= 75.f)
@@ -166,10 +172,10 @@ void ABossAIController::EnableHalfPattern()
     BossCharacter->SetSkill2Invulnerable(true);
     BossCharacter->SetbIsInvulnerable(true);
 
-    if (BossCharacter->Skill2ShieldNiagara)
-    {
-        BossCharacter->Skill2ShieldNiagara->Activate(true);
-    }
+    //if (BossCharacter->Skill2ShieldNiagara)
+    //{
+    //    BossCharacter->Skill2ShieldNiagara->Activate(true);
+    //}
 
     MissionHandle->RequestSpawnToSpawnerHandle();
 }
@@ -185,6 +191,12 @@ float ABossAIController::ComputeAttack1Weight()
 {
     AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
     if (!Player || !BossCharacter) return 0.0f;
+
+    if (BossCharacter->IsSkill2Invulnerable())
+    {
+        return 0.0f;
+    }
+
     float Distance = FVector::Dist(BossCharacter->GetActorLocation(), Player->GetActorLocation());
     float Weight = 0.0f;
     if (Distance >= 800.f && Distance <= 1500.f)

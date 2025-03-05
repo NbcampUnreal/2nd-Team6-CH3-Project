@@ -150,7 +150,7 @@ void UBTTask_BossAttack4::ExecuteBulletFire()
     {
         if (BossRef->GameState)
         {
-            BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack);
+            BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack4);
         }
         Bullet->FireProjectile(SpawnLocation, TargetRotation, Direction);
     }

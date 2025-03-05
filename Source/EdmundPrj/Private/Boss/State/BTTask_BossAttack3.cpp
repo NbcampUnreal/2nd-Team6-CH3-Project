@@ -78,10 +78,14 @@ void UBTTask_BossAttack3::OnAttack1Notify()
         return;
     }
 
+    if (BossRef->GameState)
+    {
+        BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack3);
+    }
+
     ExecuteMeleeAttack();
     BossRef->SetComboPhase(2);
     ComboPhase = 2;
-    UE_LOG(LogTemp, Log, TEXT("OnAttack1Notify Called, Phase: %d"), ComboPhase);
 }
 
 
@@ -93,13 +97,17 @@ void UBTTask_BossAttack3::OnAttack2Notify()
         return;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("OnAttack2Notify Called, Current ComboPhase: %d"), ComboPhase);
 
     if (ComboPhase != 2)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Invalid Phase in OnAttack2Notify: %d"), ComboPhase);
         return;
     }
+
+    if (BossRef->GameState)
+    {
+        BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack3);
+    }
+
 
     BossRef->SetComboPhase(3);
     ComboPhase = 3;
@@ -437,6 +445,11 @@ void UBTTask_BossAttack3::FireSingleBullet()
 
     FVector BulletDirection = NewRotation.Vector();
 
+    if (BossRef->GameState)
+    {
+        BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack);
+    }
+
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
     if (Bullet)
     {
@@ -445,6 +458,3 @@ void UBTTask_BossAttack3::FireSingleBullet()
 
     FiredBulletCount++;
 }
-
-
-

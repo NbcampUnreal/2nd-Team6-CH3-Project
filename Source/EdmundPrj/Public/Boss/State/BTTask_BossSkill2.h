@@ -20,6 +20,7 @@ protected:
     UPROPERTY()
     UBehaviorTreeComponent* CachedOwnerComp = nullptr;
     void PlaySkill2Animation();
+    void OnSkill2MontageEnded(UAnimMontage* Montage, bool bInterrupted);
     UPROPERTY()
     ABoss* BossRef = nullptr;
 
