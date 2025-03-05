@@ -19,11 +19,11 @@ void ASuicideMonster::SetMonsterStatsByLevel()
             ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
             if (PlayerCharacter)
             {
-                MonsterHP = 100 + (MonsterLevel * 50);
-                MonsterMaxHP = 100 + (MonsterLevel * 50);
+                MonsterHP = 50 + (MonsterLevel * 50);
+                MonsterMaxHP = 50 + (MonsterLevel * 50);
                 MonsterAttackDamage = 50.0f + (MonsterLevel * 30.0f);
-                MonsterArmor = -100.0f + (MonsterLevel * 0.0f);
-                MonsterExpReward += 50 * (PlayerCharacter->GetExpMultipler() - 100) / 100;
+                MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
+                MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultipler() - 100) / 100;
                 MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultipler() - 100) / 100;
                 MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
                 MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
@@ -59,7 +59,7 @@ void ASuicideMonster::MonsterAttackCheck()
             CollisionComp->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
             // 콜리전 컴포넌트 초기화
-            CollisionComp->SetCapsuleSize(2000.0f, 2000.0f); // 필요에 따라 사이즈 조정
+            CollisionComp->SetCapsuleSize(3000.0f, 3000.0f); // 필요에 따라 사이즈 조정
             CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
             CollisionComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f)); // 액터의 앞에 콜리전 위치
 
@@ -152,7 +152,7 @@ void ASuicideMonster::PlayParticle()
 
     if (AttackParticle)
     {
-        FVector ParticleScale = FVector(0.7f, 0.7f, 0.7f);
+        FVector ParticleScale = FVector(1.0f, 1.0f, 1.0f);
 
         Particle = UGameplayStatics::SpawnEmitterAtLocation(
             GetWorld(),

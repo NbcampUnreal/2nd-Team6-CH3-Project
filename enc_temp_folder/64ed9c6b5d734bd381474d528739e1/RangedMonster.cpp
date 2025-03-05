@@ -24,11 +24,11 @@ void ARangedMonster::SetMonsterStatsByLevel()
             ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
             if (PlayerCharacter)
             {
-                MonsterHP = 50 + (MonsterLevel * 50);
-                MonsterMaxHP = 50 + (MonsterLevel * 50);
+                MonsterHP = 100 + (MonsterLevel * 50);
+                MonsterMaxHP = 100 + (MonsterLevel * 50);
                 MonsterAttackDamage = 10.0f + (MonsterLevel * 5.0f);
                 MonsterArmor = 5.0f + (MonsterLevel * 2.0f);
-                MonsterExpReward += 50 * (PlayerCharacter->GetExpMultipler() - 100) / 100;
+                MonsterExpReward += MonsterExpReward * (PlayerCharacter->GetExpMultipler() - 100) / 100;
                 MonsterGoldReward += MonsterGoldReward * (PlayerCharacter->GetGoldMultipler() - 100) / 100;
                 MonsterHealKitProbability = PlayerCharacter->GetItempDropProb() / 2;
                 MonsterGoldProbability = PlayerCharacter->GetItempDropProb();
