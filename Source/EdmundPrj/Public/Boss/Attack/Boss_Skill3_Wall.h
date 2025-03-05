@@ -40,9 +40,18 @@ public:
     UFUNCTION()
     void SimulateGravity();
 
+    UFUNCTION()
+    void LowerAndDeactivate();
+
+    UFUNCTION()
+    void PerformLowering();
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gravity")
     float GravityAcceleration;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gravity")
     FVector CurrentVelocity;
+
+    FTimerHandle LowerTimerHandle;
+    float LowerTargetZ;
 };

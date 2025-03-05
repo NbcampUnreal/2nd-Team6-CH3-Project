@@ -58,6 +58,7 @@ public:
 	
 	void FireSingleBullet();
 
+
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	int32 GetComboPhase() { return ComboPhase; }
 	
@@ -68,9 +69,8 @@ public:
 
 	FTimerHandle CollisionDisableTimerHandle_Check1;
 	FTimerHandle CollisionDisableTimerHandle_Check2;
-
-private:
 	FRotator CurrentRotation;
+private:
 	FVector SpawnLocation;
 	FTimerHandle BulletFireTimerHandle;
 	float AccumulatedDeltaTime;
@@ -84,5 +84,5 @@ private:
 	FVector DashCurrentVelocity;
 	float DashFrequency;
 	float DashDamping;
-
+	
 };

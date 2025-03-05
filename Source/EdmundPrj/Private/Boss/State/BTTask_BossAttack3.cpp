@@ -62,6 +62,7 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
     ComboPhase = 1;
 
     PlayAttack3Montage();
+    ExecuteMeleeAttack();
     return EBTNodeResult::InProgress;
 }
 
@@ -77,11 +78,16 @@ void UBTTask_BossAttack3::OnAttack1Notify()
         return;
     }
 
+    if (BossRef->GameState)
+    {
+        BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack3);
+    }
+
+    ExecuteMeleeAttack();
     BossRef->SetComboPhase(2);
     ComboPhase = 2;
-
-    
 }
+
 
 
 void UBTTask_BossAttack3::OnAttack2Notify()
@@ -91,14 +97,22 @@ void UBTTask_BossAttack3::OnAttack2Notify()
         return;
     }
 
+
     if (ComboPhase != 2)
     {
         return;
     }
+
+    if (BossRef->GameState)
+    {
+        BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack3);
+    }
+
+
     BossRef->SetComboPhase(3);
     ComboPhase = 3;
-    ExecuteMeleeAttack();
 }
+
 
 void UBTTask_BossAttack3::OnAttack3Notify()
 {
@@ -142,27 +156,33 @@ void UBTTask_BossAttack3::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
     if (bIsDashing && BossRef)
     {
         FVector CurrentLocation = BossRef->GetActorLocation();
-        // 스프링 물리 공식:
-        // acceleration = Frequency^2 * (Target - Current) - 2 * Damping * Frequency * CurrentVelocity
+
+        int32 CurrentPhase = BossRef->GetComboPhase();
+        float Damping = (CurrentPhase == 3) ? 3.0f : BossRef->BossDashDamping;
+
         float Frequency = DashFrequency;
-        float Damping = DashDamping;
         FVector Displacement = DashTargetLocation - CurrentLocation;
         FVector Acceleration = Frequency * Frequency * Displacement - 2.0f * Damping * Frequency * DashCurrentVelocity;
+
         DashCurrentVelocity += Acceleration * DeltaSeconds;
         FVector NewLocation = CurrentLocation + DashCurrentVelocity * DeltaSeconds;
+
         BossRef->SetActorLocation(NewLocation, true);
 
-        // 목표에 근접하면 돌진을 종료합니다.
         if (FVector::DistSquared(NewLocation, DashTargetLocation) < FMath::Square(10.0f))
         {
             BossRef->SetActorLocation(DashTargetLocation, true);
             bIsDashing = false;
-            // 돌진 종료 후, 필요한 후속 처리(예: 공격 체크)를 호출할 수 있습니다.
+
+            if (CurrentPhase == 3)
+            {
+                DashCurrentVelocity = FVector::ZeroVector;
+            }
+
             BossRef->MonsterAttackCheck();
         }
     }
 }
-
 
 void UBTTask_BossAttack3::PlayAttack3Montage()
 {
@@ -178,8 +198,6 @@ void UBTTask_BossAttack3::PlayAttack3Montage()
     }
 }
 
-
-
 void UBTTask_BossAttack3::ExecuteMeleeAttack()
 {
     if (!BossRef)
@@ -193,33 +211,55 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
 
     switch (CurrentPhase)
     {
-    case 1:  // 1타 돌진
+    case 1:
         DashDistance = BossRef->MeleeAttackDashDistance_Attack1;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack1;
         break;
-    case 2:  // 2타 돌진
+    case 2:
         DashDistance = BossRef->MeleeAttackDashDistance_Attack2;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack2;
         break;
+    case 3:
+        bIsDashing = false;
+        DashCurrentVelocity = FVector::ZeroVector;
+        if (BossRef->GetCharacterMovement())
+        {
+            BossRef->GetCharacterMovement()->StopMovementImmediately();
+        }
+        return;
     default:
         return;
     }
 
-    // 돌진 시작 위치와 목표 위치를 계산합니다.
+    FVector DirectionToTarget = BossRef->GetActorForwardVector();
+
+    if (BossRef && BossRef->GetController() && CurrentPhase != 3)
+    {
+        ABossAIController* BossAIController = Cast<ABossAIController>(BossRef->GetController());
+        if (BossAIController)
+        {
+            FVector TargetLocation = BossAIController->GetPlayerLocation();
+            DirectionToTarget = (TargetLocation - BossRef->GetActorLocation()).GetSafeNormal();
+        }
+    }
+    if (CurrentPhase != 3)
+    {
+        float RotationSpeed = 10.0f;
+        FRotator TargetRotation = DirectionToTarget.Rotation();
+        FRotator NewRotation = FMath::RInterpTo(BossRef->GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), RotationSpeed);
+        BossRef->SetActorRotation(NewRotation);
+    }
+
     bIsDashing = true;
     DashStartLocation = BossRef->GetActorLocation();
-    FVector DashDirection = BossRef->GetActorForwardVector();
-    DashTargetLocation = DashStartLocation + DashDirection * DashDistance;
-    // 초기 속도를 돌진속도를 참조하여 설정 (방향은 DashDirection)
-    DashCurrentVelocity = DashDirection * DashSpeed;
+    DashTargetLocation = DashStartLocation + DirectionToTarget * DashDistance;
+    DashCurrentVelocity = DirectionToTarget * DashSpeed;
 
-    // 기존의 일정 속도 이동 대신, 물리 기반 돌진이므로 이동을 멈추고 TickTask에서 업데이트하도록 합니다.
     if (BossRef->GetCharacterMovement())
     {
         BossRef->GetCharacterMovement()->StopMovementImmediately();
     }
 }
-
 
 void UBTTask_BossAttack3::Attack3_ActivateMeleeCollision_Check1()
 {
@@ -321,7 +361,10 @@ void UBTTask_BossAttack3::OnMeleeCollisionOverlap_Check2(UPrimitiveComponent* Ov
         {
             BossRef->GetWorld()->GetTimerManager().ClearTimer(CollisionDisableTimerHandle_Check2);
         }
-        UGameplayStatics::ApplyDamage(OtherActor, 1000.0f, nullptr, BossRef, nullptr);
+
+        float DamageValue = BossRef->GetMonsterAttackDamage() * BossRef->GetAttack3Multiplier();
+
+        UGameplayStatics::ApplyDamage(OtherActor, DamageValue, nullptr, BossRef, nullptr);
         Attack3_DeactivateCollision_Check2();
     }
 }
@@ -402,6 +445,11 @@ void UBTTask_BossAttack3::FireSingleBullet()
 
     FVector BulletDirection = NewRotation.Vector();
 
+    if (BossRef->GameState)
+    {
+        BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack);
+    }
+
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(BossRef->GetWorld(), BossRef->Attack1BulletClass);
     if (Bullet)
     {
@@ -410,6 +458,3 @@ void UBTTask_BossAttack3::FireSingleBullet()
 
     FiredBulletCount++;
 }
-
-
-

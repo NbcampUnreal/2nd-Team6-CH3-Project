@@ -5,7 +5,7 @@
 #include "BTTask_BossSkill3.generated.h"
 
 class ABoss;
-class ABoss_Skill3_Wall; // 추가: 전방 선언
+class ABoss_Skill3_Wall;
 
 UCLASS()
 class EDMUNDPRJ_API UBTTask_BossSkill3 : public UBTTaskNode
@@ -22,6 +22,7 @@ protected:
     void SpawnWall();
     void OnSpawnComplete();
     FRotator CalculateRandomRotation();
+    //void LowerSpawnedWalls();
 
     void StartDetection();
     void PerformDetection();
