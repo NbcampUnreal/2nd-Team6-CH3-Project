@@ -6,7 +6,7 @@
 
 AHealingItem::AHealingItem()
 {
-
+	ItemType = EItemType::HealKit;
 }
 
 float AHealingItem::GetHealingPercent() const

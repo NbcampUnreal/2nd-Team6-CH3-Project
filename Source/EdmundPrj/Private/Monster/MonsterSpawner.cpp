@@ -265,6 +265,7 @@ void AMonsterSpawner::SpawnMonster()
 				AIController->SetActorTickEnabled(true);
 			}
 
+			Monster->GetCharacterMovement()->Activate();
 			Monster->SetMonsterLevel(LevelIndex + 1);
 			Monster->SetMonsterStatsByLevel();
 			Monster->Tags.Add(FName("Monster"));

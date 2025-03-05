@@ -163,7 +163,8 @@ enum class EMonsterType : uint8
 	Melee = 0,
 	Ranger,
 	Suicide,
-	Boss
+	Boss,
+	BossEtc
 };
 
 UENUM(BlueprintType)

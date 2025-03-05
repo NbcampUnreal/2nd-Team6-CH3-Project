@@ -221,4 +221,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC|Mode")
 	bool bIsMoveMode = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
+	ENpcType BaseNpcType;
 };

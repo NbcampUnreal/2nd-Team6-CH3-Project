@@ -97,14 +97,14 @@ void APlayerCharacterFey::StartJump(const FInputActionValue& value)
 		if (PlayerController && PlayerController->IsInputKeyDown(EKeys::W))
 		{
 			IsMove = true;
-			JumpVelocity = GetActorForwardVector() * GetCharacterMovement()->MaxWalkSpeed;
+			JumpVelocity = GetActorForwardVector();
 		}
 
 		// 특정 키(S 키)가 눌렸는지 확인
 		else if (PlayerController && PlayerController->IsInputKeyDown(EKeys::S))
 		{
 			IsMove = true;
-			JumpVelocity = GetActorForwardVector() * -1.0f * GetCharacterMovement()->MaxWalkSpeed;
+			JumpVelocity = GetActorForwardVector() * -1.0f;
 		}
 
 		// 특정 키(A 키)가 눌렸는지 확인
@@ -112,12 +112,14 @@ void APlayerCharacterFey::StartJump(const FInputActionValue& value)
 		{
 			if (!IsMove)
 			{
-				JumpVelocity = GetActorRightVector() * -1.0f * GetCharacterMovement()->MaxWalkSpeed;
+				JumpVelocity = GetActorRightVector() * -1.0f;
 			}
 			else
 			{
-				JumpVelocity = JumpVelocity + GetActorRightVector() * -1.0f * GetCharacterMovement()->MaxWalkSpeed;
+				JumpVelocity = JumpVelocity + GetActorRightVector() * -1.0f;
 			}
+
+			JumpVelocity.Normalize();
 		}
 
 		// 특정 키(D 키)가 눌렸는지 확인
@@ -125,13 +127,17 @@ void APlayerCharacterFey::StartJump(const FInputActionValue& value)
 		{
 			if (!IsMove)
 			{
-				JumpVelocity = GetActorRightVector() * 1.0f * GetCharacterMovement()->MaxWalkSpeed;
+				JumpVelocity = GetActorRightVector() * 1.0f;
 			}
 			else
 			{
-				JumpVelocity = JumpVelocity + GetActorRightVector() * 1.0f * GetCharacterMovement()->MaxWalkSpeed;
+				JumpVelocity = JumpVelocity + GetActorRightVector();
 			}
+
+			JumpVelocity.Normalize();
 		}
+
+		JumpVelocity *= GetCharacterMovement()->MaxWalkSpeed;
 
 		JumpVelocity.Z = DoubleJumpHeight;
 
@@ -278,7 +284,7 @@ void APlayerCharacterFey::AttackTrace()
 			// 충돌한 객체가 있다면
 			AActor* HitActor = Hit.GetActor();
 
-			if (HitActor)
+			if (!HitActor)
 			{
 				continue;
 			}
