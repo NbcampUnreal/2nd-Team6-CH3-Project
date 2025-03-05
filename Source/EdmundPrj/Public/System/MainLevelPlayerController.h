@@ -28,7 +28,8 @@ public:
 	AMainLevelPlayerController();
 	void SetTargetToNull();
 	void SetSelectMode(bool Value);
-	void InitMainLevelCharacters(const TArray<FCharacterDataRow*>& CharacterData, ECharacterType Type, AEdmundGameState* NewGameState);
+	void InitMainLevelCharacters(const TArray<FCharacterDataRow*>& NewCharacterData, ECharacterType NewType, AEdmundGameState* NewGameState);
+	void SpawnCharacters();
 	void CompareType(ECharacterType Type);
 
 protected:
@@ -52,6 +53,9 @@ private:
 	TMap<TObjectPtr<ABaseCharacter>, bool> bIsReturnByCharacter;
 	FVector MoveTargetPos;
 	FVector LookAtTargetPos;
+
+	TArray<FCharacterDataRow*> CharacterData;
+	ECharacterType CharacterType;
 
 	bool bIsSelectMode = true;
 };

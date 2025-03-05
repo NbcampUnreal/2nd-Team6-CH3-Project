@@ -64,7 +64,6 @@ void AMissionHandle::RequestUpdateNotifyText(const FString& NotifyText)
 
 void AMissionHandle::StartMainMission()
 {
-	UE_LOG(LogTemp, Warning, TEXT("MainMission Index : %d, Mission Set Num : %d"), MainMissionIndex, MainMissionSet.Num());
 	checkf(MainMissionIndex < MainMissionSet.Num(), TEXT("Main Mission Index out of range"));
 	MainMissionSet[MainMissionIndex]->PrintMissionInfoText();
 	MainMissionSet[MainMissionIndex]->SetIsActive(true);

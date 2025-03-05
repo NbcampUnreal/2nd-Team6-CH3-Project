@@ -11,6 +11,7 @@ void AMissionItemAltar::InitMissionItem(AMissionHandle* NewMissionHandle, const 
 
 	ApplyBlockCollision();
 	MissionHandle->AddAlter(this);
+	Tags.Add("MissionItem");
 }
 
 float AMissionItemAltar::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

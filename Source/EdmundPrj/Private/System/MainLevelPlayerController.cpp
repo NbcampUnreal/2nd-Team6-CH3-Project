@@ -157,9 +157,21 @@ void AMainLevelPlayerController::SetSelectMode(bool Value)
 	bIsSelectMode = Value;
 }
 
-void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacterDataRow*>& CharacterData, ECharacterType Type, AEdmundGameState* NewGameState)
+void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacterDataRow*>& NewCharacterData, ECharacterType NewType, AEdmundGameState* NewGameState)
 {
 	EdmundGameState = NewGameState;
+	CharacterData = NewCharacterData;
+	CharacterType = NewType;
+
+	SpawnCharacters();
+}
+
+void AMainLevelPlayerController::SpawnCharacters()
+{
+	if (!IsValid(GetPawn()))
+	{
+		return;
+	}
 	MoveTargetPos = GetPawn()->GetActorLocation();
 	MoveTargetPos = FVector(MoveTargetPos.X, MoveTargetPos.Y, 0);
 	LookAtTargetPos = GetPawn()->GetComponentByClass<UCameraComponent>()->GetComponentLocation();
@@ -191,7 +203,7 @@ void AMainLevelPlayerController::InitMainLevelCharacters(const TArray<FCharacter
 
 		if (!IsValid(TargetCharacter))
 		{
-			if (CharacterDataRow->CharacterType == Type)
+			if (CharacterDataRow->CharacterType == CharacterType)
 			{
 				TargetCharacter = NewCharacter;
 				EdmundGameState->SetSelectedCharacter(TargetCharacter);
