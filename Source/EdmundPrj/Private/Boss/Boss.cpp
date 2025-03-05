@@ -167,6 +167,14 @@ void ABoss::Tick(float DeltaTime)
         );
     }
 
+    if (GetCharacterMovement() && GetCharacterMovement()->MovementMode == MOVE_Walking)
+    {
+        if (!GetCharacterMovement()->IsMovingOnGround())
+        {
+            GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+        }
+    }
+
     //**************
     if (GEngine && GetCharacterMovement())
     {
@@ -494,11 +502,27 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
         ACharacter* PlayerCharacter = Cast<ACharacter>(OtherActor);
         if (PlayerCharacter)
         {
-            FVector KnockbackDirection = PlayerCharacter->GetActorLocation() - GetActorLocation();
-            KnockbackDirection.Z = 0;
-            KnockbackDirection.Normalize();
+            FVector CollisionCenter = Attack2Collision ? Attack2Collision->GetComponentLocation() : GetActorLocation();
+            FVector Direction = PlayerCharacter->GetActorLocation() - CollisionCenter;
+            Direction.Z = 0.0f;
 
-            PlayerCharacter->LaunchCharacter(KnockbackDirection * KnockbackStrength, true, false);
+            float Distance = Direction.Size();
+            if (Direction.IsNearlyZero())
+            {
+                Direction = FVector(1.0f, 0.0f, 0.0f);
+                Distance = 1.0f;
+            }
+            Direction.Normalize();
+
+            float ExtraMultiplier = 1.0f;
+            const float Threshold = 100.0f;
+            if (Distance < Threshold)
+            {
+                ExtraMultiplier = 2.0f;
+            }
+
+            float FinalKnockbackStrength = KnockbackStrength * ExtraMultiplier;
+            PlayerCharacter->LaunchCharacter(Direction * FinalKnockbackStrength, true, false);
 
             if (LandImpactParticle && GetWorld())
             {
@@ -522,6 +546,8 @@ void ABoss::OnAttack2CollisionOverlap(UPrimitiveComponent* OverlappedComp, AActo
         }
     }
 }
+
+
 
 
 void ABoss::DisableMovement()
@@ -728,7 +754,7 @@ void ABoss::CheckWeaken()
 
 void ABoss::ApplyWeaken()
 {
-    float WeakenFactor = 0.5f;
+    float WeakenFactor = 0.8f;
 
     MonsterMaxHP *= WeakenFactor;
     MonsterHP = FMath::Min(MonsterHP, MonsterMaxHP); 

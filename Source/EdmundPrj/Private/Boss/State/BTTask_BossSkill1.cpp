@@ -198,7 +198,7 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
         Shape
     );
 
-    //DrawDebugBox(World, Center, BoxExtent, (bFloorPattern ? FColor::Blue : FColor::Magenta), false, 0.5f);
+    DrawDebugBox(World, Center, BoxExtent, (bFloorPattern ? FColor::Blue : FColor::Magenta), false, 0.5f);
 
     if (bOverlapped)
     {
@@ -232,6 +232,39 @@ void UBTTask_BossSkill1::EndTask()
     {
         BossRef->SetbSkill1Used(true);
     }
+    if (CachedOwnerComp)
+    {
+        FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
+    }
+}
+
+void UBTTask_BossSkill1::EndTask()
+{
+    if (BossRef)
+    {
+        UAnimInstance* AnimInst = BossRef->GetMesh()->GetAnimInstance();
+        if (AnimInst)
+        {
+            UBoss_AnimInstance* BossAnimInst = Cast<UBoss_AnimInstance>(AnimInst);
+            if (BossAnimInst && BossAnimInst->Skill1_4Montage)
+            {
+                FOnMontageEnded MontageEndedDelegate;
+                MontageEndedDelegate.BindUObject(this, &UBTTask_BossSkill1::OnSkill1MontageEnded);
+                AnimInst->Montage_Play(BossAnimInst->Skill1_4Montage);
+                AnimInst->Montage_SetEndDelegate(MontageEndedDelegate, BossAnimInst->Skill1_4Montage);
+                return;
+            }
+        }
+    }
+
+    if (CachedOwnerComp)
+    {
+        FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
+    }
+}
+
+void UBTTask_BossSkill1::OnSkill1MontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
     if (CachedOwnerComp)
     {
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);

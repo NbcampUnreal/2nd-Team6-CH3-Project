@@ -114,13 +114,14 @@ bool ABossAIController::CheckHpPattern()
     {
         HPPercent = (BossCharacter->GetMonsterHP() / BossCharacter->GetMonsterMaxHP()) * 100.f;
     }
-    if (!bS2Used && HPPercent <= 50.f)
-    {
-        BBComp->SetValueAsInt("NextAttack", 102);
-        EnableHalfPattern();
-        return true;
-    }
-    else if (!bS3Used && HPPercent <= 25.f)
+    //if (!bS2Used && HPPercent <= 50.f)
+    //{
+    //    BBComp->SetValueAsInt("NextAttack", 102);
+    //    EnableHalfPattern();
+    //    return true;
+    //}
+    //else
+        if (!bS3Used && HPPercent <= 25.f)
     {
         BBComp->SetValueAsInt("NextAttack", 103);
         return true;
