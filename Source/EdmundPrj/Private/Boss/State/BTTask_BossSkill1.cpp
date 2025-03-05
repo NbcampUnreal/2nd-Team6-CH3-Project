@@ -166,7 +166,7 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
             FVector FootPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterFoot"));
             FVector HeadPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterHead"));
             float DynamicOffset = (HeadPos.Z - FootPos.Z) * 0.5f;
-            Center.Z = FootPos.Z + DynamicOffset + 10.0f;
+            Center.Z = FootPos.Z + DynamicOffset + 30.0f;
         }
         else
         {

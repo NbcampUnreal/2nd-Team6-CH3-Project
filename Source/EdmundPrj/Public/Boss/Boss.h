@@ -126,7 +126,13 @@ public:
     void SetSkill2Invulnerable(bool NewIsInvulnerable);
     void HpbarUpdate();
     bool IsSkill2Invulnerable() const { return bIsInvulnerable; }
-
+    EMonsterType GetMonsterType() const { return MonsterType; }
+    float GetMonsterAttackDamage() { return MonsterAttackDamage; }
+    float GetAttack1Multiplier() { return Attack1Multiplier; }
+    float GetAttack3Multiplier() { return Attack3Multiplier; }
+    float GetAttack4Multiplier() { return Attack4Multiplier; }
+    
+    
 
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
@@ -177,22 +183,19 @@ private:
 public:
     // ***********************Stat*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack1Multiplier = 1.5;
+    float Attack1Multiplier = 1.8; // 공격 1, 3 탄환 데미지 배율
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack2Multiplier = 1.5;
+    float Attack2Multiplier = 3.0; // 공격 2 데미지 배율 
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack3MeleeMultiplier = 1.5;
+    float Attack3Multiplier = 2.0; // 공격 3 근접 1/2타 데미지 배율
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack3RangeMultiplier = 1.5;
+    float Attack4Multiplier = 0.9; // 공격 4 데미지 배율
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Attack4Multiplier = 1.5;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float Skill1Multiplier = 1.5;
+    float Skill1Multiplier = 0.8; // 스킬1 데미지 배율
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float TurnSpeed = 5.0f; // 회전 속도
@@ -243,6 +246,18 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
     float KnockbackStrength = 25000.0f;  // 밀치는 힘
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
+    float Attack1_CooldownDuration = 10.0f; // 공격 1 쿨타임
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
+    float Attack2_CooldownDuration = 60.0f; // 공격 2 쿨타임
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
+    float Attack3_CooldownDuration = 20.0f; // 공격 3 쿨타임
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
+    float Attack4_CooldownDuration = 50.0f; // 공격 4 쿨타임
+
     // ***********************Attack 3*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_CooldownEnd = 0.0f;
@@ -251,22 +266,22 @@ public:
     class UBTTask_BossAttack3* CurrentAttackTask;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack1 = 150.0f; // 1타 돌진 거리
+    float MeleeAttackDashDistance_Attack1 = 1500.0f; // 1타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack2 = 150.0f; // 2타 돌진 거리
+    float MeleeAttackDashDistance_Attack2 = 1500.0f; // 2타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack1 = 100.0f; // 1타 돌진 속도
+    float MeleeAttackDashSpeed_Attack1 = 300.0f; // 1타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack2 = 100.0f; // 2타 돌진 속도
+    float MeleeAttackDashSpeed_Attack2 = 300.0f; // 2타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashFrequency = 0.8f; // 목표 위치 가속 힘
+    float BossDashFrequency = 0.9f; // 목표 위치 가속 힘
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashDamping = 0.7f; // 부드럽게 정지
+    float BossDashDamping = 1.0f; // 부드럽게 정지
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_3FiringDuration = 3.0f; // 3타 지속시간
@@ -285,7 +300,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
     TSubclassOf<ABoss_Attack4_Bullet> Attack4BulletClass;
 
-    // 탄환 발사 횟수를 관리하는 변수 (현재 발사된 탄환 수)
+    // 발사된 탄환 수
     int32 Attack4_Attack4FiredCount = 0;
 
     // 상승 전 대기 시간
@@ -314,7 +329,7 @@ public:
 
     // 발사할 탄환의 총 개수
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
-    int32 Attack4_FireBulletCount = 5;
+    int32 Attack4_FireBulletCount = 10;
 
     // 유도 지속 시간
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack4")
@@ -380,24 +395,11 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "Skill3")
     float Skill3AttackRadius = 1000.0f;  // 광역 공격 반경
 
-    UPROPERTY(EditDefaultsOnly, Category = "Skill3")
-    float Skill3AttackDamage = 50.0f;  // 광역 공격 데미지
-
     // ***********************Skill 4*************************
 
 
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack1_CooldownDuration = 5.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack2_CooldownDuration = 10.0f;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack3_CooldownDuration = 15.0f;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack4_CooldownDuration = 20.0f;
 
     ////
     void InitBoss(AMissionHandle* NewMissionHandle);

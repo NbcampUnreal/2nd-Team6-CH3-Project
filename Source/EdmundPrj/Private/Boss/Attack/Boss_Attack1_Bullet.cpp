@@ -7,6 +7,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
+#include "Boss/Boss.h"
 #include "Engine/World.h"
 
 TArray<ABoss_Attack1_Bullet*> ABoss_Attack1_Bullet::BulletPool;
@@ -96,6 +97,20 @@ void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnR
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
+
+	if (Attack1Niagara)
+	{
+		Attack1Niagara->SetAutoActivate(true);
+		Attack1Niagara->Activate();
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(LifetimeTimerHandle, this, &ABoss_Attack1_Bullet::Explode, 10.0f, false);
+
+	ABoss* BossRef = Cast<ABoss>(GetOwner());
+	if (BossRef)
+	{
+		return;
+	}
 }
 
 void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
@@ -144,31 +159,22 @@ void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 }
 
 
-
-
 void ABoss_Attack1_Bullet::Explode()
 {
 	if (!bIsActive)
 		return;
 
-	// 탄환은 즉시 숨기고 충돌 비활성화
+	GetWorld()->GetTimerManager().ClearTimer(LifetimeTimerHandle);
+
 	bIsActive = false;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 
-	// 현재 위치에서 폭발 파티클 스폰
 	if (ExplosionEffect->Template)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect->Template, GetActorLocation());
 	}
-	else
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("ExplosionEffect Template is not assigned!"));
-	}
 
-	//UE_LOG(LogTemp, Log, TEXT("Bullet exploded at: %s"), *GetActorLocation().ToString());
-
-	// ExplosionDelay 후에 ResetBullet() 호출하여 탄환을 풀에 반환
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss_Attack1_Bullet::ResetBullet, ExplosionDelay, false);
 }
@@ -181,6 +187,12 @@ void ABoss_Attack1_Bullet::ResetBullet()
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+
+	if (Attack1Niagara)
+	{
+		Attack1Niagara->Deactivate();
+		Attack1Niagara->SetAutoActivate(false);
+	}
 
 	// 탄환 풀이 누락되었으면 추가
 	if (!BulletPool.Contains(this))

@@ -66,17 +66,14 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		{
 			BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		}
-		// 액터와 소켓 위치 차 계산
 		FVector CurrentActorLocation = BossRef->GetActorLocation();
 		FVector SocketLocation = BossRef->GetMesh()->GetSocketLocation(TEXT("Back_Left_FootCapsuleComponent"));
 		float ActorSocketOffset = CurrentActorLocation.Z - SocketLocation.Z;
 
-		// 소켓 기준으로 상승할 새로운 Z 값 계산
 		float NewSocketZ = SocketLocation.Z + BossRef->Attack2_AscendSpeed * DeltaSeconds;
 
 		if (NewSocketZ >= BossRef->Attack2_TargetHeight)
 		{
-			// 목표 높이에 도달하면, 액터 위치를 보정하여 소켓이 정확히 목표 높이에 오도록 함
 			float TargetActorZ = BossRef->Attack2_TargetHeight + ActorSocketOffset;
 			FVector NewActorLocation = CurrentActorLocation;
 			NewActorLocation.Z = TargetActorZ;
@@ -85,7 +82,6 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 		}
 		else
 		{
-			// 아직 목표에 도달하지 않았다면, 단순히 위로 이동
 			FVector NewActorLocation = CurrentActorLocation;
 			NewActorLocation.Z += BossRef->Attack2_AscendSpeed * DeltaSeconds;
 			BossRef->SetActorLocation(NewActorLocation, false);
@@ -102,15 +98,13 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 			TimerHandle_Phase, this, &UBTTask_BossAttack2::StartDescend, 1.0f, false);
 		break;
 	}
-	case 5: // 하강 단계 (Back_Left_FootCapsuleComponent 기준)
+	case 5:
 	{
 		FVector CurrentActorLocation = BossRef->GetActorLocation();
 		FVector NewActorLocation = CurrentActorLocation - FVector(0, 0, BossRef->Attack2_DescendSpeed * DeltaSeconds);
-		// 액터와 소켓 높이 차 계산
 		FVector SocketLocation = BossRef->GetMesh()->GetSocketLocation(TEXT("Back_Left_FootCapsuleComponent"));
 		float ActorSocketOffset = CurrentActorLocation.Z - SocketLocation.Z;
 
-		// 소켓 위치를 기준으로 라인트레이스 실행하여 지면 높이 감지
 		FHitResult HitResult;
 		FVector TraceStart = SocketLocation;
 		FVector TraceEnd = TraceStart - FVector(0, 0, 5000.f);
@@ -123,7 +117,10 @@ void UBTTask_BossAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 			float NewSocketZ = (NewActorLocation.Z - ActorSocketOffset);
 			if (NewSocketZ <= GroundZ)
 			{
-				// 소켓이 지면보다 내려가지 않도록 보정
+				if (BossRef->GameState)
+				{
+					BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack2);
+				}
 				float TargetActorZ = GroundZ + ActorSocketOffset;
 				NewActorLocation.Z = TargetActorZ;
 				BossRef->SetActorLocation(NewActorLocation, false);
@@ -164,6 +161,12 @@ void UBTTask_BossAttack2::StartAscend()
 		BossRef->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		BossRef->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	}
+
+	if (BossRef->GameState)
+	{
+		BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack2);
+	}
+
 	CurrentPhase = 1;
 	DelayedFire_Attack2();
 }
@@ -250,3 +253,4 @@ void UBTTask_BossAttack2::OnMontageNotifyBegin(FName NotifyName, const FBranchin
 		StartAscend();
 	}
 }
+

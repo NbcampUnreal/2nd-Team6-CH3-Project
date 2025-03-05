@@ -22,6 +22,7 @@ public:
     //void OnAttackTaskComplete(int32 AttackID);
     void InitBlackboard(AMissionHandle* NewMissionHandle);
     void NotifyClearHalfPattern();
+    FVector GetPlayerLocation();
 
     UPROPERTY(BlueprintReadWrite, Category = "Attack")
     UBTTask_BossAttack3* CurrentAttackTask;
@@ -56,4 +57,5 @@ private:
     float ComputeAttack2Weight();
     float ComputeAttack3Weight();
     float ComputeAttack4Weight();
+    
 };
