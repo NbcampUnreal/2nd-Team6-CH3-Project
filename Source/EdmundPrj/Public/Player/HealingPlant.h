@@ -19,6 +19,7 @@ public:
 	virtual void SpawnTimerSkill() override;
 	virtual void Deactivate() override;
 	virtual void UpgradeSkill() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	TObjectPtr<USphereComponent> CheckCharacterCollision = nullptr;

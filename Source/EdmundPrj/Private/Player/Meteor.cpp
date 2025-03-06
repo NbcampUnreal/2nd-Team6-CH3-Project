@@ -48,6 +48,7 @@ void AMeteor::HitToGround()
 		GroundHitNiagara->SetWorldLocation(GetActorLocation());
 		GetWorldTimerManager().SetTimer(ElplosionEffectDeactivateHandle,
 			[this] {
+				if (!IsValid(this)) return;
 				GroundHitNiagara->Deactivate();
 			},
 			5,
@@ -55,7 +56,7 @@ void AMeteor::HitToGround()
 	}
 	for (AActor* activator : activators)
 	{
-		if (activator && activator->ActorHasTag("Monster"))
+		if (activator && activator->ActorHasTag("Monster") && !activator->ActorHasTag("Boss"))
 		{
 			if (TObjectPtr<ABaseMonster> Monster = Cast<ABaseMonster>(activator))
 			{
@@ -121,4 +122,9 @@ void AMeteor::Tick(float deltaTime)
 void AMeteor::UpgradeSkill()
 {
 	DamageMultiplier += DamageMultiplierAmount;
+}
+
+void AMeteor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorldTimerManager().ClearTimer(ElplosionEffectDeactivateHandle);
 }

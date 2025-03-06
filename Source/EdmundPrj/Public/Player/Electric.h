@@ -29,6 +29,7 @@ public:
 		int32 otherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	UFUNCTION()
 	void MoveToMonster(ABaseMonster* monster);
 	UFUNCTION()

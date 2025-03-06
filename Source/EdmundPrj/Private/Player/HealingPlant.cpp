@@ -25,7 +25,7 @@ void AHealingPlant::HealingCharacter()
 	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
 	if (GameState != nullptr)
 	{
-		//GameState->PlayItemSound(AudioComponent, EItemType::HealKit)
+		GameState->PlayItemSound(AudioComponent, EItemType::HealPlants, ESoundType::Attack);
 	}
 	HealingEffectNiagara->Deactivate();
 	HealingEffectNiagara->Activate();
@@ -76,4 +76,10 @@ void AHealingPlant::Deactivate()
 void AHealingPlant::UpgradeSkill()
 {
 	HealAmount += DamageMultiplierAmount;
+}
+
+void AHealingPlant::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorldTimerManager().ClearTimer(HealCycleHandle);
+	GetWorldTimerManager().ClearTimer(SpawnShakeHandle);
 }

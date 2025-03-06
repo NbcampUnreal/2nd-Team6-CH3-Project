@@ -35,7 +35,7 @@ void AThunder::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 		AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
 		if (GameState != nullptr)
 		{
-			//GameState->PlayItemSound()
+			GameState->PlayItemSound(AudioComponent, EItemType::Thunder, ESoundType::Attack);
 		}
 		ElectricEffectPool->ActivateElectricEffect(Monster->GetActorLocation(), ElectricCount);
 	}
