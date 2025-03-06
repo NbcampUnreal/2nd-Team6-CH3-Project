@@ -56,7 +56,7 @@ void AAttackPlant::ApplyDamage()
 	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
 	if (GameState != nullptr)
 	{
-		//GameState->PlayItemSound(AudioComponent)
+		GameState->PlayItemSound(AudioComponent, EItemType::AttackPlants, ESoundType::Attack);
 	}
 }
 

@@ -20,6 +20,7 @@ class EDMUNDPRJ_API AMeteor : public ATimerSkill
 	virtual void SpawnTimerSkill() override;
 	virtual void Tick(float deltaTime);
 	virtual void UpgradeSkill() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float MetoerHitPushStrength = 0;
@@ -30,4 +31,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
 	TObjectPtr<UNiagaraComponent> FallingEffectNiagara;
 	FTimerHandle ElplosionEffectDeactivateHandle;
+
 };

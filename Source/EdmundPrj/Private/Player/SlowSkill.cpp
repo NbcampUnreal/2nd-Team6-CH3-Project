@@ -11,7 +11,7 @@ void ASlowSkill::HitToMonster(TObjectPtr<ABaseMonster> monster)
 	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
 	if (GameState != nullptr)
 	{
-		//GameState->PlayItemSound(AudioComponent, EItemType::HealKit)
+		GameState->PlayItemSound(AudioComponent, EItemType::Slow, ESoundType::Attack);
 	}
 	monster->ChangeCurrentSpeed(CurrentSpeed - SlowApplicationRate);
 	UGameplayStatics::ApplyDamage(

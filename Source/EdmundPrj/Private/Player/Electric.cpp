@@ -66,6 +66,12 @@ void AElectric::FindMonster(UPrimitiveComponent* overlappedComp, AActor* otherAc
 	}
 }
 
+void AElectric::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorldTimerManager().ClearTimer(MoveTimer);
+	GetWorldTimerManager().ClearTimer(DeactivateTimer);
+}
+
 void AElectric::MoveToMonster(ABaseMonster* monster)
 {
 	AddSplinePoint(monster->GetActorLocation());
@@ -108,7 +114,7 @@ void AElectric::Attack(ABaseMonster* monster)
 	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
 	if (GameState != nullptr)
 	{
-		//GameState->PlayItemSound(AudioComponent, EItemType::);
+		GameState->PlayItemSound(AudioComponent, EItemType::Electric, ESoundType::Attack);
 	}
 	if (CurrentElectricCount >= ElectricCount)
 	{

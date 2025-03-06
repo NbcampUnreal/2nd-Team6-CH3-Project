@@ -33,7 +33,7 @@ void ASolarDisk::HitToMonsterInCollision()
 	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
 	if (GameState != nullptr)
 	{
-		//GameState->PlayItemSound(AudioComponent, EItemType::HealKit)
+		GameState->PlayItemSound(AudioComponent, EItemType::SolarDisk, ESoundType::Attack);
 	}
 	EnemySearchCollision->GetOverlappingActors(activators);
 	for(AActor* activator : activators)
@@ -64,12 +64,13 @@ void ASolarDisk::SpawnTimerSkill()
 			SphereMesh->SetRelativeLocation(spherePos + FVector(0, 0, 0.75f));
 			if (spherePos.Z >= 310)
 			{
+
 				Super::SpawnTimerSkill();
 				GetWorldTimerManager().ClearTimer(SpawnAnimHandle);
 				GetWorldTimerManager().SetTimer(AttackCycleHandle,
 					this,
 					&ASolarDisk::HitToMonsterInCollision,
-					AttackCycleSeconds,
+					DamageCycleTime,
 					true);
 				return;
 			}

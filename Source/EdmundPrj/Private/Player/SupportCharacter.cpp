@@ -32,8 +32,6 @@ void ASupportCharacter::BeginPlay()
 void ASupportCharacter::CheckMonster()
 {
 	if (!IsValid(EnemySearchCollision)) return;
-
-	Monsters.Empty();
 	TArray<AActor*> Activators;
 	EnemySearchCollision->GetOverlappingActors(Activators);
 	for (AActor* Activator : Activators)
@@ -42,12 +40,12 @@ void ASupportCharacter::CheckMonster()
 		{
 			if (TObjectPtr<ABaseMonster> Monster = Cast<ABaseMonster>(Activator))
 			{
-				Monsters.Add(Monster, false);
+				Monsters.FindOrAdd(Monster, false);
 				float Distance = FVector::Distance(GetActorLocation(), Monster->GetActorLocation());
 				if (Distance < EnemySearchCollision->GetScaledSphereRadius() && !Monsters[Monster])
 				{
 					ActivateDrectionArrow(Monster);
-					Monsters[Monster] = false;
+					Monsters[Monster] = true;
 				}
 			}
 		}
@@ -85,6 +83,14 @@ TObjectPtr<AEnemyDirectionArrow> ASupportCharacter::FindDeactivateDirectionArrow
 
 void ASupportCharacter::ActivateDrectionArrow(TObjectPtr<ABaseMonster> Monster)
 {
+	int count = 0;
+	for (TObjectPtr<AEnemyDirectionArrow> DirectionArrow : EnemyDirectionArrows)
+	{
+		if (DirectionArrow->IsHidden())
+		{
+			count++;
+		}
+	}
 	TObjectPtr<AEnemyDirectionArrow> DirectionArrow = FindDeactivateDirectionArrow();
 	if (DirectionArrow == nullptr)
 	{
@@ -95,12 +101,18 @@ void ASupportCharacter::ActivateDrectionArrow(TObjectPtr<ABaseMonster> Monster)
 	DirectionArrow->Monster = Monster;
 	DirectionArrow->SetActorTickEnabled(true);
 	DirectionArrow->SetActorHiddenInGame(false);
+	EnemyDirectionArrows.Remove(DirectionArrow);
 }
 
-void ASupportCharacter::DeactivateArrow(TObjectPtr<AEnemyDirectionArrow> DirectionArrow)
+void ASupportCharacter::DeactivateArrow(TObjectPtr<AEnemyDirectionArrow> DirectionArrow, TObjectPtr<ABaseMonster> Monster)
 {
+	if (IsValid(Monster))
+	{
+		Monsters[Monster] = false;
+	}
 	DirectionArrow->SetActorTickEnabled(false);
 	DirectionArrow->SetActorHiddenInGame(true);
+	EnemyDirectionArrows.Add(DirectionArrow);
 }
 
 void ASupportCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)

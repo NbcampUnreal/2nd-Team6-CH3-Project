@@ -42,7 +42,7 @@ void AEnemyDirectionArrow::Tick(float DeltaTime)
 	}
 	if (Distance > CollisionRadius)
 	{
-		SupportChar->DeactivateArrow(this);
+		SupportChar->DeactivateArrow(this, Monster);
 	}
 	MeshComponent->SetMaterial(0, CurrentMaterial);
 }
