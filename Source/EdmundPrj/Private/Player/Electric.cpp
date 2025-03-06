@@ -7,6 +7,8 @@
 #include "Monster\BaseMonster.h"
 #include "Kismet\GameplayStatics.h"
 #include "Kismet\KismetMathLibrary.h"
+#include "System\EdmundGameState.h"
+#include "Components\AudioComponent.h"
 
 // Sets default values
 AElectric::AElectric()
@@ -15,6 +17,9 @@ AElectric::AElectric()
 	PrimaryActorTick.bCanEverTick = false;
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	RootComponent = Scene;
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
+	AudioComponent->SetupAttachment(RootComponent);
 
 	EnemySearchCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	EnemySearchCollision->SetCollisionProfileName(TEXT("OverlapAll"));
@@ -100,6 +105,11 @@ void AElectric::Attack(ABaseMonster* monster)
 		this,
 		UDamageType::StaticClass()
 	);
+	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
+	if (GameState != nullptr)
+	{
+		//GameState->PlayItemSound(AudioComponent, EItemType::);
+	}
 	if (CurrentElectricCount >= ElectricCount)
 	{
 		GetWorldTimerManager().ClearTimer(MoveTimer);
@@ -120,7 +130,7 @@ void AElectric::Activate()
 	GetWorldTimerManager().SetTimer(
 		AutoDeactivateHandle,
 		[this] {
-			if (!isFirst)
+			if (IsValid(this) && !isFirst)
 			{
 				Deactivate();
 			}

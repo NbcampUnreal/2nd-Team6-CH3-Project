@@ -6,6 +6,10 @@
 #include "Monster\BaseMonster.h"
 #include "Kismet\GameplayStatics.h"
 #include "Player\BaseCharacter.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
+#include "System\EdmundGameState.h"
 ASolarDisk::ASolarDisk()
 {
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
@@ -15,11 +19,22 @@ ASolarDisk::ASolarDisk()
 	SphereMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SphereMesh"));
 	SphereMesh->SetupAttachment(Scene);
 	SphereMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	HitNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("HitNiagara"));
+	HitNiagara->SetupAttachment(RootComponent);
+	HitNiagara->bAutoActivate = false;
 }
 
 void ASolarDisk::HitToMonsterInCollision()
 {
 	TArray<AActor*> activators;
+	HitNiagara->Deactivate();
+	HitNiagara->Activate();
+	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
+	if (GameState != nullptr)
+	{
+		//GameState->PlayItemSound(AudioComponent, EItemType::HealKit)
+	}
 	EnemySearchCollision->GetOverlappingActors(activators);
 	for(AActor* activator : activators)
 	{

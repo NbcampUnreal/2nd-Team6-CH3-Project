@@ -37,4 +37,6 @@ public:
 	bool bIsSkillActivate = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	float DamageMultiplierAmount = 0;
+
+	UAudioComponent* AudioComponent = nullptr;
 };

@@ -9,7 +9,6 @@
 
 void AMjolnir::HitToMonster(TObjectPtr<ABaseMonster> monster)
 {
-
 	ElectricEffectPool->ActivateElectricEffect(monster->GetActorLocation(), ElectricCount);
 }
 

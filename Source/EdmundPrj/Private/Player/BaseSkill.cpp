@@ -4,6 +4,7 @@
 #include "Player/BaseSkill.h"
 #include "System\DataStructure\PlayerSkillRow.h"
 #include "System\EdmundGameState.h"
+#include "Components\AudioComponent.h"
 ABaseSkill::ABaseSkill()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -11,6 +12,8 @@ ABaseSkill::ABaseSkill()
 	SkillCurrentUpgradeIndex = 0;
 	SkillMaxUpgradeIndex = 5;
 	SkillName = "defaultSkillName";
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
+	AudioComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
