@@ -52,7 +52,7 @@ void AHealingPlant::SpawnTimerSkill()
 			randPos.Y = FMath::RandRange(myPos.Y - 3, myPos.Y + 3);
 			randPos.Z = myPos.Z + 10;
 			SetActorLocation(randPos);
-			if (myPos.Z >= StartPos.Z + SpawnPosZ)
+			if (myPos.Z >= StartPos.Z + (SpawnPosZ * -1))
 			{
 				Super::SpawnTimerSkill();
 				GetWorldTimerManager().ClearTimer(SpawnShakeHandle);
