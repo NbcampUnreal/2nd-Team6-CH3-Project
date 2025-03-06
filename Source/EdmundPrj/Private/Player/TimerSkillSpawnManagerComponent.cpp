@@ -30,6 +30,11 @@ FVector UTimerSkillSpawnManagerComponent::GetRandomMonsterLocation()
 	int currentIndex = 0;
 	for (ABaseMonster* Monster : Monsters)
 	{
+		if (!IsValid(Monster))
+		{
+			continue;
+		}
+
 		if (currentIndex == randomIndex)
 		{
 			return Monster->GetActorLocation();
