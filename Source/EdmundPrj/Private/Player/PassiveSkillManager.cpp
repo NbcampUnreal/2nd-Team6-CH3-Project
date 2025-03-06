@@ -35,10 +35,9 @@ void UPassiveSkillManager::ActivatePassiveSkill(EPassiveSkillType passiveSkillTy
 		Character = Cast<ABaseCharacter>(Owner);
 	}
 	PassiveSkillMap.FindOrAdd(passiveSkillType);
-	if (PassiveSkillMap[passiveSkillType] == 0)
-	{
-		++PassiveSkillMap[passiveSkillType];
-	}
+
+	++PassiveSkillMap[passiveSkillType];
+	
 	switch (passiveSkillType)
 	{
 	case EPassiveSkillType::Null:

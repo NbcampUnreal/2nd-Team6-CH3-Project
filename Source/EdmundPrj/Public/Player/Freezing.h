@@ -25,4 +25,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	TSubclassOf<AActor> FrozenEffectClass = nullptr;
 	TArray<TObjectPtr<AActor>> FrozenEffects = TArray<TObjectPtr<AActor>>();
+
+	UAudioComponent* AudioComponent = nullptr;
 };

@@ -6,9 +6,8 @@
 #include "Player/TimerSkill.h"
 #include "SolarDisk.generated.h"
 
-/**
- * 
- */
+class UNiagaraComponent;
+
 UCLASS()
 class EDMUNDPRJ_API ASolarDisk : public ATimerSkill
 {
@@ -35,6 +34,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float DamageCycleTime = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+	TObjectPtr<UNiagaraComponent> HitNiagara;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tracking")
 	float RotationSpeed = 5.0f;

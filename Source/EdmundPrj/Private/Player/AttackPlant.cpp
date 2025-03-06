@@ -7,6 +7,7 @@
 #include "Components\SplineComponent.h"
 #include "Kismet\GameplayStatics.h"
 #include "Components\SphereComponent.h"
+#include "System\EdmundGameState.h"
 void AAttackPlant::BeginPlay()
 {
 	Super::BeginPlay();
@@ -52,7 +53,11 @@ void AAttackPlant::ApplyDamage()
 		nullptr,
 		this,
 		UDamageType::StaticClass());
-
+	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
+	if (GameState != nullptr)
+	{
+		//GameState->PlayItemSound(AudioComponent)
+	}
 }
 
 void AAttackPlant::HitToMonster(TObjectPtr<ABaseMonster> Monster)

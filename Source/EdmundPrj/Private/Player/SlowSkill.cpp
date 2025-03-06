@@ -4,11 +4,15 @@
 #include "Player/SlowSkill.h"
 #include "Monster\BaseMonster.h"
 #include "Kismet\GameplayStatics.h"
-
 void ASlowSkill::HitToMonster(TObjectPtr<ABaseMonster> monster)
 {
 	if (!IsValid(monster)) return;
 	float CurrentSpeed = monster->GetCurrentSpeed();
+	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
+	if (GameState != nullptr)
+	{
+		//GameState->PlayItemSound(AudioComponent, EItemType::HealKit)
+	}
 	monster->ChangeCurrentSpeed(CurrentSpeed - SlowApplicationRate);
 	UGameplayStatics::ApplyDamage(
 		monster,
