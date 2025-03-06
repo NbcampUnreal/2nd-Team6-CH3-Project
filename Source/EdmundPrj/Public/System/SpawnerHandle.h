@@ -43,7 +43,7 @@ public:
 	TSubclassOf<AMonsterSpawner> SuperSpawner;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
-	int32 BossPatternSpawnCount = 1;
+	int32 BossPatternSpawnCount = 5;
 
 private:
 	TObjectPtr<AEdmundGameMode> EdmundGameMode;

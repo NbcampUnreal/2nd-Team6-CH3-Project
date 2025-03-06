@@ -22,7 +22,6 @@ class EDMUNDPRJ_API AEdmundGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	//virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void InitGameMode(
 		UEdmundGameInstance* NewGameInstance,
 		const TArray<FMissionDataRow*>& MissionDataSet,

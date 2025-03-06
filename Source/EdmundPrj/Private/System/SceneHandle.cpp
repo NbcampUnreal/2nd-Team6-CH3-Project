@@ -57,7 +57,6 @@ void USceneHandle::OpenScene(ESceneType SceneType)
 	UEnum* CharacterEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ECharacterType"));
 	ECharacterType CharacterType = EdmundGameInstance->GetPlayerType();
 	FString TypeName = CharacterEnum->GetNameStringByValue((int64)CharacterType);
-	UE_LOG(LogTemp, Warning, TEXT("Selected Character Type is %s"), *TypeName);
 
 	switch (CurrentScene)
 	{

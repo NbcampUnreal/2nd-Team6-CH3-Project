@@ -112,9 +112,9 @@ void AEdmundGameState::StopPrintStory()
 
 void AEdmundGameState::SkipCurrentStory()
 {
-	EdmundGameMode->OnEndedCurrentStory();
 	StoryIndex = 0;
 	OnEndedCurrentStory();
+	EdmundGameMode->OnEndedCurrentStory();
 }
 
 void AEdmundGameState::InitMainLevelPlayerController()
@@ -369,9 +369,6 @@ void AEdmundGameState::OnPressedPauseKey()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("Game Instance is invalid"));
 	EdmundGameInstance->OnPause();
-	PlayerController->SetPause(true);
-	ChangeCursorMode(true);
-	ChangeInputMode(FInputModeUIOnly());
 }
 
 void AEdmundGameState::RequestOnPause()
