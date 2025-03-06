@@ -36,6 +36,11 @@ TSet < TObjectPtr<ABaseMonster>> HitMonsterSet;
 void AMeteor::HitToGround()
 {
 	TArray<AActor*> activators;
+	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
+	if (GameState != nullptr)
+	{
+		//GameState->PlayItemSound(AudioComponent, EItemType::HealKit)
+	}
 	MonsterLaunchCollision->GetOverlappingActors(activators);
 	if (GroundHitNiagara)
 	{

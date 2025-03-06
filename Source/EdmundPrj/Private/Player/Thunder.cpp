@@ -6,6 +6,7 @@
 #include "Player\TimerSkillSpawnManagerComponent.h"
 #include "Player\ElectricEffectPool.h"
 #include "Kismet\GameplayStatics.h"
+#include "System\EdmundGameState.h"
 AThunder::AThunder()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -31,7 +32,11 @@ void AThunder::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 			nullptr,
 			this,
 			UDamageType::StaticClass());
-	
+		AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
+		if (GameState != nullptr)
+		{
+			//GameState->PlayItemSound()
+		}
 		ElectricEffectPool->ActivateElectricEffect(Monster->GetActorLocation(), ElectricCount);
 	}
 }

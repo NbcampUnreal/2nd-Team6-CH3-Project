@@ -24,6 +24,11 @@ void AFreezing::CreateFrozenEffect(int createCount)
 
 TObjectPtr<AActor> AFreezing::ActivateFrozenEffect(TObjectPtr<ABaseMonster> monster)
 {
+	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
+	if (GameState != nullptr)
+	{
+		//GameState->PlayItemSound(AudioComponent, EItemType::HealKit)
+	}
 	TObjectPtr<AActor> frozen = FindDeactivateFrozenEffect();
 	if (frozen == nullptr)
 	{
