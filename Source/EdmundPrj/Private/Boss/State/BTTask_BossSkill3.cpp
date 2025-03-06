@@ -221,6 +221,13 @@ void UBTTask_BossSkill3::StopDetection()
 
     if (CachedOwnerComp)
     {
+        for (ABoss_Skill3_Wall* Wall : ABoss_Skill3_Wall::WallPool)
+        {
+            if (Wall)
+            {
+                Wall->DeactivateWall();
+            }
+        }
         FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
     }
 }
