@@ -26,7 +26,7 @@ public:
 	void CreateDirectionArrow(int count);
 	TObjectPtr<AEnemyDirectionArrow> FindDeactivateDirectionArrow();
 	void ActivateDrectionArrow(TObjectPtr<ABaseMonster> Monster);
-	void DeactivateArrow(TObjectPtr<AEnemyDirectionArrow> DirectionArrow);
+	void DeactivateArrow(TObjectPtr<AEnemyDirectionArrow> DirectionArrow, TObjectPtr<ABaseMonster> Monster);
 
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -45,5 +45,5 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	TSubclassOf<AEnemyDirectionArrow> EnemyDirectionArrowClass = nullptr;
-	TArray<TObjectPtr<AEnemyDirectionArrow>> EnemyDirectionArrows = TArray<TObjectPtr<AEnemyDirectionArrow>>();
+	TSet<TObjectPtr<AEnemyDirectionArrow>> EnemyDirectionArrows = TSet<TObjectPtr<AEnemyDirectionArrow>>();
 };
