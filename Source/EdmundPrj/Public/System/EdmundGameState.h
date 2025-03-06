@@ -135,7 +135,7 @@ private:
 	FTimerHandle TimerHandle;
 
 	int32 CurrentLevelMoney = 0;
-	int32 MissionClearMoney = 500;
+	int32 MissionClearMoney = 1000;
 	float EffectVolume = 0;
 	ECharacterType CurrentCharacterType = ECharacterType::Gunner;
 	FText StoryText;

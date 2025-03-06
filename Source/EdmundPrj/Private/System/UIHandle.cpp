@@ -26,6 +26,8 @@ void UUIHandle::AddToViewportBySceneType(ESceneType SceneType)
 		ViewCount = 0;
 	}
 
+	bBaseCursorMode = false;
+
 	switch (SceneType)
 	{
 	case ESceneType::Title:
@@ -44,6 +46,7 @@ void UUIHandle::AddToViewportBySceneType(ESceneType SceneType)
 		CurrentBaseWidget = InGameWidget;
 		bBaseCursorMode = false;
 		RequestChangeCursorMode(false, FInputModeGameOnly());
+
 		break;
 
 	case ESceneType::Mission2:
@@ -280,7 +283,8 @@ bool UUIHandle::CheckClearedMission(int32 Index) const
 void UUIHandle::OpenOption()
 {
 	RequestPlayUISound(EUISoundType::Open);
-	//RequestChangeCursorMode(true, FInputModeUIOnly());
+	EdmundGameInstance->RequestPause();
+	RequestChangeCursorMode(true, FInputModeUIOnly());
 }
 
 void UUIHandle::CloseOption()
@@ -470,11 +474,11 @@ const TArray<TScriptInterface<IGameStateObserver>>& UUIHandle::GetUIObservers() 
 void UUIHandle::RequestChangeCursorMode(const bool bIsVisible, const FInputModeDataBase& InputMode)
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-
+	
 	if (!bBaseCursorMode)
 	{
-		EdmundGameInstance->ChangeCursorMode(bIsVisible);
 		EdmundGameInstance->ChangeInputMode(InputMode);
+		EdmundGameInstance->ChangeCursorMode(bIsVisible);
 	}
 }
 
