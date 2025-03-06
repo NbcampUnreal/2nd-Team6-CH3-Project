@@ -67,6 +67,8 @@ public:
 	float Speed = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float PointDestroyTime = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
+	UAudioComponent* AudioComponent = nullptr;
 	int CurrentElectricCount = 0;
 	TObjectPtr<ABaseMonster> TargetMonster;
 	FVector FirstEnemyPos = FVector::ZeroVector;

@@ -69,7 +69,7 @@ TArray<TSubclassOf<ABaseItem>> AllItems;
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster|Spawn")
 TSubclassOf<ABaseItem> ItemClass;
 
-void FreezeMonster(float FreezeDuration);
+virtual void FreezeMonster(float FreezeDuration);
 
 void UnfreezeMonster();
 

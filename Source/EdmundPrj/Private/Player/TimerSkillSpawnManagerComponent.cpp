@@ -129,7 +129,7 @@ void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillT
 		skillLocation = SummonSkillLocation(skillLocation);
 	}
 
-	skillLocation.Z = skill->SpawnPosZ;
+	skillLocation.Z += skill->SpawnPosZ;
 	if (skill->TimerSkillSpanwManager == nullptr)
 	{
 		skill->TimerSkillSpanwManager = this;
