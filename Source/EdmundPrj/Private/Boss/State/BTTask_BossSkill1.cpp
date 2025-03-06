@@ -147,7 +147,7 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
 
     if (bFloorPattern)
     {
-        Center.Z = 0.f;
+        Center.Z = 164.f;
         if (BossRef->Skill1LowerEffect)
         {
             UNiagaraFunctionLibrary::SpawnSystemAtLocation(
@@ -166,11 +166,11 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
             FVector FootPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterFoot"));
             FVector HeadPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterHead"));
             float DynamicOffset = (HeadPos.Z - FootPos.Z) * 0.5f;
-            Center.Z = FootPos.Z + DynamicOffset + 30.0f;
+            Center.Z = FootPos.Z + DynamicOffset + 120.0f;
         }
         else
         {
-            Center.Z += 110.f;
+            Center.Z += 120.f;
         }
         if (BossRef->Skill1UpperEffect)
         {
