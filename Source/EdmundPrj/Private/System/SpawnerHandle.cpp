@@ -109,7 +109,6 @@ void ASpawnerHandle::SpawnBossPatternSpawner(const TArray<FVector>& PosSet)
 void ASpawnerHandle::IncreaseSpawnerClearCount()
 {
 	--SpawnerClearCount;
-	UE_LOG(LogTemp, Warning, TEXT("Call Increase Spawner Count"));
 
 	if (SpawnerClearCount <= 0)
 	{
@@ -119,7 +118,6 @@ void ASpawnerHandle::IncreaseSpawnerClearCount()
 
 void ASpawnerHandle::ClearSpawnPattern()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Clear Half pattern"));
 	EdmundGameMode->NotifyClearedHalfPatternByBoss();
 }
 
