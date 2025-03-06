@@ -118,12 +118,14 @@ void AMonsterSpawner::AddDeadCount()
 		if (IsValid(SpawnerHandle))
 		{
 			SpawnerHandle->IncreaseSpawnerClearCount();
+			UE_LOG(LogTemp, Warning, TEXT("All Clear Monster %s"), *GetName());
+
 		}
-		UE_LOG(LogTemp, Warning, TEXT("모든 몬스터 사망"));
+		//UE_LOG(LogTemp, Warning, TEXT("모든 몬스터 사망"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("남은 몬스터 수: %d"), BossModeSpawnCount - DeadMonsterCount);
+		UE_LOG(LogTemp, Warning, TEXT("%s 남은 몬스터 수: %d "), *GetName(), BossModeSpawnCount - DeadMonsterCount);
 	}
 
 }

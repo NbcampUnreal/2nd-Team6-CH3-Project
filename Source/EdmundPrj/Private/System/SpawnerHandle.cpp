@@ -78,10 +78,12 @@ void ASpawnerHandle::SpawnBossPatternSpawner(const TArray<FVector>& PosSet)
 	for (const FVector& SpawnPos : PosSet)
 	{
 		UClass* SpawnClass = nullptr;
+		FVector AddVector = FVector(1000, 0, 0);
 
-		if (SpawnCount <= SpawnerClearCount / 2)
+		if (SpawnCount < SpawnerClearCount / 2)
 		{
 			SpawnClass = NormalSpawner;
+			AddVector *= -1;
 		}
 		else
 		{
@@ -95,8 +97,8 @@ void ASpawnerHandle::SpawnBossPatternSpawner(const TArray<FVector>& PosSet)
 
 		FActorSpawnParameters SpawnParam;
 
-		AMonsterSpawner* NewSpawner = GetWorld()->SpawnActor<AMonsterSpawner>(SpawnClass, SpawnPos, FRotator::ZeroRotator, SpawnParam);
-
+		AMonsterSpawner* NewSpawner = GetWorld()->SpawnActor<AMonsterSpawner>(SpawnClass, SpawnPos + AddVector, FRotator::ZeroRotator, SpawnParam);
+		NewSpawner->SetActorScale3D(FVector(1, 1, 1));
 		NewSpawner->BossSpawn(this, MonsterBulletPool, BossPatternSpawnCount);
 
 		MonsterSpawnerSet.Add(NewSpawner);
@@ -107,6 +109,7 @@ void ASpawnerHandle::SpawnBossPatternSpawner(const TArray<FVector>& PosSet)
 void ASpawnerHandle::IncreaseSpawnerClearCount()
 {
 	--SpawnerClearCount;
+	UE_LOG(LogTemp, Warning, TEXT("Call Increase Spawner Count"));
 
 	if (SpawnerClearCount <= 0)
 	{
@@ -116,6 +119,7 @@ void ASpawnerHandle::IncreaseSpawnerClearCount()
 
 void ASpawnerHandle::ClearSpawnPattern()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Clear Half pattern"));
 	EdmundGameMode->NotifyClearedHalfPatternByBoss();
 }
 
