@@ -132,7 +132,7 @@ public:
     float GetAttack3Multiplier() { return Attack3Multiplier; }
     float GetAttack4Multiplier() { return Attack4Multiplier; }
     
-    
+    virtual void FreezeMonster(float FreezeDuration) override;
 
     UFUNCTION(BlueprintCallable)
     void SetCurrentAttackTask(UBTTask_BossAttack3* Task) { CurrentAttackTask = Task; }
