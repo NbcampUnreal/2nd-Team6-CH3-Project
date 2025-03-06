@@ -834,4 +834,7 @@ void ABoss::BossSkill3RoarSounds()
     }
 }
 
-
+void ABoss::FreezeMonster(float FreezeDuration)
+{
+    
+}

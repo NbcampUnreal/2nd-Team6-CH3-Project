@@ -95,15 +95,17 @@ void ABoss_Skill3_Wall::SimulateGravity()
     const float DeltaTime = 0.02f;
     CurrentVelocity.Z -= GravityAcceleration * DeltaTime;
     FVector NewLocation = GetActorLocation() + CurrentVelocity * DeltaTime;
+
     if (NewLocation.Z <= 0.f)
     {
-        NewLocation.Z = 0.f;
+        NewLocation.Z = 220.0f;
         SetActorLocation(NewLocation);
         GetWorldTimerManager().ClearTimer(GravityTimerHandle);
         return;
     }
     SetActorLocation(NewLocation);
 }
+
 
 void ABoss_Skill3_Wall::LowerAndDeactivate()
 {
