@@ -13,14 +13,14 @@ struct EDMUNDPRJ_API FPlayerSoundDataRow : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName RowName;
+	FName RowName = "DefaultName";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ECharacterType CharacterType;
+	ECharacterType CharacterType = ECharacterType::Aurora;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESoundType SoundType;
+	ESoundType SoundType = ESoundType::Attack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<USoundBase> SoundSource;
+	TSoftObjectPtr<USoundBase> SoundSource = nullptr;
 };

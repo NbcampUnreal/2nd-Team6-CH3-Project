@@ -14,32 +14,32 @@ struct EDMUNDPRJ_API FPlayerSkillRow : public FTableRowBase
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName RowName;
+	FName RowName = TEXT("DefaultName");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName SkillName;
+	FName SkillName = TEXT("DefaultName");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SkillValue;
+	float SkillValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MaxLevel;
+	int32 MaxLevel = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESkillType SkillType;
+	ESkillType SkillType = ESkillType::ActiveSkill;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EActiveSkillType ActiveSkillType;
+	EActiveSkillType ActiveSkillType = EActiveSkillType::Null;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EPassiveSkillType PassiveSkillType;
+	EPassiveSkillType PassiveSkillType = EPassiveSkillType::Null;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ETimerSkillType TimerSkillType;
+	ETimerSkillType TimerSkillType = ETimerSkillType::Null;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString SkillInfo;
+	FString SkillInfo = TEXT("DefulatInfo");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UTexture2D> SkillImage;
+	TObjectPtr<UTexture2D> SkillImage = nullptr;
 };

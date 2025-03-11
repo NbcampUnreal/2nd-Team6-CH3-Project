@@ -15,19 +15,19 @@ struct EDMUNDPRJ_API FMissionDataRow : public FTableRowBase
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName RowName;
+	FName RowName = TEXT("DefaultName");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESceneType InSceneType;
+	ESceneType InSceneType = ESceneType::Main;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ABaseMissionItem> MissionItemClass;
+	TSubclassOf<ABaseMissionItem> MissionItemClass = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FVector> SpawnLocationSet;
+	TArray<FVector> SpawnLocationSet = TArray<FVector>();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString MissionInfoText;
+	FString MissionInfoText = TEXT("DefaultText");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString MissionClearText;

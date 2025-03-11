@@ -14,29 +14,29 @@ struct EDMUNDPRJ_API FShopCatalogRow : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName AdvanceName;
+	FName AdvanceName = TEXT("DefaultName");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 OriginPrice;
+	int32 OriginPrice = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MaxLevel;
+	int32 MaxLevel = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float AdvanceValue;
+	float AdvanceValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MultiplyValue;
+	float MultiplyValue = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CurrentLevel;
+	int32 CurrentLevel = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CurrentPrice;
+	int32 CurrentPrice = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UTexture2D> SkillImage;
+	TObjectPtr<UTexture2D> SkillImage = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString InfoString;
+	FString InfoString = TEXT("DefaultInfo");
 };

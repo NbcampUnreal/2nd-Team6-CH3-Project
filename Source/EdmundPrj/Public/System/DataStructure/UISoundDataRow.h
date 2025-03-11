@@ -13,11 +13,11 @@ struct EDMUNDPRJ_API FUISoundDataRow : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName RowName;
+	FName RowName = TEXT("DefaultName");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EUISoundType Type;
+	EUISoundType Type = EUISoundType::Buy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<USoundBase> SoundSource;
+	TSoftObjectPtr<USoundBase> SoundSource = nullptr;
 };

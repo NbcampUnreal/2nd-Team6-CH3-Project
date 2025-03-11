@@ -15,17 +15,17 @@ struct EDMUNDPRJ_API FCharacterDataRow : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ECharacterType CharacterType;
+	ECharacterType CharacterType = ECharacterType::Gunner;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName CharacterName;
+	FName CharacterName = TEXT("DefaultName");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText CharacterInfo;
+	FText CharacterInfo = FText::FromString(TEXT("DefaultInfo"));
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector SpawnLocation;
+	FVector SpawnLocation = FVector::Zero();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ABaseCharacter> CharacterClass;
+	TSubclassOf<ABaseCharacter> CharacterClass = nullptr;
 };

@@ -13,14 +13,14 @@ struct EDMUNDPRJ_API FMonsterSoundDataRow : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName RowName;
+	FName RowName = TEXT("DefaultName");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EMonsterType MonsterType;
+	EMonsterType MonsterType = EMonsterType::Boss;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESoundType SoundType;
+	ESoundType SoundType = ESoundType::Attack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<USoundBase> SoundSource;
+	TSoftObjectPtr<USoundBase> SoundSource = nullptr;
 };

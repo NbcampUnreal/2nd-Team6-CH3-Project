@@ -14,20 +14,20 @@ struct EDMUNDPRJ_API FPlayDataRow : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ECharacterType CharacterType;
+	ECharacterType CharacterType = ECharacterType::Aurora;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bShowedIntro;
+	bool bShowedIntro = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bClearedMission1;
+	bool bClearedMission1 = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bClearedMission2;
+	bool bClearedMission2 = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bClearedMission3;
+	bool bClearedMission3 = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 PossessMoney;
+	int32 PossessMoney = 0;
 };

@@ -14,11 +14,11 @@ struct EDMUNDPRJ_API FStoryDataRow : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESceneType SceneType;
+	ESceneType SceneType = ESceneType::Ending;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Index;
+	int32 Index = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FText> StoryText;
+	TArray<FText> StoryText = TArray<FText>();
 };

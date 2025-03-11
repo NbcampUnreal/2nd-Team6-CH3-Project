@@ -124,14 +124,12 @@ void AElectric::Attack(ABaseMonster* monster)
 
 void AElectric::Activate()
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s is Activate"), *GetActorLabel());
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 	SetActorTickEnabled(true);
 
 	FVector OwnerLocation = GetActorLocation();
 	EnemySearchCollision->SetWorldLocation(OwnerLocation);
-	UE_LOG(LogTemp, Warning, TEXT("Location Init Success"));
 	FTimerHandle AutoDeactivateHandle;
 	GetWorldTimerManager().SetTimer(
 		AutoDeactivateHandle,
@@ -149,7 +147,6 @@ void AElectric::Activate()
 void AElectric::Deactivate()
 {
 	GetWorldTimerManager().ClearTimer(MoveTimer);
-	UE_LOG(LogTemp, Warning, TEXT("%s is Deactivate"), *GetActorLabel());
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);

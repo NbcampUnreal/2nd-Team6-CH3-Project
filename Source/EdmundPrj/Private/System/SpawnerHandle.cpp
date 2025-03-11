@@ -78,7 +78,7 @@ void ASpawnerHandle::SpawnBossPatternSpawner(const TArray<FVector>& PosSet)
 	for (const FVector& SpawnPos : PosSet)
 	{
 		UClass* SpawnClass = nullptr;
-		FVector AddVector = FVector(1000, 0, 0);
+		FVector AddVector = FVector(2000, 0, 0);
 
 		if (SpawnCount < SpawnerClearCount / 2)
 		{

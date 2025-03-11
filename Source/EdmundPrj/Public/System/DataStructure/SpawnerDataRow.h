@@ -15,20 +15,20 @@ struct EDMUNDPRJ_API FSpawnerDataRow : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName RowName;
+	FName RowName = TEXT("DefaultName");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESceneType InSceneType;
+	ESceneType InSceneType = ESceneType::Ending;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AMonsterSpawner> SpawnerClass;
+	TSubclassOf<AMonsterSpawner> SpawnerClass = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FVector> SpawnLocationSet;
+	TArray<FVector> SpawnLocationSet = TArray<FVector>();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<float> SpawnTimeSet;
+	TArray<float> SpawnTimeSet = TArray<float>();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<int32> SpawnCountSet;
+	TArray<int32> SpawnCountSet = TArray<int32>();
 };

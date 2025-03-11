@@ -86,15 +86,17 @@ private:
 	TArray<FNpcSoundDataRow*> NpcData;
 	TArray<FItemSoundDataRow*> ItemData;
 
+	UPROPERTY()
 	TMap<EBGMSoundType, TObjectPtr<USoundBase>> BgmSet;
+	UPROPERTY()
 	TMap<EUISoundType, TObjectPtr<USoundBase>> UISet;
+	UPROPERTY()
 	TMap<ESoundType, TObjectPtr<USoundBase>> ReturnFail;
 
 	TMap<ECharacterType, TMap<ESoundType, TObjectPtr<USoundBase>>> PlayerSoundMap;
 	TMap<EMonsterType, TMap<ESoundType, TObjectPtr<USoundBase>>> MonsterSoundMap;
 	TMap<ENpcType, TMap<ESoundType, TObjectPtr<USoundBase>>> NpcSoundMap;
 	TMap<EItemType, TMap<ESoundType, TObjectPtr<USoundBase>>> ItemSoundMap;
-
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 	float BGMVolume = 0.8f;
 	float EffectVolume = 0.8f;
