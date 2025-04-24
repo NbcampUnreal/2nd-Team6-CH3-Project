@@ -21,58 +21,11 @@ public:
 	// 공격력 Getter
 	virtual float GetAttackDamage() const override;
 
-	// 공격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
-	UAnimMontage* ChargeMontage;
-
-	// 공격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
-	UAnimMontage* AttackMontage;
-
-	// 근접 공격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
-	UAnimMontage* MeleeAttackMontage;
-
-	// 재장전 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
-	UAnimMontage* ReloadMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
-	UStaticMeshComponent* BulletMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
-	float ReloadDelay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	float MeleeAttackDelay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	float MeleeAttackRadius;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	float MeleeAttackPushStrength;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	float ZoomMouseMoveMultipler;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
-	TSubclassOf<AWeapon> Weapon;
-
-	// 최대 탄환
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	int32 MaxAmmo;
-
-	// 현재 탄환
-	int32 CurrentAmmo;
-
-	UPROPERTY()
-	TObjectPtr<AWeapon> WeaponActor;
-
-	FTimerHandle ReloadDelayHandle;
-	FTimerHandle MeleeAttackDelayHandle;
-
-	// Notify에서 호출하기 위해 public
+	// Notify에서 호출
 	void AttackTrace() override;
+
+	// 총알 스케일 Getter
+	FVector GetBulletScale() const;
 
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -81,11 +34,9 @@ protected:
 	void Look(const FInputActionValue& value);
 
 	// 공격
-	virtual void StartAttack(const FInputActionValue& value);
-	virtual void Attack(const FInputActionValue& value) override;
-	virtual void EndAttack(const FInputActionValue& value);
-
-	virtual bool ActiveWeapon();
+	void StartAttack(const FInputActionValue& value);
+	void Attack(const FInputActionValue& value) override;
+	void EndAttack(const FInputActionValue& value);
 
 	// 근접공격
 	void MeleeAttack(const FInputActionValue& value);
@@ -101,10 +52,17 @@ protected:
 	void ZoomOut(const FInputActionValue& value);
 
 	// 탄환 Setter
-	void SetAmmo(int32 NewAmmo);
+	void SetAmmo(const int32 NewAmmo);
 
 	// 탄환 더하기
-	void AmountAmmo(int32 AmountAmmo);
+	void AmountAmmo(const int32 AmountAmmo);
+
+private:
+	void UpScale();
+	void NormalizeScale();
+
+	// 강화해놓은 스테이터스값 받기
+	virtual void GetUpgradeStatus() override;
 
 	// 현재 액션 실행 중 인지 - 다른 액션 불가
 	bool CheckAction() override;
@@ -112,15 +70,60 @@ protected:
 	// 죽음
 	void ActiveDieAction();
 
-	// 강화해놓은 스테이터스값 받기
-	virtual void GetUpgradeStatus() override;
+	bool ActiveWeapon() const;
+
+	// 공격 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> ChargeMontage = nullptr;
+
+	// 공격 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> AttackMontage = nullptr;
+
+	// 근접 공격 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> MeleeAttackMontage = nullptr;
+
+	// 재장전 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> ReloadMontage = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> BulletMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	float ReloadDelay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float MeleeAttackDelay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float MeleeAttackRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float MeleeAttackPushStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float ZoomMouseMoveMultipler;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AWeapon> Weapon;
+
+	UPROPERTY()
+	TObjectPtr<AWeapon> WeaponActor;
+
+	// 최대 탄환
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	int32 MaxAmmo;
+
+	// 현재 탄환
+	int32 CurrentAmmo;
 
 	bool IsAttack;
 	bool IsMeleeAttack;
 	bool IsReload;
 	bool IsZoom;
 
-private:
 	float ReloadTimeMultipler;
 	float AttackMultipler;
 	float SaveAttackMultipler;
@@ -128,8 +131,7 @@ private:
 	FVector BulletScale;
 	FVector BulletLocation;
 
+	FTimerHandle ReloadDelayHandle;
+	FTimerHandle MeleeAttackDelayHandle;
 	FTimerHandle CharingBulletTimerHandle;
-
-	void UpScale();
-	void NormalizeScale();
 };

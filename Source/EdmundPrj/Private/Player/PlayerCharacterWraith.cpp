@@ -1,6 +1,5 @@
 #include "Player/PlayerCharacterWraith.h"
 #include "Player/EdmundPlayerController.h"
-#include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "Player/Weapon.h"
@@ -23,12 +22,6 @@ APlayerCharacterWraith::APlayerCharacterWraith()
 	MeleeAttackRadius = 100.0f;
 	MeleeAttackPushStrength = 1000.0f;
 	AttackMultipler = 0.5f;
-
-	ReloadMontage = nullptr;
-
-	ChargeMontage = nullptr;
-	AttackMontage = nullptr;
-	MeleeAttackMontage = nullptr;
 
 	CurrentAmmo = MaxAmmo = 20;
 	ZoomMouseMoveMultipler = 0.5f;
@@ -213,7 +206,7 @@ void APlayerCharacterWraith::EndAttack(const FInputActionValue& value)
 	NormalizeScale();
 }
 
-bool APlayerCharacterWraith::ActiveWeapon()
+bool APlayerCharacterWraith::ActiveWeapon() const
 {
 	if (IsValid(WeaponActor))
 	{
@@ -344,6 +337,12 @@ void APlayerCharacterWraith::AttackTrace()
 			DamagedActors.Add(HitActor);
 		}
 	}
+}
+
+FVector APlayerCharacterWraith::GetBulletScale() const
+{
+	check(BulletMesh);
+	return BulletMesh->GetRelativeScale3D();
 }
 
 void APlayerCharacterWraith::ReloadAction(const FInputActionValue& value)

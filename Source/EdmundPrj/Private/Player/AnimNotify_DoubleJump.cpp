@@ -10,7 +10,7 @@ void UAnimNotify_DoubleJump::Notify(USkeletalMeshComponent* MeshComp, UAnimSeque
 
 		if (Player)
 		{
-			Player->JumpCount = 1;
+			Player->SetJumpCount();
 		}
 	}
 }
