@@ -80,7 +80,7 @@ void UPassiveSkillManager::BerserkerSkill()
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::Berserker];
 	float HpRatio = Character->GetHP() / Character->GetMaxHP();
 	float AttackMultiplier = 1.0f + (1.0f - HpRatio + SkillLevel / 10);
-	Character->SetAttackDamage(Character->GetAttackDamage() * AttackMultiplier);
+	Character->SetAttackDamage(Character->GetDamage() * AttackMultiplier);
 }
 
 //델리게이트
