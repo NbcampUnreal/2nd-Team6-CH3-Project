@@ -24,9 +24,9 @@ void AChargingBullet::SetBulletScale()
 	{
 		APlayerCharacterWraith* Player = Cast<APlayerCharacterWraith>(PlayerCharacter);
 
-		if (IsValid(Player) && IsValid(Player->BulletMesh))
+		if (IsValid(Player))
 		{
-			SetActorRelativeScale3D(Player->BulletMesh->GetRelativeScale3D());
+			SetActorRelativeScale3D(Player->GetBulletScale());
 		}
 	}
 }
