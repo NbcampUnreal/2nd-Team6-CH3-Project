@@ -200,9 +200,11 @@ void UBTTask_BossSkill3::PerformDetection()
 
     //UE_LOG(LogTemp, Warning, TEXT("HitResults Count: %d"), HitResults.Num());
 
+#if WITH_EDITOR
     UE_LOG(LogTemp, Warning, TEXT("%s"), bCharacterDetected ? TEXT("Player Die") : TEXT("Hide"));
 
     DrawDebugSphere(World, BossLocation, DetectionRadius, 32, bCharacterDetected ? FColor::Red : FColor::Blue, false, 0.5f);
+#endif
 }
 
 void UBTTask_BossSkill3::StopDetection()
