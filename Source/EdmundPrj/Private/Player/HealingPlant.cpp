@@ -7,6 +7,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
+
 AHealingPlant::AHealingPlant()
 {
 	CheckCharacterCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
@@ -21,7 +22,6 @@ AHealingPlant::AHealingPlant()
 
 void AHealingPlant::HealingCharacter()
 {
-	//»ç¿îµå
 	AEdmundGameState* GameState = GetWorld() ? Cast<AEdmundGameState>(GetWorld()->GetGameState()) : nullptr;
 	if (GameState != nullptr)
 	{
@@ -46,13 +46,10 @@ void AHealingPlant::SpawnTimerSkill()
 	FVector StartPos = GetActorLocation();
 	GetWorldTimerManager().SetTimer(SpawnShakeHandle,
 		[this, StartPos] {
-			FVector myPos = GetActorLocation();
-			FVector randPos;;
-			randPos.X = FMath::RandRange(myPos.X - 3, myPos.X + 3);
-			randPos.Y = FMath::RandRange(myPos.Y - 3, myPos.Y + 3);
-			randPos.Z = myPos.Z + 10;
-			SetActorLocation(randPos);
-			if (myPos.Z >= StartPos.Z + (SpawnPosZ * -1))
+			FVector MyPos = GetActorLocation();
+			FVector RandPos = FVector::ZeroVector;
+			SetActorLocation(ShakeMove(RandPos, MyPos, 1));
+			if (MyPos.Z >= StartPos.Z + SpawnPosZ)
 			{
 				Super::SpawnTimerSkill();
 				GetWorldTimerManager().ClearTimer(SpawnShakeHandle);
@@ -67,10 +64,31 @@ void AHealingPlant::SpawnTimerSkill()
 		true);
 }
 
+FVector AHealingPlant::ShakeMove(FVector RandPos, const FVector& MyPos, int32 AddOrSub)
+{
+	RandPos.X = FMath::RandRange(MyPos.X - 3, MyPos.X + 3);
+	RandPos.Y = FMath::RandRange(MyPos.Y - 3, MyPos.Y + 3);
+	RandPos.Z = MyPos.Z + (10 * AddOrSub);
+	return RandPos;
+}
+
 void AHealingPlant::Deactivate()
 {
 	GetWorldTimerManager().ClearTimer(HealCycleHandle);
-	Super::Deactivate();
+	FVector StartPos = GetActorLocation();
+	GetWorldTimerManager().SetTimer(SpawnShakeHandle,
+		[this, StartPos] {
+			FVector MyPos = GetActorLocation();
+			FVector RandPos = FVector::ZeroVector;
+			SetActorLocation(ShakeMove(RandPos, MyPos, -1));
+			if (MyPos.Z < StartPos.Z - SpawnPosZ)
+			{
+				Super::Deactivate();
+				GetWorldTimerManager().ClearTimer(SpawnShakeHandle);
+			}
+		},
+		0.1f,
+		true);
 }
 
 void AHealingPlant::UpgradeSkill()

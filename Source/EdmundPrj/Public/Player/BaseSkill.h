@@ -25,16 +25,22 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<ABaseCharacter> Character = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	FString SkillName = "defaultSkillName";
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	int SkillMaxUpgradeIndex = 5;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	int SkillCurrentUpgradeIndex = 0;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	int SkillIndex = 0;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	bool bIsSkillActivate = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	float DamageMultiplierAmount = 0;
 
