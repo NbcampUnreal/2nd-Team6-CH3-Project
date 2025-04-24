@@ -13,12 +13,6 @@ ABossAIController::ABossAIController()
 void ABossAIController::BeginPlay()
 {
     Super::BeginPlay();
-
-    BossCharacter = Cast<ABoss>(GetPawn());
-    if (!BossCharacter)
-    {
-        UE_LOG(LogTemp, Error, TEXT("BossAIController::BeginPlay - BossCharacter is null"));
-    }
 }
 
 void ABossAIController::OnPossess(APawn* InPawn)
@@ -86,7 +80,11 @@ void ABossAIController::Tick(float DeltaTime)
 
     float MaxWeight = FMath::Max(Weight1, FMath::Max(Weight2, FMath::Max(Weight3, Weight4)));
     int32 NextAttack = 0;
-    if (MaxWeight == Weight4)
+    if (MaxWeight <= 0.0f)
+    {
+        NextAttack = 0;
+    }
+    else if (MaxWeight == Weight4)
     {
         NextAttack = 4;
     }
@@ -150,10 +148,10 @@ bool ABossAIController::CheckHpPattern()
 
 void ABossAIController::CheckLockedSkill(float CurrentTime)
 {
-    bAttack1Ready = (CurrentTime >= BossCharacter->Attack1_CooldownEnd);
-    bAttack2Ready = (CurrentTime >= BossCharacter->Attack2_CooldownEnd);
-    bAttack3Ready = (CurrentTime >= BossCharacter->Attack3_CooldownEnd);
-    bAttack4Ready = (CurrentTime >= BossCharacter->Attack4_CooldownEnd);
+    //bAttack1Ready = (CurrentTime >= BossCharacter->Attack1_CooldownEnd);
+    //bAttack2Ready = (CurrentTime >= BossCharacter->Attack2_CooldownEnd);
+    //bAttack3Ready = (CurrentTime >= BossCharacter->Attack3_CooldownEnd);
+    //bAttack4Ready = (CurrentTime >= BossCharacter->Attack4_CooldownEnd);
 
     switch (MissionHandle->GetLockedSkill())
     {
@@ -211,6 +209,11 @@ float ABossAIController::ComputeAttack1Weight()
         return 0.0f;
     }
 
+    if (!BossCharacter->bAttack1Ready)
+    {
+        return 0.0f;
+    }
+
     float Distance = FVector::Dist(BossCharacter->GetActorLocation(), Player->GetActorLocation());
     float Weight = 0.0f;
     if (Distance >= 800.f && Distance <= 1500.f)
@@ -221,10 +224,10 @@ float ABossAIController::ComputeAttack1Weight()
     {
         Weight = FMath::Clamp(1.0f - FMath::Abs(Distance - 1150.f) / 1150.f, 0.0f, 1.0f);
     }
-    if (BossCharacter->Attack1_CooldownEnd > GetWorld()->GetTimeSeconds())
-    {
-        Weight = 0.0f;
-    }
+    //if (BossCharacter->Attack1_CooldownEnd > GetWorld()->GetTimeSeconds())
+    //{
+    //    Weight = 0.0f;
+    //}
     Weight *= FMath::RandRange(0.8f, 1.2f);
     return Weight;
 }
@@ -243,9 +246,9 @@ float ABossAIController::ComputeAttack2Weight()
     {
         Weight = FMath::Clamp(Distance / 1500.f, 0.0f, 1.0f);
     }
-    if (BossCharacter->Attack2_CooldownEnd > GetWorld()->GetTimeSeconds())
+    if (!BossCharacter->bAttack2Ready)
     {
-        Weight = 0.0f;
+        return 0.0f;
     }
     Weight *= FMath::RandRange(0.8f, 1.2f);
     return Weight;
@@ -265,9 +268,9 @@ float ABossAIController::ComputeAttack3Weight()
     {
         Weight = FMath::Clamp(1.0f - (Distance - 800.f) / 800.f, 0.0f, 1.0f);
     }
-    if (BossCharacter->Attack3_CooldownEnd > GetWorld()->GetTimeSeconds())
+    if (!BossCharacter->bAttack3Ready)
     {
-        Weight = 0.0f;
+        return 0.0f;
     }
     Weight *= FMath::RandRange(0.8f, 1.2f);
     return Weight;
@@ -287,9 +290,9 @@ float ABossAIController::ComputeAttack4Weight()
     {
         Weight = FMath::Clamp(1.0f - FMath::Abs(Distance - 1500.f) / 1500.f, 0.0f, 1.0f);
     }
-    if (BossCharacter->Attack4_CooldownEnd > GetWorld()->GetTimeSeconds())
+    if (!BossCharacter->bAttack4Ready)
     {
-        Weight = 0.0f;
+        return 0.0f;
     }
     Weight *= FMath::RandRange(0.8f, 1.2f);
     return Weight;

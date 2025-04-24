@@ -136,8 +136,9 @@ void ABoss::BeginPlay()
     }
 
     // Stat
-    MonsterMoveSpeed = 100.0f;
+    MonsterMoveSpeed = 1000.0f;
     MonsterHP = MonsterMaxHP = 20000.0f;
+    //MonsterHP = MonsterMaxHP = 100.0f;
     MonsterArmor = 15.0f;
     MonsterAttackDamage = 50.0f;
 
@@ -157,15 +158,6 @@ void ABoss::Tick(float DeltaTime)
     {
         GetCharacterMovement()->MaxWalkSpeed = MonsterChaseSpeed;
     }
-    /*if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            DeltaTime,
-            FColor::Green,
-            FString::Printf(TEXT("Boss HP: %.1f / %.1f"), MonsterHP, MonsterMaxHP)
-        );
-    }*/
 
     if (GetCharacterMovement() && GetCharacterMovement()->MovementMode == MOVE_Walking)
     {
@@ -175,17 +167,50 @@ void ABoss::Tick(float DeltaTime)
         }
     }
 
-    //**************
-    //if (GEngine && GetCharacterMovement())
-    //{
-    //    GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Cyan,
-    //        FString::Printf(TEXT("%d"), (int32)GetCharacterMovement()->MovementMode));
-    //}
-    //**************
     if (!bIsInvulnerable && Skill2ShieldNiagara && Skill2ShieldNiagara->IsActive())
     {
         Skill2ShieldNiagara->Deactivate();
     }
+
+    //if (GEngine)
+    //{
+    //    float Rem1 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack1CooldownHandle);
+    //    float Rem2 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack2CooldownHandle);
+    //    float Rem3 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack3CooldownHandle);
+    //    float Rem4 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack4CooldownHandle);
+
+    //    int32 NextAttack = 0;
+    //    if (AAIController* AICon = Cast<AAIController>(GetController()))
+    //    {
+    //        if (UBlackboardComponent* BB = AICon->GetBlackboardComponent())
+    //        {
+    //            NextAttack = BB->GetValueAsInt(TEXT("NextAttack"));
+    //        }
+    //    }
+
+    //    FString StateName;
+    //    switch (NextAttack)
+    //    {
+    //    case 0: StateName = TEXT("Idle");    break;
+    //    case 1: StateName = TEXT("Attack1"); break;
+    //    case 2: StateName = TEXT("Attack2"); break;
+    //    case 3: StateName = TEXT("Attack3"); break;
+    //    case 4: StateName = TEXT("Attack4"); break;
+    //    default: StateName = TEXT("Unknown"); break;
+    //    }
+
+    //    FString DebugMsg = FString::Printf(
+    //        TEXT("Ready: A1=%d A2=%d A3=%d A4=%d  Remain: %.1f/%.1f/%.1f/%.1f  State: %s(%d)"),
+    //        bAttack1Ready ? 1 : 0,
+    //        bAttack2Ready ? 1 : 0,
+    //        bAttack3Ready ? 1 : 0,
+    //        bAttack4Ready ? 1 : 0,
+    //        Rem1, Rem2, Rem3, Rem4,
+    //        *StateName, NextAttack
+    //    );
+    //    GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, DebugMsg);
+    //}
+
 #pragma region Soket
     if (GetMesh())
     {
@@ -362,30 +387,63 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
     // Attack1 풀 정리
     ABoss_Attack1_Bullet::BulletPool.Empty();
     ABoss_Attack4_Bullet::Bullet4Pool.Empty();
-    ABoss_Skill3_Wall::WallPool.Empty();    
+    ABoss_Skill3_Wall::WallPool.Empty();   
+
+    GetWorldTimerManager().ClearTimer(Attack1CooldownHandle);
+    GetWorldTimerManager().ClearTimer(Attack2CooldownHandle);
+    GetWorldTimerManager().ClearTimer(Attack3CooldownHandle);
+    GetWorldTimerManager().ClearTimer(Attack4CooldownHandle);
 }
 
 void ABoss::UpdateAttackCooldown(int32 AttackID)
 {
-    float CurrentTime = GetWorld()->GetTimeSeconds();
     switch (AttackID)
     {
     case 1:
-        Attack1_CooldownEnd = CurrentTime + Attack1_CooldownDuration;
+        bAttack1Ready = false;
+        GetWorldTimerManager().SetTimer(
+            Attack1CooldownHandle,
+            [this]() { bAttack1Ready = true; },
+            Attack1_CooldownDuration,
+            false
+        );
         break;
+
     case 2:
-        Attack2_CooldownEnd = CurrentTime + Attack2_CooldownDuration;
+        bAttack2Ready = false;
+        GetWorldTimerManager().SetTimer(
+            Attack2CooldownHandle,
+            [this]() { bAttack2Ready = true; },
+            Attack2_CooldownDuration,
+            false
+        );
         break;
+
     case 3:
-        Attack3_CooldownEnd = CurrentTime + Attack3_CooldownDuration;
+        bAttack3Ready = false;
+        GetWorldTimerManager().SetTimer(
+            Attack3CooldownHandle,
+            [this]() { bAttack3Ready = true; },
+            Attack3_CooldownDuration,
+            false
+        );
         break;
+
     case 4:
-        Attack4_CooldownEnd = CurrentTime + Attack4_CooldownDuration;
+        bAttack4Ready = false;
+        GetWorldTimerManager().SetTimer(
+            Attack4CooldownHandle,
+            [this]() { bAttack4Ready = true; },
+            Attack4_CooldownDuration,
+            false
+        );
         break;
+
     default:
         break;
     }
 }
+
 
 void ABoss::MonsterAttackCheck()
 {

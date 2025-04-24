@@ -200,7 +200,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float TurnSpeed = 5.0f; // 회전 속도
 
-    float Chase_AcceptanceRadius = 100.0f; // Chase 반경
+    float Chase_AcceptanceRadius = 1000.0f; // Chase 반경
 
     // ***********************Attack 1*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack1")
@@ -250,13 +250,13 @@ public:
     float Attack1_CooldownDuration = 10.0f; // 공격 1 쿨타임
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack2_CooldownDuration = 60.0f; // 공격 2 쿨타임
+    float Attack2_CooldownDuration = 50.0f; // 공격 2 쿨타임
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
     float Attack3_CooldownDuration = 20.0f; // 공격 3 쿨타임
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack4_CooldownDuration = 50.0f; // 공격 4 쿨타임
+    float Attack4_CooldownDuration = 60.0f; // 공격 4 쿨타임
 
     // ***********************Attack 3*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
@@ -424,5 +424,17 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void BossSkill3RoarSounds();
+
+    FTimerHandle Attack1CooldownHandle;
+    bool        bAttack1Ready = true;
+
+    FTimerHandle Attack2CooldownHandle;
+    bool        bAttack2Ready = true;
+
+    FTimerHandle Attack3CooldownHandle;
+    bool        bAttack3Ready = true;
+
+    FTimerHandle Attack4CooldownHandle;
+    bool        bAttack4Ready = true;
 };
 
