@@ -21,16 +21,16 @@ FVector UTimerSkillSpawnManagerComponent::GetRandomMonsterLocation()
 		Character = Cast<ABaseCharacter>(GetOwner());
 	}
 	Character->SupportCharInstance->CheckMonster();
-	TSet<TObjectPtr<ABaseMonster>> Monsters; 
+	TSet<TWeakObjectPtr<ABaseMonster>> Monsters; 
 	for (auto& Monster : Character->SupportCharInstance->Monsters)
 	{
 		Monsters.Add(Monster.Key);
 	}
 	int randomIndex = FMath::RandRange(0, Monsters.Num() - 1);
 	int currentIndex = 0;
-	for (ABaseMonster* Monster : Monsters)
+	for (TWeakObjectPtr<ABaseMonster> Monster : Monsters)
 	{
-		if (!IsValid(Monster))
+		if (!Monster.IsValid())
 		{
 			continue;
 		}
@@ -126,15 +126,13 @@ void UTimerSkillSpawnManagerComponent::ActivateTimerSkill(ETimerSkillType skillT
 	FVector skillLocation = GetRandomMonsterLocation();
 	if (skillLocation == FVector::ZeroVector)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Target is Null"));
 		return;
 	}
 	if (skillType == ETimerSkillType::AttackPlants || skillType == ETimerSkillType::HealPlants)
 	{
 		skillLocation = SummonSkillLocation(skillLocation);
 	}
-
-	skillLocation.Z += skill->SpawnPosZ;
+	skillLocation.Z = GetOwner()->GetActorLocation().Z;
 	if (skill->TimerSkillSpanwManager == nullptr)
 	{
 		skill->TimerSkillSpanwManager = this;
