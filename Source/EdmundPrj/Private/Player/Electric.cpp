@@ -72,13 +72,14 @@ void AElectric::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorldTimerManager().ClearTimer(DeactivateTimer);
 }
 
-void AElectric::MoveToMonster(ABaseMonster* monster)
+void AElectric::MoveToMonster(TWeakObjectPtr<ABaseMonster> monster)
 {
-	AddSplinePoint(monster->GetActorLocation());
+	if (!monster.IsValid()) return;
+	AddSplinePoint(monster.Get()->GetActorLocation());
 	CurrentElectricCount++;
-	FRotator Direction = UKismetMathLibrary::FindLookAtRotation(EnemySearchCollision->GetComponentLocation(), monster->GetActorLocation());
+	FRotator Direction = UKismetMathLibrary::FindLookAtRotation(EnemySearchCollision->GetComponentLocation(), monster.Get()->GetActorLocation());
 	EnemySearchCollision->SetWorldRotation(Direction);
-
+	Attack(monster);
 	GetWorldTimerManager().SetTimer(
 		MoveTimer,
 		this,
@@ -102,10 +103,11 @@ void AElectric::Move()
 	float Distance = FVector::Distance(EnemySearchCollision->GetComponentLocation(), TargetMonster->GetActorLocation());
 }
 
-void AElectric::Attack(ABaseMonster* monster)
+void AElectric::Attack(TWeakObjectPtr<ABaseMonster> monster)
 {
+	if (!monster.IsValid()) return;
 	UGameplayStatics::ApplyDamage(
-		monster,
+		monster.Get(),
 		30.0f,
 		nullptr,
 		this,

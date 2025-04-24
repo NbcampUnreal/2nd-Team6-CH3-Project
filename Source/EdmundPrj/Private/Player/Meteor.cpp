@@ -32,7 +32,6 @@ void AMeteor::HitToMonster(TObjectPtr<ABaseMonster> Monster)
 	HitToGround();
 }
 
-TSet < TObjectPtr<ABaseMonster>> HitMonsterSet;
 void AMeteor::HitToGround()
 {
 	TArray<AActor*> activators;
@@ -44,8 +43,9 @@ void AMeteor::HitToGround()
 	MonsterLaunchCollision->GetOverlappingActors(activators);
 	if (GroundHitNiagara)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("asdfasdfasdf"));
 		GroundHitNiagara->Activate();
-		GroundHitNiagara->SetWorldLocation(GetActorLocation());
+		//GroundHitNiagara->SetWorldLocation(GetActorLocation());
 		GetWorldTimerManager().SetTimer(ElplosionEffectDeactivateHandle,
 			[this] {
 				if (!IsValid(this)) return;
@@ -81,7 +81,6 @@ void AMeteor::HitToGround()
 
 				if (HitPrimitive)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("In HitPrimitive"))
 					ACharacter* HitCharacter = Cast<ACharacter>(activator);
 					if (HitCharacter)
 					{
@@ -92,8 +91,6 @@ void AMeteor::HitToGround()
 						HitCharacter->LaunchCharacter(LaunchVector, false, false);
 					}
 				}
-
-				
 			}
 		}
 	}

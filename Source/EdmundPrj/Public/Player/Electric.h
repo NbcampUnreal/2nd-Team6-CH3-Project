@@ -31,11 +31,11 @@ public:
 		const FHitResult& SweepResult);
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	UFUNCTION()
-	void MoveToMonster(ABaseMonster* monster);
+	void MoveToMonster(TWeakObjectPtr<ABaseMonster> monster);
 	UFUNCTION()
 	void Move();
 	UFUNCTION()
-	void Attack(ABaseMonster* monster);
+	void Attack(TWeakObjectPtr<ABaseMonster> monster);
 	UFUNCTION()
 	void Activate();
 	UFUNCTION()
