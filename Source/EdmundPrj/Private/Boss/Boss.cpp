@@ -173,44 +173,44 @@ void ABoss::Tick(float DeltaTime)
         Skill2ShieldNiagara->Deactivate();
     }
 
-    if (GEngine)
-    {
-        float Rem1 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack1CooldownHandle);
-        float Rem2 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack2CooldownHandle);
-        float Rem3 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack3CooldownHandle);
-        float Rem4 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack4CooldownHandle);
+    //if (GEngine)
+    //{
+    //    float Rem1 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack1CooldownHandle);
+    //    float Rem2 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack2CooldownHandle);
+    //    float Rem3 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack3CooldownHandle);
+    //    float Rem4 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack4CooldownHandle);
 
-        int32 NextAttack = 0;
-        if (AAIController* AICon = Cast<AAIController>(GetController()))
-        {
-            if (UBlackboardComponent* BB = AICon->GetBlackboardComponent())
-            {
-                NextAttack = BB->GetValueAsInt(TEXT("NextAttack"));
-            }
-        }
+    //    int32 NextAttack = 0;
+    //    if (AAIController* AICon = Cast<AAIController>(GetController()))
+    //    {
+    //        if (UBlackboardComponent* BB = AICon->GetBlackboardComponent())
+    //        {
+    //            NextAttack = BB->GetValueAsInt(TEXT("NextAttack"));
+    //        }
+    //    }
 
-        FString StateName;
-        switch (NextAttack)
-        {
-        case 0: StateName = TEXT("Idle");    break;
-        case 1: StateName = TEXT("Attack1"); break;
-        case 2: StateName = TEXT("Attack2"); break;
-        case 3: StateName = TEXT("Attack3"); break;
-        case 4: StateName = TEXT("Attack4"); break;
-        default: StateName = TEXT("Unknown"); break;
-        }
+    //    FString StateName;
+    //    switch (NextAttack)
+    //    {
+    //    case 0: StateName = TEXT("Idle");    break;
+    //    case 1: StateName = TEXT("Attack1"); break;
+    //    case 2: StateName = TEXT("Attack2"); break;
+    //    case 3: StateName = TEXT("Attack3"); break;
+    //    case 4: StateName = TEXT("Attack4"); break;
+    //    default: StateName = TEXT("Unknown"); break;
+    //    }
 
-        FString DebugMsg = FString::Printf(
-            TEXT("Ready: A1=%d A2=%d A3=%d A4=%d  Remain: %.1f/%.1f/%.1f/%.1f  State: %s(%d)"),
-            bAttack1Ready ? 1 : 0,
-            bAttack2Ready ? 1 : 0,
-            bAttack3Ready ? 1 : 0,
-            bAttack4Ready ? 1 : 0,
-            Rem1, Rem2, Rem3, Rem4,
-            *StateName, NextAttack
-        );
-        GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, DebugMsg);
-    }
+    //    FString DebugMsg = FString::Printf(
+    //        TEXT("Ready: A1=%d A2=%d A3=%d A4=%d  Remain: %.1f/%.1f/%.1f/%.1f  State: %s(%d)"),
+    //        bAttack1Ready ? 1 : 0,
+    //        bAttack2Ready ? 1 : 0,
+    //        bAttack3Ready ? 1 : 0,
+    //        bAttack4Ready ? 1 : 0,
+    //        Rem1, Rem2, Rem3, Rem4,
+    //        *StateName, NextAttack
+    //    );
+    //    GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, DebugMsg);
+    //}
 
 #pragma region Soket
     if (GetMesh())
