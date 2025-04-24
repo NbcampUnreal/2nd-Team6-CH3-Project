@@ -21,6 +21,8 @@ APlayerCharacterFey::APlayerCharacterFey()
 	MeleeAttackRadius = 100.0f;
 	MeleeAttackPushStrength = 1000.0f;
 
+	AttackCost = 10;
+
 	AttackMontage = nullptr;
 
 	IsAttack = false;
@@ -89,53 +91,7 @@ void APlayerCharacterFey::StartJump(const FInputActionValue& value)
 		// 2단 점프 수행
 		FVector JumpVelocity = GetVelocity();
 
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-
-		bool IsMove = false;
-
-		// 특정 키(W 키)가 눌렸는지 확인
-		if (PlayerController && PlayerController->IsInputKeyDown(EKeys::W))
-		{
-			IsMove = true;
-			JumpVelocity = GetActorForwardVector();
-		}
-
-		// 특정 키(S 키)가 눌렸는지 확인
-		else if (PlayerController && PlayerController->IsInputKeyDown(EKeys::S))
-		{
-			IsMove = true;
-			JumpVelocity = GetActorForwardVector() * -1.0f;
-		}
-
-		// 특정 키(A 키)가 눌렸는지 확인
-		if (PlayerController && PlayerController->IsInputKeyDown(EKeys::A))
-		{
-			if (!IsMove)
-			{
-				JumpVelocity = GetActorRightVector() * -1.0f;
-			}
-			else
-			{
-				JumpVelocity = JumpVelocity + GetActorRightVector() * -1.0f;
-			}
-
-			JumpVelocity.Normalize();
-		}
-
-		// 특정 키(D 키)가 눌렸는지 확인
-		else if (PlayerController && PlayerController->IsInputKeyDown(EKeys::D))
-		{
-			if (!IsMove)
-			{
-				JumpVelocity = GetActorRightVector() * 1.0f;
-			}
-			else
-			{
-				JumpVelocity = JumpVelocity + GetActorRightVector();
-			}
-
-			JumpVelocity.Normalize();
-		}
+		JumpVelocity.Normalize();
 
 		JumpVelocity *= GetCharacterMovement()->MaxWalkSpeed;
 
@@ -207,7 +163,7 @@ void APlayerCharacterFey::EndMeleeAttack()
 
 void APlayerCharacterFey::Attack(const FInputActionValue& value)
 {
-	if (Stamina < 10 || IsAttack)
+	if (Stamina < AttackCost || IsAttack)
 	{
 		return;
 	}
@@ -215,7 +171,7 @@ void APlayerCharacterFey::Attack(const FInputActionValue& value)
 	Super::Attack(value);
 
 	IsAttack = true;
-	Stamina -= 10;
+	Stamina -= AttackCost;
 
 	if (IsValid(CurrentGameState))
 	{

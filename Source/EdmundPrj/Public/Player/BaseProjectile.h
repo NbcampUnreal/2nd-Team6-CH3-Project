@@ -14,17 +14,6 @@ class EDMUNDPRJ_API ABaseProjectile : public AActor
 public:
 	ABaseProjectile();
 
-protected:
-	virtual void BeginPlay() override;
-
-	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet|Component")
-	USphereComponent* Collision;
-
-	bool bIsHidden;
-
-public:
 	virtual void SetBulletHidden(bool IsHidden);  // ÃÑ¾Ë ¼û±è »óÅÂ¸¦ ¼³Á¤ÇÏ´Â ÇÔ¼ö
 
 	virtual void EndBulletLife();  // ÃÑ¾Ë ¼û±è »óÅÂ¸¦ ¼³Á¤ÇÏ´Â ÇÔ¼ö
@@ -41,20 +30,30 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UProjectileMovementComponent> ProjectileMovementComponent;
 
-	FTimerHandle BulletLifeTimerHandle;
+protected:
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet|Component")
+	USphereComponent* Collision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet|Particle")
 	TObjectPtr<UParticleSystem> BulletLandParticle;  // ÅºÂø ÆÄÆ¼Å¬
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
-	float BulletSpeed;
+	bool bIsHidden;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet")
-	float BulletDuraion;
+	FTimerHandle BulletLifeTimerHandle;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet", meta = (AllowPrivateAccess = "true"))
+	float BulletSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet", meta = (AllowPrivateAccess = "true"))
+	float BulletDuraion;
 
 	FVector PrevProjectileLocation;
 };
