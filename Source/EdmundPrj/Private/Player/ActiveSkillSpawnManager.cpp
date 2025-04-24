@@ -60,7 +60,7 @@ void UActiveSkillSpawnManager::CreateActiveSkill(TSubclassOf<AAttackSkill> attac
 		TObjectPtr<AAttackSkill> skill = GetWorld()->SpawnActor<AAttackSkill>(attackSkill);
 
 		if (!skill) continue;
-		skill->DamageMultiplier = Character->AttackDamage;
+		skill->DamageMultiplier = Character->GetAttackDamage();
 		skill->SetActorHiddenInGame(true);
 		skill->SetActorEnableCollision(false);
 		skill->SetActorTickEnabled(false);

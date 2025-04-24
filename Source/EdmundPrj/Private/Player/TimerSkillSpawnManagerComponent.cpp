@@ -165,7 +165,7 @@ void UTimerSkillSpawnManagerComponent::CreateTimerSkill(TSubclassOf<ATimerSkill>
 		TObjectPtr<ATimerSkill> skill = GetWorld()->SpawnActor<ATimerSkill>(timerSkill);
 
 		if (!skill) continue;
-		skill->DamageMultiplier = Character->AttackDamage;
+		skill->DamageMultiplier = Character->GetAttackDamage();
 		skill->Character = Character;
 		skill->SetActorHiddenInGame(true);
 		skill->SetActorEnableCollision(false);

@@ -334,6 +334,11 @@ void APlayerCharacterFey::AttackTrace()
 	}
 }
 
+void APlayerCharacterFey::SetJumpCount()
+{
+	JumpCount = 1;
+}
+
 void APlayerCharacterFey::SetIsHover()
 {
 	IsHover = false;

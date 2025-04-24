@@ -1,6 +1,5 @@
 #include "Player/PlayerCharacter.h"
 #include "Player/EdmundPlayerController.h"
-#include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "Player/Weapon.h"
@@ -360,7 +359,7 @@ void APlayerCharacter::ZoomOut(const FInputActionValue& value)
 	SpringArmComp->TargetArmLength = 200;
 }
 
-void APlayerCharacter::SetAmmo(int32 NewAmmo)
+void APlayerCharacter::SetAmmo(const int32 NewAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, NewAmmo);
 
@@ -370,7 +369,7 @@ void APlayerCharacter::SetAmmo(int32 NewAmmo)
 	}
 }
 
-void APlayerCharacter::AmountAmmo(int32 AmountAmmo)
+void APlayerCharacter::AmountAmmo(const int32 AmountAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, CurrentAmmo + AmountAmmo);
 
