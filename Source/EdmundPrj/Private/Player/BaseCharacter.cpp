@@ -5,9 +5,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-//#include "DrawDebugHelpers.h"
-//#include "Kismet/GameplayStatics.h"
-//#include "Sound/SoundBase.h"
 #include "System/EdmundGameState.h"
 #include "System/DataStructure/ShopCatalogRow.h"
 #include "Player/SkillManager.h"
@@ -264,7 +261,7 @@ void ABaseCharacter::StartSprint(const FInputActionValue& value)
 		return;
 	}
 
-	if (Stamina < 4)
+	if (Stamina < StaminaConsumAmount)
 	{
 		StopSprint(value);
 		return;
@@ -414,6 +411,11 @@ float ABaseCharacter::GetAttackDamage() const
 	Damage = FMath::RandRange(MinDamage, MaxDamage);
 
 	return Damage;
+}
+
+float ABaseCharacter::GetDamage() const
+{
+	return AttackDamage;
 }
 
 void ABaseCharacter::SetAttackDamage(float NewAttackDamage)
