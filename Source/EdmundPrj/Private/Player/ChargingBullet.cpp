@@ -60,9 +60,7 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 			IsBossAttack = true;
 		}
 
-		float Damage = 30.0f;
-
-		Damage = BulletDamage;
+		float Damage = BulletDamage;
 
 		// 랜덤 데미지 적용
 		float RandomRange = 0.2f;

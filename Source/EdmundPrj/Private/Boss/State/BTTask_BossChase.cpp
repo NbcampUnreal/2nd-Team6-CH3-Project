@@ -65,10 +65,10 @@ void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     }
 
     float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
-    if (Distance >= 1500.0f)
-    {
-        BossRef->Chase_AcceptanceRadius += 100.0f;
-    }
+    //if (Distance >= 1500.0f)
+    //{
+    //    BossRef->Chase_AcceptanceRadius += 100.0f;
+    //}
 
     FRotator CurrentRotation = BossRef->GetActorRotation();
     FVector Direction = (Player->GetActorLocation() - BossRef->GetActorLocation()).GetSafeNormal();
@@ -87,7 +87,7 @@ void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         NextAttack = BBComp->GetValueAsInt("NextAttack");
     }
 
-    if (NextAttack != 0 || Distance <= BossRef->Chase_AcceptanceRadius + 500.0f)
+    if (NextAttack != 0 || Distance <= BossRef->Chase_AcceptanceRadius)
     {
         BossRef->SetbChaseComplete(true);
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

@@ -13,6 +13,7 @@
 #include "CollisionShape.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "Player/BaseCharacter.h"
 #include "Engine/Engine.h"
 
 #include "Boss/Boss_AnimInstance.h"
@@ -160,13 +161,11 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
     }
     else
     {
-        ACharacter* PlayerChar = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(World, 0));
-        if (PlayerChar && PlayerChar->GetMesh())
+        ABaseCharacter* PlayerChar = Cast<ABaseCharacter>(UGameplayStatics::GetPlayerPawn(World, 0));
+        if (PlayerChar)
         {
-            FVector FootPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterFoot"));
-            FVector HeadPos = PlayerChar->GetMesh()->GetSocketLocation(TEXT("CharacterHead"));
-            float DynamicOffset = (HeadPos.Z - FootPos.Z) * 0.5f;
-            Center.Z = FootPos.Z + DynamicOffset + 120.0f;
+            float Height = PlayerChar->GetHeight();
+            Center.Z = 164.0f + Height;
         }
         else
         {
@@ -184,8 +183,8 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
             );
         }
     }
-
-    FVector BoxExtent(5000.f, 5000.f, 10.f);
+    
+    FVector BoxExtent(9999999.f, 9999999.f, 10.f);
 
     TArray<FOverlapResult> OverlapResults;
     FCollisionShape Shape = FCollisionShape::MakeBox(BoxExtent);
@@ -198,7 +197,9 @@ void UBTTask_BossSkill1::PerformOverlapCheck(bool bFloorPattern)
         Shape
     );
 
+#if WITH_EDITOR
     DrawDebugBox(World, Center, BoxExtent, (bFloorPattern ? FColor::Blue : FColor::Magenta), false, 0.5f);
+#endif
 
     if (bOverlapped)
     {

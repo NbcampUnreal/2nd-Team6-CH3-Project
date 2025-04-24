@@ -32,6 +32,9 @@ public:
 	// 공격력 Getter
 	virtual float GetAttackDamage() const;
 
+	// 공격력 Getter
+	virtual float GetDamage() const;
+
 	// 공격력 Setter
 	void SetAttackDamage(const float NewAttackDamage);
 
