@@ -209,7 +209,7 @@ float ABossAIController::ComputeAttack1Weight()
         return 0.0f;
     }
 
-    if (!BossCharacter->bAttack1Ready)
+    if (!BossCharacter->GetbAttack1Ready())
     {
         return 0.0f;
     }
@@ -246,7 +246,7 @@ float ABossAIController::ComputeAttack2Weight()
     {
         Weight = FMath::Clamp(Distance / 1500.f, 0.0f, 1.0f);
     }
-    if (!BossCharacter->bAttack2Ready)
+    if (!BossCharacter->GetbAttack2Ready())
     {
         return 0.0f;
     }
@@ -268,7 +268,7 @@ float ABossAIController::ComputeAttack3Weight()
     {
         Weight = FMath::Clamp(1.0f - (Distance - 800.f) / 800.f, 0.0f, 1.0f);
     }
-    if (!BossCharacter->bAttack3Ready)
+    if (!BossCharacter->GetbAttack3Ready())
     {
         return 0.0f;
     }
@@ -290,7 +290,7 @@ float ABossAIController::ComputeAttack4Weight()
     {
         Weight = FMath::Clamp(1.0f - FMath::Abs(Distance - 1500.f) / 1500.f, 0.0f, 1.0f);
     }
-    if (!BossCharacter->bAttack4Ready)
+    if (!BossCharacter->GetbAttack4Ready())
     {
         return 0.0f;
     }

@@ -131,6 +131,10 @@ public:
     float GetAttack1Multiplier() { return Attack1Multiplier; }
     float GetAttack3Multiplier() { return Attack3Multiplier; }
     float GetAttack4Multiplier() { return Attack4Multiplier; }
+    bool GetbAttack1Ready() { return bAttack1Ready; }
+    bool GetbAttack2Ready() { return bAttack2Ready; }
+    bool GetbAttack3Ready() { return bAttack3Ready; }
+    bool GetbAttack4Ready() { return bAttack4Ready; }
     
     virtual void FreezeMonster(float FreezeDuration) override;
 
@@ -177,8 +181,19 @@ private:
     bool bChaseComplete = false;
     float Skill2InvulnerableStartHP;
 
-
     FTimerHandle Skill2HealingTimerHandle;
+
+    FTimerHandle Attack1CooldownHandle;
+    bool bAttack1Ready = true;
+
+    FTimerHandle Attack2CooldownHandle;
+    bool bAttack2Ready = true;
+
+    FTimerHandle Attack3CooldownHandle;
+    bool bAttack3Ready = true;
+
+    FTimerHandle Attack4CooldownHandle;
+    bool bAttack4Ready = true;
 
 public:
     // ***********************Stat*************************
@@ -424,17 +439,5 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void BossSkill3RoarSounds();
-
-    FTimerHandle Attack1CooldownHandle;
-    bool        bAttack1Ready = true;
-
-    FTimerHandle Attack2CooldownHandle;
-    bool        bAttack2Ready = true;
-
-    FTimerHandle Attack3CooldownHandle;
-    bool        bAttack3Ready = true;
-
-    FTimerHandle Attack4CooldownHandle;
-    bool        bAttack4Ready = true;
 };
 
