@@ -79,9 +79,10 @@ void UPassiveSkillManager::BerserkerSkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::Berserker];
 	float HpRatio = Character->GetHP() / Character->GetMaxHP();
-	float AttackMultiplier = 1.0f + (1.0f - HpRatio) * (MinHealthMultiplier - (1.0f - SkillLevel / 10));
+	float AttackMultiplier = 1.0f + (1.0f - HpRatio + SkillLevel / 10);
 	Character->SetAttackDamage(Character->GetAttackDamage() * AttackMultiplier);
 }
+
 //µ®∏Æ∞‘¿Ã∆Æ
 void UPassiveSkillManager::BloodAbsorbingSkill()
 {
