@@ -179,7 +179,8 @@ protected:
 
 	virtual bool CheckAction();
 
-	AEdmundGameState* CurrentGameState;
+	UPROPERTY()
+	TObjectPtr<AEdmundGameState> CurrentGameState = nullptr;
 
 	// �ǰ� �ִϸ��̼�
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")

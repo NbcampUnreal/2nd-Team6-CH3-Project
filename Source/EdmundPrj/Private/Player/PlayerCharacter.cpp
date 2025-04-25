@@ -277,10 +277,7 @@ void APlayerCharacter::Reload()
 
 	if (IsValid(ReloadMontage))
 	{
-		if (IsValid(ReloadMontage))
-		{
-			PlayAnimMontage(ReloadMontage, ReloadTimeMultipler);
-		}
+		PlayAnimMontage(ReloadMontage, ReloadTimeMultipler);
 	}
 }
 
