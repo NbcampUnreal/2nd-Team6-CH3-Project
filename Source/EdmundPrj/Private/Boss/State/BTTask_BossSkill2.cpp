@@ -39,11 +39,6 @@ EBTNodeResult::Type UBTTask_BossSkill2::ExecuteTask(UBehaviorTreeComponent& Owne
         BossRef->SetSkill2Invulnerable(true);
         BossRef->SetbIsInvulnerable(true);
         BossRef->GetMesh()->SetMaterial(0, BossRef->Skill2NewMaterial);
-        
-        //if (BossRef->Skill2ShieldNiagara)
-        //{
-        //    BossRef->Skill2ShieldNiagara->Activate(true);
-        //}
     }
     return EBTNodeResult::Succeeded;
 }

@@ -10,30 +10,23 @@ void UBoss_AnimInstance::NativeInitializeAnimation()
     APawn* OwningPawn = TryGetPawnOwner();
     if (!OwningPawn)
     {
-        //UE_LOG(LogTemp, Warning, TEXT("[UBoss_AnimInstance] TryGetPawnOwner() Returned NULL!"));
         GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBoss_AnimInstance::InitializeBossRef);
         return; 
     }
 
-    //UE_LOG(LogTemp, Log, TEXT("[UBoss_AnimInstance] TryGetPawnOwner() succeeded: %s"), *OwningPawn->GetName());
-
     BossRef = Cast<ABoss>(OwningPawn);
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("[UBoss_AnimInstance] BossRef is NULL after casting! Check if the Pawn is correctly set as ABoss."));
         return;
     }
 
     MovementComponent = BossRef->GetCharacterMovement();
     if (!MovementComponent)
     {
-        //UE_LOG(LogTemp, Error, TEXT("[UBoss_AnimInstance] MovementComponent is NULL! Check if ABoss properly initializes UCharacterMovementComponent."));
         return;
     }
 
     bIsFalling = MovementComponent->IsFalling();
-
-    //UE_LOG(LogTemp, Log, TEXT("[UBoss_AnimInstance] Initialization Complete! BossRef: %s"), *BossRef->GetName());
 }
 
 
@@ -57,26 +50,17 @@ void UBoss_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     }
 }
 
-void UBoss_AnimInstance::AnimNotify_AttackCheck()
-{
-    //UE_LOG(LogTemp, Log, TEXT("AttackCheck AnimNotify triggered."));
-}
-
 void UBoss_AnimInstance::InitializeBossRef()
 {
     APawn* OwningPawn = TryGetPawnOwner();
     if (!OwningPawn)
     {
-        //UE_LOG(LogTemp, Warning, TEXT("[UBoss_AnimInstance] Delayed TryGetPawnOwner() Returned NULL!"));
         return;
     }
-
-    //UE_LOG(LogTemp, Log, TEXT("[UBoss_AnimInstance] TryGetPawnOwner() succeeded: %s"), *OwningPawn->GetName());
 
     BossRef = Cast<ABoss>(OwningPawn);
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("[UBoss_AnimInstance] BossRef is NULL after casting!"));
         return;
     }
 }

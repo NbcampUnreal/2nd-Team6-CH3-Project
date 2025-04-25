@@ -19,7 +19,6 @@ public:
     virtual void BeginPlay() override;
     virtual void OnPossess(APawn* InPawn) override;
     virtual void Tick(float DeltaTime) override;
-    //void OnAttackTaskComplete(int32 AttackID);
     void InitBlackboard(AMissionHandle* NewMissionHandle);
     void NotifyClearHalfPattern();
     FVector GetPlayerLocation();
@@ -29,7 +28,6 @@ public:
     
 private:
     bool CheckHpPattern();
-    //void CheckBossHeight();
     void CheckLockedSkill(float CurrentTime);
     void EnableHalfPattern();
 

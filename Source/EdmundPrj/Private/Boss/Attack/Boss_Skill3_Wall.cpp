@@ -129,9 +129,4 @@ void ABoss_Skill3_Wall::PerformLowering()
 
 void ABoss_Skill3_Wall::BossSkill3WallSounds()
 {
-    //if (GameState && CurrentAudioComp)
-    //{
-    //    MonsterType = EMonsterType::Boss;
-    //    GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Weapon);
-    //}
 }

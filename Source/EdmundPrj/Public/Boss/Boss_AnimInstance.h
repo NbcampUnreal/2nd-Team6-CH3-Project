@@ -15,9 +15,6 @@ public:
     virtual void NativeInitializeAnimation() override;
     virtual void NativeUpdateAnimation(float DeltaSeconds) override;
     
-    UFUNCTION()
-    void AnimNotify_AttackCheck();
-
     void InitializeBossRef();
 
 
@@ -86,7 +83,6 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     UAnimMontage* Skill3Montage;
-
 
     UFUNCTION(BlueprintCallable)
     bool GetbIsFalling() const { return bIsFalling; }
