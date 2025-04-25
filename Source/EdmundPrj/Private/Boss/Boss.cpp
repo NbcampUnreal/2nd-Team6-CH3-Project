@@ -473,13 +473,13 @@ void ABoss::DeactivateAttack2Collision()
     if (LandImpactParticle)
     {
         FVector SpawnLocation = GetActorLocation();
-        float CustomZOffset = -50.0f;
+        float CustomZOffset = -100.0f;
         SpawnLocation.Z += CustomZOffset;
 
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(
             GetWorld(),
             LandImpactParticle,
-            GetActorLocation(),
+            SpawnLocation,
             FRotator::ZeroRotator,
             FVector(10.0f)
         );
