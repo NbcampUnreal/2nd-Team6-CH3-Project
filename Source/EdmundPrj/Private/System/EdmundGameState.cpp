@@ -244,49 +244,57 @@ void AEdmundGameState::PlayPlayerSound(UAudioComponent* AudioComp, ESoundType So
 		PlayerSoundSet.Add(SoundType, SoundHandle->GetPlayerSound(SoundType));
 	}
 
-	PlaySoundSource(AudioComp, PlayerSoundSet[SoundType]);
+	if (PlayerSoundSet.Contains(SoundType))
+	{
+		PlaySoundSource(AudioComp, PlayerSoundSet[SoundType]);
+	}
+	
 }
 
 void AEdmundGameState::PlayMonsterSound(UAudioComponent* AudioComp, EMonsterType MonsterType, ESoundType SoundType)
 {
 	if (!MonsterSoundSet.Contains(MonsterType) ||
-		(MonsterSoundSet.Contains(MonsterType) && !MonsterSoundSet[MonsterType].Contains(SoundType)))
+		(MonsterSoundSet.Contains(MonsterType) && !MonsterSoundSet[MonsterType].SoundMap.Contains(SoundType)))
 	{
 		checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
-		TMap<ESoundType, USoundBase*> TempMap;
-		TempMap.Add(SoundType, SoundHandle->GetMonsterSound(MonsterType, SoundType));
-		MonsterSoundSet.Add(MonsterType, TempMap);
+
+		FSoundSourceData TempData;
+		TempData.SoundMap.Add(SoundType, SoundHandle->GetMonsterSound(MonsterType, SoundType));
+
+		MonsterSoundSet.Add(MonsterType, TempData);
 	}
 
-	PlaySoundSource(AudioComp, MonsterSoundSet[MonsterType][SoundType]);
+	PlaySoundSource(AudioComp, MonsterSoundSet[MonsterType].SoundMap[SoundType]);
 }
 
 void AEdmundGameState::PlayNpcSound(UAudioComponent* AudioComp, ENpcType NpcType, ESoundType SoundType)
 {
 	if (!NpcSoundSet.Contains(NpcType) ||
-		(NpcSoundSet.Contains(NpcType) && !NpcSoundSet[NpcType].Contains(SoundType)))
+		(NpcSoundSet.Contains(NpcType) && !NpcSoundSet[NpcType].SoundMap.Contains(SoundType)))
 	{
 		checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
-		TMap<ESoundType, USoundBase*> TempMap;
-		TempMap.Add(SoundType, SoundHandle->GetNpcSound(NpcType, SoundType));
-		NpcSoundSet.Add(NpcType, TempMap);
+		
+		FSoundSourceData TempData;
+		TempData.SoundMap.Add(SoundType, SoundHandle->GetNpcSound(NpcType, SoundType));
+		NpcSoundSet.Add(NpcType, TempData);
 	}
 
-	PlaySoundSource(AudioComp, NpcSoundSet[NpcType][SoundType]);
+	PlaySoundSource(AudioComp, NpcSoundSet[NpcType].SoundMap[SoundType]);
 }
 
 void AEdmundGameState::PlayItemSound(UAudioComponent* AudioComp, EItemType ItemType, ESoundType SoundType)
 {
 	if (!ItemSoundSet.Contains(ItemType) ||
-		(ItemSoundSet.Contains(ItemType) && !ItemSoundSet[ItemType].Contains(SoundType)))
+		(ItemSoundSet.Contains(ItemType) && !ItemSoundSet[ItemType].SoundMap.Contains(SoundType)))
 	{
 		checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
-		TMap<ESoundType, USoundBase*> TempMap;
-		TempMap.Add(SoundType, SoundHandle->GetItemrSound(ItemType, SoundType));
-		ItemSoundSet.Add(ItemType, TempMap);
+		
+		FSoundSourceData TempData;
+		TempData.SoundMap.Add(SoundType, SoundHandle->GetItemrSound(ItemType, SoundType));
+		ItemSoundSet.Add(ItemType, TempData);
 	}
 
-	PlaySoundSource(AudioComp, ItemSoundSet[ItemType][SoundType]);
+	PlaySoundSource(AudioComp, ItemSoundSet[ItemType].SoundMap[SoundType]);
 }
 
 void AEdmundGameState::PlaySoundSource(UAudioComponent* AudioComp, USoundBase* SoundSource)
