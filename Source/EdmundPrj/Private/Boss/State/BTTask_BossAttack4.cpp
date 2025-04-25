@@ -50,20 +50,16 @@ void UBTTask_BossAttack4::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
-
-    // 상승
     if (CurrentPhase == 1)
     {
         UpdateRise(DeltaSeconds);
     }
-    // 하강
     else if (CurrentPhase == 4)
     {
         UpdateDescend(DeltaSeconds);
     }
 }
 
-//****************상승*************************
 void UBTTask_BossAttack4::StartRise()
 {
     if (!BossRef) return;
@@ -109,7 +105,6 @@ void UBTTask_BossAttack4::OnRiseComplete()
         TimerHandle_Phase, this, &UBTTask_BossAttack4::StartBulletFire, BossRef->Attack4_WaitAtTarget, false);
 }
 
-// ****************탄 관련*******************
 void UBTTask_BossAttack4::StartBulletFire()
 {
     CurrentPhase = 3;
@@ -163,7 +158,6 @@ void UBTTask_BossAttack4::EndBulletFire()
     CurrentPhase = 4;
 }
 
-//*****************하강*************************
 void UBTTask_BossAttack4::UpdateDescend(float DeltaTime)
 {
     if (!BossRef)
@@ -202,23 +196,3 @@ void UBTTask_BossAttack4::UpdateDescend(float DeltaTime)
     }
     BossRef->SetActorLocation(NewLocation, false);
 }
-
-
-
-
-//void UBTTask_BossAttack4::OnDescendComplete()
-//{
-//    CurrentPhase = 5;
-//    BossRef->GetWorld()->GetTimerManager().SetTimer(
-//        TimerHandle_Transition, this, &UBTTask_BossAttack4::DelayedTransition, BossRef->Attack4_WaitAfterLanding, false);
-//}
-//
-//void UBTTask_BossAttack4::DelayedTransition()
-//{
-//    if (!BossRef || !CachedOwnerComp)
-//    {
-//        return;
-//    }
-//    BossRef->UpdateAttackCooldown(4);
-//    FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
-//}

@@ -26,8 +26,6 @@ ABoss::ABoss()
     MonsterArmor = 10;
     MonsterMoveSpeed = 5000.0f;
 
-
-    // 공격2 범위
     Attack2Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2Collision"));
     Attack2Collision->SetupAttachment(RootComponent);
     Attack2Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -35,18 +33,14 @@ ABoss::ABoss()
     Attack2Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
     Attack2Collision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnAttack2CollisionOverlap);
 
-    // 공격 3 근접
     Attack2_MeleeCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Attack2_Melee_Range"));
     Attack2_MeleeCollision->SetupAttachment(GetMesh());
     Attack2_MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-    // 스킬 2 쉴드 이펙트
     Skill2ShieldNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Skill2ShieldNiagara"));
     Skill2ShieldNiagara->SetupAttachment(RootComponent);
     Skill2ShieldNiagara->bAutoActivate = false;
 
-
-    // 캡슐
 #pragma region Capsule Components Creation
 
     BossHeadCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("BossHeadCapsuleComponent"));
@@ -104,7 +98,6 @@ ABoss::ABoss()
     Skill3Particle->SetupAttachment(RootComponent);
     Skill3Particle->bAutoActivate = false;
 
-    // 공격 스폰 위치
     MuzzleLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleLocation"));
     MuzzleLocation->SetupAttachment(GetMesh(), TEXT("MuzzleSocket"));
 
@@ -135,11 +128,8 @@ void ABoss::BeginPlay()
         GetCharacterMovement()->SetMovementMode(MOVE_Walking);
     }
 
-    // Stat
     MonsterMoveSpeed = 1000.0f;
     MonsterHP = MonsterMaxHP = 20000.0f;
-    //MonsterMaxHP = 100.0f;
-    //MonsterHP = 69.0f;
     MonsterArmor = 15.0f;
     MonsterAttackDamage = 50.0f;
 
@@ -172,45 +162,6 @@ void ABoss::Tick(float DeltaTime)
     {
         Skill2ShieldNiagara->Deactivate();
     }
-
-    //if (GEngine)
-    //{
-    //    float Rem1 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack1CooldownHandle);
-    //    float Rem2 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack2CooldownHandle);
-    //    float Rem3 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack3CooldownHandle);
-    //    float Rem4 = GetWorld()->GetTimerManager().GetTimerRemaining(Attack4CooldownHandle);
-
-    //    int32 NextAttack = 0;
-    //    if (AAIController* AICon = Cast<AAIController>(GetController()))
-    //    {
-    //        if (UBlackboardComponent* BB = AICon->GetBlackboardComponent())
-    //        {
-    //            NextAttack = BB->GetValueAsInt(TEXT("NextAttack"));
-    //        }
-    //    }
-
-    //    FString StateName;
-    //    switch (NextAttack)
-    //    {
-    //    case 0: StateName = TEXT("Idle");    break;
-    //    case 1: StateName = TEXT("Attack1"); break;
-    //    case 2: StateName = TEXT("Attack2"); break;
-    //    case 3: StateName = TEXT("Attack3"); break;
-    //    case 4: StateName = TEXT("Attack4"); break;
-    //    default: StateName = TEXT("Unknown"); break;
-    //    }
-
-    //    FString DebugMsg = FString::Printf(
-    //        TEXT("Ready: A1=%d A2=%d A3=%d A4=%d  Remain: %.1f/%.1f/%.1f/%.1f  State: %s(%d)"),
-    //        bAttack1Ready ? 1 : 0,
-    //        bAttack2Ready ? 1 : 0,
-    //        bAttack3Ready ? 1 : 0,
-    //        bAttack4Ready ? 1 : 0,
-    //        Rem1, Rem2, Rem3, Rem4,
-    //        *StateName, NextAttack
-    //    );
-    //    GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, DebugMsg);
-    //}
 
 #pragma region Soket
     if (GetMesh())
@@ -306,48 +257,32 @@ void ABoss::SetState(EBossState NewState)
     switch (NewState)
     {
     case EBossState::Idle:
-        //BossState = NewObject<UBoss_Idle>(this);
-        //if (AnimInstance) AnimInstance->bIsMoving = false;
         break;
 
     case EBossState::Chase:
-        //BossState = NewObject<UBoss_Chase>();
         GetCharacterMovement()->MaxWalkSpeed = GetMonsterMoveSpeed();
-        //if (AnimInstance) AnimInstance->bIsMoving = true;
         break;
 
     case EBossState::Attack1:
-        //BossState = NewObject<UBoss_Attack1>();
         break;
 
     case EBossState::Attack2:
-        //BossState = NewObject<UBoss_Attack2>();
         break;
 
     case EBossState::Attack3:
-        //BossState = NewObject<UBoss_Attack3>();
         break;
 
     case EBossState::Attack4:
-        //BossState = NewObject<UBoss_Attack4>();
         break;
 
     case EBossState::Skill2:
-        //BossState = NewObject<UBoss_Skill2>();
         break;
 
     case EBossState::Skill3:
-        //BossState = NewObject<UBoss_Skill3>();
         break;
 
     default:
-        //BossState = nullptr;
         break;
-    }
-
-    if (BossState)
-    {
-        //BossState->EnterState(this);
     }
 }
 
@@ -385,7 +320,6 @@ void ABoss::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     Super::EndPlay(EndPlayReason);
 
-    // Attack1 풀 정리
     ABoss_Attack1_Bullet::BulletPool.Empty();
     ABoss_Attack4_Bullet::Bullet4Pool.Empty();
     ABoss_Skill3_Wall::WallPool.Empty();   
@@ -687,11 +621,6 @@ void ABoss::FireBullet()
     DisableRotation();
     TargetRotation = (PlayerLocation - SpawnLocation).Rotation();
 
-    //if (GameState)
-    //{
-    //    GameState->PlayMonsterSound(CurrentAudioComp, GetMonsterType(), ESoundType::Attack3);
-    //}
-
     ABoss_Attack1_Bullet* Bullet = ABoss_Attack1_Bullet::GetBulletFromPool(GetWorld(), Attack1BulletClass);
     if (Bullet)
     {
@@ -824,7 +753,6 @@ void ABoss::ApplyWeaken()
 }
 
 
-/******** Sounds ******/
 void ABoss::BossFireballSounds()
 {
     if (GameState && CurrentAudioComp)
@@ -861,7 +789,6 @@ void ABoss::BossAttack3_2Sounds()
     }
 }
 
-//
 
 void ABoss::BossLightLandingSounds()
 {

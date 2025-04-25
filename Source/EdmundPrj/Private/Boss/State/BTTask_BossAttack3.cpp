@@ -8,11 +8,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Boss/Boss_AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
 
 UBTTask_BossAttack3::UBTTask_BossAttack3()
 {
     NodeName = TEXT("Boss Attack3");
-    bNotifyTick = true; 
+    bNotifyTick = false; 
     BossRef = nullptr;
     CachedOwnerComp = nullptr;
     ComboPhase = 0;
@@ -30,14 +31,12 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
     AAIController* AIController = OwnerComp.GetAIOwner();
     if (!AIController)
     {
-        //UE_LOG(LogTemp, Error, TEXT("Boss AIController is NULL"));
         return EBTNodeResult::Failed;
     }
 
     ABossAIController* BossController = Cast<ABossAIController>(AIController);
     if (!BossController)
     {
-        //UE_LOG(LogTemp, Error, TEXT("Boss AIController cast failed"));
         return EBTNodeResult::Failed;
     }
     BossController->CurrentAttackTask = this;
@@ -45,12 +44,11 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
     BossRef = Cast<ABoss>(AIController->GetPawn());
     if (!BossRef)
     {
-        //UE_LOG(LogTemp, Error, TEXT("Boss Pawn is NULL"));
         return EBTNodeResult::Failed;
     }
 
     DashFrequency = BossRef->BossDashFrequency;
-    DashDamping = BossRef->BossDashFrequency;
+    DashDamping = BossRef->BossDashDamping;
 
     if (BossRef->GetWorld()->GetTimerManager().IsTimerActive(BulletFireTimerHandle))
     {
@@ -107,8 +105,7 @@ void UBTTask_BossAttack3::OnAttack2Notify()
     {
         BossRef->GameState->PlayMonsterSound(BossRef->CurrentAudioComp, BossRef->GetMonsterType(), ESoundType::Attack3);
     }
-
-
+    ExecuteMeleeAttack();
     BossRef->SetComboPhase(3);
     ComboPhase = 3;
 }
@@ -150,40 +147,6 @@ void UBTTask_BossAttack3::FinishComboAttack()
     }
 }
 
-
-void UBTTask_BossAttack3::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-{
-    if (bIsDashing && BossRef)
-    {
-        FVector CurrentLocation = BossRef->GetActorLocation();
-
-        int32 CurrentPhase = BossRef->GetComboPhase();
-        float Damping = (CurrentPhase == 3) ? 3.0f : BossRef->BossDashDamping;
-
-        float Frequency = DashFrequency;
-        FVector Displacement = DashTargetLocation - CurrentLocation;
-        FVector Acceleration = Frequency * Frequency * Displacement - 2.0f * Damping * Frequency * DashCurrentVelocity;
-
-        DashCurrentVelocity += Acceleration * DeltaSeconds;
-        FVector NewLocation = CurrentLocation + DashCurrentVelocity * DeltaSeconds;
-
-        BossRef->SetActorLocation(NewLocation, true);
-
-        if (FVector::DistSquared(NewLocation, DashTargetLocation) < FMath::Square(10.0f))
-        {
-            BossRef->SetActorLocation(DashTargetLocation, true);
-            bIsDashing = false;
-
-            if (CurrentPhase == 3)
-            {
-                DashCurrentVelocity = FVector::ZeroVector;
-            }
-
-            BossRef->MonsterAttackCheck();
-        }
-    }
-}
-
 void UBTTask_BossAttack3::PlayAttack3Montage()
 {
     if (!BossRef)
@@ -205,11 +168,11 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
         return;
     }
 
-    float DashDistance = 0.0f;
-    float DashSpeed = 0.0f;
-    int32 CurrentPhase = BossRef->GetComboPhase();
+    int32 Phase = BossRef->GetComboPhase();
+    float DashDistance = 0.f;
+    float DashSpeed = 0.f;
 
-    switch (CurrentPhase)
+    switch (Phase)
     {
     case 1:
         DashDistance = BossRef->MeleeAttackDashDistance_Attack1;
@@ -219,45 +182,70 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
         DashDistance = BossRef->MeleeAttackDashDistance_Attack2;
         DashSpeed = BossRef->MeleeAttackDashSpeed_Attack2;
         break;
-    case 3:
-        bIsDashing = false;
-        DashCurrentVelocity = FVector::ZeroVector;
-        if (BossRef->GetCharacterMovement())
-        {
-            BossRef->GetCharacterMovement()->StopMovementImmediately();
-        }
-        return;
     default:
         return;
     }
 
-    FVector DirectionToTarget = BossRef->GetActorForwardVector();
-
-    if (BossRef && BossRef->GetController() && CurrentPhase != 3)
+    FVector Dir = BossRef->GetActorForwardVector();
+    if (auto AICon = Cast<ABossAIController>(BossRef->GetController()))
     {
-        ABossAIController* BossAIController = Cast<ABossAIController>(BossRef->GetController());
-        if (BossAIController)
-        {
-            FVector TargetLocation = BossAIController->GetPlayerLocation();
-            DirectionToTarget = (TargetLocation - BossRef->GetActorLocation()).GetSafeNormal();
-        }
+        Dir = (AICon->GetPlayerLocation() - BossRef->GetActorLocation()).GetSafeNormal();
     }
-    if (CurrentPhase != 3)
+    BossRef->SetActorRotation(Dir.Rotation());
+
+    if (auto Anim = BossRef->GetMesh()->GetAnimInstance())
     {
-        float RotationSpeed = 10.0f;
-        FRotator TargetRotation = DirectionToTarget.Rotation();
-        FRotator NewRotation = FMath::RInterpTo(BossRef->GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), RotationSpeed);
-        BossRef->SetActorRotation(NewRotation);
+        Anim->RootMotionMode = ERootMotionMode::IgnoreRootMotion;
     }
 
-    bIsDashing = true;
-    DashStartLocation = BossRef->GetActorLocation();
-    DashTargetLocation = DashStartLocation + DirectionToTarget * DashDistance;
-    DashCurrentVelocity = DirectionToTarget * DashSpeed;
-
-    if (BossRef->GetCharacterMovement())
+    UCharacterMovementComponent* MC = BossRef->GetCharacterMovement();
+    if (MC)
     {
-        BossRef->GetCharacterMovement()->StopMovementImmediately();
+        MC->StopMovementImmediately();
+        MC->SetMovementMode(MOVE_Flying);
+        MC->GroundFriction = 0.f;
+        MC->BrakingFriction = 0.f;
+        MC->BrakingFrictionFactor = 0.f;
+    }
+
+    if (MC)
+    {
+        MC->AddImpulse(Dir * DashSpeed, true);
+    }
+
+    TWeakObjectPtr<ABoss> WeakBoss = BossRef;
+    float DashTime = 1.f;
+    FTimerHandle TimerHandle;
+    BossRef->GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle,
+        FTimerDelegate::CreateLambda([WeakBoss]()
+            {
+                if (auto Boss = WeakBoss.Get())
+                {
+                    if (auto M = Boss->GetCharacterMovement())
+                    {
+                        M->StopMovementImmediately();
+                        M->SetMovementMode(MOVE_Walking);
+                        M->GravityScale = 1.f;
+                        M->GroundFriction = 8.f;
+                        M->BrakingFriction = 8.f;
+                        M->BrakingFrictionFactor = 2.f;
+                    }
+                }
+            }),
+        DashTime,
+        false
+    );
+}
+
+void UBTTask_BossAttack3::OnDashFinished()
+{
+    if (!BossRef)
+        return;
+
+    if (auto MoveComp = BossRef->GetCharacterMovement())
+    {
+        MoveComp->SetMovementMode(MOVE_Walking);
     }
 }
 
