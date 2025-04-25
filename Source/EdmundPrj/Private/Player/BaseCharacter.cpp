@@ -46,6 +46,7 @@ ABaseCharacter::ABaseCharacter()
 	WalkSpeed = 600.0f;
 	SprintSpeed = 1000.0f;
 	CrouchMoveSpeed = 300.0f;
+	CrouchHeightMultiplier = 0.8f;
 
 	HP = MaxHP = 200;
 	Stamina = MaxStamina = 100;
@@ -96,14 +97,12 @@ void ABaseCharacter::BeginPlay()
 		CapsuleHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
 	}
 
-	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
-
-	CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
-
 	GetUpgradeStatus();
 
 	HP = MaxHP;
 	Stamina = MaxStamina;
+
+	CurrentGameState = GetWorld()->GetGameState<AEdmundGameState>();
 
 	if (IsValid(CurrentGameState))
 	{
@@ -116,20 +115,19 @@ void ABaseCharacter::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(
 		StaminaDelayHandle,
 		this,
-		&ABaseCharacter::UpdateStamina,
+		&ThisClass::UpdateStamina,
 		StaminaRecoveryAndConsumDelay,
 		true
 	);
 
-	if (IsValid(SupportCharClass))
+	check(SupportCharClass);
+
+	SupportCharInstance = GetWorld()->SpawnActor<ASupportCharacter>(SupportCharClass, GetActorLocation(), GetActorRotation());
+
+	if (IsValid(SupportCharInstance))
 	{
-		SupportCharInstance = GetWorld()->SpawnActor<ASupportCharacter>(SupportCharClass, GetActorLocation(), GetActorRotation());
-		if (IsValid(SupportCharInstance))
-		{
-			SupportCharInstance->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-		}
+		SupportCharInstance->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 	}
-	
 }
 
 void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -149,50 +147,50 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		{
 			if (PlayerController->MoveAction)
 			{
-				EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this, &ABaseCharacter::Move);
+				EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 			}
 
 			if (PlayerController->JumpAction)
 			{
-				EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Started, this, &ABaseCharacter::StartJump);
-				EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Completed, this, &ABaseCharacter::StopJump);
+				EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Started, this, &ThisClass::StartJump);
+				EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Completed, this, &ThisClass::StopJump);
 			}
 
 			if (PlayerController->LookAction)
 			{
-				EnhancedInput->BindAction(PlayerController->LookAction, ETriggerEvent::Triggered, this, &ABaseCharacter::Look);
+				EnhancedInput->BindAction(PlayerController->LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 			}
 
 			if (PlayerController->SprintAction)
 			{
-				EnhancedInput->BindAction(PlayerController->SprintAction, ETriggerEvent::Triggered, this, &ABaseCharacter::StartSprint);
-				EnhancedInput->BindAction(PlayerController->SprintAction, ETriggerEvent::Completed, this, &ABaseCharacter::StopSprint);
+				EnhancedInput->BindAction(PlayerController->SprintAction, ETriggerEvent::Triggered, this, &ThisClass::StartSprint);
+				EnhancedInput->BindAction(PlayerController->SprintAction, ETriggerEvent::Completed, this, &ThisClass::StopSprint);
 			}
 
 			if (PlayerController->AttackAction)
 			{
-				EnhancedInput->BindAction(PlayerController->AttackAction, ETriggerEvent::Triggered, this, &ABaseCharacter::Attack);
+				EnhancedInput->BindAction(PlayerController->AttackAction, ETriggerEvent::Triggered, this, &ThisClass::Attack);
 			}
 
 			if (PlayerController->InteractionAction)
 			{
-				EnhancedInput->BindAction(PlayerController->InteractionAction, ETriggerEvent::Started, this, &ABaseCharacter::Interaction);
+				EnhancedInput->BindAction(PlayerController->InteractionAction, ETriggerEvent::Started, this, &ThisClass::Interaction);
 			}
 
 			if (PlayerController->CrouchAction)
 			{
-				EnhancedInput->BindAction(PlayerController->CrouchAction, ETriggerEvent::Triggered, this, &ABaseCharacter::StartCrouch);
-				EnhancedInput->BindAction(PlayerController->CrouchAction, ETriggerEvent::Completed, this, &ABaseCharacter::StopCrouch);
+				EnhancedInput->BindAction(PlayerController->CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::StartCrouch);
+				EnhancedInput->BindAction(PlayerController->CrouchAction, ETriggerEvent::Completed, this, &ThisClass::StopCrouch);
 			}
 
 			if (PlayerController->PauseAction)
 			{
-				EnhancedInput->BindAction(PlayerController->PauseAction, ETriggerEvent::Started, this, &ABaseCharacter::PauseAction);
+				EnhancedInput->BindAction(PlayerController->PauseAction, ETriggerEvent::Started, this, &ThisClass::PauseAction);
 			}
 
 			if (PlayerController->MissionOnAction)
 			{
-				EnhancedInput->BindAction(PlayerController->MissionOnAction, ETriggerEvent::Started, this, &ABaseCharacter::MissionOnAction);
+				EnhancedInput->BindAction(PlayerController->MissionOnAction, ETriggerEvent::Started, this, &ThisClass::MissionOnAction);
 			}
 		}
 	}
@@ -303,6 +301,7 @@ void ABaseCharacter::Attack(const FInputActionValue& value)
 
 void ABaseCharacter::Interaction(const FInputActionValue& value)
 {
+	check(CurrentGameState);
 	CurrentGameState->RequestInteraction();
 }
 
@@ -321,20 +320,20 @@ void ABaseCharacter::StartCrouch(const FInputActionValue& value)
 
 		if (IsValid(CapsuleComp))
 		{
-			float NewCapsuleHeight = CapsuleHeight * 0.7;
+			float NewCapsuleHeight = CapsuleHeight * CrouchHeightMultiplier;
 
-			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight * 0.8);
+			CapsuleComp->SetCapsuleHalfHeight(NewCapsuleHeight);
 
 			FVector NewLocation = GetMesh()->GetRelativeLocation();
-			NewLocation.Z += CapsuleHeight * 0.2;
+			NewLocation.Z = NewLocation.Z + CapsuleHeight * (1 - CrouchHeightMultiplier);
 			GetMesh()->SetRelativeLocation(NewLocation);
 
 			NewLocation = SpringArmComp->GetRelativeLocation();
-			NewLocation.Z += CapsuleHeight * 0.2;
+			NewLocation.Z = NewLocation.Z + CapsuleHeight * (1 - CrouchHeightMultiplier);
 			SpringArmComp->SetRelativeLocation(NewLocation);
 
 			NewLocation = GetActorLocation();
-			NewLocation.Z -= CapsuleHeight * 0.2;
+			NewLocation.Z = NewLocation.Z - CapsuleHeight * (1 - CrouchHeightMultiplier);
 			SetActorLocation(NewLocation);
 		}
 
@@ -360,15 +359,15 @@ void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 			CapsuleComp->SetCapsuleHalfHeight(CapsuleHeight);
 
 			FVector NewLocation = GetMesh()->GetRelativeLocation();
-			NewLocation.Z -= CapsuleHeight * 0.2;
+			NewLocation.Z = NewLocation.Z - CapsuleHeight * (1 - CrouchHeightMultiplier);
 			GetMesh()->SetRelativeLocation(NewLocation);
 
 			NewLocation = SpringArmComp->GetRelativeLocation();
-			NewLocation.Z -= CapsuleHeight * 0.2;
+			NewLocation.Z = NewLocation.Z - CapsuleHeight * (1 - CrouchHeightMultiplier);
 			SpringArmComp->SetRelativeLocation(NewLocation);
 
 			NewLocation = GetActorLocation();
-			NewLocation.Z += CapsuleHeight * 0.2;
+			NewLocation.Z = NewLocation.Z + CapsuleHeight * (1 - CrouchHeightMultiplier);
 			SetActorLocation(NewLocation);
 		}
 
@@ -378,18 +377,14 @@ void ABaseCharacter::StopCrouch(const FInputActionValue& value)
 
 void ABaseCharacter::PauseAction(const FInputActionValue& value)
 {
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->OnPressedPauseKey();
-	}
+	check(CurrentGameState);
+	CurrentGameState->OnPressedPauseKey();
 }
 
 void ABaseCharacter::MissionOnAction(const FInputActionValue& value)
 {
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyOnMissionInfo();
-	}
+	check(CurrentGameState);
+	CurrentGameState->NotifyOnMissionInfo();
 }
 
 float ABaseCharacter::GetAttackDamage() const
@@ -442,12 +437,11 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 	int32 DamageProb = FMath::RandRange(1, 100);
 
+	check(CurrentGameState);
+
 	if (DamageProb <= EvasionProb)
 	{
-		if (IsValid(CurrentGameState))
-		{
-			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Avoid);
-		}
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Avoid);
 
 		return 0.0f;
 	}
@@ -469,11 +463,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		{
 			RevivalCount--;
 			HP = MaxHP;
-
-			if (IsValid(CurrentGameState))
-			{
-				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Respawn);
-			}
+			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Respawn);
 		}
 		else
 		{
@@ -482,10 +472,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		}
 	}
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
-	}
+	CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 	OnBerserkerSkillActivate.Broadcast();
 
 	return ActualDamage;
@@ -505,10 +492,9 @@ void ABaseCharacter::AddExp(int32 Exp)
 		LevelUp();
 	}
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerExp(MaxExp, CurrentExp);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerExp(MaxExp, CurrentExp);
 }
 
 void ABaseCharacter::LevelUp()
@@ -525,13 +511,12 @@ void ABaseCharacter::LevelUp()
 	CurrentExp -= MaxExp;
 	MaxExp += 50;
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
-		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
-		CurrentGameState->NotifyPlayerLevel(CurrentLevel);
-		CurrentGameState->CreateRandomSkillSet();
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+	CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
+	CurrentGameState->NotifyPlayerLevel(CurrentLevel);
+	CurrentGameState->CreateRandomSkillSet();
 }
 
 int32 ABaseCharacter::GetMaxHP() const
@@ -554,10 +539,9 @@ void ABaseCharacter::SetHP(int32 NewHP)
 	HP = FMath::Min(MaxHP, NewHP);
 	HP = FMath::Max(0, HP);
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerHp(MaxHP, HP);
 
 	OnBerserkerSkillActivate.Broadcast();
 }
@@ -566,10 +550,10 @@ void ABaseCharacter::AmountHP(int32 AmountHP)
 {
 	HP = FMath::Min(MaxHP, HP + AmountHP);
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerHp(MaxHP, HP);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerHp(MaxHP, HP);
+
 	OnBerserkerSkillActivate.Broadcast();
 }
 
@@ -615,7 +599,10 @@ int32 ABaseCharacter::GetItempDropProb() const
 
 void ABaseCharacter::GetUpgradeStatus()
 {
-	check(CurrentGameState);
+	if (!IsValid(CurrentGameState))
+	{
+		return;
+	}
 
 	TArray<FShopCatalogRow*> ShopStatusList = CurrentGameState->GetPlayerAdvancedData();
 
@@ -662,10 +649,9 @@ void ABaseCharacter::GetUpgradeStatus()
 
 void ABaseCharacter::ActiveDieAction()
 {
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Die);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Die);
 
 	if (IsValid(DieActionMontage))
 	{
@@ -697,10 +683,9 @@ void ABaseCharacter::UpdateStamina()
 
 	Stamina = FMath::Clamp(Stamina, 0, MaxStamina);
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
 }
 
 bool ABaseCharacter::CheckAction()

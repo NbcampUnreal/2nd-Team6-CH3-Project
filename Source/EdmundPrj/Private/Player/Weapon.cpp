@@ -4,9 +4,6 @@
 #include "Player/BaseCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "Sound/SoundBase.h"
-#include "Particles/ParticleSystem.h"
-#include "System/EdmundGameState.h"
 #include "Player/ChargingBullet.h"
 #include "Player/PlayerCharacterWraith.h"
 
@@ -21,7 +18,7 @@ AWeapon::AWeapon()
 	MuzzleOffset->SetupAttachment(Mesh);
 
 	AttackDelay = 0.2f;
-	IsAttack = false;
+	IsDelay = false;
 }
 
 void AWeapon::BeginPlay()
@@ -117,7 +114,7 @@ void AWeapon::ReturnBulletToPool(ABaseProjectile* Bullet)
 
 bool AWeapon::Fire(float NewAttackDelay)
 {
-	if (IsAttack)
+	if (IsDelay)
 	{
 		return false;
 	}
@@ -200,7 +197,6 @@ bool AWeapon::Fire(float NewAttackDelay)
 			FVector TargetLocation = WorldCenter + WorldDirection * 3500;
 			SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, TargetLocation);
 		}
-		
 
 		BulletToFire->SetActorLocation(SpawnLocation);
 		BulletToFire->SetActorRotation(SpawnRotation);
@@ -213,12 +209,12 @@ bool AWeapon::Fire(float NewAttackDelay)
 		}
 
 		// ÃÑ¾Ë¿¡ µô·¹ÀÌ ¼³Á¤
-		IsAttack = true;
+		IsDelay = true;
 
 		GetWorld()->GetTimerManager().SetTimer(
 			AttackDelayHandle,
 			this,
-			&AWeapon::ActivateAttack,
+			&AWeapon::DelayAttack,
 			AttackDelay,
 			false
 		);
@@ -233,7 +229,7 @@ bool AWeapon::Fire(float NewAttackDelay)
 	return true;
 }
 
-void AWeapon::ActivateAttack()
+void AWeapon::DelayAttack()
 {
-	IsAttack = false;
+	IsDelay = false;
 }

@@ -59,20 +59,29 @@ private:
 	float HoveringZSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
+	float HoveringDelay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
 	int32 JumpCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
 	float DoubleJumpHeight;
 
-	bool IsAttack;
-
-	bool IsHover;
-	float HoveringDelay;
-
-	bool IsMeleeAttack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
 	float MeleeAttackDelay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
 	float MeleeAttackRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
 	float MeleeAttackPushStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
+	float MeleeAttackForwardOffset;
+
+	bool IsAttack;
+	bool IsHover;
+	bool IsMeleeAttack;
 
 	FTimerHandle HoveringDelayHandle;
 	FTimerHandle AttackDelayHandle;
