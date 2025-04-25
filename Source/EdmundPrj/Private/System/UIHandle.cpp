@@ -5,19 +5,25 @@
 #include "UI/BaseWidget.h"
 #include "System/EdmundGameInstance.h"
 #include "System/Settings/UIHandleSettings.h"
+#include "GameFramework/GameUserSettings.h"
+
 
 void UUIHandle::InitUIHandle(UEdmundGameInstance* NewGameInstance)
 {
-	EdmundGameInstance = NewGameInstance;
+	UGameUserSettings* GameUserSettings = GEngine->GetGameUserSettings();
+	GameUserSettings->SetFullscreenMode(EWindowMode::Windowed);
+	GameUserSettings->SetScreenResolution(FIntPoint(1920, 1080));//(1280, 720));
+	GameUserSettings->ApplySettings(false);
 
+	EdmundGameInstance = NewGameInstance;
 	UISettings = GetDefault<UUIHandleSettings>();
 	checkf(IsValid(UISettings), TEXT("UI Settings is invalid"));
-	//CreateBaseWidgets(UISettings);
-	//CreateCoverWidgets(UISettings);
 }
 
 void UUIHandle::AddToViewportBySceneType(ESceneType SceneType)
 {
+	
+
 	if (IsValid(CurrentBaseWidget))
 	{
 		RemoveWidgetFromViewport(CurrentBaseWidget);

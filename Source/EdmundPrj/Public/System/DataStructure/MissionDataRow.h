@@ -30,20 +30,20 @@ public:
 	FString MissionInfoText = TEXT("DefaultText");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString MissionClearText;
+	FString MissionClearText = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString MissionActiveText;
+	FString MissionActiveText = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName MissionType;
+	FName MissionType = "";
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIsContainStory;
+	bool bIsContainStory = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIsBeginStory;
+	bool bIsBeginStory = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 StoryIndex;
+	int32 StoryIndex = 0;
 };
