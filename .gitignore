@@ -82,5 +82,4 @@ DerivedDataCache/*
 *.tmp
 .DS_Store
 .vscode/
-.vsconfig
 
