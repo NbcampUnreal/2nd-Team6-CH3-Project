@@ -29,67 +29,67 @@ class EDMUNDPRJ_API ABaseCharacter : public ACharacter
 public:
 	ABaseCharacter();
 	
-	// °ø°Ý·Â Getter
+	// ï¿½ï¿½ï¿½Ý·ï¿½ Getter
 	virtual float GetAttackDamage() const;
 
-	// °ø°Ý·Â Getter
+	// ï¿½ï¿½ï¿½Ý·ï¿½ Getter
 	virtual float GetDamage() const;
 
-	// °ø°Ý·Â Setter
+	// ï¿½ï¿½ï¿½Ý·ï¿½ Setter
 	void SetAttackDamage(const float NewAttackDamage);
 
-	// °ø°Ý·Â Getter
+	// ï¿½ï¿½ï¿½Ý·ï¿½ Getter
 	float GetAttackDelay() const;
 
 	// Å° Getter
 	float GetHeight() const;
 
-	// °æÇèÄ¡ Áõ°¡
+	// ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 	void AddExp(const int32 Exp);
 
-	// ·¹º§¾÷
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void LevelUp();
 
-	// ÃÖ´ë Ã¼·Â Getter
+	// ï¿½Ö´ï¿½ Ã¼ï¿½ï¿½ Getter
 	int32 GetMaxHP() const;
 
-	// ÃÖ´ë Ã¼·Â Setter
+	// ï¿½Ö´ï¿½ Ã¼ï¿½ï¿½ Setter
 	void SetMaxHP(const int32 NewMaxHP);
 
-	// ÇöÀç Ã¼·Â Getter
+	// ï¿½ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½ Getter
 	int32 GetHP() const;
 
-	// ÇöÀç Ã¼·Â Setter
+	// ï¿½ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½ Setter
 	void SetHP(const int32 NewHP);
 
-	// Ã¼·Â È¸º¹
+	// Ã¼ï¿½ï¿½ È¸ï¿½ï¿½
 	void AmountHP(const int32 AmountHP);
 
-	// ÃÖ´ë ½ºÅÂ¹Ì³ª Getter
+	// ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½Â¹Ì³ï¿½ Getter
 	int32 GetMaxStamina() const;
 
-	// ÃÖ´ë ½ºÅÂ¹Ì³ª Setter
+	// ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½Â¹Ì³ï¿½ Setter
 	void SetMaxStamina(const int32 NewMaxStamina);
 
-	// ÇöÀç ½ºÅÂ¹Ì³ª Getter
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¹Ì³ï¿½ Getter
 	int32 GetCurrentStamina() const;
 
-	// ½ºÅÂ¹Ì³ª È¸º¹·® Getter
+	// ï¿½ï¿½ï¿½Â¹Ì³ï¿½ È¸ï¿½ï¿½ï¿½ï¿½ Getter
 	int32 GetStaminaRecoveryAmount() const;
 
-	// ½ºÅÂ¹Ì³ª È¸º¹·® Setter
+	// ï¿½ï¿½ï¿½Â¹Ì³ï¿½ È¸ï¿½ï¿½ï¿½ï¿½ Setter
 	void SetStaminaRecoveryAmount(int32 NewStaminaRecoveryAmount);
 
-	// °æÇèÄ¡ ¹èÀ² Getter
+	// ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ Getter
 	float GetExpMultipler() const;
 
-	// °ñµå ¹èÀ² Getter
+	// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Getter
 	float GetGoldMultipler() const;
 
-	// ¾ÆÀÌÅÛ µå¶ø·ü Getter
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Getter
 	int32 GetItempDropProb() const;
 
-	// Ä³¸¯ÅÍ Å¸ÀÔ ¹ÝÈ¯
+	// Ä³ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½È¯
 	ECharacterType GetCharacterType() const;
 
 	virtual void AttackTrace();
@@ -135,44 +135,44 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// ÀÌµ¿
+	// ï¿½Ìµï¿½
 	void Move(const FInputActionValue& value);
 
-	// ¸¶¿ì½º È¸Àü
+	// ï¿½ï¿½ï¿½ì½º È¸ï¿½ï¿½
 	virtual void Look(const FInputActionValue& value);
 
-	// Á¡ÇÁ
+	// ï¿½ï¿½ï¿½ï¿½
 	virtual void StartJump(const FInputActionValue& value);
 	virtual void StopJump(const FInputActionValue& value);
 	
-	// ´Þ¸®±â
+	// ï¿½Þ¸ï¿½ï¿½ï¿½
 	void StartSprint(const FInputActionValue& value);
 	void StopSprint(const FInputActionValue& value);
 
-	// °ø°Ý
+	// ï¿½ï¿½ï¿½ï¿½
 	virtual void Attack(const FInputActionValue& value);
 
-	// »óÈ£ÀÛ¿ë
+	// ï¿½ï¿½È£ï¿½Û¿ï¿½
 	void Interaction(const FInputActionValue& value);
 
-	// ¾É±â
+	// ï¿½É±ï¿½
 	void StartCrouch(const FInputActionValue& value);
 	void StopCrouch(const FInputActionValue& value);
 
-	// ÆÛÁî
+	// ï¿½ï¿½ï¿½ï¿½
 	void PauseAction(const FInputActionValue& value);
 
-	// ¹Ì¼ÇÃ¢
+	// ï¿½Ì¼ï¿½Ã¢
 	void MissionOnAction(const FInputActionValue& value);
 
-	// ÇÇ°Ý
+	// ï¿½Ç°ï¿½
 	virtual float TakeDamage(
 		float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
 		AController* EventInstigator,
 		AActor* DamageCauser) override;
 
-	// °­È­ÇØ³õÀº ½ºÅ×ÀÌÅÍ½º°ª ¹Þ±â
+	// ï¿½ï¿½È­ï¿½Ø³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í½ï¿½ï¿½ï¿½ ï¿½Þ±ï¿½
 	virtual void GetUpgradeStatus();
 
 	virtual void ActiveDieAction();
@@ -182,45 +182,45 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AEdmundGameState> CurrentGameState = nullptr;
 
-	UPROPERTY()
-	TObjectPtr<UAudioComponent> CurrentAudioComp = nullptr;
-
-	// ÇÇ°Ý ¾Ö´Ï¸ÞÀÌ¼Ç
+	// ï¿½Ç°ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
 	TObjectPtr<UAnimMontage> HitActionMontage = nullptr;
 
-	// Á×À½ ¾Ö´Ï¸ÞÀÌ¼Ç
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	TObjectPtr<UAnimMontage> DieActionMontage = nullptr;
 
-	// ÃÖ´ë ½ºÅÂ¹Ì³ª
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	TObjectPtr<UAudioComponent> CurrentAudioComp = nullptr;
+
+	// ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½Â¹Ì³ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 MaxStamina;
 
-	// °ø°Ý·Â
+	// ï¿½ï¿½ï¿½Ý·ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float AttackDamage;
 
-	// °ø°Ý µô·¹ÀÌ (°ø¼Ó)
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float AttackDelay;
 
-	// Ä¡¸íÅ¸ È®·ü
+	// Ä¡ï¿½ï¿½Å¸ È®ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	int32 CriticalProb;
 
-	// Ä¡¸íÅ¸ È®·ü
+	// Ä¡ï¿½ï¿½Å¸ È®ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float CriticalMultiplier;
 
-	// ¾ÉÀ» ¼ö ¾ø´Â Ä³¸¯ - Fey
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ä³ï¿½ï¿½ - Fey
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Crouch")
 	bool CanCrouchCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Crouch")
 	bool IsCrouch;
 
-	// ÇöÀç ½ºÅÂ¹Ì³ª
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¹Ì³ï¿½
 	int32 Stamina;
 
 	bool IsSprint;
@@ -230,90 +230,90 @@ protected:
 private:
 	void UpdateStamina();
 
-	// Ä³¸¯ÅÍ Å¸ÀÔ
+	// Ä³ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	ECharacterType CharacterType;
 
-	// ÃÖ´ë Ã¼·Â
+	// ï¿½Ö´ï¿½ Ã¼ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 MaxHP;
 
-	// ÇöÀç Ã¼·Â
+	// ï¿½ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½
 	int32 HP;
 
-	// Ä³¸¯ÅÍ Å°
+	// Ä³ï¿½ï¿½ï¿½ï¿½ Å°
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float Height;
 
-	// °È±â ¼Óµµ
+	// ï¿½È±ï¿½ ï¿½Óµï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed;
 
-	// ´Þ¸®±â ¼Óµµ
+	// ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½Óµï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed;
 
-	// ¾É¾Æ¼­ ÀÌµ¿ ¼Óµµ
+	// ï¿½É¾Æ¼ï¿½ ï¿½Ìµï¿½ ï¿½Óµï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float CrouchMoveSpeed;
 
-	// ¾ÉÀº Ä¸½¶ Å©±â ¹èÀ²
+	// ï¿½ï¿½ï¿½ï¿½ Ä¸ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float CrouchHeightMultiplier;
 
-	// ½ºÅÂ¹Ì³ª È¸º¹·®
+	// ï¿½ï¿½ï¿½Â¹Ì³ï¿½ È¸ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 StaminaRecoveryAmount;
 
-	// ½ºÅÂ¹Ì³ª ¼Ò¸ð·®
+	// ï¿½ï¿½ï¿½Â¹Ì³ï¿½ ï¿½Ò¸ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 StaminaConsumAmount;
 
-	// ½ºÅÂ¹Ì³ª È¸º¹·®
+	// ï¿½ï¿½ï¿½Â¹Ì³ï¿½ È¸ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float StaminaRecoveryAndConsumDelay;
 
-	// ¹æ¾î·Â
+	// ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 Defense;
 
-	// È¸ÇÇ È®·ü
+	// È¸ï¿½ï¿½ È®ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 EvasionProb;
 
-	// ÇöÀç °æÇèÄ¡
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡
 	int32 CurrentExp;
 
-	// ÃÖ´ë °æÇèÄ¡
+	// ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 MaxExp;
 
-	// ÇöÀç ·¹º§
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	int32 CurrentLevel;
 
-	// ÃÖ´ë ·¹º§
+	// ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 MaxLevel;
 
-	// ¾ÆÀÌÅÛ µå¶ø·ü
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 ItemDropProb;
 
-	// °æÇèÄ¡ ¹èÀ²
+	// ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Shop", meta = (AllowPrivateAccess = "true"))
 	float ExpMultipler;
 
-	// °ñµå ¹èÀ²
+	// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Shop", meta = (AllowPrivateAccess = "true"))
 	float GoldMultipler;
 
-	// ºÎÈ° È½¼ö
+	// ï¿½ï¿½È° È½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Shop", meta = (AllowPrivateAccess = "true"))
 	int32 RevivalCount;
 
-	// Ä¸½¶ ³ôÀÌ <- ¾É±â¿¡¼­ »ç¿ë
+	// Ä¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ <- ï¿½É±â¿¡ï¿½ï¿½ ï¿½ï¿½ï¿½
 	float CapsuleHeight;
 
-	// ½ºÅÂ¹Ì³ª
+	// ï¿½ï¿½ï¿½Â¹Ì³ï¿½
 	FTimerHandle StaminaDelayHandle;
 };
