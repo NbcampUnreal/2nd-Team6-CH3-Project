@@ -179,7 +179,11 @@ protected:
 
 	virtual bool CheckAction();
 
-	AEdmundGameState* CurrentGameState;
+	UPROPERTY()
+	TObjectPtr<AEdmundGameState> CurrentGameState = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> CurrentAudioComp = nullptr;
 
 	// 피격 애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
@@ -188,8 +192,6 @@ protected:
 	// 죽음 애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	TObjectPtr<UAnimMontage> DieActionMontage = nullptr;
-
-	TObjectPtr<UAudioComponent> CurrentAudioComp = nullptr;
 
 	// 최대 스태미나
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
