@@ -74,10 +74,14 @@ protected:
 	FWidgetAnimationDynamicEvent StartRemoveDelegate;
 	FWidgetAnimationDynamicEvent EndRemoveDelegate;
 
-	TObjectPtr<UWidgetAnimation> OpenAnimation;
-	TObjectPtr<UWidgetAnimation> CloseAnimation;
+	UPROPERTY()
+	TObjectPtr<UWidgetAnimation> OpenAnimation = nullptr;
 
-	TObjectPtr<UUIHandle> UIHandle;
-	//ESceneType MoveTargetScene = ESceneType::Title;
+	UPROPERTY()
+	TObjectPtr<UWidgetAnimation> CloseAnimation = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UUIHandle> UIHandle = nullptr;
+	
 	bool bIsPlaying = false;
 };

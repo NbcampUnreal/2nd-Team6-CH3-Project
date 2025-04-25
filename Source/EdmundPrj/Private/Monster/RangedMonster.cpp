@@ -78,16 +78,8 @@ void ARangedMonster::Fire()
                     BulletToFire->ProjectileMovementComp->Velocity = ForwardDirection * BulletToFire->ProjectileMovementComp->InitialSpeed;
                 }
             }
-            else
-            {
-                UE_LOG(LogTemp, Warning, TEXT("BulletToFire 없음. GameMode Pool에 있는 GetBulletFromPool이 없을 수 있음"));
-            }
         }
     }
-    //else if (!MonsterBulletPool)
-    //{
-    //    UE_LOG(LogTemp, Warning, TEXT("MonsterBUlletPool 없음"));
-    //}
 }
 
 
@@ -115,8 +107,6 @@ void ARangedMonster::PlayParticle()
 void ARangedMonster::PlaySound()
 {
     GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
-    //CurrentAudioComp->SetSound(AttackSound);
-    //CurrentAudioComp->Play();
 }
 
 

@@ -63,11 +63,6 @@ void AMeleeMonster::MonsterAttackCheck()
             CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMeleeMonster::OnOverlapBegin);
         }
 
-       //  공격 Collision Visible 활성화
-        //FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-        //DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
-
-
         // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
 
         if (GetWorld())
@@ -91,7 +86,6 @@ void AMeleeMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
         {
             PlayParticle();
 
-            //UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
             AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
             ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
             if (Monster)
@@ -134,6 +128,4 @@ void AMeleeMonster::PlayParticle()
 void AMeleeMonster::PlaySound()
 {
     GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
-    //CurrentAudioComp->SetSound(AttackSound);
-    //CurrentAudioComp->Play();
 }

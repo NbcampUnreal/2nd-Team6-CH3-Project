@@ -68,12 +68,6 @@ void ASuicideMonster::MonsterAttackCheck()
             CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ASuicideMonster::OnOverlapBegin);
         }
 
-
-        //  공격 Collision Visible 활성화
-        //FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-        //DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
-
-
          // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
         FTimerHandle TimerHandle;
 
@@ -105,7 +99,6 @@ void ASuicideMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
     {
         if (OtherActor->ActorHasTag("Player"))
         {
-            //UE_LOG(LogTemp, Warning, TEXT("Suicide Attack Succeed")); // 공격 성공 Log
             AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
             ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
             if (Monster)
@@ -124,7 +117,6 @@ void ASuicideMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 
         if (OtherActor->ActorHasTag("NPC"))
         {
-            //UE_LOG(LogTemp, Warning, TEXT("Suicide Attack Succeed")); // 공격 성공 Log
             AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
             ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
             if (Monster)
@@ -168,6 +160,4 @@ void ASuicideMonster::PlayParticle()
 void ASuicideMonster::PlaySound()
 {
     GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Attack);
-    //CurrentAudioComp->SetSound(AttackSound);
-    //CurrentAudioComp->Play();
 }

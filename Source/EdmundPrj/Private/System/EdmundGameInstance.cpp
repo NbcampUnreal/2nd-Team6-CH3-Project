@@ -12,6 +12,7 @@
 #include "System/DataStructure/MissionDataRow.h"
 #include "System/DataStructure/SpawnerDataRow.h"
 #include "System/DataStructure/StoryDataRow.h"
+#include "System/Observer/GameStateObserver.h"
 
 
 void UEdmundGameInstance::Init()
@@ -46,6 +47,9 @@ void UEdmundGameInstance::ApplyCurrentDataToGameMode()
 {
 	checkf(IsValid(EdmundGameMode), TEXT("EdmundGameMode is invalid"));
 	checkf(IsValid(DataHandle), TEXT("DataHandle is Invalid"));
+
+	OnUIByScene();
+	PlayBGMByScene();
 	BindGameStateObserver();
 
 	ESceneType CurrentScene = GetCurrentSceneName();
@@ -61,20 +65,9 @@ void UEdmundGameInstance::ApplyCurrentDataToGameMode()
 
 void UEdmundGameInstance::StartMission(ESceneType SceneType)
 {
-	OnUIByScene();
-	PlayBGMByScene();
 	EdmundGameMode->StartMission(SceneType);
 	EdmundGameState->SetEffectVolume(GetEffectVolume());
 	EdmundGameState->InitSkillData(GetPlayerSkillData());
-
-	checkf(IsValid(SoundHandle), TEXT("Sound Handle is invalid"));
-
-	EdmundGameState->InitSoundMap(
-		SoundHandle->GetSoundMapByType(ESoundCategory::Player, (int32)GetPlayerType()),
-		SoundHandle->GetMonsterSoundMap(),
-		SoundHandle->GetNpcSoundMap(),
-		SoundHandle->GetItemSoundMap()
-	);
 }
 
 void UEdmundGameInstance::BindGameStateObserver() const
@@ -101,6 +94,12 @@ void UEdmundGameInstance::OnUIByScene() const
 	UIHandle->FadeIn();
 	SceneHandle->CheckCurrentScene();
 	UIHandle->AddToViewportBySceneType(SceneHandle->GetCurrentScene());
+}
+
+void UEdmundGameInstance::BindUIObserverToGameState(const TScriptInterface<IGameStateObserver> Target)
+{
+	checkf(IsValid(EdmundGameState), TEXT("EdmundGameState is invalid"));
+	EdmundGameState->RegisterGameStateObserver(Target);
 }
 
 void UEdmundGameInstance::OnPause() const
@@ -342,10 +341,3 @@ void UEdmundGameInstance::PlayUISound(const EUISoundType Type) const
 	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
 	SoundHandle->PlayUISound(Type);
 }
-
-const TMap<ESoundType, TObjectPtr<USoundBase>>& UEdmundGameInstance::GetSoundSetByCategory(const ESoundCategory Category, const int32 TypeIndex) const
-{
-	checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
-	return SoundHandle->GetSoundMapByType(Category, TypeIndex);
-}
-

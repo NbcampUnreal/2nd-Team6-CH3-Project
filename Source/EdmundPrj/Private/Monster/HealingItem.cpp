@@ -30,9 +30,6 @@ void AHealingItem::ActivateItem(AActor* Actor)
 			float HealAmount = Player->MaxHP * HealingPercent / 100.0f;
 
 			Player->AmountHP(HealAmount);
-
-			UE_LOG(LogTemp, Warning, TEXT("%f 만큼 회복"), HealAmount);
-
 			PlaySound();
 		}
 	}

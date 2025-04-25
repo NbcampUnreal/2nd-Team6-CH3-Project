@@ -15,10 +15,8 @@
 #include "System/SpawnerHandle.h"
 
 
-// Sets default values
 AMonsterSpawner::AMonsterSpawner()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
@@ -45,15 +43,10 @@ void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawn
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
 
 	SetBossMode(false);
-
-	//UE_LOG(LogTemp, Warning, TEXT("레벨: %d"), NewLevelIndex);
-
 }
 
 void AMonsterSpawner::InitSpawner(AMonsterBulletPool* BulletPool, float NewSpawnTime, int32 NewSpawnCount)
 {
-	UE_LOG(LogTemp, Warning, TEXT("InitSpawner에 NewLevelIndex가 없습니다. Monster의 레벨이 1이 됩니다."));
-
 	MonsterBulletPool = BulletPool;
 
 	SpawnTime = NewSpawnTime;
@@ -154,18 +147,6 @@ ARangedMonsterBullet* AMonsterSpawner::GetBulletFromSpawner()
 void AMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnMonster, SpawnTime, true);
-
-	//CurrentGameMode = GetWorld()->GetAuthGameMode();
-	//if (CurrentGameMode)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Spawner가 CurrentGameMode를 가져옴"));
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("CurrentGameMode 없음"));
-	//}
 }
 
 
@@ -175,7 +156,6 @@ ABaseMonster* AMonsterSpawner::GetMonsterFromPool()
 	{
 		if (!Monster)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to retrieve a monster from the SpawnedMonsterpool."));
 			return nullptr;
 		}
 
@@ -186,7 +166,6 @@ ABaseMonster* AMonsterSpawner::GetMonsterFromPool()
 		}
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("Full Spawn: %d"), SpawnCount);
 	return nullptr;
 }
 
@@ -203,25 +182,12 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 
 		if (AllMonsters.Num() > 0)
 		{
-			for (const TSubclassOf<ABaseMonster>& Monster : AllMonsters)
-			{
-				if (Monster == nullptr)
-				{
-					UE_LOG(LogTemp, Error, TEXT("유효하지 않은 클래스가 발견되었습니다."));
-				}
-			}
-
 			int32 SelectedMonsterIndex = FMath::RandRange(0, AllMonsters.Num() - 1);
 			MonsterClass = AllMonsters[SelectedMonsterIndex];
 
 			if (IsValid(MonsterClass))
 			{
 				ABaseMonster* NewMonster = GetWorld()->SpawnActor<ABaseMonster>(MonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
-
-				if (!NewMonster)
-				{
-					UE_LOG(LogTemp, Error, TEXT("There is No Monster"))
-				}
 
 				if (NewMonster)
 				{
@@ -232,11 +198,6 @@ void AMonsterSpawner::InitializeMonsterSpawnPool(int32 PoolSize)
 					NewMonster->SetActorHiddenInGame(true);
 					SpawnedMonstersPool.Add(NewMonster);
 				}
-			}
-
-			else if (MonsterClass == nullptr)
-			{
-				UE_LOG(LogTemp, Error, TEXT("MonsterClass is null"));
 			}
 		}
 	}
@@ -252,10 +213,6 @@ void AMonsterSpawner::SpawnMonster()
 			AAIController* AIController = Cast<AAIController>(Monster->GetController());
 			if (AIController)
 			{
-				//UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
-				//BlackboardComp->SetValueAsBool(TEXT("HasLineOfSight"), false);
-				//BlackboardComp->SetValueAsObject(TEXT("PlayerActor"), nullptr);
-
 				AIController->SetActorTickEnabled(true);
 			}
 

@@ -83,7 +83,6 @@ void AMainLevelPlayerController::CheckCollideCharacter()
 	}
 
 	TargetCharacter = Cast<ABaseCharacter>(Hit.GetActor());
-	UE_LOG(LogTemp, Warning, TEXT("Target Character Name is %s"), *TargetCharacter->GetName());
 
 	checkf(IsValid(EdmundGameState), TEXT("GameState is invalid"));
 	EdmundGameState->SetSelectedCharacter(TargetCharacter);
