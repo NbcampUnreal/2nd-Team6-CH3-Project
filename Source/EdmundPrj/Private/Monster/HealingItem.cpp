@@ -27,7 +27,7 @@ void AHealingItem::ActivateItem(AActor* Actor)
 		ABaseCharacter* Player = Cast<ABaseCharacter>(Actor);
 		if (Player)
 		{
-			float HealAmount = Player->MaxHP * HealingPercent / 100.0f;
+			float HealAmount = Player->GetMaxHP() * HealingPercent / 100.0f;
 
 			Player->AmountHP(HealAmount);
 			PlaySound();

@@ -24,12 +24,21 @@ class EDMUNDPRJ_API AMeteor : public ATimerSkill
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
 	float MetoerHitPushStrength = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setting")
-	TObjectPtr<USphereComponent> MonsterLaunchCollision = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
-	TObjectPtr<UNiagaraComponent> GroundHitNiagara;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
-	TObjectPtr<UNiagaraComponent> FallingEffectNiagara;
+
+
+
+private:
+	UPROPERTY()
+	TSet<TObjectPtr<ABaseMonster>> HitMonsterSet = {};
+
 	FTimerHandle ElplosionEffectDeactivateHandle;
 
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	TObjectPtr<UNiagaraComponent> FallingEffectNiagara = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	TObjectPtr<UNiagaraComponent> GroundHitNiagara = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Setting")
+	TObjectPtr<USphereComponent> MonsterLaunchCollision = nullptr;
 };

@@ -24,9 +24,9 @@ void AChargingBullet::SetBulletScale()
 	{
 		APlayerCharacterWraith* Player = Cast<APlayerCharacterWraith>(PlayerCharacter);
 
-		if (IsValid(Player) && IsValid(Player->BulletMesh))
+		if (IsValid(Player))
 		{
-			SetActorRelativeScale3D(Player->BulletMesh->GetRelativeScale3D());
+			SetActorRelativeScale3D(Player->GetBulletScale());
 		}
 	}
 }
@@ -60,9 +60,7 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 			IsBossAttack = true;
 		}
 
-		float Damage = 30.0f;
-
-		Damage = BulletDamage;
+		float Damage = BulletDamage;
 
 		// 랜덤 데미지 적용
 		float RandomRange = 0.2f;

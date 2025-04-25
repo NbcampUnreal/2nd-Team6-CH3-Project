@@ -13,6 +13,14 @@ class EDMUNDPRJ_API APlayerCharacterFey : public ABaseCharacter
 
 public:
 	APlayerCharacterFey();
+
+	virtual void ActiveWeapon();
+
+	// Notify에서 호출
+	void AttackTrace() override;
+	void SetJumpCount();
+
+protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -22,43 +30,40 @@ public:
 	UFUNCTION()
 	void TriggerJump(const FInputActionValue& value);
 
+	// 공격
+	virtual void Attack(const FInputActionValue& value) override;
+
 	// 근접공격
 	void MeleeAttack(const FInputActionValue& value);
 	void EndMeleeAttack();
 
-	virtual void ActiveWeapon();
-
-	// Notify에서 호출하기 위해 public
-	void AttackTrace() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon")
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AWeapon> Weapon;
 
 	UPROPERTY()
 	TObjectPtr<AWeapon> WeaponActor;
 
 	// 공격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
-	UAnimMontage* AttackMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> AttackMontage = nullptr;
 
 	// 근접 공격 애니메이션
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim")
-	UAnimMontage* MeleeAttackMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Anim", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> MeleeAttackMontage = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	int32 AttackCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
 	float HoveringZSpeed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
 	int32 JumpCount;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
 	float DoubleJumpHeight;
 
-protected:
-	// 공격
-	virtual void Attack(const FInputActionValue& value) override;
-
-private:
 	bool IsAttack;
 
 	bool IsHover;
@@ -75,7 +80,5 @@ private:
 
 	void SetIsHover();
 	void SetIsAttack();
-
-	// 현재 액션 실행 중 인지 - 다른 액션 불가
 	bool CheckAction() override;
 };

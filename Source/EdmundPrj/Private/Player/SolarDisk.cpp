@@ -62,9 +62,8 @@ void ASolarDisk::SpawnTimerSkill()
 		[this] {
 			FVector spherePos = SphereMesh->GetRelativeLocation();
 			SphereMesh->SetRelativeLocation(spherePos + FVector(0, 0, 0.75f));
-			if (spherePos.Z >= 310)
+			if (spherePos.Z >= 260)
 			{
-
 				Super::SpawnTimerSkill();
 				GetWorldTimerManager().ClearTimer(SpawnAnimHandle);
 				GetWorldTimerManager().SetTimer(AttackCycleHandle,
@@ -99,16 +98,13 @@ void ASolarDisk::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (Character)
 	{
-		// 목표 방향 계산
 		FVector Direction = Character->GetActorLocation() - GetActorLocation();
-		Direction.Z = 0; // Yaw 회전만 반영
+		Direction.Z = 0;
 		Direction.Normalize();
 
-		// 목표 회전 계산
 		FRotator TargetRotation = Direction.Rotation();
 		FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaTime, RotationSpeed);
 
-		// 새로운 회전 적용
 		SetActorRotation(NewRotation);
 	}
 }

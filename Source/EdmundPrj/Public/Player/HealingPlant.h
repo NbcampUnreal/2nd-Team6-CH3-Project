@@ -20,6 +20,8 @@ public:
 	virtual void Deactivate() override;
 	virtual void UpgradeSkill() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+private:
+	FVector ShakeMove(FVector RandPos, const FVector& MyPos, int32 AddOrSub);
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	TObjectPtr<USphereComponent> CheckCharacterCollision = nullptr;

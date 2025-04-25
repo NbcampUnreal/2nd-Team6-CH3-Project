@@ -25,12 +25,12 @@ public:
 
 	void SetBulletDamage(float NewDamage);
 
-	UAudioComponent* CurrentAudioComp;
-
 protected:
 	void BeginPlay();
 
 private:
 	float BulletDamage;
 	bool IsBossAttack;
+
+	TObjectPtr<UAudioComponent> CurrentAudioComp;
 };

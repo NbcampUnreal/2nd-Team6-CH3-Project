@@ -1,5 +1,4 @@
 #include "Player/PlayerCharacterAurora.h"
-#include "Player/EdmundPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "System/EdmundGameState.h"
@@ -8,7 +7,6 @@ APlayerCharacterAurora::APlayerCharacterAurora()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	IsAttack = false;
 	ComboCount = 0;
 	ResetDelay = 1.0f;
 	AttackRangeRadius = 150.0f;
@@ -24,6 +22,7 @@ void APlayerCharacterAurora::BeginPlay()
 
 void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 {
+	check(AttackMontages.Num() >= 4 && CurrentGameState);
 
 	if (!IsAttack)
 	{
@@ -34,54 +33,26 @@ void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 		switch (ComboCount)
 		{
 			case 0:
-				if (IsValid(AttackMontages[0]))
-				{
-					if (IsValid(CurrentGameState))
-					{
-						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
-					}
-
-					PlayAnimMontage(AttackMontages[0], ComboTimeDuration);
-				}
+				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
+				PlayAnimMontage(AttackMontages[0], ComboTimeDuration);
 
 				break;
 
 			case 1:
-				if (IsValid(AttackMontages[1]))
-				{
-					if (IsValid(CurrentGameState))
-					{
-						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack2);
-					}
-
-					PlayAnimMontage(AttackMontages[1], ComboTimeDuration);
-				}
+				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack2);
+				PlayAnimMontage(AttackMontages[1], ComboTimeDuration);
 
 				break;
 
 			case 2:
-				if (IsValid(AttackMontages[2]))
-				{
-					if (IsValid(CurrentGameState))
-					{
-						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack3);
-					}
-
-					PlayAnimMontage(AttackMontages[2], ComboTimeDuration);
-				}
+				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack3);
+				PlayAnimMontage(AttackMontages[2], ComboTimeDuration);
 
 				break;
 
 			case 3:
-				if (IsValid(AttackMontages[3]))
-				{
-					if (IsValid(CurrentGameState))
-					{
-						CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack4);
-					}
-
-					PlayAnimMontage(AttackMontages[3], ComboTimeDuration);
-				}
+				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack4);
+				PlayAnimMontage(AttackMontages[3], ComboTimeDuration);
 
 				break;
 

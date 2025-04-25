@@ -78,9 +78,9 @@ void UPassiveSkillManager::ActivatePassiveSkill(EPassiveSkillType passiveSkillTy
 void UPassiveSkillManager::BerserkerSkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::Berserker];
-	float HpRatio = Character->GetHP() / Character->MaxHP;
+	float HpRatio = Character->GetHP() / Character->GetMaxHP();
 	float AttackMultiplier = 1.0f + (1.0f - HpRatio) * (MinHealthMultiplier - (1.0f - SkillLevel / 10));
-	Character->AttackDamage *= AttackMultiplier;
+	Character->SetAttackDamage(Character->GetAttackDamage() * AttackMultiplier);
 }
 //µ¨¸®°ÔÀÌÆ®
 void UPassiveSkillManager::BloodAbsorbingSkill()
@@ -104,27 +104,27 @@ void UPassiveSkillManager::ElectricChainSkill(FVector MonsterLocation)
 void UPassiveSkillManager::AmountMaxHpSkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::AmountMaxHp];
-	Character->MaxHP += SkillLevel * 20;
+	Character->SetMaxHP(Character->GetMaxHP() + SkillLevel * 20);
 	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GetWorld()->GetGameState());
 	if (IsValid(CurrentGameState))
 	{
-		CurrentGameState->NotifyPlayerHp(Character->MaxHP, Character->GetHP());
+		CurrentGameState->NotifyPlayerHp(Character->GetMaxHP(), Character->GetHP());
 	}
 }
 
 void UPassiveSkillManager::AmountMaxStaminaSkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::AmountMaxStamina];
-	Character->MaxStamina += SkillLevel * 20;
+	Character->SetMaxStamina(Character->GetMaxStamina() + SkillLevel * 20);
 	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GetWorld()->GetGameState());
 	if (IsValid(CurrentGameState))
 	{
-		CurrentGameState->NotifyPlayerOther(Character->MaxStamina, Character->Stamina);
+		CurrentGameState->NotifyPlayerOther(Character->GetMaxStamina(), Character->GetCurrentStamina());
 	}
 }
 
 void UPassiveSkillManager::AmountStaminaRecoverySkill()
 {
 	float SkillLevel = PassiveSkillMap[EPassiveSkillType::AmountStaminaRecovery];
-	Character->StaminaRecoveryAmount += SkillLevel * 2;
+	Character->SetStaminaRecoveryAmount(Character->GetStaminaRecoveryAmount() + SkillLevel * 2);
 }
