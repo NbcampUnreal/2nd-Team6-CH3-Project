@@ -59,9 +59,16 @@ public:
 	TSubclassOf<AActor> SpawnerHandleClass = nullptr;
 
 private:
+	UPROPERTY()
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
+
+	UPROPERTY()
 	TObjectPtr<AEdmundGameState> EdmundGameState = nullptr;
+
+	UPROPERTY()
 	TObjectPtr<AMissionHandle> MissionHandle = nullptr;
+
+	UPROPERTY()
 	TObjectPtr<ASpawnerHandle> SpawnerHandle = nullptr;
 
 	TArray<FStoryDataRow*> MissionStoryData;

@@ -63,8 +63,8 @@ void AEdmundGameMode::SpawnPlayerByCharacterType(UClass* SpawnClass)
 void AEdmundGameMode::ClearMission()
 {
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameState->EndCurrentLevel(true);
 	EdmundGameInstance->EndMission(true);
+	EdmundGameState->EndCurrentLevel(true);
 }
 
 void AEdmundGameMode::FailMission()
@@ -74,8 +74,8 @@ void AEdmundGameMode::FailMission()
 		return;
 	}
 	checkf(IsValid(EdmundGameInstance), TEXT("EdmundGameInstance is invalid"));
-	EdmundGameState->EndCurrentLevel(false);
 	EdmundGameInstance->EndMission(false);
+	EdmundGameState->EndCurrentLevel(false);
 }
 
 void AEdmundGameMode::NotifyAllClearedMission()

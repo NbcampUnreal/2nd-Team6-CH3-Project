@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "System/EnumSet.h"
+#include "System/Struct/EdmundDataBuffer.h"
 #include "DataHandle.generated.h"
 
 class UEdmundGameInstance;
@@ -23,29 +24,29 @@ class EDMUNDPRJ_API UDataHandle : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	//Initialize - LoadDataTable By DataHandleSettings / Initialize Arrays
+	//Initialize - LoadDataTable By DataHandleSettings
 	void InitDataHandle(UEdmundGameInstance* NewGameInstance);
 
 	// Controll Player Advance State Data
 	const bool UpdateCurrentAdvance(const FName& TargetRow, const int32 UpdateValue);
-	const TArray<FShopCatalogRow*>& GetCurrentAdvance() const;
-	const FShopCatalogRow* GetCurrentAdvanceByRowName(const FName& TargetRow) const;
+	const TArray<FShopCatalogRow*>& GetCurrentAdvance();
+	const FShopCatalogRow* GetCurrentAdvanceByRowName(const FName& TargetRow);
 
 	// Controll Player Money Data
 	void AddMoney(const int32 AddValue);
-	const int32 GetMoney() const;
+	const int32 GetMoney();
 	const bool Consume(const int32 Price);
 
 	// Controll Player Type Data
 	void SetPlayerType(const ECharacterType CharacterType);
-	const ECharacterType GetPlayerType() const;
+	const ECharacterType GetPlayerType();
 
 	//Controll Player Skill Data
-	const TArray<FPlayerSkillRow*>& GetPlayerSkillData() const;
+	const TArray<FPlayerSkillRow*>& GetPlayerSkillData();
 
 	// Controll Character Data
-	const TArray<FCharacterDataRow*>& GetCharacterData() const;
-	UClass* GetCharacterClass() const;
+	const TArray<FCharacterDataRow*>& GetCharacterData();
+	UClass* GetCharacterClass();
 
 	// Controll Mission Data
 	const TArray<FMissionDataRow*>& GetMissionDataBySceneType(const ESceneType SceneType);
@@ -58,13 +59,20 @@ public:
 
 	// Controll Play Data
 	void UpdateClearMission(const ESceneType SceneType);
-	const bool GetIsClearedMission(const int32 Index) const;
+	const bool GetIsClearedMission(const int32 Index);
 	void UpdateShowedIntro(const bool bShowed);
-	const bool GetIsShowedIntro() const;
+	const bool GetIsShowedIntro();
 
 private:
-	void LoadDataTables(const UDataHandleSettings* DataSettings);
-	FShopCatalogRow* SelectRow(const FName& TargetRow) const;
+	FShopCatalogRow* SelectAdvanceRow(const FName& TargetRow);
+
+	bool CheckValidOfAdvanceData();
+	bool CheckValidOfPlayData();
+	bool CheckValidOfSkillData();
+	bool CheckValidOfCharacterData();
+	bool CheckValidOfMissionData();
+	bool CheckValidOfSpawnData();
+	bool CheckValidOfStoryData();
 
 private:
 	UPROPERTY()
@@ -88,17 +96,12 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> StoryDataTable = nullptr;
 
+	UPROPERTY()
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 
-	TArray<FShopCatalogRow*> CurrentAdvance;
-	TArray<FPlayDataRow*> PlayData;
-	TArray<FPlayerSkillRow*> PlayerSkillData;
-	TArray<FCharacterDataRow*> CharacterData;
-	TArray<FMissionDataRow*> MissionData;
-	TArray<FSpawnerDataRow*> SpawnerData;
-	TArray<FStoryDataRow*> StoryData;
+	UPROPERTY()
+	FEdmundDataBuffer EdmundDataBuffer;
 
-	TArray<FMissionDataRow*> CurrentMissionData;
-	TArray<FSpawnerDataRow*> CurrentSpawnerData;
-	TArray<FStoryDataRow*> CurrentStoryData;
+	UPROPERTY()
+	const UDataHandleSettings* DataSettings = nullptr;
 };

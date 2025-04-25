@@ -15,20 +15,20 @@ class EDMUNDPRJ_API USoundHandleSettings : public UDeveloperSettings
 	
 public:
 	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
-	TSoftObjectPtr<UDataTable> BgmSoundDataTable;
+	TSoftObjectPtr<UDataTable> BgmSoundDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
-	TSoftObjectPtr<UDataTable> UISoundDataTable;
+	TSoftObjectPtr<UDataTable> UISoundDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
-	TSoftObjectPtr<UDataTable> PlayerSoundDataTable;
+	TSoftObjectPtr<UDataTable> PlayerSoundDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
-	TSoftObjectPtr<UDataTable> MonsterSoundDataTable;
+	TSoftObjectPtr<UDataTable> MonsterSoundDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
-	TSoftObjectPtr<UDataTable> NpcSoundDataTable;
+	TSoftObjectPtr<UDataTable> NpcSoundDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "SoundData")
-	TSoftObjectPtr<UDataTable> ItemSoundDataTable;
+	TSoftObjectPtr<UDataTable> ItemSoundDataTable = nullptr;
 };

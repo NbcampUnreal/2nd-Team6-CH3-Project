@@ -11,7 +11,6 @@
 // Sets default values
 ABaseItem::ABaseItem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
@@ -87,22 +86,8 @@ void ABaseItem::PlaySound()
 {
 	GameState->PlayItemSound(PickupSoundComp, ItemType, ESoundType::Hit);
 
-	//PickupSoundComp->SetSound(PickupSound);
-
-	//if (PickupSound)
-	//{
-		GetWorld()->GetTimerManager().ClearTimer(DestroyTimerHandle);
-
-		//float SoundDuration = PickupSoundComp->Sound->GetDuration();
-
-		/*PickupSoundComp->Play();*/
-
-		GetWorld()->GetTimerManager().SetTimer(SoundDurationTimerHandle, this, &ABaseItem::ItemDestroy, 1.0f, false);
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("PickupSound가 없습니다."));
-	//}
+	GetWorld()->GetTimerManager().ClearTimer(DestroyTimerHandle);
+	GetWorld()->GetTimerManager().SetTimer(SoundDurationTimerHandle, this, &ABaseItem::ItemDestroy, 1.0f, false);
 }
 
 void ABaseItem::ItemDestroy()

@@ -28,10 +28,8 @@ void ABaseMonster::SetMonsterStatsByLevel()
 }
 
 
-// Sets default values
 ABaseMonster::ABaseMonster()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	CurrentAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
@@ -72,14 +70,6 @@ void ABaseMonster::BeginPlay()
 			MonsterOverHeadWidgetObject->SetIsVisible(true);
 			MonsterOverHeadWidgetObject->InitWidget();
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MonsterOverHeadWidgetObject 없음"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("MonsterOverHeadWidget 없음"));
 	}
 }
 void ABaseMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -104,8 +94,6 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 			{
 				GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Hit);
 			}
-			//CurrentAudioComp->SetSound(TakeDamageSound);
-			//CurrentAudioComp->Play();
 		}
 
 	if (TakeDamageParticle)
@@ -126,19 +114,11 @@ float ABaseMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 			false
 		);
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TakeDamageParticle이 없습니다."));
-	}
 
 	GetCharacterMovement()->Deactivate();
 
 	float TakeDamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	float ActualDamage = TakeDamageAmount * (1.0f - MonsterArmor / 100.0f);
-
-	//UE_LOG(LogTemp, Warning, TEXT("원래 피해량: %f"), TakeDamageAmount);
-
-	//UE_LOG(LogTemp, Warning, TEXT("감소된 피해량: %f"), ActualDamage);
 
 	MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
 
@@ -175,7 +155,6 @@ void ABaseMonster::MonsterDead()
 					ABaseCharacter* PlayerCharacter = Cast<ABaseCharacter>(PlayerPawn);
 					if (PlayerCharacter)
 					{
-						//UE_LOG(LogTemp, Warning, TEXT("%f EXP얻음"), MonsterExpReward);
 						PlayerCharacter->AddExp(MonsterExpReward);
 					}
 				}
@@ -204,10 +183,6 @@ void ABaseMonster::MonsterDead()
 
 				GetWorld()->GetTimerManager().SetTimer(DeadAnimTimerHandle, this, &ABaseMonster::MonsterDestroy, AnimDuration - 0.3f, false);
 			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("DeathAnimation이 없습니다."));
 		}
 	}
 }
@@ -258,10 +233,6 @@ void ABaseMonster::MonsterDestroy()
 	{
 		MonsterSpawner->AddDeadCount();
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("MonsterSpawner가 없습니다."));
-	}
 	
 	GetCharacterMovement()->Activate();
 
@@ -301,14 +272,6 @@ void ABaseMonster::DropReward()
 					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
 				}
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("0번 아이템이 없습니다."));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("AllItems가 없습니다."));
 		}
 	}
 
@@ -326,14 +289,6 @@ void ABaseMonster::DropReward()
 					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
 				}
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("1번 아이템이 없습니다."));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("AllItems가 없습니다."));
 		}
 	}
 
@@ -351,14 +306,6 @@ void ABaseMonster::DropReward()
 					ABaseItem* NewMonster = GetWorld()->SpawnActor<ABaseItem>(ItemClass, GetActorLocation(), GetActorRotation());
 				}
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("2번 아이템이 없습니다."));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("AllItems가 없습니다."));
 		}
 	}
 }
@@ -431,14 +378,6 @@ void ABaseMonster::SetChaseMode(bool Mode)
 			AIController->GetBlackboardComponent()->SetValueAsBool(FName("HasLineOfSight"), Mode);
 			AIController->GetBlackboardComponent()->SetValueAsObject(FName("PlayerActor"), PlayerPawn);
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: PlayerController가 없습니다."));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ChaseMode 실행중: AIController가 없습니다."));
 	}
 }
 
@@ -446,15 +385,11 @@ void ABaseMonster::SetChaseMode(bool Mode)
 void ABaseMonster::MonsterAttackEnd()
 {
 	GetMesh()->GetAnimInstance()->Montage_Stop(0.3f, AttackAnimation);
-
-	//주석 처리를 했는데 왜 움직일까?
-	//GetCharacterMovement()->Activate();
-	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void ABaseMonster::MonsterAttackCheck()
 {
-	UE_LOG(LogTemp, Warning, TEXT("몬스터에 MonsterAttackCheck 함수가 없습니다."));
+	
 }
 
 float ABaseMonster::GetMonsterAttackDamage()
@@ -466,29 +401,12 @@ void ABaseMonster::UpdateMonsterOverHeadWidget(float Damage)
 {
 	if (!MonsterOverHeadWidget)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("위젯 X"));
 		return;
 	}
 	if (IsValid(MonsterOverHeadWidgetObject))
 	{
 		MonsterOverHeadWidgetObject->SetIsVisible(true);
 	}
-
-	//UUserWidget* MonsterOverHeadWidgetInstance = MonsterOverHeadWidget->GetUserWidgetObject();
-
-	//if (!MonsterOverHeadWidgetInstance) return;
-
-	//MonsterOverHeadWidget->SetVisibility(true, true);
-	//GetWorld()->GetTimerManager().ClearTimer(OverHeadUITimerHandle);
-
-	//if (UProgressBar* HPBar = Cast<UProgressBar>(MonsterOverHeadWidgetInstance->GetWidgetFromName(TEXT("HealthBar"))))
-	//{
-	//	float HealthPercent = MonsterHP / MonsterMaxHP;
-	//	HPBar->SetPercent(HealthPercent);
-	//}
-
-	//GetWorld()->GetTimerManager().SetTimer(OverHeadUITimerHandle, this, &ABaseMonster::UpdateMonsterOverHeadWidgetEnd, 1.0f, false);
-
 
 	if (IsValid(MonsterOverHeadWidgetObject))
 	{

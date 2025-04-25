@@ -7,12 +7,8 @@
 #include "Components/BoxComponent.h"
 #include "TimerManager.h"
 
-// Sets default values
 ANPCAttack::ANPCAttack()
 {
-    //UE_LOG(LogTemp, Warning, TEXT("공격 스폰"));
-
-    // Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = false;
 
     SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
@@ -41,10 +37,6 @@ ANPCAttack::ANPCAttack()
             }
         }
     }
-    else
-    {
-        //UE_LOG(LogTemp, Warning, TEXT("GetWorld()가 없습니다."));
-    }
 }
 
 
@@ -52,8 +44,6 @@ void ANPCAttack::OnOverlapAttackBegin(UPrimitiveComponent* OverlappedComp, AActo
 {
 	if (OtherActor && OtherActor->ActorHasTag(FName("Monster")))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NPCAttack 몬스터에게 데미지를 가함"));
-
 		UGameplayStatics::ApplyDamage(
 			OtherActor,
 			DamageValue,

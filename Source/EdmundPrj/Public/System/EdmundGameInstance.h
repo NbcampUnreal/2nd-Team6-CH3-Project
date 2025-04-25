@@ -13,6 +13,7 @@ class USoundHandle;
 class UDataHandle;
 class AEdmundGameState;
 class AEdmundGameMode;
+class IGameStateObserver;
 struct FShopCatalogRow;
 struct FPlayerSkillRow;
 struct FCharacterDataRow;
@@ -34,6 +35,8 @@ public:
 	void StartMission(ESceneType SceneType);
 	void BindGameStateObserver() const;
 	void OnUIByScene() const;
+
+	void BindUIObserverToGameState(const TScriptInterface<IGameStateObserver> Target);
 
 	// Controll Game Tool
 	void OnPause() const;
@@ -89,7 +92,6 @@ public:
 	void PlayBGMByScene() const;
 	void PlayBGM(const EBGMSoundType Type) const;
 	void PlayUISound(const EUISoundType Type) const;
-	const TMap<ESoundType, TObjectPtr<USoundBase>>& GetSoundSetByCategory(const ESoundCategory Category, const int32 TypeIndex) const;
 
 private:
 	// Level Data Controll
@@ -100,10 +102,21 @@ public:
 
 
 private:
-	TObjectPtr<USceneHandle> SceneHandle;
-	TObjectPtr<UUIHandle> UIHandle;
-	TObjectPtr<USoundHandle> SoundHandle;
-	TObjectPtr<UDataHandle> DataHandle;
-	TObjectPtr<AEdmundGameState> EdmundGameState;
-	TObjectPtr<AEdmundGameMode> EdmundGameMode;
+	UPROPERTY()
+	TObjectPtr<USceneHandle> SceneHandle = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UUIHandle> UIHandle = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<USoundHandle> SoundHandle = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UDataHandle> DataHandle = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<AEdmundGameState> EdmundGameState = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
 };

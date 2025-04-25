@@ -9,6 +9,7 @@
 
 class UEdmundGameInstance;
 class AEdmundGameMode;
+class USoundHandle;
 class IGameStateObserver;
 class ABaseCharacter;
 class AMissionHandle;
@@ -33,19 +34,14 @@ public:
 	void InitMainLevelPlayerController();
 
 	void SetEffectVolume(const float Volume);
-
-	void InitSoundMap(
-		const TMap<ESoundType, TObjectPtr<USoundBase>> PlayerSound,
-		const TMap<EMonsterType, TMap<ESoundType, TObjectPtr<USoundBase>>> MonsterSound,
-		const TMap<ENpcType, TMap<ESoundType, TObjectPtr<USoundBase>>> NpcSound,
-		const TMap<EItemType, TMap<ESoundType, TObjectPtr<USoundBase>>> ItemSound
-	);
 	void InitSkillData(const TArray<FPlayerSkillRow*> PlayerSkillDataSet);
 
 	void PlayPlayerSound(UAudioComponent* AudioComp, ESoundType SoundType);
 	void PlayMonsterSound(UAudioComponent* AudioComp, EMonsterType MonsterType, ESoundType SoundType);
 	void PlayNpcSound(UAudioComponent* AudioComp, ENpcType NpcType, ESoundType SoundType);
 	void PlayItemSound(UAudioComponent* AudioComp, EItemType ItemType, ESoundType SoundType);
+
+	void PlaySoundSource(UAudioComponent* AudioComp, USoundBase* SoundSource);
 
 	const TArray<FShopCatalogRow*>& GetPlayerAdvancedData() const;
 
@@ -114,12 +110,13 @@ public:
 
 private:
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
+	TObjectPtr<USoundHandle> SoundHandle = nullptr;
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
 	TObjectPtr<APlayerController> PlayerController = nullptr;
 	TObjectPtr<AActor> PlayerPawn = nullptr;
 
-	TObjectPtr<AMissionHandle> MissionHandle;
-	TObjectPtr<ASpawnerHandle> SpawnerHandle;
+	TObjectPtr<AMissionHandle> MissionHandle = nullptr;
+	TObjectPtr<ASpawnerHandle> SpawnerHandle = nullptr;
 
 	TArray<TScriptInterface<IGameStateObserver>> Observers;
 
@@ -127,10 +124,10 @@ private:
 	TArray<FPlayerSkillRow*> RandomSkillSet;
 	TMap<FPlayerSkillRow*, int32> CurrentSkillMap;
 
-	TMap<ESoundType, TObjectPtr<USoundBase>> PlayerSoundSet;
-	TMap<EMonsterType, TMap<ESoundType, TObjectPtr<USoundBase>>> MonsterSoundSet;
-	TMap<ENpcType, TMap<ESoundType, TObjectPtr<USoundBase>>> NpcSoundSet;
-	TMap<EItemType, TMap<ESoundType, TObjectPtr<USoundBase>>> ItemSoundSet;
+	TMap<ESoundType, USoundBase*> PlayerSoundSet;
+	TMap<EMonsterType, TMap<ESoundType, USoundBase*>> MonsterSoundSet;
+	TMap<ENpcType, TMap<ESoundType, USoundBase*>> NpcSoundSet;
+	TMap<EItemType, TMap<ESoundType, USoundBase*>> ItemSoundSet;
 
 	FTimerHandle TimerHandle;
 
@@ -138,8 +135,8 @@ private:
 	int32 MissionClearMoney = 1000;
 	float EffectVolume = 0;
 	ECharacterType CurrentCharacterType = ECharacterType::Gunner;
-	FText StoryText;
-	FString CurrentText;
+	FText StoryText = FText::GetEmpty();
+	FString CurrentText = "";
 	float CurrentTime = 0;
 	int32 StoryIndex = -1;
 	int32 StoryLastIndex = -1;
