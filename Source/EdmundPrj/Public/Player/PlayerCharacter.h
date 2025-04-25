@@ -89,6 +89,14 @@ private:
 	float MeleeAttackPushStrength;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float MeleeAttackForwardOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float ZoomInLength;  // 줌 카메라
+
+	float ZoomOutLength; // 일반 카메라
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float ZoomMouseMoveMultipler;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))

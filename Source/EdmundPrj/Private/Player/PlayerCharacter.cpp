@@ -9,7 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "System/DataStructure/ShopCatalogRow.h"
 
-APlayerCharacter::APlayerCharacter()
+APlayerCharacter::APlayerCharacter() : Super()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -17,6 +17,7 @@ APlayerCharacter::APlayerCharacter()
 	MeleeAttackDelay = 0.7f;
 	MeleeAttackRadius = 100.0f;
 	MeleeAttackPushStrength = 1000.0f;
+	MeleeAttackForwardOffset = 50.0f;
 
 	ReloadMontage = nullptr;
 
@@ -24,6 +25,9 @@ APlayerCharacter::APlayerCharacter()
 	MeleeAttackMontage = nullptr;
 
 	CurrentAmmo = MaxAmmo = 20;
+
+	ZoomInLength = 100.0f;
+	ZoomOutLength = 200.0f;
 	ZoomMouseMoveMultipler = 0.5f;
 
 	IsMeleeAttack = false;
@@ -38,19 +42,22 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentAmmo = MaxAmmo;
+	ZoomOutLength = SpringArmComp->TargetArmLength;
+
+	check(Weapon);
+
 	WeaponActor = GetWorld()->SpawnActor<AWeapon>(Weapon);
 
-	if (Weapon)
+	if (IsValid(WeaponActor))
 	{
 		FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
 		WeaponActor->AttachToComponent(GetMesh(), TransformRules, TEXT("WeaponSocket"));
 		WeaponActor->SetOwner(this);
 	}
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -63,39 +70,18 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		{
 			if (PlayerController->MeleeAttackAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->MeleeAttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacter::MeleeAttack
-				);
+				EnhancedInput->BindAction(PlayerController->MeleeAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacter::MeleeAttack);
 			}
 
 			if (PlayerController->ReloadAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->ReloadAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacter::ReloadAction
-				);
+				EnhancedInput->BindAction(PlayerController->ReloadAction, ETriggerEvent::Triggered, this, &APlayerCharacter::ReloadAction);
 			}
 
 			if (PlayerController->ZoomAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->ZoomAction,
-					ETriggerEvent::Started,
-					this,
-					&APlayerCharacter::ZoomIn
-				);
-
-				EnhancedInput->BindAction(
-					PlayerController->ZoomAction,
-					ETriggerEvent::Completed,
-					this,
-					&APlayerCharacter::ZoomOut
-				);
+				EnhancedInput->BindAction(PlayerController->ZoomAction, ETriggerEvent::Started, this, &APlayerCharacter::ZoomIn);
+				EnhancedInput->BindAction(PlayerController->ZoomAction, ETriggerEvent::Completed, this, &APlayerCharacter::ZoomOut);
 			}
 		}
 	}
@@ -122,7 +108,6 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 
 void APlayerCharacter::Attack(const FInputActionValue& value)
 {
-
 	if (CurrentAmmo <= 0 || CheckAction() || IsAttack)
 	{
 		return;
@@ -135,7 +120,7 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 	GetWorld()->GetTimerManager().SetTimer(
 		AttackDelayHandle,
 		this,
-		&APlayerCharacter::SetIsAttack,
+		&ThisClass::SetIsAttack,
 		AttackDelay,
 		false
 	);
@@ -148,17 +133,13 @@ void APlayerCharacter::Attack(const FInputActionValue& value)
 
 void APlayerCharacter::ActiveWeapon()
 {
-	if (IsValid(WeaponActor))
+	check(WeaponActor && CurrentGameState);
+
+	if (WeaponActor->Fire(AttackDelay))
 	{
-		if (WeaponActor->Fire(AttackDelay))
-		{
-			if (IsValid(CurrentGameState))
-			{
-				CurrentAmmo--;
-				CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
-			}
-		}
+		CurrentAmmo--;
+		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
 	}
 
 	if (CurrentAmmo <= 0)
@@ -181,16 +162,15 @@ void APlayerCharacter::MeleeAttack(const FInputActionValue& value)
 		PlayAnimMontage(MeleeAttackMontage);
 	}
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
 
 	// 근접 공격 딜레이
 	GetWorld()->GetTimerManager().SetTimer(
 		MeleeAttackDelayHandle,
 		this,
-		&APlayerCharacter::EndMeleeAttack,
+		&ThisClass::EndMeleeAttack,
 		MeleeAttackDelay,
 		false
 	);
@@ -209,8 +189,8 @@ void APlayerCharacter::AttackTrace()
 	FRotator ControlRotation = PlayerController->GetControlRotation();
 	FVector ForwardVector = ControlRotation.Vector();
 
-	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + 50)); // 공격 시작 위치
-	FVector End = Start + (ForwardVector * (MeleeAttackRadius + 50)); // 공격 끝 위치
+	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // 공격 시작 위치
+	FVector End = Start + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // 공격 끝 위치
 
 	// 공격 범위 내에서 충돌 체크
 	float Radius = MeleeAttackRadius;
@@ -230,64 +210,51 @@ void APlayerCharacter::AttackTrace()
 		QueryParams
 	);
 
-	// 데미지를 입힌 액터를 추적할 Set (중복 방지)
-	// Set이 없으면 근접공격한번에 여러번 데미지 받는 현상 발생
-	TSet<AActor*> DamagedActors;
-
-	if (bHit)
+	if (!bHit)
 	{
-		// 여러 충돌 객체가 있다면
-		for (const FHitResult& Hit : HitResults)
+		return;
+	}
+
+	// 여러 충돌 객체가 있다면
+	for (const FHitResult& Hit : HitResults)
+	{
+		// 충돌한 객체가 있다면
+		AActor* HitActor = Hit.GetActor();
+
+		if (!IsValid(HitActor) || HitActor->ActorHasTag("Boss"))
 		{
-			// 충돌한 객체가 있다면
-			AActor* HitActor = Hit.GetActor();
+			continue;
+		}
 
-			if (!HitActor)
-			{
-				continue;
-			}
+		// 미션 아이템 데미지 주기
+		if (HitActor->ActorHasTag("MissionItem"))
+		{
+			UGameplayStatics::ApplyDamage(
+				HitActor,
+				GetAttackDamage(),
+				nullptr,
+				this,
+				UDamageType::StaticClass()
+			);
+		}
 
-			if (HitActor->ActorHasTag("Boss"))
-			{
-				continue;
-			}
+		// 몬스터는 밀치기
+		else if (HitActor->ActorHasTag("Monster"))
+		{
+			UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
 
-			if (!DamagedActors.Contains(HitActor) && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+			if (HitPrimitive)
 			{
-				// 미션 아이템 + 보스 데미지 주기
-				if (HitActor->ActorHasTag("MissionItem"))
+				ACharacter* HitCharacter = Cast<ACharacter>(HitActor);
+
+				if (HitCharacter)
 				{
-					UGameplayStatics::ApplyDamage(
-						HitActor,
-						GetAttackDamage(),
-						nullptr,
-						this,
-						UDamageType::StaticClass()
-					);
-				}
-
-				// 몬스터는 밀치기
-				else if (HitActor->ActorHasTag("Monster"))
-				{
-					UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
-
-					if (HitPrimitive)
-					{
-						ACharacter* HitCharacter = Cast<ACharacter>(HitActor);
-
-						if (HitCharacter)
-						{
-							HitCharacter->GetCharacterMovement()->StopMovementImmediately();
-							FVector LaunchVector = GetActorForwardVector() * MeleeAttackPushStrength;
-							LaunchVector.Z = 300;
-							HitCharacter->LaunchCharacter(LaunchVector, false, false);
-						}
-					}
+					HitCharacter->GetCharacterMovement()->StopMovementImmediately();
+					FVector LaunchVector = GetActorForwardVector() * MeleeAttackPushStrength;
+					LaunchVector.Z = MeleeAttackPushStrength * 0.3f;
+					HitCharacter->LaunchCharacter(LaunchVector, false, false);
 				}
 			}
-
-			// 데미지를 입힌 액터를 Set에 추가
-			DamagedActors.Add(HitActor);
 		}
 	}
 }
@@ -321,10 +288,9 @@ void APlayerCharacter::StopReload()
 {
 	IsReload = false;
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 }
 
 void APlayerCharacter::ZoomIn(const FInputActionValue& value)
@@ -340,7 +306,7 @@ void APlayerCharacter::ZoomIn(const FInputActionValue& value)
 	}
 
 	IsZoom = true;
-	SpringArmComp->TargetArmLength = 100;
+	SpringArmComp->TargetArmLength = ZoomInLength;
 }
 
 void APlayerCharacter::ZoomOut(const FInputActionValue& value)
@@ -356,27 +322,25 @@ void APlayerCharacter::ZoomOut(const FInputActionValue& value)
 	}
 
 	IsZoom = false;
-	SpringArmComp->TargetArmLength = 200;
+	SpringArmComp->TargetArmLength = ZoomOutLength;
 }
 
 void APlayerCharacter::SetAmmo(const int32 NewAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, NewAmmo);
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	check(CurrentGameState)
+
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 }
 
 void APlayerCharacter::AmountAmmo(const int32 AmountAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, CurrentAmmo + AmountAmmo);
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 }
 
 bool APlayerCharacter::CheckAction()
@@ -387,8 +351,7 @@ bool APlayerCharacter::CheckAction()
 void APlayerCharacter::ActiveDieAction()
 {
 	// 만약 줌상태라면
-	IsZoom = false;
-	SpringArmComp->TargetArmLength = 300;
+	SpringArmComp->TargetArmLength = ZoomOutLength;
 
 	if (IsValid(DieActionMontage))
 	{
@@ -422,15 +385,14 @@ void APlayerCharacter::SetIsAttack()
 
 void APlayerCharacter::PlayReloadSound()
 {
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Reload);
-	}
+	check(CurrentGameState);
+	
+	CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Reload);
 
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadDelayHandle,
 		this,
-		&APlayerCharacter::StopReload,
+		&ThisClass::StopReload,
 		ReloadDelay,
 		false
 	);

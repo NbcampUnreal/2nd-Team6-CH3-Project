@@ -11,6 +11,7 @@ APlayerCharacterAurora::APlayerCharacterAurora()
 	ResetDelay = 1.0f;
 	AttackRangeRadius = 150.0f;
 	ComboTimeDuration = 1.2f;
+	AttackForwardOffset = 10.0f;
 }
 
 void APlayerCharacterAurora::BeginPlay()
@@ -22,53 +23,49 @@ void APlayerCharacterAurora::BeginPlay()
 
 void APlayerCharacterAurora::Attack(const FInputActionValue& value)
 {
-	check(AttackMontages.Num() >= 4 && CurrentGameState);
-
-	if (!IsAttack)
+	if (IsAttack)
 	{
-		IsAttack = true;
-
-		Super::Attack(value);
-
-		switch (ComboCount)
-		{
-			case 0:
-				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
-				PlayAnimMontage(AttackMontages[0], ComboTimeDuration);
-
-				break;
-
-			case 1:
-				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack2);
-				PlayAnimMontage(AttackMontages[1], ComboTimeDuration);
-
-				break;
-
-			case 2:
-				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack3);
-				PlayAnimMontage(AttackMontages[2], ComboTimeDuration);
-
-				break;
-
-			case 3:
-				CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack4);
-				PlayAnimMontage(AttackMontages[3], ComboTimeDuration);
-
-				break;
-
-			default:
-				break;
-		}
-
-		// 콤보 공격 딜레이
-		GetWorld()->GetTimerManager().SetTimer(
-			ComboResetTimerHandle,
-			this,
-			&APlayerCharacterAurora::ResetCombo,
-			ResetDelay,
-			false
-		);
+		return;
 	}
+
+	check(AttackMontages[ComboCount] && CurrentGameState);
+
+	IsAttack = true;
+
+	Super::Attack(value);
+
+	PlayAnimMontage(AttackMontages[ComboCount], ComboTimeDuration);
+
+	switch (ComboCount)
+	{
+		case 0:
+			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
+			break;
+
+		case 1:
+			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack2);
+			break;
+
+		case 2:
+			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack3);
+			break;
+
+		case 3:
+			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack4);
+			break;
+
+		default:
+			break;
+	}
+
+	// 콤보 공격 딜레이
+	GetWorld()->GetTimerManager().SetTimer(
+		ComboResetTimerHandle,
+		this,
+		&ThisClass::ResetCombo,
+		ResetDelay,
+		false
+	);
 }
 
 void APlayerCharacterAurora::AttackTrace()
@@ -77,8 +74,8 @@ void APlayerCharacterAurora::AttackTrace()
 	FRotator ControlRotation = PlayerController->GetControlRotation();
 	FVector ForwardVector = ControlRotation.Vector();
 
-	FVector Start = GetActorLocation() + (ForwardVector * (AttackRangeRadius + 10)); // 공격 시작 위치
-	FVector End = Start + (ForwardVector * (AttackRangeRadius + 10)); // 공격 끝 위치
+	FVector Start = GetActorLocation() + (ForwardVector * (AttackRangeRadius + AttackForwardOffset)); // 공격 시작 위치
+	FVector End = Start + (ForwardVector * (AttackRangeRadius + AttackForwardOffset)); // 공격 끝 위치
 
 	TArray<FHitResult> HitResults;
 
@@ -97,43 +94,32 @@ void APlayerCharacterAurora::AttackTrace()
 	);
 
 	// 데미지를 입힌 액터를 추적할 Set (중복 방지)
-	// Set이 없으면 근접공격한번에 여러번 데미지 받는 현상 발생
 	TSet<AActor*> DamagedActors;
 
 	if (bHit)
 	{
-		bool IsBossAttack = false;
+		return;
+	}
 
-		// 여러 충돌 객체가 있다면
-		for (const FHitResult& Hit : HitResults)
+	// 여러 충돌 객체가 있다면
+	for (const FHitResult& Hit : HitResults)
+	{
+		// 충돌한 객체가 있다면
+		AActor* HitActor = Hit.GetActor();
+
+		if (IsValid(HitActor) && !DamagedActors.Contains(HitActor) && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
 		{
-			// 충돌한 객체가 있다면
-			AActor* HitActor = Hit.GetActor();
-
-			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
-			{
-				if (!IsBossAttack && HitActor->ActorHasTag("Boss"))
-				{
-					if (IsBossAttack)
-					{
-						continue;
-					}
-
-					IsBossAttack = true;
-				}
-
-				UGameplayStatics::ApplyDamage(
-					HitActor,
-					GetAttackDamage(),
-					nullptr,
-					this,
-					UDamageType::StaticClass()
-				);
-			}
-
-			// 데미지를 입힌 액터를 Set에 추가
-			DamagedActors.Add(HitActor);
+			UGameplayStatics::ApplyDamage(
+				HitActor,
+				GetAttackDamage(),
+				nullptr,
+				this,
+				UDamageType::StaticClass()
+			);
 		}
+
+		// 데미지를 입힌 액터를 Set에 추가
+		DamagedActors.Add(HitActor);
 	}
 }
 
@@ -141,7 +127,7 @@ void APlayerCharacterAurora::NextCombo()
 {
 	IsAttack = false;
 
-	ComboCount = ++ComboCount % 4;
+	ComboCount = ++ComboCount % AttackMontages.Num();
 }
 
 void APlayerCharacterAurora::ResetCombo()

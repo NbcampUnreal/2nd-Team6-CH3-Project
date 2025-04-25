@@ -255,6 +255,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float CrouchMoveSpeed;
 
+	// 앉은 캡슐 크기 배율
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float CrouchHeightMultiplier;
+
 	// 스태미나 회복량
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 StaminaRecoveryAmount;
