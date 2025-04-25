@@ -35,7 +35,6 @@ protected:
 
 	// 공격
 	void StartAttack(const FInputActionValue& value);
-	void Attack(const FInputActionValue& value) override;
 	void EndAttack(const FInputActionValue& value);
 
 	// 근접공격
@@ -92,6 +91,18 @@ private:
 	TObjectPtr<UStaticMeshComponent> BulletMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	FVector ChargingScaleMultiplier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	FVector ChargingLocationMultiplier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	float ChargingAttackMultiplier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
+	float MaxCharging;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Weapon", meta = (AllowPrivateAccess = "true"))
 	float ReloadDelay;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
@@ -102,6 +113,14 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float MeleeAttackPushStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float MeleeAttackForwardOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float ZoomInLength;  // 줌 카메라
+
+	float ZoomOutLength; // 일반 카메라
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float ZoomMouseMoveMultipler;
@@ -127,6 +146,7 @@ private:
 	float ReloadTimeMultipler;
 	float AttackMultipler;
 	float SaveAttackMultipler;
+	float ChargingDelay;
 
 	FVector BulletScale;
 	FVector BulletLocation;

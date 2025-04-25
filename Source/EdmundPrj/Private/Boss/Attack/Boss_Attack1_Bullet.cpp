@@ -16,25 +16,19 @@ ABoss_Attack1_Bullet::ABoss_Attack1_Bullet()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 충돌 컴포넌트 생성 및 설정
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	CollisionComp->InitSphereRadius(10.0f);
 	CollisionComp->SetCollisionProfileName(TEXT("IgnoreAll"));
-	// Pawn 채널은 Overlap 처리하여 물리 밀림 방지
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// CCD 활성화 (빠른 이동에도 충돌 감지)
 	CollisionComp->BodyInstance.bUseCCD = true;
-	// Hit와 Overlap 이벤트 바인딩
 	CollisionComp->OnComponentHit.AddDynamic(this, &ABoss_Attack1_Bullet::OnHit);
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABoss_Attack1_Bullet::OnOverlapBegin);
 	RootComponent = CollisionComp;
 
-	// 총알 메쉬 컴포넌트 생성 및 설정 (충돌은 CollisionComp가 처리)
 	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
 	BulletMesh->SetupAttachment(RootComponent);
 	BulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// 폭발 파티클 이펙트 컴포넌트 생성 및 설정 (자동 재생 비활성)
 	ExplosionEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplosionEffect"));
 	ExplosionEffect->SetupAttachment(RootComponent);
 	ExplosionEffect->bAutoActivate = false;
@@ -43,8 +37,6 @@ ABoss_Attack1_Bullet::ABoss_Attack1_Bullet()
 	Attack1Niagara->SetupAttachment(RootComponent);
 	Attack1Niagara->bAutoActivate = false;
 
-
-	// 초기 상태: 탄환은 숨기고 충돌 비활성
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 }
@@ -53,7 +45,6 @@ ABoss_Attack1_Bullet::ABoss_Attack1_Bullet()
 void ABoss_Attack1_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
-	// 생성 시 탄환 풀에 등록
 	BulletPool.Add(this);
 }
 
@@ -65,15 +56,10 @@ void ABoss_Attack1_Bullet::Tick(float DeltaTime)
 	{
 		FVector NewLocation = GetActorLocation() + GetActorForwardVector() * BulletSpeed * DeltaTime;
 		FHitResult HitResult;
-		// Sweep 옵션을 활성화하여 이동 중 충돌 검사
 		SetActorLocation(NewLocation, true, &HitResult);
 
 		if (HitResult.bBlockingHit)
 		{
-			/*UE_LOG(LogTemp, Log, TEXT("Bullet sweep hit: %s at %s"),
-				HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("Unknown"),
-				*GetActorLocation().ToString());
-			Explode();*/
 			return;
 		}
 
@@ -88,11 +74,9 @@ void ABoss_Attack1_Bullet::Tick(float DeltaTime)
 
 void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnRotation, FVector Direction)
 {
-	// 발사 위치 및 회전 설정
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
 
-	// 탄환 활성화 및 초기화
 	bIsActive = true;
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(false);
@@ -100,7 +84,6 @@ void ABoss_Attack1_Bullet::FireProjectile(FVector SpawnLocation, FRotator SpawnR
 
 	if (Attack1Niagara)
 	{
-		Attack1Niagara->SetAutoActivate(true);
 		Attack1Niagara->Activate();
 	}
 
@@ -121,8 +104,6 @@ void ABoss_Attack1_Bullet::OnHit(UPrimitiveComponent* HitComponent, AActor* Othe
 		return;
 	}
 
-	//UE_LOG(LogTemp, Log, TEXT("Bullet hit: %s"), *OtherActor->GetName());
-
 	if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
 	{
 		Explode();
@@ -138,8 +119,6 @@ void ABoss_Attack1_Bullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 	{
 		return;
 	}
-
-	//UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
 
 	if (OtherActor->ActorHasTag("NPC") || OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Ground"))
 	{
@@ -182,7 +161,6 @@ void ABoss_Attack1_Bullet::Explode()
 
 void ABoss_Attack1_Bullet::ResetBullet()
 {
-	// 탄환 초기화
 	bIsActive = false;
 	TraveledDistance = 0.0f;
 	SetActorHiddenInGame(true);
@@ -191,7 +169,6 @@ void ABoss_Attack1_Bullet::ResetBullet()
 	if (Attack1Niagara)
 	{
 		Attack1Niagara->Deactivate();
-		Attack1Niagara->SetAutoActivate(false);
 	}
 
 	if (!BulletPool.Contains(this))

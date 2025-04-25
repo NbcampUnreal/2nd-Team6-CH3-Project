@@ -8,10 +8,8 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
 ARangedMonsterBullet::ARangedMonsterBullet()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
@@ -75,15 +73,8 @@ void ARangedMonsterBullet::OnMonsterBulletOverlap(UPrimitiveComponent* Overlappe
 				);
 
 				GetWorld()->GetTimerManager().ClearTimer(MonsterBulletLifeTimerHandle);
-
-				//UE_LOG(LogTemp, Warning, TEXT("%f"), DamageValue);
-
 				EndMonsterBulletLife();
 			}
 		}
 	}
-	//if (OtherActor && !OtherActor->ActorHasTag("Monster"))
-	//{
-	//	EndMonsterBulletLife();
-	//}
 }

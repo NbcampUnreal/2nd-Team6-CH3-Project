@@ -262,16 +262,16 @@ public:
     float KnockbackStrength = 25000.0f;  // 밀치는 힘
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack1_CooldownDuration = 10.0f; // 공격 1 쿨타임
+    float Attack1_CooldownDuration = 2.0f; // 공격 1 쿨타임
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack2_CooldownDuration = 50.0f; // 공격 2 쿨타임
+    float Attack2_CooldownDuration = 30.0f; // 공격 2 쿨타임
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack3_CooldownDuration = 20.0f; // 공격 3 쿨타임
+    float Attack3_CooldownDuration = 10.0f; // 공격 3 쿨타임
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Cooldowns")
-    float Attack4_CooldownDuration = 60.0f; // 공격 4 쿨타임
+    float Attack4_CooldownDuration = 30.0f; // 공격 4 쿨타임
 
     // ***********************Attack 3*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
@@ -281,22 +281,22 @@ public:
     class UBTTask_BossAttack3* CurrentAttackTask;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack1 = 1500.0f; // 1타 돌진 거리
+    float MeleeAttackDashDistance_Attack1 = 3000.0f; // 1타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashDistance_Attack2 = 1500.0f; // 2타 돌진 거리
+    float MeleeAttackDashDistance_Attack2 = 3000.0f; // 2타 돌진 거리
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack1 = 300.0f; // 1타 돌진 속도
+    float MeleeAttackDashSpeed_Attack1 = 1000.0f; // 1타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float MeleeAttackDashSpeed_Attack2 = 300.0f; // 2타 돌진 속도
+    float MeleeAttackDashSpeed_Attack2 = 1000.0f; // 2타 돌진 속도
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashFrequency = 0.9f; // 목표 위치 가속 힘
+    float BossDashFrequency = 5.0f; // 목표 위치 가속 힘
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
-    float BossDashDamping = 1.0f; // 부드럽게 정지
+    float BossDashDamping = 2.0f; // 부드럽게 정지
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack3")
     float Attack3_3FiringDuration = 3.0f; // 3타 지속시간

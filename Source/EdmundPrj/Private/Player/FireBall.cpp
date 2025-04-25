@@ -1,5 +1,4 @@
 #include "Player/FireBall.h"
-#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BaseCharacter.h"
 #include "System/EdmundGameState.h"
@@ -27,7 +26,7 @@ void AFireBall::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AFireBall::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Skill") || OtherActor->ActorHasTag("Bullet")) || bIsHidden)
+	if (bIsHidden || !IsValid(OtherActor) || (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Skill") || OtherActor->ActorHasTag("Bullet") || OtherActor->ActorHasTag("Area") || OtherActor->ActorHasTag("NPC")))
 	{
 		return;
 	}
@@ -39,15 +38,12 @@ void AFireBall::EndBulletLife()
 {
 	Super::EndBulletLife();
 
-	// ���� ����Ʈ ���
 	if (BulletLandParticle)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation(), FVector(1.0f, 1.0f, 1.0f) * AttackRadiusMultifler);
 	}
 
-	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
-
-	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
+	AEdmundGameState* CurrentGameState = GetWorld()->GetGameState<AEdmundGameState>();
 
 	if (IsValid(CurrentGameState))
 	{
@@ -56,111 +52,85 @@ void AFireBall::EndBulletLife()
 
 	SetBulletHidden(true);
 
-	FVector Start = GetActorLocation(); // ���� ���� ��ġ
-	FVector End = Start; // ���� �� ��ġ
+	FVector Start = GetActorLocation();
+	FVector End = Start;
 
 	TArray<FHitResult> HitResults;
 
-	// Ʈ���̽� ����
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // �ڽ��� �����ϵ��� ����
+	QueryParams.AddIgnoredActor(this);
 
 	bool bHit = GetWorld()->SweepMultiByChannel(
 		HitResults,
-		Start,               // ���� ��ġ
-		End,                 // �� ��ġ
-		FQuat::Identity,     // ȸ���� (ȸ�� ����)
-		ECollisionChannel::ECC_OverlapAll_Deprecated, // �浹 ä��
-		FCollisionShape::MakeSphere(100.0f * AttackRadiusMultifler), // ���� ���� (��ü ���)
+		Start,
+		End,
+		FQuat::Identity,
+		ECollisionChannel::ECC_OverlapAll_Deprecated,
+		FCollisionShape::MakeSphere(100.0f * AttackRadiusMultifler),
 		QueryParams
 	);
 
-	// �������� ���� ���͸� ������ Set (�ߺ� ����)
-	// Set�� ������ ���������ѹ��� ������ ������ �޴� ���� �߻�
-	TSet<AActor*> DamagedActors;
-
-	if (bHit)
-	{
-		bool IsBossAttack = false;
-
-		// ���� �浹 ��ü�� �ִٸ�
-		for (const FHitResult& Hit : HitResults)
-		{
-			// �浹�� ��ü�� �ִٸ�
-			AActor* HitActor = Hit.GetActor();
-
-			if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster") || HitActor->ActorHasTag("Area") || HitActor->ActorHasTag("NPC")))
-			{
-				if (!IsBossAttack && HitActor->ActorHasTag("Boss"))
-				{
-					if (IsBossAttack)
-					{
-						continue;
-					}
-
-					IsBossAttack = true;
-				}
-
-				float Damage = 30.0f;
-
-				// ���� �÷��̾� ĳ���ͷκ��� ������ ���� ��� �ڵ�
-				APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);  // 0�� ù ��° �÷��̾�
-				if (PlayerController)
-				{
-					APawn* ControlledPawn = PlayerController->GetPawn();
-					if (ControlledPawn)
-					{
-						ABaseCharacter* Player = Cast<ABaseCharacter>(ControlledPawn);
-						if (IsValid(Player))
-						{
-							Damage = Player->GetAttackDamage();
-						}
-					}
-				}
-
-				UGameplayStatics::ApplyDamage(
-					HitActor,
-					Damage,
-					nullptr,
-					this,
-					UDamageType::StaticClass()
-				);
-			}
-
-			// �������� ���� ���͸� Set�� �߰�
-			DamagedActors.Add(HitActor);
-		}
-	}
-
 	GetWorld()->GetTimerManager().ClearTimer(BulletLifeTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(ParticleCreateDelayTimerHandle);
+
+	TSet<AActor*> DamagedActors;
+
+	if (!bHit)
+	{
+		return;
+	}
+
+	for (const FHitResult& Hit : HitResults)
+	{
+		AActor* HitActor = Hit.GetActor();
+
+		if (!DamagedActors.Contains(HitActor) && HitActor && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+		{
+			float Damage = 30.0f;
+
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+			if (IsValid(PlayerController))
+			{
+				ABaseCharacter* Player = PlayerController->GetPawn<ABaseCharacter>();
+
+				if (IsValid(Player))
+				{
+					Damage = Player->GetAttackDamage();
+				}
+			}
+
+			UGameplayStatics::ApplyDamage(
+				HitActor,
+				Damage,
+				nullptr,
+				this,
+				UDamageType::StaticClass()
+			);
+		}
+
+		DamagedActors.Add(HitActor);
+	}
 }
 
 void AFireBall::SetBulletHidden(bool IsHidden)
 {
+	Super::SetBulletHidden(IsHidden);
+
 	bIsHidden = IsHidden;
 
-	// 3�� �ڱ��� ������ �ȵ� ��� Ǯ��
 	if (!IsHidden)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
-			BulletLifeTimerHandle,
-			this,
-			&ABullet::EndBulletLife,
-			3.0f,
-			false
-		);
-
-		GetWorld()->GetTimerManager().SetTimer(
 			ParticleCreateDelayTimerHandle,
 			this,
-			&AFireBall::CreateParticle,
+			&ThisClass::CreateParticle,
 			0.03f,
 			true
 		);
 	}
 
-	SetActorHiddenInGame(bIsHidden);  // �Ѿ� ���� ó��
+	SetActorHiddenInGame(bIsHidden);
 }
 
 void AFireBall::CreateParticle()
@@ -170,6 +140,5 @@ void AFireBall::CreateParticle()
 		return;
 	}
 
-	// ��ƼŬ ����
 	UParticleSystemComponent* ParticleComponent = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireBallParticle, GetActorLocation(), GetActorRotation(), true);
 }

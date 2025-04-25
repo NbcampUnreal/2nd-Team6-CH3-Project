@@ -65,10 +65,6 @@ void UBTTask_BossChase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     }
 
     float Distance = FVector::Dist(BossRef->GetActorLocation(), Player->GetActorLocation());
-    //if (Distance >= 1500.0f)
-    //{
-    //    BossRef->Chase_AcceptanceRadius += 100.0f;
-    //}
 
     FRotator CurrentRotation = BossRef->GetActorRotation();
     FVector Direction = (Player->GetActorLocation() - BossRef->GetActorLocation()).GetSafeNormal();

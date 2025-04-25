@@ -9,11 +9,8 @@ void UBoss_Idle::EnterState(ABoss* Boss)
 
     if (!Boss || !Boss->GetWorld())
     {
-        UE_LOG(LogTemp, Error, TEXT("Boss or World is NULL in Idle State"));
         return;
     }
-
-    UE_LOG(LogTemp, Log, TEXT("Idle Start"));
 
     Boss->GetWorld()->GetTimerManager().SetTimer(IdleTimerHandle, FTimerDelegate::CreateLambda([Boss]()
         {
@@ -26,7 +23,6 @@ void UBoss_Idle::EnterState(ABoss* Boss)
 
 void UBoss_Idle::ExitState()
 {
-    UE_LOG(LogTemp, Log, TEXT("Idle End"));
 
     if (GetWorld())
     {

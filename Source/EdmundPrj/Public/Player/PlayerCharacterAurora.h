@@ -29,6 +29,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float AttackRangeRadius;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move", meta = (AllowPrivateAccess = "true"))
+	float AttackForwardOffset;
+
 	// 공격 애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	TArray<TObjectPtr<UAnimMontage>> AttackMontages = { };

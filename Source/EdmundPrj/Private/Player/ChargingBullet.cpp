@@ -33,22 +33,18 @@ void AChargingBullet::SetBulletScale()
 
 void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (bIsHidden || (OtherActor && (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Skill") || OtherActor->ActorHasTag("Bullet") || OtherActor->ActorHasTag("Area") || OtherActor->ActorHasTag("NPC"))))
+	if (bIsHidden || !IsValid(OtherActor) || (OtherActor->ActorHasTag("Player") || OtherActor->ActorHasTag("Skill") || OtherActor->ActorHasTag("Bullet") || OtherActor->ActorHasTag("Area") || OtherActor->ActorHasTag("NPC")))
 	{
 		return;
 	}
 
-	AGameStateBase* GameStateBase = GetWorld()->GetGameState();
-
-	AEdmundGameState* CurrentGameState = Cast<AEdmundGameState>(GameStateBase);
-
 	// 몬스터는 관통
-	if (OtherActor && !(OtherActor->ActorHasTag("Monster")))
+	if ((OtherActor->ActorHasTag("Monster")))
 	{
 		SetBulletHidden(true);
 	}
 
-	if (OtherActor && (OtherActor->ActorHasTag("Monster") || OtherActor->ActorHasTag("MissionItem")))
+	if (OtherActor->ActorHasTag("Monster") || OtherActor->ActorHasTag("MissionItem"))
 	{
 		if (OtherActor->ActorHasTag("Boss"))
 		{
@@ -84,6 +80,8 @@ void AChargingBullet::OnProjectileOverlap(UPrimitiveComponent* OverlappedComp, A
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletLandParticle, GetActorLocation(), GetActorRotation());
 	}
+
+	AEdmundGameState* CurrentGameState = GetWorld()->GetGameState<AEdmundGameState>();
 
 	if (IsValid(CurrentGameState))
 	{

@@ -20,6 +20,7 @@ APlayerCharacterFey::APlayerCharacterFey()
 	MeleeAttackDelay = 0.7f;
 	MeleeAttackRadius = 100.0f;
 	MeleeAttackPushStrength = 1000.0f;
+	MeleeAttackForwardOffset = 50.0f;
 
 	AttackCost = 10;
 
@@ -57,21 +58,12 @@ void APlayerCharacterFey::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		{
 			if (PlayerController->JumpAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->JumpAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacterFey::TriggerJump
-				);
+				EnhancedInput->BindAction(PlayerController->JumpAction, ETriggerEvent::Triggered, this, &ThisClass::TriggerJump);
 			}
+
 			if (PlayerController->MeleeAttackAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->MeleeAttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacterFey::MeleeAttack
-				);
+				EnhancedInput->BindAction(PlayerController->MeleeAttackAction, ETriggerEvent::Triggered, this, &ThisClass::MeleeAttack);
 			}
 		}
 	}
@@ -85,6 +77,7 @@ void APlayerCharacterFey::StartJump(const FInputActionValue& value)
 		Super::Jump(); // 첫 번째 점프 수행
 		JumpCount = 1; // 점프 후 2단 점프 가능
 	}
+
 	// 첫 번째 점프 후, 떨어지는 상태에서 두 번째 점프가 가능
 	else if (JumpCount < 2) // 이미 공중에 있을 때 (IsFalling()이 true)
 	{
@@ -92,9 +85,7 @@ void APlayerCharacterFey::StartJump(const FInputActionValue& value)
 		FVector JumpVelocity = GetVelocity();
 
 		JumpVelocity.Normalize();
-
 		JumpVelocity *= GetCharacterMovement()->MaxWalkSpeed;
-
 		JumpVelocity.Z = DoubleJumpHeight;
 
 		GetCharacterMovement()->Launch(JumpVelocity);  // Z축 방향으로 점프
@@ -107,8 +98,8 @@ void APlayerCharacterFey::StartJump(const FInputActionValue& value)
 		GetWorld()->GetTimerManager().SetTimer(
 			HoveringDelayHandle,
 			this,
-			&APlayerCharacterFey::SetIsHover,
-			0.1f,
+			&ThisClass::SetIsHover,
+			HoveringDelay,
 			false
 		);
 	}
@@ -119,6 +110,7 @@ void APlayerCharacterFey::TriggerJump(const FInputActionValue& value)
 	UCharacterMovementComponent* CharacterMovement2 = GetCharacterMovement();
 
 	FVector CurrentVelocity = GetVelocity();
+
 	if (CurrentVelocity.Z < HoveringZSpeed && !IsHover)
 	{
 		CurrentVelocity.Z = HoveringZSpeed;		// 하강 속도 제한
@@ -137,18 +129,17 @@ void APlayerCharacterFey::MeleeAttack(const FInputActionValue& value)
 	{
 		PlayAnimMontage(MeleeAttackMontage);
 	}
+	
+	check(CurrentGameState);
 
 	// 근접공격 소리 재생
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
-	}
+	CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
 
 	// 근접 공격 딜레이
 	GetWorld()->GetTimerManager().SetTimer(
 		MeleeAttackDelayHandle,
 		this,
-		&APlayerCharacterFey::EndMeleeAttack,
+		&ThisClass::EndMeleeAttack,
 		MeleeAttackDelay,
 		false
 	);
@@ -173,10 +164,10 @@ void APlayerCharacterFey::Attack(const FInputActionValue& value)
 	IsAttack = true;
 	Stamina -= AttackCost;
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerOther(MaxStamina, Stamina);
+
 
 	if (IsValid(AttackMontage))
 	{
@@ -193,7 +184,7 @@ void APlayerCharacterFey::ActiveWeapon()
 			GetWorld()->GetTimerManager().SetTimer(
 				AttackDelayHandle,
 				this,
-				&APlayerCharacterFey::SetIsAttack,
+				&ThisClass::SetIsAttack,
 				AttackDelay,
 				false
 			);
@@ -207,8 +198,8 @@ void APlayerCharacterFey::AttackTrace()
 	FRotator ControlRotation = PlayerController->GetControlRotation();
 	FVector ForwardVector = ControlRotation.Vector();
 
-	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + 50)); // 공격 시작 위치
-	FVector End = Start + (ForwardVector * (MeleeAttackRadius + 50)); // 공격 끝 위치
+	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // 공격 시작 위치
+	FVector End = Start + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // 공격 끝 위치
 
 	// 공격 범위 내에서 충돌 체크
 	float Radius = MeleeAttackRadius;
@@ -228,64 +219,51 @@ void APlayerCharacterFey::AttackTrace()
 		QueryParams
 	);
 
-	// 데미지를 입힌 액터를 추적할 Set (중복 방지)
-	// Set이 없으면 근접공격한번에 여러번 데미지 받는 현상 발생
-	TSet<AActor*> DamagedActors;
-
-	if (bHit)
+	if (!bHit)
 	{
-		// 여러 충돌 객체가 있다면
-		for (const FHitResult& Hit : HitResults)
+		return;
+	}
+
+	// 여러 충돌 객체가 있다면
+	for (const FHitResult& Hit : HitResults)
+	{
+		// 충돌한 객체가 있다면
+		AActor* HitActor = Hit.GetActor();
+
+		if (!IsValid(HitActor) || HitActor->ActorHasTag("Boss"))
 		{
-			// 충돌한 객체가 있다면
-			AActor* HitActor = Hit.GetActor();
+			continue;
+		}
 
-			if (!HitActor)
-			{
-				continue;
-			}
+		// 미션 아이템 데미지 주기
+		if (HitActor->ActorHasTag("MissionItem"))
+		{
+			UGameplayStatics::ApplyDamage(
+				HitActor,
+				GetAttackDamage(),
+				nullptr,
+				this,
+				UDamageType::StaticClass()
+			);
+		}
 
-			if (HitActor->ActorHasTag("Boss"))
-			{
-				continue;
-			}
+		// 몬스터는 밀치기
+		else if (HitActor->ActorHasTag("Monster"))
+		{
+			UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
 
-			if (!DamagedActors.Contains(HitActor) && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+			if (HitPrimitive)
 			{
-				// 미션 아이템
-				if (HitActor->ActorHasTag("MissionItem"))
+				ACharacter* HitCharacter = Cast<ACharacter>(HitActor);
+
+				if (HitCharacter)
 				{
-					UGameplayStatics::ApplyDamage(
-						HitActor,
-						GetAttackDamage(),
-						nullptr,
-						this,
-						UDamageType::StaticClass()
-					);
-				}
-
-				// 몬스터는 밀치기
-				else if (HitActor->ActorHasTag("Monster"))
-				{
-					UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
-
-					if (HitPrimitive)
-					{
-						ACharacter* HitCharacter = Cast<ACharacter>(HitActor);
-
-						if (HitCharacter)
-						{
-							HitCharacter->GetCharacterMovement()->StopMovementImmediately();
-							FVector LaunchVector = GetActorForwardVector() * MeleeAttackPushStrength;
-							LaunchVector.Z = 300;
-							HitCharacter->LaunchCharacter(LaunchVector, false, false);
-						}
-					}
+					HitCharacter->GetCharacterMovement()->StopMovementImmediately();
+					FVector LaunchVector = GetActorForwardVector() * MeleeAttackPushStrength;
+					LaunchVector.Z = MeleeAttackPushStrength * 0.3f;
+					HitCharacter->LaunchCharacter(LaunchVector, false, false);
 				}
 			}
-
-			// 데미지를 입힌 액터를 Set에 추가
-			DamagedActors.Add(HitActor);
 		}
 	}
 }

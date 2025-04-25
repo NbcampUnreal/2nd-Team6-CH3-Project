@@ -5,10 +5,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "System/EdmundGameInstance.h"
 
-//void USceneHandle::Initialize(FSubsystemCollectionBase& Collection)
-//{
-//	Super::Initialize(Collection);
-//}
+const FName USceneHandle::TitleSceneName = "TitleLevel";
+const FName USceneHandle::MainSceneName = "MainLevel";
+const FName USceneHandle::Mission1SceneName = "Mission1Level";
+const FName USceneHandle::Mission2SceneName = "Mission2Level";
+const FName USceneHandle::Mission3SceneName = "Mission3Level";
+const FName USceneHandle::InfinitySceneName = "InfinityLevel";
+const FName USceneHandle::EndingSceneName = "EndingLevel";
 
 void USceneHandle::InitSceneHandle(UEdmundGameInstance* NewGameInstance)
 {

@@ -4,13 +4,11 @@
 #include "Monster/MonsterBulletPool.h"
 #include "Monster/RangedMonsterBullet.h"
 
-// Sets default values
 AMonsterBulletPool::AMonsterBulletPool()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 }
-// Called when the game starts or when spawned
+
 void AMonsterBulletPool::BeginPlay()
 {
 	Super::BeginPlay();
@@ -32,20 +30,11 @@ void AMonsterBulletPool::InitializeMonsterBulletPool(int32 PoolSize)
         {
             ARangedMonsterBullet* NewBullet = GetWorld()->SpawnActor<ARangedMonsterBullet>(MonsterBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
 
-            if (!NewBullet)
-            {
-                UE_LOG(LogTemp, Error, TEXT("There is No Bullet"));
-            }
-
             if (NewBullet)
             {
                 NewBullet->SetActorHiddenInGame(true);
                 BulletPool.Add(NewBullet);
             }
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("MonsterBulletClass 없음"));
         }
     }
 }
@@ -62,15 +51,7 @@ ARangedMonsterBullet* AMonsterBulletPool::GetBulletFromPool()
                 return Bullet;
             }
         }
-
-        UE_LOG(LogTemp, Warning, TEXT("모든 Bullet이 Hidden이 아님"));
     }
 
-    else
-    {
-		UE_LOG(LogTemp, Error, TEXT("BulletPool안에 Bullet이 없음"));
-    }
-
-    UE_LOG(LogTemp, Error, TEXT("There is no MonsterBullet in the object pool."));
     return nullptr;;
 }

@@ -15,23 +15,23 @@ class EDMUNDPRJ_API UDataHandleSettings : public UDeveloperSettings
 	
 public:
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
-	TSoftObjectPtr<UDataTable> ShopCatalogDataTable;
+	TSoftObjectPtr<UDataTable> ShopCatalogDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
-	TSoftObjectPtr<UDataTable> PlayDataTable;
+	TSoftObjectPtr<UDataTable> PlayDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
-	TSoftObjectPtr<UDataTable> PlayerSkillDataTable;
+	TSoftObjectPtr<UDataTable> PlayerSkillDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
-	TSoftObjectPtr<UDataTable> CharacterDataTable;
+	TSoftObjectPtr<UDataTable> CharacterDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
-	TSoftObjectPtr<UDataTable> MissionDataTable;
+	TSoftObjectPtr<UDataTable> MissionDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
-	TSoftObjectPtr<UDataTable> SpawnerDataTable;
+	TSoftObjectPtr<UDataTable> SpawnerDataTable = nullptr;
 
 	UPROPERTY(EditAnywhere, Config, Category = "DataTableAsset")
-	TSoftObjectPtr<UDataTable> StoryDataTable;
+	TSoftObjectPtr<UDataTable> StoryDataTable = nullptr;
 };

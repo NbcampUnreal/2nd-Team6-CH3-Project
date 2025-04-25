@@ -18,15 +18,6 @@ public:
 	void OnAttack2Completed();
 
 protected:
-	// Phase 정의:
-	// 0: InitialWait (대기)
-	// 1: Ascending (상승)
-	// 2: AtMaxWait (최대 높이 도달 후 대기)
-	// 3: HorizontalReposition (플레이어 위치 이동)
-	// 4: PreDescendWait (대기)
-	// 5: Descending (하강)
-	// 6: Completed (종료)
-
 	int32 CurrentPhase;
 	ABoss* BossRef;
 	UBehaviorTreeComponent* CachedOwnerComp;

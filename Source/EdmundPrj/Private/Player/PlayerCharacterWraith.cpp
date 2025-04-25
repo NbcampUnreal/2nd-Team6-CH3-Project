@@ -15,15 +15,26 @@ APlayerCharacterWraith::APlayerCharacterWraith()
 	PrimaryActorTick.bCanEverTick = false;
 
 	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	BulletMesh->SetupAttachment(RootComponent);
+	BulletMesh->SetupAttachment(GetMesh(), TEXT("WeaponSocket"));
+
+	ChargingScaleMultiplier = FVector(0.03f, 0.03f, 0.03f);
+	ChargingLocationMultiplier = FVector(0.0f, 2.0f, 0.0f);
+	ChargingAttackMultiplier = 0.05f;
+	MaxCharging = 3.0f;
 
 	ReloadDelay = 2.0f;
 	MeleeAttackDelay = 0.7f;
 	MeleeAttackRadius = 100.0f;
 	MeleeAttackPushStrength = 1000.0f;
+	MeleeAttackForwardOffset = 50.0f;
+
+	ChargingDelay = 0.1f;
 	AttackMultipler = 0.5f;
 
 	CurrentAmmo = MaxAmmo = 20;
+
+	ZoomInLength = 100.0f;
+	ZoomOutLength = 200.0f;
 	ZoomMouseMoveMultipler = 0.5f;
 
 	IsMeleeAttack = false;
@@ -38,25 +49,17 @@ void APlayerCharacterWraith::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentAmmo = MaxAmmo;
+	ZoomOutLength = SpringArmComp->TargetArmLength;
+
 	WeaponActor = GetWorld()->SpawnActor<AWeapon>(Weapon);
 
-	if (Weapon)
-	{
-		FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
-		WeaponActor->AttachToComponent(GetMesh(), TransformRules, TEXT("WeaponSocket"));
-		WeaponActor->SetOwner(this);
-	}
+	check(Weapon && CurrentGameState);
 
 	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
-	BulletMesh->AttachToComponent(GetMesh(), TransformRules, TEXT("WeaponSocket"));
-	BulletMesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
-	BulletMesh->AddRelativeLocation(FVector(0.0f, -28.0f, 0.0f));
-	BulletMesh->SetVisibility(false);
+	WeaponActor->AttachToComponent(GetMesh(), TransformRules, TEXT("WeaponSocket"));
+	WeaponActor->SetOwner(this);
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 }
 
 float APlayerCharacterWraith::GetAttackDamage() const
@@ -84,59 +87,28 @@ void APlayerCharacterWraith::SetupPlayerInputComponent(UInputComponent* PlayerIn
 		{
 			if (PlayerController->AttackAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->AttackAction,
-					ETriggerEvent::Started,
-					this,
-					&APlayerCharacterWraith::StartAttack
-				);
+				EnhancedInput->BindAction(PlayerController->AttackAction, ETriggerEvent::Started, this, &APlayerCharacterWraith::StartAttack);
 			}
 
 			if (PlayerController->AttackAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->AttackAction,
-					ETriggerEvent::Completed,
-					this,
-					&APlayerCharacterWraith::EndAttack
-				);
+				EnhancedInput->BindAction(PlayerController->AttackAction, ETriggerEvent::Completed, this, &APlayerCharacterWraith::EndAttack);
 			}
 
 			if (PlayerController->MeleeAttackAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->MeleeAttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacterWraith::MeleeAttack
-				);
+				EnhancedInput->BindAction(PlayerController->MeleeAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterWraith::MeleeAttack);
 			}
 
 			if (PlayerController->ReloadAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->ReloadAction,
-					ETriggerEvent::Triggered,
-					this,
-					&APlayerCharacterWraith::ReloadAction
-				);
+				EnhancedInput->BindAction(PlayerController->ReloadAction, ETriggerEvent::Triggered, this, &APlayerCharacterWraith::ReloadAction);
 			}
 
 			if (PlayerController->ZoomAction)
 			{
-				EnhancedInput->BindAction(
-					PlayerController->ZoomAction,
-					ETriggerEvent::Started,
-					this,
-					&APlayerCharacterWraith::ZoomIn
-				);
-
-				EnhancedInput->BindAction(
-					PlayerController->ZoomAction,
-					ETriggerEvent::Completed,
-					this,
-					&APlayerCharacterWraith::ZoomOut
-				);
+				EnhancedInput->BindAction(PlayerController->ZoomAction, ETriggerEvent::Started, this, &APlayerCharacterWraith::ZoomIn);
+				EnhancedInput->BindAction(PlayerController->ZoomAction, ETriggerEvent::Completed, this, &APlayerCharacterWraith::ZoomOut);
 			}
 		}
 	}
@@ -163,12 +135,14 @@ void APlayerCharacterWraith::Look(const FInputActionValue& value)
 
 void APlayerCharacterWraith::StartAttack(const FInputActionValue& value)
 {
+	check(WeaponActor);
+
 	if (CurrentAmmo <= 0 || CheckAction())
 	{
 		return;
 	}
 
-	if (IsValid(MeleeAttackMontage))
+	if (IsValid(ChargeMontage))
 	{
 		PlayAnimMontage(ChargeMontage);
 	}
@@ -184,16 +158,10 @@ void APlayerCharacterWraith::StartAttack(const FInputActionValue& value)
 	GetWorld()->GetTimerManager().SetTimer(
 		CharingBulletTimerHandle,
 		this,
-		&APlayerCharacterWraith::UpScale,
-		0.1f,
+		&ThisClass::UpScale,
+		ChargingDelay,
 		true
 	);
-}
-
-void APlayerCharacterWraith::Attack(const FInputActionValue& value)
-{
-
-	
 }
 
 void APlayerCharacterWraith::EndAttack(const FInputActionValue& value)
@@ -228,16 +196,15 @@ void APlayerCharacterWraith::MeleeAttack(const FInputActionValue& value)
 		PlayAnimMontage(MeleeAttackMontage);
 	}
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
 
 	// 근접 공격 딜레이
 	GetWorld()->GetTimerManager().SetTimer(
 		MeleeAttackDelayHandle,
 		this,
-		&APlayerCharacterWraith::EndMeleeAttack,
+		&ThisClass::EndMeleeAttack,
 		MeleeAttackDelay,
 		false
 	);
@@ -256,8 +223,8 @@ void APlayerCharacterWraith::AttackTrace()
 	FRotator ControlRotation = PlayerController->GetControlRotation();
 	FVector ForwardVector = ControlRotation.Vector();
 
-	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + 50)); // 공격 시작 위치
-	FVector End = Start + (ForwardVector * (MeleeAttackRadius + 50)); // 공격 끝 위치
+	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // 공격 시작 위치
+	FVector End = Start + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // 공격 끝 위치
 
 	// 공격 범위 내에서 충돌 체크
 	float Radius = MeleeAttackRadius;
@@ -277,64 +244,51 @@ void APlayerCharacterWraith::AttackTrace()
 		QueryParams
 	);
 
-	// 데미지를 입힌 액터를 추적할 Set (중복 방지)
-	// Set이 없으면 근접공격한번에 여러번 데미지 받는 현상 발생
-	TSet<AActor*> DamagedActors;
-
-	if (bHit)
+	if (!bHit)
 	{
-		// 여러 충돌 객체가 있다면
-		for (const FHitResult& Hit : HitResults)
+		return;
+	}
+
+	// 여러 충돌 객체가 있다면
+	for (const FHitResult& Hit : HitResults)
+	{
+		// 충돌한 객체가 있다면
+		AActor* HitActor = Hit.GetActor();
+
+		if (!IsValid(HitActor) || HitActor->ActorHasTag("Boss"))
 		{
-			// 충돌한 객체가 있다면
-			AActor* HitActor = Hit.GetActor();
+			continue;
+		}
 
-			if (!HitActor)
-			{
-				continue;
-			}
+		// 미션 아이템 데미지 주기
+		if (HitActor->ActorHasTag("MissionItem"))
+		{
+			UGameplayStatics::ApplyDamage(
+				HitActor,
+				GetAttackDamage(),
+				nullptr,
+				this,
+				UDamageType::StaticClass()
+			);
+		}
 
-			if (HitActor->ActorHasTag("Boss"))
-			{
-				continue;
-			}
+		// 몬스터는 밀치기
+		else if (HitActor->ActorHasTag("Monster"))
+		{
+			UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
 
-			if (!DamagedActors.Contains(HitActor) && (HitActor->ActorHasTag("MissionItem") || HitActor->ActorHasTag("Monster")))
+			if (HitPrimitive)
 			{
-				// 미션 아이템
-				if (HitActor->ActorHasTag("MissionItem"))
+				ACharacter* HitCharacter = Cast<ACharacter>(HitActor);
+
+				if (HitCharacter)
 				{
-					UGameplayStatics::ApplyDamage(
-						HitActor,
-						GetAttackDamage(),
-						nullptr,
-						this,
-						UDamageType::StaticClass()
-					);
-				}
-
-				// 몬스터는 밀치기
-				else if (HitActor->ActorHasTag("Monster"))
-				{
-					UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
-
-					if (HitPrimitive)
-					{
-						ACharacter* HitCharacter = Cast<ACharacter>(HitActor);
-
-						if (HitCharacter)
-						{
-							HitCharacter->GetCharacterMovement()->StopMovementImmediately();
-							FVector LaunchVector = GetActorForwardVector() * MeleeAttackPushStrength;
-							LaunchVector.Z = 300;
-							HitCharacter->LaunchCharacter(LaunchVector, false, false);
-						}
-					}
+					HitCharacter->GetCharacterMovement()->StopMovementImmediately();
+					FVector LaunchVector = GetActorForwardVector() * MeleeAttackPushStrength;
+					LaunchVector.Z = MeleeAttackPushStrength * 0.3f;
+					HitCharacter->LaunchCharacter(LaunchVector, false, false);
 				}
 			}
-
-			// 데미지를 입힌 액터를 Set에 추가
-			DamagedActors.Add(HitActor);
 		}
 	}
 }
@@ -359,10 +313,9 @@ void APlayerCharacterWraith::Reload()
 {
 	CurrentAmmo = MaxAmmo;
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Reload);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Reload);
 
 	if (IsValid(ReloadMontage))
 	{
@@ -376,7 +329,7 @@ void APlayerCharacterWraith::Reload()
 		GetWorld()->GetTimerManager().SetTimer(
 			ReloadDelayHandle,
 			this,
-			&APlayerCharacterWraith::StopReload,
+			&ThisClass::StopReload,
 			ReloadDelay,
 			false
 		);
@@ -387,10 +340,10 @@ void APlayerCharacterWraith::StopReload()
 {
 	IsReload = false;
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+
 }
 
 void APlayerCharacterWraith::ZoomIn(const FInputActionValue& value)
@@ -406,7 +359,7 @@ void APlayerCharacterWraith::ZoomIn(const FInputActionValue& value)
 	}
 
 	IsZoom = true;
-	SpringArmComp->TargetArmLength = 100;
+	SpringArmComp->TargetArmLength = ZoomInLength;
 }
 
 void APlayerCharacterWraith::ZoomOut(const FInputActionValue& value)
@@ -422,27 +375,26 @@ void APlayerCharacterWraith::ZoomOut(const FInputActionValue& value)
 	}
 
 	IsZoom = false;
-	SpringArmComp->TargetArmLength = 200;
+	SpringArmComp->TargetArmLength = ZoomOutLength;
 }
 
 void APlayerCharacterWraith::SetAmmo(int32 NewAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, NewAmmo);
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
+
 }
 
 void APlayerCharacterWraith::AmountAmmo(int32 AmountAmmo)
 {
 	CurrentAmmo = FMath::Min(MaxAmmo, CurrentAmmo + AmountAmmo);
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 }
 
 bool APlayerCharacterWraith::CheckAction()
@@ -453,8 +405,7 @@ bool APlayerCharacterWraith::CheckAction()
 void APlayerCharacterWraith::ActiveDieAction()
 {
 	// 만약 줌상태라면
-	IsZoom = false;
-	SpringArmComp->TargetArmLength = 300;
+	SpringArmComp->TargetArmLength = ZoomOutLength;
 
 	if (IsValid(DieActionMontage))
 	{
@@ -483,11 +434,11 @@ void APlayerCharacterWraith::GetUpgradeStatus()
 
 void APlayerCharacterWraith::UpScale()
 {
-	BulletMesh->SetRelativeScale3D(BulletMesh->GetRelativeScale3D() + FVector(0.03f, 0.03f, 0.03f));
-	BulletMesh->AddRelativeLocation(FVector(0.0f, 2.0f, 0.0f));
-	AttackMultipler += 0.05;
+	BulletMesh->SetRelativeScale3D(BulletMesh->GetRelativeScale3D() + ChargingScaleMultiplier);
+	BulletMesh->AddRelativeLocation(ChargingLocationMultiplier);
+	AttackMultipler += ChargingAttackMultiplier;
 
-	if (BulletMesh->GetRelativeScale3D().X >= 3.0f)
+	if (BulletMesh->GetRelativeScale3D().X >= MaxCharging)
 	{
 		NormalizeScale();
 	}
@@ -497,10 +448,9 @@ void APlayerCharacterWraith::NormalizeScale()
 {
 	if (ActiveWeapon())
 	{
-		if (IsValid(CurrentGameState))
-		{
-			CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
-		}
+		check(CurrentGameState);
+
+		CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::Attack);
 
 		if (IsValid(AttackMontage))
 		{
@@ -521,10 +471,9 @@ void APlayerCharacterWraith::NormalizeScale()
 
 	AttackMultipler = SaveAttackMultipler;
 
-	if (IsValid(CurrentGameState))
-	{
-		CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
-	}
+	check(CurrentGameState);
+
+	CurrentGameState->NotifyPlayerAmmo(MaxAmmo, CurrentAmmo);
 
 	if (CurrentAmmo <= 0)
 	{

@@ -13,9 +13,9 @@ class EDMUNDPRJ_API ANPCAIController : public AAIController
     GENERATED_BODY()
 
 public:
+    ANPCAIController();
     virtual void OnPossess(APawn* InPawn) override;
     virtual void BeginPlay() override;
-    virtual void Tick(float DeltaTime) override;
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC")

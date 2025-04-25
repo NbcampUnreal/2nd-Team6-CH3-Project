@@ -37,7 +37,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet|Particle", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UParticleSystem> FireBallParticle;
 
-	UAudioComponent* CurrentAudioComp;
+	TObjectPtr<UAudioComponent> CurrentAudioComp;
 	FTimerHandle ParticleCreateDelayTimerHandle;
 
 	void CreateParticle();

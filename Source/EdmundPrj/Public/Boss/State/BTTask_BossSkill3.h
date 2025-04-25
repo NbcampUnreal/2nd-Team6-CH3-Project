@@ -22,7 +22,6 @@ protected:
     void SpawnWall();
     void OnSpawnComplete();
     FRotator CalculateRandomRotation();
-    //void LowerSpawnedWalls();
 
     void StartDetection();
     void PerformDetection();
