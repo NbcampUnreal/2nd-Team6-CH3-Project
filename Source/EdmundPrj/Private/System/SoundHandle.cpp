@@ -12,7 +12,7 @@
 #include "System/DataStructure/ItemSoundDataRow.h"
 #include "Components/AudioComponent.h"
 #include <Kismet/GameplayStatics.h>
-
+#include "System/Struct/SoundSourceData.h"
 
 void USoundHandle::InitSoundHandle(UEdmundGameInstance* NewGameInstance)
 {
@@ -129,7 +129,7 @@ USoundBase* USoundHandle::GetPlayerSound(ESoundType SoundType)
 		return nullptr;
 	}
 
-	return SoundBuffer.PlayerSoundMap[CharacterType][SoundType];
+	return SoundBuffer.PlayerSoundMap[CharacterType].SoundMap[SoundType];
 }
 
 USoundBase* USoundHandle::GetMonsterSound(EMonsterType MonsterType, ESoundType SoundType)
@@ -139,7 +139,7 @@ USoundBase* USoundHandle::GetMonsterSound(EMonsterType MonsterType, ESoundType S
 		return nullptr;
 	}
 
-	return SoundBuffer.MonsterSoundMap[MonsterType][SoundType];
+	return SoundBuffer.MonsterSoundMap[MonsterType].SoundMap[SoundType];
 }
 
 USoundBase* USoundHandle::GetNpcSound(ENpcType NpcType, ESoundType SoundType)
@@ -149,7 +149,7 @@ USoundBase* USoundHandle::GetNpcSound(ENpcType NpcType, ESoundType SoundType)
 		return nullptr;
 	}
 
-	return SoundBuffer.NpcSoundMap[NpcType][SoundType];
+	return SoundBuffer.NpcSoundMap[NpcType].SoundMap[SoundType];
 }
 
 USoundBase* USoundHandle::GetItemrSound(EItemType ItemType, ESoundType SoundType)
@@ -159,7 +159,7 @@ USoundBase* USoundHandle::GetItemrSound(EItemType ItemType, ESoundType SoundType
 		return nullptr;
 	}
 
-	return SoundBuffer.ItemSoundMap[ItemType][SoundType];
+	return SoundBuffer.ItemSoundMap[ItemType].SoundMap[SoundType];
 }
 
 void USoundHandle::UpdateBGMVolume(const float VolumeValue)
@@ -211,11 +211,11 @@ bool USoundHandle::CheckValidOfBgmSource(EBGMSoundType Type)
 
 	USoundBase* SoundSource = nullptr;
 
-	for (const FBgmDataRow* SoundData : SoundBuffer.BgmData)
+	for (const FBgmDataRow& SoundData : SoundBuffer.BgmData)
 	{
-		if (SoundData->Type == Type)
+		if (SoundData.Type == Type)
 		{
-			SoundSource = SoundData->SoundSource.LoadSynchronous();
+			SoundSource = SoundData.SoundSource.LoadSynchronous();
 			break;
 		}
 	}
@@ -244,10 +244,16 @@ bool USoundHandle::CheckValidOfBgmData()
 			return false;
 		}
 
+		TArray<FBgmDataRow*> TempArray;
 		const FString DataContext(TEXT("Bgm Data Load"));
 
 		BgmDataTable = SoundSettings->BgmSoundDataTable.LoadSynchronous();
-		BgmDataTable->GetAllRows(DataContext, SoundBuffer.BgmData);
+		BgmDataTable->GetAllRows(DataContext, TempArray);
+
+		for (const FBgmDataRow* BgmDataRow : TempArray)
+		{
+			SoundBuffer.BgmData.Add(*BgmDataRow);
+		}
 	}
 
 	return true;
@@ -267,11 +273,11 @@ bool USoundHandle::CheckValidOfUISoundSource(EUISoundType Type)
 
 	USoundBase* SoundSource = nullptr;
 
-	for (const FUISoundDataRow* SoundData : SoundBuffer.UIData)
+	for (const FUISoundDataRow& SoundData : SoundBuffer.UIData)
 	{
-		if (SoundData->Type == Type)
+		if (SoundData.Type == Type)
 		{
-			SoundSource = SoundData->SoundSource.LoadSynchronous();
+			SoundSource = SoundData.SoundSource.LoadSynchronous();
 			break;
 		}
 	}
@@ -300,10 +306,16 @@ bool USoundHandle::CheckValidOfUISoundData()
 			return false;
 		}
 
+		TArray<FUISoundDataRow*> TempArray;
 		const FString DataContext(TEXT("UI Data Load"));
 
 		UIDataTable = SoundSettings->UISoundDataTable.LoadSynchronous();
-		UIDataTable->GetAllRows(DataContext, SoundBuffer.UIData);
+		UIDataTable->GetAllRows(DataContext, TempArray);
+
+		for (const FUISoundDataRow* UISoundDataRow : TempArray)
+		{
+			SoundBuffer.UIData.Add(*UISoundDataRow);
+		}
 	}
 
 	return true;
@@ -313,7 +325,7 @@ bool USoundHandle::CheckValidOfPlayerSoundSource(ECharacterType CharacterType, E
 {
 	if (SoundBuffer.PlayerSoundMap.Contains(CharacterType))
 	{
-		if (SoundBuffer.PlayerSoundMap[CharacterType].Contains(SoundType))
+		if (SoundBuffer.PlayerSoundMap[CharacterType].SoundMap.Contains(SoundType))
 		{
 			return true;
 		}
@@ -326,13 +338,13 @@ bool USoundHandle::CheckValidOfPlayerSoundSource(ECharacterType CharacterType, E
 
 	USoundBase* SoundSource = nullptr;
 
-	for (const FPlayerSoundDataRow* SoundData : SoundBuffer.PlayerData)
+	for (const FPlayerSoundDataRow& SoundData : SoundBuffer.PlayerData)
 	{
-		if (SoundData->CharacterType == CharacterType)
+		if (SoundData.CharacterType == CharacterType)
 		{
-			if (SoundData->SoundType == SoundType)
+			if (SoundData.SoundType == SoundType)
 			{
-				SoundSource = SoundData->SoundSource.LoadSynchronous();
+				SoundSource = SoundData.SoundSource.LoadSynchronous();
 				break;
 			}
 		}
@@ -343,9 +355,9 @@ bool USoundHandle::CheckValidOfPlayerSoundSource(ECharacterType CharacterType, E
 		return false;
 	}
 
-	TMap<ESoundType, TObjectPtr<USoundBase>> TempMap;
-	TempMap.Add(SoundType, SoundSource);
-	SoundBuffer.PlayerSoundMap.Add(CharacterType, TempMap);
+	FSoundSourceData TempData;
+	TempData.SoundMap.Add(SoundType, SoundSource);
+	SoundBuffer.PlayerSoundMap.Add(CharacterType, TempData);
 
 	return true;
 }
@@ -364,10 +376,16 @@ bool USoundHandle::CheckValidOfPlayerSoundData()
 			return false;
 		}
 
+		TArray<FPlayerSoundDataRow*> TempArray;
 		const FString DataContext(TEXT("Player Data Load"));
 
 		PlayerDataTable = SoundSettings->PlayerSoundDataTable.LoadSynchronous();
-		PlayerDataTable->GetAllRows(DataContext, SoundBuffer.PlayerData);
+		PlayerDataTable->GetAllRows(DataContext, TempArray);
+
+		for (const FPlayerSoundDataRow* SoundDataRow : TempArray)
+		{
+			SoundBuffer.PlayerData.Add(*SoundDataRow);
+		}
 	}
 
 	return true;
@@ -377,7 +395,7 @@ bool USoundHandle::CheckValidOfMonsterSoundSource(EMonsterType MonsterType, ESou
 {
 	if (SoundBuffer.MonsterSoundMap.Contains(MonsterType))
 	{
-		if (SoundBuffer.MonsterSoundMap[MonsterType].Contains(SoundType))
+		if (SoundBuffer.MonsterSoundMap[MonsterType].SoundMap.Contains(SoundType))
 		{
 			return true;
 		}
@@ -390,13 +408,13 @@ bool USoundHandle::CheckValidOfMonsterSoundSource(EMonsterType MonsterType, ESou
 
 	USoundBase* SoundSource = nullptr;
 
-	for (const FMonsterSoundDataRow* SoundData : SoundBuffer.MonsterData)
+	for (const FMonsterSoundDataRow& SoundData : SoundBuffer.MonsterData)
 	{
-		if (SoundData->MonsterType == MonsterType)
+		if (SoundData.MonsterType == MonsterType)
 		{
-			if (SoundData->SoundType == SoundType)
+			if (SoundData.SoundType == SoundType)
 			{
-				SoundSource = SoundData->SoundSource.LoadSynchronous();
+				SoundSource = SoundData.SoundSource.LoadSynchronous();
 				break;
 			}
 		}
@@ -407,9 +425,9 @@ bool USoundHandle::CheckValidOfMonsterSoundSource(EMonsterType MonsterType, ESou
 		return false;
 	}
 
-	TMap<ESoundType, TObjectPtr<USoundBase>> TempMap;
-	TempMap.Add(SoundType, SoundSource);
-	SoundBuffer.MonsterSoundMap.Add(MonsterType, TempMap);
+	FSoundSourceData TempData;
+	TempData.SoundMap.Add(SoundType, SoundSource);
+	SoundBuffer.MonsterSoundMap.Add(MonsterType, TempData);
 
 	return true;
 }
@@ -428,10 +446,16 @@ bool USoundHandle::CheckValidOfMonsterSoundData()
 			return false;
 		}
 
+		TArray<FMonsterSoundDataRow*> TempArray;
 		const FString DataContext(TEXT("Monster Data Load"));
 
 		MonsterDataTable = SoundSettings->MonsterSoundDataTable.LoadSynchronous();
-		MonsterDataTable->GetAllRows(DataContext, SoundBuffer.MonsterData);
+		MonsterDataTable->GetAllRows(DataContext, TempArray);
+
+		for (const FMonsterSoundDataRow* MonsterSoundDataRow : TempArray)
+		{
+			SoundBuffer.MonsterData.Add(*MonsterSoundDataRow);
+		}
 	}
 
 	return true;
@@ -441,7 +465,7 @@ bool USoundHandle::CheckValidOfNpcSoundSource(ENpcType NpcType, ESoundType Sound
 {
 	if (SoundBuffer.NpcSoundMap.Contains(NpcType))
 	{
-		if (SoundBuffer.NpcSoundMap[NpcType].Contains(SoundType))
+		if (SoundBuffer.NpcSoundMap[NpcType].SoundMap.Contains(SoundType))
 		{
 			return true;
 		}
@@ -454,13 +478,13 @@ bool USoundHandle::CheckValidOfNpcSoundSource(ENpcType NpcType, ESoundType Sound
 
 	USoundBase* SoundSource = nullptr;
 
-	for (const FNpcSoundDataRow* SoundData : SoundBuffer.NpcData)
+	for (const FNpcSoundDataRow& SoundData : SoundBuffer.NpcData)
 	{
-		if (SoundData->NpcType == NpcType)
+		if (SoundData.NpcType == NpcType)
 		{
-			if (SoundData->SoundType == SoundType)
+			if (SoundData.SoundType == SoundType)
 			{
-				SoundSource = SoundData->SoundSource.LoadSynchronous();
+				SoundSource = SoundData.SoundSource.LoadSynchronous();
 				break;
 			}
 		}
@@ -471,9 +495,9 @@ bool USoundHandle::CheckValidOfNpcSoundSource(ENpcType NpcType, ESoundType Sound
 		return false;
 	}
 
-	TMap<ESoundType, TObjectPtr<USoundBase>> TempMap;
-	TempMap.Add(SoundType, SoundSource);
-	SoundBuffer.NpcSoundMap.Add(NpcType, TempMap);
+	FSoundSourceData TempData;
+	TempData.SoundMap.Add(SoundType, SoundSource);
+	SoundBuffer.NpcSoundMap.Add(NpcType, TempData);
 
 	return true;
 }
@@ -492,10 +516,16 @@ bool USoundHandle::CheckValidOfNpcSoundData()
 			return false;
 		}
 
+		TArray<FNpcSoundDataRow*> TempArray;
 		const FString DataContext(TEXT("Npc Data Load"));
 
 		NpcDataTable = SoundSettings->NpcSoundDataTable.LoadSynchronous();
-		NpcDataTable->GetAllRows(DataContext, SoundBuffer.NpcData);
+		NpcDataTable->GetAllRows(DataContext, TempArray);
+
+		for (const FNpcSoundDataRow* NpcSoundDataRow : TempArray)
+		{
+			SoundBuffer.NpcData.Add(*NpcSoundDataRow);
+		}
 	}
 
 	return true;
@@ -505,7 +535,7 @@ bool USoundHandle::CheckValidOfItemSoundSource(EItemType ItemType, ESoundType So
 {
 	if (SoundBuffer.ItemSoundMap.Contains(ItemType))
 	{
-		if (SoundBuffer.ItemSoundMap[ItemType].Contains(SoundType))
+		if (SoundBuffer.ItemSoundMap[ItemType].SoundMap.Contains(SoundType))
 		{
 			return true;
 		}
@@ -518,13 +548,13 @@ bool USoundHandle::CheckValidOfItemSoundSource(EItemType ItemType, ESoundType So
 
 	USoundBase* SoundSource = nullptr;
 
-	for (const FItemSoundDataRow* SoundData : SoundBuffer.ItemData)
+	for (const FItemSoundDataRow& SoundData : SoundBuffer.ItemData)
 	{
-		if (SoundData->ItemType == ItemType)
+		if (SoundData.ItemType == ItemType)
 		{
-			if (SoundData->SoundType == SoundType)
+			if (SoundData.SoundType == SoundType)
 			{
-				SoundSource = SoundData->SoundSource.LoadSynchronous();
+				SoundSource = SoundData.SoundSource.LoadSynchronous();
 				break;
 			}
 		}
@@ -535,9 +565,9 @@ bool USoundHandle::CheckValidOfItemSoundSource(EItemType ItemType, ESoundType So
 		return false;
 	}
 
-	TMap<ESoundType, TObjectPtr<USoundBase>> TempMap;
-	TempMap.Add(SoundType, SoundSource);
-	SoundBuffer.ItemSoundMap.Add(ItemType, TempMap);
+	FSoundSourceData TempData;
+	TempData.SoundMap.Add(SoundType, SoundSource);
+	SoundBuffer.ItemSoundMap.Add(ItemType, TempData);
 
 	return true;
 }
@@ -556,10 +586,16 @@ bool USoundHandle::CheckValidOfItemSoundData()
 			return false;
 		}
 
+		TArray<FItemSoundDataRow*> TempArray;
 		const FString DataContext(TEXT("Item Data Load"));
 
 		ItemDataTable = SoundSettings->ItemSoundDataTable.LoadSynchronous();
-		ItemDataTable->GetAllRows(DataContext, SoundBuffer.ItemData);
+		ItemDataTable->GetAllRows(DataContext, TempArray);
+
+		for (const FItemSoundDataRow* ItemSoundDataRow : TempArray)
+		{
+			SoundBuffer.ItemData.Add(*ItemSoundDataRow);
+		}
 	}
 
 	return true;
