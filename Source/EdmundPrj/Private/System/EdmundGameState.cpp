@@ -12,6 +12,7 @@
 #include "System/SpawnerHandle.h"
 #include "Player/SkillManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/SoundHandle.h"
 
 AEdmundGameState::AEdmundGameState() : Super()
 {
@@ -25,6 +26,7 @@ void AEdmundGameState::BeginPlay()
 	EdmundGameInstance = GetWorld()->GetGameInstance<UEdmundGameInstance>();
 	EdmundGameMode = GetWorld()->GetAuthGameMode<AEdmundGameMode>();
 	PlayerController = GetWorld()->GetPlayerControllerIterator()->Get();
+	SoundHandle = EdmundGameInstance->GetSubsystem<USoundHandle>();
 
 	checkf(IsValid(EdmundGameInstance), TEXT("GameInstance is invalid"));
 	EdmundGameInstance->RequestGameStart(EdmundGameMode, this);
@@ -125,14 +127,6 @@ void AEdmundGameState::InitMainLevelPlayerController()
 	MainLevelPlayerController->InitMainLevelCharacters(EdmundGameInstance->GetCharacterData(), EdmundGameInstance->GetPlayerType(), this);
 }
 
-void AEdmundGameState::InitSoundMap(const TMap<ESoundType, TObjectPtr<USoundBase>> PlayerSound, const TMap<EMonsterType, TMap<ESoundType, TObjectPtr<USoundBase>>> MonsterSound, const TMap<ENpcType, TMap<ESoundType, TObjectPtr<USoundBase>>> NpcSound, const TMap<EItemType, TMap<ESoundType, TObjectPtr<USoundBase>>> ItemSound)
-{
-	PlayerSoundSet = PlayerSound;
-	MonsterSoundSet = MonsterSound;
-	NpcSoundSet = NpcSound;
-	ItemSoundSet = ItemSound;
-}
-
 void AEdmundGameState::InitSkillData(const TArray<FPlayerSkillRow*> PlayerSkillDataSet)
 {
 	SkillDataSet = PlayerSkillDataSet;
@@ -177,9 +171,9 @@ void AEdmundGameState::CreateRandomSkillSet()
 		CalculateSkillList();
 	}
 
-	NotifyCreateRandomSkill();
 	EdmundGameInstance->OnSkillListUI();
 	EdmundGameInstance->PlayUISound(EUISoundType::LevelUp);
+	NotifyCreateRandomSkill();
 }
 
 const TArray<FPlayerSkillRow*>& AEdmundGameState::GetRandomSkillSet() const
@@ -191,14 +185,13 @@ void AEdmundGameState::ApplySelectedSkill(const int32 Index)
 {
 	if (Index >= RandomSkillSet.Num())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Selected Skill Index is invalid"));
+		return;
 	}
 
 	FPlayerSkillRow* SelectedSkill = RandomSkillSet[Index];
 
 	++CurrentSkillMap[SelectedSkill];
 
-	UE_LOG(LogTemp, Warning, TEXT("Selected Skill Name is %s"), *SelectedSkill->SkillName.ToString());
 	USkillManager* SkillManager = PlayerPawn->FindComponentByClass<USkillManager>();
 	if (IsValid(SkillManager) && SelectedSkill != nullptr)
 	{
@@ -245,106 +238,65 @@ void AEdmundGameState::SetEffectVolume(const float Volume)
 
 void AEdmundGameState::PlayPlayerSound(UAudioComponent* AudioComp, ESoundType SoundType)
 {
-	if (!IsValid(AudioComp))
-	{
-		return;
-	}
-
 	if (!PlayerSoundSet.Contains(SoundType))
 	{
-		return;
+		checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+		PlayerSoundSet.Add(SoundType, SoundHandle->GetPlayerSound(SoundType));
 	}
 
-	USoundBase* SoundSource = PlayerSoundSet[SoundType];
-
-	if (!IsValid(SoundSource))
-	{
-		return;
-	}
-
-	AudioComp->SetSound(SoundSource);
-	AudioComp->SetVolumeMultiplier(EffectVolume);
-	AudioComp->Play();
+	PlaySoundSource(AudioComp, PlayerSoundSet[SoundType]);
 }
 
 void AEdmundGameState::PlayMonsterSound(UAudioComponent* AudioComp, EMonsterType MonsterType, ESoundType SoundType)
 {
-	if (!IsValid(AudioComp))
+	if (!MonsterSoundSet.Contains(MonsterType) ||
+		(MonsterSoundSet.Contains(MonsterType) && !MonsterSoundSet[MonsterType].Contains(SoundType)))
 	{
-		return;
+		checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+		TMap<ESoundType, USoundBase*> TempMap;
+		TempMap.Add(SoundType, SoundHandle->GetMonsterSound(MonsterType, SoundType));
+		MonsterSoundSet.Add(MonsterType, TempMap);
 	}
 
-	if (!MonsterSoundSet.Contains(MonsterType))
-	{
-		return;
-	}
-
-	if (!MonsterSoundSet[MonsterType].Contains(SoundType))
-	{
-		return;
-	}
-
-	USoundBase* SoundSource = MonsterSoundSet[MonsterType][SoundType];
-
-	if (!IsValid(SoundSource))
-	{
-		return;
-	}
-
-	AudioComp->SetSound(SoundSource);
-	AudioComp->SetVolumeMultiplier(EffectVolume);
-	AudioComp->Play();
+	PlaySoundSource(AudioComp, MonsterSoundSet[MonsterType][SoundType]);
 }
 
 void AEdmundGameState::PlayNpcSound(UAudioComponent* AudioComp, ENpcType NpcType, ESoundType SoundType)
 {
-	if (!IsValid(AudioComp))
+	if (!NpcSoundSet.Contains(NpcType) ||
+		(NpcSoundSet.Contains(NpcType) && !NpcSoundSet[NpcType].Contains(SoundType)))
 	{
-		return;
+		checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+		TMap<ESoundType, USoundBase*> TempMap;
+		TempMap.Add(SoundType, SoundHandle->GetNpcSound(NpcType, SoundType));
+		NpcSoundSet.Add(NpcType, TempMap);
 	}
 
-	if (!NpcSoundSet.Contains(NpcType))
-	{
-		return;
-	}
-
-	if (!NpcSoundSet[NpcType].Contains(SoundType))
-	{
-		return;
-	}
-
-	USoundBase* SoundSource = NpcSoundSet[NpcType][SoundType];
-
-	if (!IsValid(SoundSource))
-	{
-		return;
-	}
-
-	AudioComp->SetSound(SoundSource);
-	AudioComp->SetVolumeMultiplier(EffectVolume);
-	AudioComp->Play();
+	PlaySoundSource(AudioComp, NpcSoundSet[NpcType][SoundType]);
 }
 
 void AEdmundGameState::PlayItemSound(UAudioComponent* AudioComp, EItemType ItemType, ESoundType SoundType)
 {
-	if (!IsValid(AudioComp))
+	if (!ItemSoundSet.Contains(ItemType) ||
+		(ItemSoundSet.Contains(ItemType) && !ItemSoundSet[ItemType].Contains(SoundType)))
 	{
-		return;
+		checkf(IsValid(SoundHandle), TEXT("SoundHandle is invalid"));
+		TMap<ESoundType, USoundBase*> TempMap;
+		TempMap.Add(SoundType, SoundHandle->GetItemrSound(ItemType, SoundType));
+		ItemSoundSet.Add(ItemType, TempMap);
 	}
 
-	if (!ItemSoundSet.Contains(ItemType))
-	{
-		return;
-	}
+	PlaySoundSource(AudioComp, ItemSoundSet[ItemType][SoundType]);
+}
 
-	if (!ItemSoundSet[ItemType].Contains(SoundType))
-	{
-		return;
-	}
-
-	USoundBase* SoundSource = ItemSoundSet[ItemType][SoundType];
-
+void AEdmundGameState::PlaySoundSource(UAudioComponent* AudioComp, USoundBase* SoundSource)
+{
 	if (!IsValid(SoundSource))
+	{
+		return;
+	}
+
+	if (!IsValid(AudioComp))
 	{
 		return;
 	}
@@ -410,12 +362,18 @@ void AEdmundGameState::EndCurrentLevel(bool bIsClear)
 
 void AEdmundGameState::RegisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
 {
-	Observers.Add(Observer);
+	if (!Observers.Contains(Observer))
+	{
+		Observers.Add(Observer);
+	}
 }
 
 void AEdmundGameState::UnregisterGameStateObserver(const TScriptInterface<IGameStateObserver> Observer)
 {
-	Observers.Remove(Observer);
+	if (Observers.Contains(Observer))
+	{
+		Observers.Remove(Observer);
+	}
 }
 
 void AEdmundGameState::NotifyUpdateNotifyText(const FString& NotifyText)

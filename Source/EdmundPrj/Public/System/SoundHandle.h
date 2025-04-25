@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "System/EnumSet.h"
+#include "System/Struct/SoundBuffer.h"
 #include "SoundHandle.generated.h"
 
 class UEdmundGameInstance;
@@ -30,12 +31,11 @@ public:
 	void PlayBgmByBgmType(EBGMSoundType BgmSoundType);
 	void PlayUISound(EUISoundType UISoundType);
 
-	// Get Sound Map
-	const TMap<ESoundType, TObjectPtr<USoundBase>>& GetSoundMapByType(ESoundCategory Category, int32 TypeIndex) const;
-	const TMap<ECharacterType, TMap<ESoundType, TObjectPtr<USoundBase>>> GetPlayerSoundMap() const;
-	const TMap<EMonsterType, TMap<ESoundType, TObjectPtr<USoundBase>>> GetMonsterSoundMap() const;
-	const TMap<ENpcType, TMap<ESoundType, TObjectPtr<USoundBase>>> GetNpcSoundMap() const;
-	const TMap<EItemType, TMap<ESoundType, TObjectPtr<USoundBase>>> GetItemSoundMap() const;
+	//Get Sound Source
+	USoundBase* GetPlayerSound(ESoundType SoundType);
+	USoundBase* GetMonsterSound(EMonsterType MonsterType, ESoundType SoundType);
+	USoundBase* GetNpcSound(ENpcType NpcType, ESoundType SoundType);
+	USoundBase* GetItemrSound(EItemType ItemType, ESoundType SoundType);
 
 	// Update Sound Volume By UI Sound Slider
 	void UpdateBGMVolume(const float VolumeValue);
@@ -46,14 +46,24 @@ public:
 	float GetEffectVolume() const;
 
 private:
-	void LoadSoundData(const USoundHandleSettings* SoundSettings);
-	void InitBgm();
-	void InitUISound();
-	void InitPlayerSoundMap();
-	void InitMonsterSoundMap();
-	void InitNpcSoundMap();
-	void InitItemSoundMap();
+	bool CheckValidOfBgmSource(EBGMSoundType Type);
+	bool CheckValidOfBgmData();
 
+	bool CheckValidOfUISoundSource(EUISoundType Type);
+	bool CheckValidOfUISoundData();
+
+	bool CheckValidOfPlayerSoundSource(ECharacterType CharacterType, ESoundType SoundType);
+	bool CheckValidOfPlayerSoundData();
+
+	bool CheckValidOfMonsterSoundSource(EMonsterType MonsterType, ESoundType SoundType);
+	bool CheckValidOfMonsterSoundData();
+	
+	bool CheckValidOfNpcSoundSource(ENpcType NpcType, ESoundType SoundType);
+	bool CheckValidOfNpcSoundData();
+	
+	bool CheckValidOfItemSoundSource(EItemType ItemType, ESoundType SoundType);
+	bool CheckValidOfItemSoundData();
+	
 private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> BgmDataTable;
@@ -79,25 +89,24 @@ private:
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> UIAudio;
 
-	TArray<FBgmDataRow*> BgmData;
-	TArray<FUISoundDataRow*> UIData;
-	TArray<FPlayerSoundDataRow*> PlayerData;
-	TArray<FMonsterSoundDataRow*> MonsterData;
-	TArray<FNpcSoundDataRow*> NpcData;
-	TArray<FItemSoundDataRow*> ItemData;
-
 	UPROPERTY()
 	TMap<EBGMSoundType, TObjectPtr<USoundBase>> BgmSet;
+
 	UPROPERTY()
 	TMap<EUISoundType, TObjectPtr<USoundBase>> UISet;
-	UPROPERTY()
-	TMap<ESoundType, TObjectPtr<USoundBase>> ReturnFail;
 
-	TMap<ECharacterType, TMap<ESoundType, TObjectPtr<USoundBase>>> PlayerSoundMap;
-	TMap<EMonsterType, TMap<ESoundType, TObjectPtr<USoundBase>>> MonsterSoundMap;
-	TMap<ENpcType, TMap<ESoundType, TObjectPtr<USoundBase>>> NpcSoundMap;
-	TMap<EItemType, TMap<ESoundType, TObjectPtr<USoundBase>>> ItemSoundMap;
+	UPROPERTY()
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
+
+	UPROPERTY()
+	const USoundHandleSettings* SoundSettings = nullptr;
+
+	UPROPERTY()
+	FSoundDataBuffer SoundBuffer;
+
+	UPROPERTY()
 	float BGMVolume = 0.8f;
+
+	UPROPERTY()
 	float EffectVolume = 0.8f;
 };

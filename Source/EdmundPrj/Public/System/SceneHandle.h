@@ -32,16 +32,17 @@ protected:
 	UPROPERTY()
 	ESceneType CurrentScene = ESceneType::Title;
 
-	const FName TitleSceneName = "TitleLevel";
-	const FName MainSceneName = "MainLevel";
-	const FName Mission1SceneName = "Mission1Level";
-	const FName Mission2SceneName = "Mission2Level";
-	const FName Mission3SceneName = "Mission3Level";
-	const FName InfinitySceneName = "InfinityLevel";
-	const FName EndingSceneName = "EndingLevel";
+	static const FName TitleSceneName;
+	static const FName MainSceneName;
+	static const FName Mission1SceneName;
+	static const FName Mission2SceneName;
+	static const FName Mission3SceneName;
+	static const FName InfinitySceneName;
+	static const FName EndingSceneName;
 
 	const float FadeTime = 0.5f;
 	FTimerHandle TimerHandle;
 
+	UPROPERTY()
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 };

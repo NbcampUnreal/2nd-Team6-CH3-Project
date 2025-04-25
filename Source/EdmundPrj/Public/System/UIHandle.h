@@ -72,10 +72,6 @@ public:
 	const TArray<TScriptInterface<IGameStateObserver>>& GetUIObservers() const;
 
 private:
-	//Initialize Widgets : Load WidgetClass from UIHandleSettings(DeveloperSettings), and Create UserWidget from WidgetClass
-	void CreateBaseWidgets(const UUIHandleSettings* UISettings);
-	void CreateCoverWidgets(const UUIHandleSettings* UISettings);
-
 	// Cursor Visible and Input Mode Change. Request to GameInstance
 	void RequestChangeCursorMode(const bool bIsVisible, const FInputModeDataBase& InputMode);
 
@@ -106,6 +102,22 @@ private:
 	// MissionListWidget Close or Open
 	void OpenMissionList();
 	void CloseMissionList();
+
+	UBaseWidget* SpawnWidget(UClass* WidgetClass);
+
+	void CheckValidOfTitleWidget();
+	void CheckValidOfMainWidget();
+	void CheckValidOfInGameWidget();
+	void CheckValidOfEndingWidget();
+	
+	void CheckValidOfFadeWidget();
+	void CheckValidOfOptionWidget();
+	void CheckValidOfShopWidget();
+	void CheckValidOfTextWidget();
+	void CheckValidOfResultWidget();
+	void CheckValidOfCharacterListWidget();
+	void CheckValidOfSkillListWidget();
+	void CheckValidOfMissionListWidget();
 
 private:
 	UPROPERTY()
@@ -146,14 +158,28 @@ private:
 
 
 	UPROPERTY()
+	TObjectPtr<UBaseWidget> CreateTempWidget = nullptr;
+
+	UPROPERTY()
 	TObjectPtr<UBaseWidget> CurrentBaseWidget = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UBaseWidget> CurrentCoverWidget = nullptr;
 
+	UPROPERTY()
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
+
+	UPROPERTY()
 	TArray<TScriptInterface<IGameStateObserver>> UIObservers;
-	FTimerHandle TimerHandle;
+
+	UPROPERTY()
+	const UUIHandleSettings* UISettings = nullptr;
+
+	UPROPERTY()
 	int32 ViewCount = 0;
+
+	UPROPERTY()
 	bool bBaseCursorMode = false;
+
+	FTimerHandle TimerHandle;
 };

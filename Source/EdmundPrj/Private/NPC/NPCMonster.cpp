@@ -24,7 +24,6 @@ void ANPCMonster::SetMonsterStatsByLevel()
 ANPCMonster::ANPCMonster()
 {
     NpcType = ENpcType::Baldor;
-    //MonsterType = EMonsterType::Melee;
 }
 
 void ANPCMonster::BeginPlay()
@@ -34,8 +33,6 @@ void ANPCMonster::BeginPlay()
     this->Tags.Empty();
     this->Tags.Add(FName("NPC"));
 
-    //SetBondageMode(true);
-    //SetMoveMode(true);
     SetBattleMode(true);
 
     MonsterMoveSpeed = 500.0f;
@@ -78,11 +75,6 @@ void ANPCMonster::MonsterAttackCheck()
             CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ANPCMonster::OnOverlapBegin);
         }
 
-        //  공격 Collision Visible 활성화
-         //FVector CapsuleLocation = CollisionComp->GetComponentLocation();
-         //DrawDebugCapsule(GetWorld(), CapsuleLocation, CollisionComp->GetScaledCapsuleHalfHeight(), CollisionComp->GetScaledCapsuleRadius(), FQuat::Identity, FColor::Green, true, 1.0f);
-
-
          // 타이머 X시, 이벤트가 끝나기 전 Destory됨. 왜일까,,
         if (GetWorld())
         {
@@ -119,7 +111,6 @@ void ANPCMonster::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
             );
         }
 
-        //UE_LOG(LogTemp, Warning, TEXT("Player Attack Succeed")); // 공격 성공 Log
         AActor* LocalOwner = OverlappedComp->GetOwner();  // OverlappedComp는 CollisionComp를 의미
         ABaseMonster* Monster = Cast<ABaseMonster>(LocalOwner);
         if (Monster)
@@ -180,8 +171,6 @@ void ANPCMonster::SetBattleMode(bool NewState)
 
     SetMoveMode(false);
 
-    //SetChaseMode(!NewState);
-
     GetWorld()->GetTimerManager().ClearTimer(BondageTimerHandle);
 
     bIsFightMode = NewState;
@@ -192,10 +181,6 @@ void ANPCMonster::SetBattleMode(bool NewState)
         if (AIController)
         {
             AIController->GetBlackboardComponent()->SetValueAsBool(FName("IsBattleMode"), NewState);
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("NPC BattleMode 실행중: AIController가 없습니다."));
         }
     }
 
@@ -220,10 +205,6 @@ void ANPCMonster::SetMoveMode(bool NewState)
         if (AIController)
         {
             AIController->GetBlackboardComponent()->SetValueAsBool(FName("IsModeMode"), NewState);
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("NPC BattleMode 실행중: AIController가 없습니다."));
         }
 }
 
@@ -256,16 +237,8 @@ void ANPCMonster::PlayBondageMontage()
 
 void ANPCMonster::PlaySound()
 {
-    //CurrentAudioComp->SetSound(AttackSound);
-    //CurrentAudioComp->Play();
-
     if (GameState)
     {
         GameState->PlayNpcSound(CurrentAudioComp, NpcType, ESoundType::Attack);
     }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("NPC게임스테이트없음"));
-    }
-    //GameState->PlayMonsterSound(CurrentAudioComp, MonsterType, ESoundType::Avoid);
 }

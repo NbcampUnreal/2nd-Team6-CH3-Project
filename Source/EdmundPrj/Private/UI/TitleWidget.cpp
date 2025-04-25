@@ -12,7 +12,6 @@ void UTitleWidget::InitWidget(UUIHandle* NewUIHandle)
 	StartButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedMoveNext);
 	OptionButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedOptionButton);
 	QuitButton->OnClicked.AddDynamic(this, &ThisClass::OnClickedQuitGame);
-	//UE_LOG(LogTemp, Warning, TEXT("Title StartButton Name is %s"), *StartButton->GetName());
 }
 
 void UTitleWidget::OnClickedOptionButton()

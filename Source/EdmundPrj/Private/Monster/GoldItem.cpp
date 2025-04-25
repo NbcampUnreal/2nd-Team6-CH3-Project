@@ -40,11 +40,6 @@ void AGoldItem::ActivateItem(AActor* Actor)
 	if (GameState)
 	{
 		GameState->AddCurrentLevelMoney(GoldAmount);
-		UE_LOG(LogTemp, Warning, TEXT("%f 골드획득"), GoldAmount);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameState가 없습니다."));
 	}
 
 	PlaySound();

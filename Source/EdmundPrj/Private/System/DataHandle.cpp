@@ -18,17 +18,20 @@ void UDataHandle::InitDataHandle(UEdmundGameInstance* NewGameInstance)
 {
 	EdmundGameInstance = NewGameInstance;
 
-	const UDataHandleSettings* DataSettings = GetDefault<UDataHandleSettings>();
+	DataSettings = GetDefault<UDataHandleSettings>();
 	checkf(IsValid(DataSettings), TEXT("DataSettings is invalid"));
-
-	LoadDataTables(DataSettings);
 }
 
 const bool UDataHandle::UpdateCurrentAdvance(const FName& TargetRow, const int32 UpdateValue)
 {
+	if (!CheckValidOfAdvanceData())
+	{
+		return false;
+	}
+
 	bool bIsPossible = false;
 
-	FShopCatalogRow* ShopCatalog = SelectRow(TargetRow);
+	FShopCatalogRow* ShopCatalog = SelectAdvanceRow(TargetRow);
 
 	if (Consume(ShopCatalog->CurrentPrice))
 	{
@@ -40,64 +43,99 @@ const bool UDataHandle::UpdateCurrentAdvance(const FName& TargetRow, const int32
 	return bIsPossible;
 }
 
-const TArray<FShopCatalogRow*>& UDataHandle::GetCurrentAdvance() const
+const TArray<FShopCatalogRow*>& UDataHandle::GetCurrentAdvance()
 {
-	return CurrentAdvance;
+	CheckValidOfAdvanceData();
+
+	return EdmundDataBuffer.CurrentAdvance;
 }
 
-const FShopCatalogRow* UDataHandle::GetCurrentAdvanceByRowName(const FName& TargetRow) const
+const FShopCatalogRow* UDataHandle::GetCurrentAdvanceByRowName(const FName& TargetRow)
 {
-	return SelectRow(TargetRow);
+	return SelectAdvanceRow(TargetRow);
 }
 
 void UDataHandle::AddMoney(const int32 AddValue)
 {
-	PlayData[0]->PossessMoney += AddValue;
+	if (!CheckValidOfPlayData())
+	{
+		return;
+	}
+
+	EdmundDataBuffer.PlayData[0]->PossessMoney += AddValue;
 }
 
-const int32 UDataHandle::GetMoney() const
+const int32 UDataHandle::GetMoney()
 {
-	return PlayData[0]->PossessMoney;
+	if (!CheckValidOfPlayData())
+	{
+		return 0;
+	}
+
+	return EdmundDataBuffer.PlayData[0]->PossessMoney;
 }
 
 const bool UDataHandle::Consume(const int32 Price)
 {
-	if (PlayData[0]->PossessMoney < Price)
+	if (!CheckValidOfPlayData())
 	{
 		return false;
 	}
 
-	PlayData[0]->PossessMoney -= Price;
+	if (EdmundDataBuffer.PlayData[0]->PossessMoney < Price)
+	{
+		return false;
+	}
+
+	EdmundDataBuffer.PlayData[0]->PossessMoney -= Price;
 	return true;
 }
 
 void UDataHandle::SetPlayerType(const ECharacterType CharacterType)
 {
-	PlayData[0]->CharacterType = CharacterType;
+	if (!CheckValidOfPlayData())
+	{
+		return;
+	}
+
+	EdmundDataBuffer.PlayData[0]->CharacterType = CharacterType;
 }
 
-const ECharacterType UDataHandle::GetPlayerType() const
+const ECharacterType UDataHandle::GetPlayerType()
 {
-	return PlayData[0]->CharacterType;
+	CheckValidOfPlayData();
+	return EdmundDataBuffer.PlayData[0]->CharacterType;
 }
 
-const TArray<FPlayerSkillRow*>& UDataHandle::GetPlayerSkillData() const
+const TArray<FPlayerSkillRow*>& UDataHandle::GetPlayerSkillData()
 {
-	return PlayerSkillData;
+	CheckValidOfSkillData();
+	return EdmundDataBuffer.PlayerSkillData;
 }
 
-const TArray<FCharacterDataRow*>& UDataHandle::GetCharacterData() const
+const TArray<FCharacterDataRow*>& UDataHandle::GetCharacterData()
 {
-	return CharacterData;
+	CheckValidOfCharacterData();
+	return EdmundDataBuffer.CharacterData;
 }
 
-UClass* UDataHandle::GetCharacterClass() const
+UClass* UDataHandle::GetCharacterClass()
 {
+	if (!CheckValidOfPlayData())
+	{
+		return nullptr;
+	}
+
+	if (!CheckValidOfCharacterData())
+	{
+		return nullptr;
+	}
+
 	UClass* CurrentClass = nullptr;
 
-	for (const FCharacterDataRow* CharacterDataRow : CharacterData)
+	for (const FCharacterDataRow* CharacterDataRow : EdmundDataBuffer.CharacterData)
 	{
-		if (CharacterDataRow->CharacterType == PlayData[0]->CharacterType)
+		if (CharacterDataRow->CharacterType == EdmundDataBuffer.PlayData[0]->CharacterType)
 		{
 			CurrentClass = CharacterDataRow->CharacterClass.Get();
 		}
@@ -108,63 +146,71 @@ UClass* UDataHandle::GetCharacterClass() const
 
 const TArray<FMissionDataRow*>& UDataHandle::GetMissionDataBySceneType(const ESceneType SceneType)
 {
-	CurrentMissionData.Empty();
+	CheckValidOfMissionData();
+	EdmundDataBuffer.CurrentMissionData.Empty();
 
-	for (FMissionDataRow* MissionDataRow : MissionData)
+	for (FMissionDataRow* MissionDataRow : EdmundDataBuffer.MissionData)
 	{
 		if (MissionDataRow->InSceneType == SceneType)
 		{
-			CurrentMissionData.Add(MissionDataRow);
+			EdmundDataBuffer.CurrentMissionData.Add(MissionDataRow);
 		}
 	}
 
-	return CurrentMissionData;
+	return EdmundDataBuffer.CurrentMissionData;
 }
 
 const TArray<FSpawnerDataRow*>& UDataHandle::GetSpawnerDataBySceneType(const ESceneType SceneType)
 {
-	CurrentSpawnerData.Empty();
+	CheckValidOfSpawnData();
+	EdmundDataBuffer.CurrentSpawnerData.Empty();
 
-	for (FSpawnerDataRow* SpawnerDataRow : SpawnerData)
+	for (FSpawnerDataRow* SpawnerDataRow : EdmundDataBuffer.SpawnerData)
 	{
 		if (SpawnerDataRow->InSceneType == SceneType)
 		{
-			CurrentSpawnerData.Add(SpawnerDataRow);
+			EdmundDataBuffer.CurrentSpawnerData.Add(SpawnerDataRow);
 		}
 	}
 	
-	return CurrentSpawnerData;
+	return EdmundDataBuffer.CurrentSpawnerData;
 }
 
 const TArray<FStoryDataRow*>& UDataHandle::GetStoryDataBySceneType(const ESceneType SceneType)
 {
-	CurrentStoryData.Empty();
+	CheckValidOfStoryData();
+	EdmundDataBuffer.CurrentStoryData.Empty();
 
-	for (FStoryDataRow* StoryDataRow : StoryData)
+	for (FStoryDataRow* StoryDataRow : EdmundDataBuffer.StoryData)
 	{
 		if (StoryDataRow->SceneType == SceneType)
 		{
-			CurrentStoryData.Add(StoryDataRow);
+			EdmundDataBuffer.CurrentStoryData.Add(StoryDataRow);
 		}
 	}
 
-	return CurrentStoryData;
+	return EdmundDataBuffer.CurrentStoryData;
 }
 
 void UDataHandle::UpdateClearMission(const ESceneType SceneType)
 {
+	if (!CheckValidOfPlayData())
+	{
+		return;
+	}
+
 	switch (SceneType)
 	{
 	case ESceneType::Mission1:
-		PlayData[0]->bClearedMission1 = true;
+		EdmundDataBuffer.PlayData[0]->bClearedMission1 = true;
 		break;
 
 	case ESceneType::Mission2:
-		PlayData[0]->bClearedMission2 = true;
+		EdmundDataBuffer.PlayData[0]->bClearedMission2 = true;
 		break;
 
 	case ESceneType::Mission3:
-		PlayData[0]->bClearedMission3 = true;
+		EdmundDataBuffer.PlayData[0]->bClearedMission3 = true;
 		break;
 
 	default:
@@ -175,28 +221,43 @@ void UDataHandle::UpdateClearMission(const ESceneType SceneType)
 
 void UDataHandle::UpdateShowedIntro(const bool bShowed)
 {
-	PlayData[0]->bShowedIntro = bShowed;
+	if (!CheckValidOfPlayData())
+	{
+		return;
+	}
+
+	EdmundDataBuffer.PlayData[0]->bShowedIntro = bShowed;
 }
 
-const bool UDataHandle::GetIsShowedIntro() const
+const bool UDataHandle::GetIsShowedIntro()
 {
-	return PlayData[0]->bShowedIntro;
+	if (!CheckValidOfPlayData())
+	{
+		return false;
+	}
+
+	return EdmundDataBuffer.PlayData[0]->bShowedIntro;
 }
 
-const bool UDataHandle::GetIsClearedMission(const int32 Index) const
+const bool UDataHandle::GetIsClearedMission(const int32 Index)
 {
+	if (!CheckValidOfPlayData())
+	{
+		return false;
+	}
+
 	switch (Index)
 	{
 	case 0:
-		return PlayData[0]->bClearedMission1;
+		return EdmundDataBuffer.PlayData[0]->bClearedMission1;
 		break;
 
 	case 1:
-		return PlayData[0]->bClearedMission2;
+		return EdmundDataBuffer.PlayData[0]->bClearedMission2;
 		break;
 
 	case 2:
-		return PlayData[0]->bClearedMission3;
+		return EdmundDataBuffer.PlayData[0]->bClearedMission3;
 		break;
 
 	default:
@@ -207,32 +268,16 @@ const bool UDataHandle::GetIsClearedMission(const int32 Index) const
 	return false;
 }
 
-void UDataHandle::LoadDataTables(const UDataHandleSettings* DataSettings)
+FShopCatalogRow* UDataHandle::SelectAdvanceRow(const FName& TargetRow)
 {
-	ShopCatalogDataTable = DataSettings->ShopCatalogDataTable.LoadSynchronous();
-	PlayDataTable = DataSettings->PlayDataTable.LoadSynchronous();
-	PlayerSkillDataTable = DataSettings->PlayerSkillDataTable.LoadSynchronous();
-	CharacterDataTable = DataSettings->CharacterDataTable.LoadSynchronous();
-	MissionDataTable = DataSettings->MissionDataTable.LoadSynchronous();
-	SpawnerDataTable = DataSettings->SpawnerDataTable.LoadSynchronous();
-	StoryDataTable = DataSettings->StoryDataTable.LoadSynchronous();
+	if (!CheckValidOfAdvanceData())
+	{
+		return nullptr;
+	}
 
-	const FString DataContext(TEXT("Data ConText"));
-
-	ShopCatalogDataTable->GetAllRows(DataContext, CurrentAdvance);
-	PlayDataTable->GetAllRows(DataContext, PlayData);
-	PlayerSkillDataTable->GetAllRows(DataContext, PlayerSkillData);
-	CharacterDataTable->GetAllRows(DataContext, CharacterData);
-	MissionDataTable->GetAllRows(DataContext, MissionData);
-	SpawnerDataTable->GetAllRows(DataContext, SpawnerData);
-	StoryDataTable->GetAllRows(DataContext, StoryData);
-}
-
-FShopCatalogRow* UDataHandle::SelectRow(const FName& TargetRow) const
-{
 	FShopCatalogRow* Result = nullptr;
 
-	for (FShopCatalogRow* ShopCatalog : CurrentAdvance)
+	for (FShopCatalogRow* ShopCatalog : EdmundDataBuffer.CurrentAdvance)
 	{
 		if (ShopCatalog->AdvanceName == TargetRow)
 		{
@@ -240,4 +285,165 @@ FShopCatalogRow* UDataHandle::SelectRow(const FName& TargetRow) const
 		}
 	}
 	return Result;
+}
+
+bool UDataHandle::CheckValidOfAdvanceData()
+{
+	if (EdmundDataBuffer.CurrentAdvance.IsEmpty())
+	{
+		if (!IsValid(DataSettings))
+		{
+			return false;
+		}
+
+		if (DataSettings->ShopCatalogDataTable.IsNull())
+		{
+			return false;
+		}
+
+		const FString DataContext(TEXT("Advance Data ConText"));
+
+		ShopCatalogDataTable = DataSettings->ShopCatalogDataTable.LoadSynchronous();
+		ShopCatalogDataTable->GetAllRows(DataContext, EdmundDataBuffer.CurrentAdvance);
+	}
+
+	return true;
+}
+
+bool UDataHandle::CheckValidOfPlayData()
+{
+	if (EdmundDataBuffer.PlayData.IsEmpty())
+	{
+		if (!IsValid(DataSettings))
+		{
+			return false;
+		}
+
+		if (DataSettings->PlayDataTable.IsNull())
+		{
+			return false;
+		}
+
+		const FString DataContext(TEXT("Play Data ConText"));
+
+		PlayDataTable = DataSettings->PlayDataTable.LoadSynchronous();
+		PlayDataTable->GetAllRows(DataContext, EdmundDataBuffer.PlayData);
+	}
+
+	return true;
+}
+
+bool UDataHandle::CheckValidOfSkillData()
+{
+	if (EdmundDataBuffer.PlayerSkillData.IsEmpty())
+	{
+		if (!IsValid(DataSettings))
+		{
+			return false;
+		}
+
+		if (DataSettings->PlayerSkillDataTable.IsNull())
+		{
+			return false;
+		}
+
+		const FString DataContext(TEXT("Skill Data ConText"));
+
+		PlayerSkillDataTable = DataSettings->PlayerSkillDataTable.LoadSynchronous();
+		PlayerSkillDataTable->GetAllRows(DataContext, EdmundDataBuffer.PlayerSkillData);
+	}
+
+	return true;
+}
+
+bool UDataHandle::CheckValidOfCharacterData()
+{
+	if (EdmundDataBuffer.CharacterData.IsEmpty())
+	{
+		if (!IsValid(DataSettings))
+		{
+			return false;
+		}
+
+		if (DataSettings->CharacterDataTable.IsNull())
+		{
+			return false;
+		}
+
+		const FString DataContext(TEXT("Character Data ConText"));
+
+		CharacterDataTable = DataSettings->CharacterDataTable.LoadSynchronous();
+		CharacterDataTable->GetAllRows(DataContext, EdmundDataBuffer.CharacterData);
+	}
+
+	return true;
+}
+
+bool UDataHandle::CheckValidOfMissionData()
+{
+	if (EdmundDataBuffer.MissionData.IsEmpty())
+	{
+		if (!IsValid(DataSettings))
+		{
+			return false;
+		}
+
+		if (DataSettings->MissionDataTable.IsNull())
+		{
+			return false;
+		}
+
+		const FString DataContext(TEXT("Mission Data ConText"));
+
+		MissionDataTable = DataSettings->MissionDataTable.LoadSynchronous();
+		MissionDataTable->GetAllRows(DataContext, EdmundDataBuffer.MissionData);
+	}
+
+	return true;
+}
+
+bool UDataHandle::CheckValidOfSpawnData()
+{
+	if (EdmundDataBuffer.SpawnerData.IsEmpty())
+	{
+		if (!IsValid(DataSettings))
+		{
+			return false;
+		}
+
+		if (DataSettings->SpawnerDataTable.IsNull())
+		{
+			return false;
+		}
+
+		const FString DataContext(TEXT("Spawn Data ConText"));
+
+		SpawnerDataTable = DataSettings->SpawnerDataTable.LoadSynchronous();
+		SpawnerDataTable->GetAllRows(DataContext, EdmundDataBuffer.SpawnerData);
+	}
+
+	return true;
+}
+
+bool UDataHandle::CheckValidOfStoryData()
+{
+	if (EdmundDataBuffer.StoryData.IsEmpty())
+	{
+		if (!IsValid(DataSettings))
+		{
+			return false;
+		}
+
+		if (DataSettings->StoryDataTable.IsNull())
+		{
+			return false;
+		}
+
+		const FString DataContext(TEXT("Story Data ConText"));
+
+		StoryDataTable = DataSettings->StoryDataTable.LoadSynchronous();
+		StoryDataTable->GetAllRows(DataContext, EdmundDataBuffer.StoryData);
+	}
+
+	return true;
 }
