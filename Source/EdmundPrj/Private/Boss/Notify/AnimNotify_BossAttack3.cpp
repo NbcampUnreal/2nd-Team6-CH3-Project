@@ -24,20 +24,17 @@ void UAnimNotify_BossAttack3::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 
     if (NotifyName == FName("BossAttack3_1"))
     {
-        BossRef->SetComboPhase(1);  // 1타 콤보
-        UE_LOG(LogTemp, Log, TEXT("BossAttack3_1"), BossRef->GetComboPhase());
+        BossRef->SetComboPhase(1);
         BossRef->CurrentAttackTask->OnAttack1Notify();
     }
     else if (NotifyName == FName("BossAttack3_2"))
     {
-        BossRef->SetComboPhase(2);  // 2타 콤보
-        UE_LOG(LogTemp, Log, TEXT("BossAttack3_2"), BossRef->GetComboPhase());
+        BossRef->SetComboPhase(2);
         BossRef->CurrentAttackTask->OnAttack2Notify();
     }
     else if (NotifyName == FName("BossAttack3_3"))
     {
-        BossRef->SetComboPhase(3);  // 콤보 종료
-        UE_LOG(LogTemp, Log, TEXT("BossAttack3_3"), BossRef->GetComboPhase());
+        BossRef->SetComboPhase(3);
         BossRef->CurrentAttackTask->FinishComboAttack();
     }
 }

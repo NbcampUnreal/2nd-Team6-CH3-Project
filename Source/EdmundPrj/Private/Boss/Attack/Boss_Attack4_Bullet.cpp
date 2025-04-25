@@ -53,10 +53,10 @@ ABoss_Attack4_Bullet::ABoss_Attack4_Bullet()
     }
 
     bIsActive = false;
-    BulletSpeed = 2000.f;
+    BulletSpeed = 700.f;
     MaxDistance = 5000.f;
     ExplosionDelay = 1.0f;
-    HomingDuration = 5.0f;
+    HomingDuration = 8.0f;
     HomingTarget = nullptr;
     bIsHoming = false;
     HomingStartTime = 0.0f;
@@ -78,16 +78,10 @@ void ABoss_Attack4_Bullet::Tick(float DeltaTime)
 
     if (bIsActive)
     {
-
-        if (!ProjectileMovement->bIsHomingProjectile)
+        if (bIsHoming && (GetWorld()->GetTimeSeconds() - HomingStartTime) >= HomingDuration)
         {
-            FVector NewLocation = GetActorLocation() + GetActorForwardVector() * BulletSpeed * DeltaTime;
-            SetActorLocation(NewLocation, true);
-            TraveledDistance += BulletSpeed * DeltaTime;
-            if (TraveledDistance >= MaxDistance)
-            {
-                Explode();
-            }
+            Explode();
+            return;
         }
     }
 }

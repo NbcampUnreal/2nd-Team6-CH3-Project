@@ -58,8 +58,8 @@ public:
 	
 	void FireSingleBullet();
 
+	void OnDashFinished();
 
-	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	int32 GetComboPhase() { return ComboPhase; }
 	
 	UPROPERTY()

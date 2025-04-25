@@ -21,14 +21,12 @@ void ABossAIController::OnPossess(APawn* InPawn)
 
     if (!InPawn)
     {
-        UE_LOG(LogTemp, Error, TEXT("BossAIController::OnPossess - InPawn is NULL!"));
         return;
     }
 
     BossCharacter = Cast<ABoss>(InPawn);
     if (!BossCharacter)
     {
-        UE_LOG(LogTemp, Error, TEXT("BossAIController::OnPossess - BossCharacter Cast Failed! InPawn Name: %s"), *InPawn->GetName());
         return;
     }
 }
@@ -148,11 +146,6 @@ bool ABossAIController::CheckHpPattern()
 
 void ABossAIController::CheckLockedSkill(float CurrentTime)
 {
-    //bAttack1Ready = (CurrentTime >= BossCharacter->Attack1_CooldownEnd);
-    //bAttack2Ready = (CurrentTime >= BossCharacter->Attack2_CooldownEnd);
-    //bAttack3Ready = (CurrentTime >= BossCharacter->Attack3_CooldownEnd);
-    //bAttack4Ready = (CurrentTime >= BossCharacter->Attack4_CooldownEnd);
-
     switch (MissionHandle->GetLockedSkill())
     {
     case EBossState::Attack1:
@@ -184,11 +177,6 @@ void ABossAIController::EnableHalfPattern()
     BossCharacter->SetSkill2Invulnerable(true);
     BossCharacter->SetbIsInvulnerable(true);
 
-    //if (BossCharacter->Skill2ShieldNiagara)
-    //{
-    //    BossCharacter->Skill2ShieldNiagara->Activate(true);
-    //}
-
     MissionHandle->RequestSpawnToSpawnerHandle();
 }
 
@@ -216,7 +204,7 @@ float ABossAIController::ComputeAttack1Weight()
 
     float Distance = FVector::Dist(BossCharacter->GetActorLocation(), Player->GetActorLocation());
     float Weight = 0.0f;
-    if (Distance >= 800.f && Distance <= 1500.f)
+    if (Distance >= 800.f)
     {
         Weight = 1.0f;
     }
@@ -224,10 +212,6 @@ float ABossAIController::ComputeAttack1Weight()
     {
         Weight = FMath::Clamp(1.0f - FMath::Abs(Distance - 1150.f) / 1150.f, 0.0f, 1.0f);
     }
-    //if (BossCharacter->Attack1_CooldownEnd > GetWorld()->GetTimeSeconds())
-    //{
-    //    Weight = 0.0f;
-    //}
     Weight *= FMath::RandRange(0.8f, 1.2f);
     return Weight;
 }
@@ -260,13 +244,13 @@ float ABossAIController::ComputeAttack3Weight()
     if (!Player || !BossCharacter) return 0.0f;
     float Distance = FVector::Dist(BossCharacter->GetActorLocation(), Player->GetActorLocation());
     float Weight = 0.0f;
-    if (Distance < 800.f)
+    if (Distance < 1200.f)
     {
         Weight = 1.0f;
     }
     else
     {
-        Weight = FMath::Clamp(1.0f - (Distance - 800.f) / 800.f, 0.0f, 1.0f);
+        Weight = FMath::Clamp(1.0f - (Distance - 1500.f) / 1500.f, 0.0f, 1.0f);
     }
     if (!BossCharacter->GetbAttack3Ready())
     {
