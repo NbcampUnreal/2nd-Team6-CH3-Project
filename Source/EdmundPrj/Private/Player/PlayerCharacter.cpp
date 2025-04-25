@@ -96,7 +96,7 @@ void APlayerCharacter::Look(const FInputActionValue& value)
 
 	FVector2D LookInput = value.Get<FVector2D>();
 
-	// ÁÜ»óÅÂ¿¡¼­ ¸¶¿ì½º °¨µµ ³·Ãß±â
+	// ï¿½Ü»ï¿½ï¿½Â¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ì½º ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ß±ï¿½
 	if (IsZoom)
 	{
 		LookInput *= ZoomMouseMoveMultipler;
@@ -166,7 +166,7 @@ void APlayerCharacter::MeleeAttack(const FInputActionValue& value)
 
 	CurrentGameState->PlayPlayerSound(CurrentAudioComp, ESoundType::MeleeAttack);
 
-	// ±ÙÁ¢ °ø°Ý µô·¹ÀÌ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 	GetWorld()->GetTimerManager().SetTimer(
 		MeleeAttackDelayHandle,
 		this,
@@ -189,24 +189,24 @@ void APlayerCharacter::AttackTrace()
 	FRotator ControlRotation = PlayerController->GetControlRotation();
 	FVector ForwardVector = ControlRotation.Vector();
 
-	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // °ø°Ý ½ÃÀÛ À§Ä¡
-	FVector End = Start + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // °ø°Ý ³¡ À§Ä¡
+	FVector Start = GetActorLocation() + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+	FVector End = Start + (ForwardVector * (MeleeAttackRadius + MeleeAttackForwardOffset)); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ä¡
 
-	// °ø°Ý ¹üÀ§ ³»¿¡¼­ Ãæµ¹ Ã¼Å©
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹ Ã¼Å©
 	float Radius = MeleeAttackRadius;
 	TArray<FHitResult> HitResults;
 
-	// Æ®·¹ÀÌ½º ¼öÇà
+	// Æ®ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // ÀÚ½ÅÀº ¹«½ÃÇÏµµ·Ï ¼³Á¤
+	QueryParams.AddIgnoredActor(this); // ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	bool bHit = GetWorld()->SweepMultiByChannel(
 		HitResults,
-		Start,               // ½ÃÀÛ À§Ä¡
-		End,                 // ³¡ À§Ä¡
-		FQuat::Identity,     // È¸Àü°ª (È¸Àü ¾øÀÌ)
-		ECollisionChannel::ECC_OverlapAll_Deprecated, // Ãæµ¹ Ã¤³Î
-		FCollisionShape::MakeSphere(Radius), // ¹üÀ§ ¼³Á¤ (±¸Ã¼ ¸ð¾ç)
+		Start,               // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+		End,                 // ï¿½ï¿½ ï¿½ï¿½Ä¡
+		FQuat::Identity,     // È¸ï¿½ï¿½ï¿½ï¿½ (È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+		ECollisionChannel::ECC_OverlapAll_Deprecated, // ï¿½æµ¹ Ã¤ï¿½ï¿½
+		FCollisionShape::MakeSphere(Radius), // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½)
 		QueryParams
 	);
 
@@ -215,10 +215,10 @@ void APlayerCharacter::AttackTrace()
 		return;
 	}
 
-	// ¿©·¯ Ãæµ¹ °´Ã¼°¡ ÀÖ´Ù¸é
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½
 	for (const FHitResult& Hit : HitResults)
 	{
-		// Ãæµ¹ÇÑ °´Ã¼°¡ ÀÖ´Ù¸é
+		// ï¿½æµ¹ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½
 		AActor* HitActor = Hit.GetActor();
 
 		if (!IsValid(HitActor) || HitActor->ActorHasTag("Boss"))
@@ -226,7 +226,7 @@ void APlayerCharacter::AttackTrace()
 			continue;
 		}
 
-		// ¹Ì¼Ç ¾ÆÀÌÅÛ µ¥¹ÌÁö ÁÖ±â
+		// ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö±ï¿½
 		if (HitActor->ActorHasTag("MissionItem"))
 		{
 			UGameplayStatics::ApplyDamage(
@@ -238,7 +238,7 @@ void APlayerCharacter::AttackTrace()
 			);
 		}
 
-		// ¸ó½ºÅÍ´Â ¹ÐÄ¡±â
+		// ï¿½ï¿½ï¿½Í´ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½
 		else if (HitActor->ActorHasTag("Monster"))
 		{
 			UPrimitiveComponent* HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
@@ -347,7 +347,7 @@ bool APlayerCharacter::CheckAction()
 
 void APlayerCharacter::ActiveDieAction()
 {
-	// ¸¸¾à ÁÜ»óÅÂ¶ó¸é
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Ü»ï¿½ï¿½Â¶ï¿½ï¿½
 	SpringArmComp->TargetArmLength = ZoomOutLength;
 
 	if (IsValid(DieActionMontage))

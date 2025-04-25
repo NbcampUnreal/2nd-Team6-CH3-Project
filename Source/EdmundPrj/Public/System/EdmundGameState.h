@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
 #include "System/EnumSet.h"
+#include "System/Struct/SoundSourceData.h"
 #include "EdmundGameState.generated.h"
 
 class UEdmundGameInstance;
@@ -109,6 +110,18 @@ public:
 	float SlowTime = 0.2f;
 
 private:
+	UPROPERTY()
+	TMap<ESoundType, USoundBase*> PlayerSoundSet;
+
+	UPROPERTY()
+	TMap<EMonsterType, FSoundSourceData> MonsterSoundSet;
+
+	UPROPERTY()
+	TMap<ENpcType, FSoundSourceData> NpcSoundSet;
+
+	UPROPERTY()
+	TMap<EItemType, FSoundSourceData> ItemSoundSet;
+
 	TObjectPtr<UEdmundGameInstance> EdmundGameInstance = nullptr;
 	TObjectPtr<USoundHandle> SoundHandle = nullptr;
 	TObjectPtr<AEdmundGameMode> EdmundGameMode = nullptr;
@@ -123,11 +136,6 @@ private:
 	TArray<FPlayerSkillRow*> SkillDataSet;
 	TArray<FPlayerSkillRow*> RandomSkillSet;
 	TMap<FPlayerSkillRow*, int32> CurrentSkillMap;
-
-	TMap<ESoundType, USoundBase*> PlayerSoundSet;
-	TMap<EMonsterType, TMap<ESoundType, USoundBase*>> MonsterSoundSet;
-	TMap<ENpcType, TMap<ESoundType, USoundBase*>> NpcSoundSet;
-	TMap<EItemType, TMap<ESoundType, USoundBase*>> ItemSoundSet;
 
 	FTimerHandle TimerHandle;
 
