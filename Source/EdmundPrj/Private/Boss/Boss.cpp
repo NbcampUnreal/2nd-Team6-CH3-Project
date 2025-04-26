@@ -403,6 +403,22 @@ void ABoss::MonsterDead()
 
     SetIsDead(true);
 
+    for (ABoss_Attack1_Bullet* Bullet : ABoss_Attack1_Bullet::BulletPool)
+    {
+        if (Bullet && Bullet->bIsActive)
+        {
+            Bullet->ResetBullet();
+        }
+    }
+
+    for (ABoss_Attack4_Bullet* Bullet4 : ABoss_Attack4_Bullet::Bullet4Pool)
+    {
+        if (Bullet4 && Bullet4->bIsActive)
+        {
+            Bullet4->ResetBullet();
+        }
+    }
+
     if (GetWorld())
     {
         GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
@@ -430,19 +446,43 @@ void ABoss::MonsterDead()
         MeshComp->bBlendPhysics = true;
     }
 
-    MissionHandle->CompleteMission();
+    if (MissionHandle)
+    {
+        TWeakObjectPtr<AMissionHandle> WeakHandle = MissionHandle;
+        FTimerDelegate CompleteDel;
+        CompleteDel.BindLambda([WeakHandle]()
+            {
+                if (WeakHandle.IsValid())
+                {
+                    WeakHandle->CompleteMission();
+                }
+            });
+        GetWorld()->GetTimerManager().SetTimer(CompleteMissionTimerHandle, CompleteDel, 10.0f, false);
+    }
 }
 
 float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-    float DamageDealt = 0.f;
-    if (!bIsInvulnerable)
+    if (bIsInvulnerable)
     {
-        DamageDealt = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-        MonsterHP -= DamageDealt;
-        HpbarUpdate();
+        return 0.f;
     }
-    return DamageDealt;
+    float RawDamage = AActor::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    float ActualDamage = RawDamage * (1.0f - MonsterArmor / 100.0f);
+
+    MonsterHP = FMath::Clamp(MonsterHP - ActualDamage, 0.0f, MonsterMaxHP);
+    HpbarUpdate();
+
+    if (MonsterHP <= 0.0f)
+    {
+        MonsterDead();
+    }
+    else
+    {
+        MonsterHit();
+    }
+
+    return ActualDamage;
 }
 
 void ABoss::NotifyActorBeginOverlap(AActor* OtherActor)
