@@ -13,7 +13,7 @@
 UBTTask_BossAttack3::UBTTask_BossAttack3()
 {
     NodeName = TEXT("Boss Attack3");
-    bNotifyTick = false; 
+    bNotifyTick = true; 
     BossRef = nullptr;
     CachedOwnerComp = nullptr;
     ComboPhase = 0;
@@ -62,6 +62,24 @@ EBTNodeResult::Type UBTTask_BossAttack3::ExecuteTask(UBehaviorTreeComponent& Own
     PlayAttack3Montage();
     ExecuteMeleeAttack();
     return EBTNodeResult::InProgress;
+}
+
+void UBTTask_BossAttack3::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+    Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
+    if (!BossRef) return;
+    int32 Phase = BossRef->GetComboPhase();
+    if (Phase == 1 || Phase == 2)
+    {
+        FVector Dir = (Cast<ABossAIController>(BossRef->GetController())->GetPlayerLocation()
+            - BossRef->GetActorLocation()).GetSafeNormal();
+        FRotator Curr = BossRef->GetActorRotation();
+        FRotator Target = Dir.Rotation();
+        float InterpSpeed = 360.0f;
+        FRotator NewRot = FMath::RInterpTo(Curr, Target, DeltaSeconds, InterpSpeed);
+        BossRef->SetActorRotation(NewRot);
+    }
 }
 
 void UBTTask_BossAttack3::OnAttack1Notify()
@@ -191,7 +209,6 @@ void UBTTask_BossAttack3::ExecuteMeleeAttack()
     {
         Dir = (AICon->GetPlayerLocation() - BossRef->GetActorLocation()).GetSafeNormal();
     }
-    BossRef->SetActorRotation(Dir.Rotation());
 
     if (auto Anim = BossRef->GetMesh()->GetAnimInstance())
     {
