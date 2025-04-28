@@ -195,6 +195,8 @@ private:
     FTimerHandle Attack4CooldownHandle;
     bool bAttack4Ready = true;
 
+    FTimerHandle CompleteMissionTimerHandle;
+
 public:
     // ***********************Stat*************************
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
